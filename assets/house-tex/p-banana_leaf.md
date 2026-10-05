@@ -1,0 +1,3 @@
+Use your image generation tool to create ONE image and save it in the current directory as banana_leaf.png (if the tool saves elsewhere, copy it here under that name and print its path).
+
+A single fresh banana leaf photographed flat from directly above, filling the frame lengthwise from top to bottom: the long midrib running exactly vertically down the centre, fine parallel veins, a few natural lengthwise tears at the edges. Vivid but natural green, slightly glossy, soft even daylight. Background: pure flat white (#FFFFFF) everywhere outside the leaf, with no shadow. Portrait 1024x1536. Photorealistic botanical reference.

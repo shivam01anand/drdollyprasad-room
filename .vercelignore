@@ -8,3 +8,4 @@ run-variants.sh
 .env*
 .vercel
 scripts/bake/work
+assets/polyhaven

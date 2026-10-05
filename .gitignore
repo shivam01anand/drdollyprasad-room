@@ -8,3 +8,5 @@ node_modules
 review/
 tsconfig.tsbuildinfo
 scripts/bake/work/
+assets/polyhaven/
+scripts/house/work/
