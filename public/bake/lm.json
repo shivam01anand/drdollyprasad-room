@@ -1,0 +1,175 @@
+{
+ "res": 4096,
+ "samples": 160,
+ "meshes": {
+  "Merged_floor_nocast": {
+   "offset": 0,
+   "count": 6,
+   "runtime": "Merged_floor_nocast",
+   "index": 0
+  },
+  "Merged_floor_lm0.06_nocast": {
+   "offset": 12,
+   "count": 18,
+   "runtime": "Merged_floor_lm0.06_nocast",
+   "index": 0
+  },
+  "Merged_courtFloor_lm0.2_nocast": {
+   "offset": 48,
+   "count": 6,
+   "runtime": "Merged_courtFloor_lm0.2_nocast",
+   "index": 0
+  },
+  "Merged_wall": {
+   "offset": 60,
+   "count": 396,
+   "runtime": "Merged_wall",
+   "index": 0
+  },
+  "Merged_wallShade": {
+   "offset": 852,
+   "count": 36,
+   "runtime": "Merged_wallShade",
+   "index": 0
+  },
+  "Merged_stone": {
+   "offset": 924,
+   "count": 5400,
+   "runtime": "Merged_stone",
+   "index": 0
+  },
+  "Merged_field": {
+   "offset": 11724,
+   "count": 900,
+   "runtime": "Merged_field",
+   "index": 0
+  },
+  "Merged_ram": {
+   "offset": 13524,
+   "count": 1800,
+   "runtime": "Merged_ram",
+   "index": 0
+  },
+  "Merged_sandstone": {
+   "offset": 17124,
+   "count": 1800,
+   "runtime": "Merged_sandstone",
+   "index": 0
+  },
+  "Merged_iron": {
+   "offset": 20724,
+   "count": 20250,
+   "runtime": "Merged_iron",
+   "index": 0
+  },
+  "Merged_timber": {
+   "offset": 61224,
+   "count": 11340,
+   "runtime": "Merged_timber",
+   "index": 0
+  },
+  "Merged_door": {
+   "offset": 83904,
+   "count": 900,
+   "runtime": "Merged_door",
+   "index": 0
+  },
+  "Merged_brass": {
+   "offset": 85704,
+   "count": 1764,
+   "runtime": "Merged_brass",
+   "index": 0
+  },
+  "Merged_ironDark": {
+   "offset": 89232,
+   "count": 144,
+   "runtime": "Merged_ironDark",
+   "index": 0
+  },
+  "Merged_court_lm0.2": {
+   "offset": 89520,
+   "count": 1872,
+   "runtime": "Merged_court_lm0.2",
+   "index": 0
+  },
+  "Merged_timber_ceil": {
+   "offset": 93264,
+   "count": 6306,
+   "runtime": "Merged_timber_ceil",
+   "index": 0
+  },
+  "Art_rickshaw-puller-and-coin": {
+   "offset": 105876,
+   "count": 6,
+   "runtime": "Art_rickshaw-puller-and-coin",
+   "index": 0
+  },
+  "Art_weathered-door-ring": {
+   "offset": 105888,
+   "count": 6,
+   "runtime": "Art_weathered-door-ring",
+   "index": 0
+  },
+  "Art_red-and-teal-door-lock": {
+   "offset": 105900,
+   "count": 6,
+   "runtime": "Art_red-and-teal-door-lock",
+   "index": 0
+  },
+  "Art_teal-door-bolt": {
+   "offset": 105912,
+   "count": 6,
+   "runtime": "Art_teal-door-bolt",
+   "index": 0
+  },
+  "Art_carved-door-knocker": {
+   "offset": 105924,
+   "count": 6,
+   "runtime": "Art_carved-door-knocker",
+   "index": 0
+  },
+  "Art_mother-india-and-kettles": {
+   "offset": 105936,
+   "count": 6,
+   "runtime": "Art_mother-india-and-kettles",
+   "index": 0
+  },
+  "Art_bullock-cart-and-truck": {
+   "offset": 105948,
+   "count": 6,
+   "runtime": "Art_bullock-cart-and-truck",
+   "index": 0
+  },
+  "Art_boy-with-bananas": {
+   "offset": 105960,
+   "count": 6,
+   "runtime": "Art_boy-with-bananas",
+   "index": 0
+  },
+  "Art_child-among-flowers": {
+   "offset": 105972,
+   "count": 6,
+   "runtime": "Art_child-among-flowers",
+   "index": 0
+  },
+  "Art_terracotta-pots": {
+   "offset": 105984,
+   "count": 6,
+   "runtime": "Art_terracotta-pots",
+   "index": 0
+  },
+  "Merged_frame": {
+   "offset": 105996,
+   "count": 2880,
+   "runtime": "Merged_frame",
+   "index": 0
+  },
+  "Merged_canvasBack": {
+   "offset": 111756,
+   "count": 36,
+   "runtime": "Merged_canvasBack",
+   "index": 0
+  }
+ },
+ "max": 2.3657140159606933
+}

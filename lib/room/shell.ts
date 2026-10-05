@@ -37,10 +37,20 @@ export type UVMode =
   | { kind: "metric"; su: number; sv: number }
   | { kind: "keep" };
 
-export type Tag = { role: Role; uv: UVMode; cast: boolean; receive: boolean };
+/** `lm`: lightmap density relative to the room (1); far ground and the
+ *  courtyard take less of the bake's resolution */
+export type Tag = { role: Role; uv: UVMode; cast: boolean; receive: boolean; lm?: number };
 
-export function tag(m: THREE.Mesh, role: Role, uv: UVMode = { kind: "world" }, cast = true, receive = true) {
-  m.userData.tag = { role, uv, cast, receive } satisfies Tag;
+export function tag(m: THREE.Mesh, role: Role, uv: UVMode = { kind: "world" }, cast = true, receive = true, lm?: number) {
+  m.userData.tag = { role, uv, cast, receive, lm } satisfies Tag;
+  return m;
+}
+
+/** a flat rectangle of ground, x0…x1 by z0…z1 at height y */
+function groundRect(x0: number, x1: number, z0: number, z1: number, y = 0) {
+  const m = new THREE.Mesh(new THREE.PlaneGeometry(x1 - x0, z1 - z0));
+  m.rotation.x = -Math.PI / 2;
+  m.position.set((x0 + x1) / 2, y, (z0 + z1) / 2);
   return m;
 }
 
@@ -117,18 +127,23 @@ export function buildShell() {
   /* --- ground ------------------------------------------------------------ */
   // kota-stone floor, oversized so it never ends in frame — out through the
   // open side and under the right wall
-  const floor = new THREE.Mesh(new THREE.PlaneGeometry(36, 44));
-  floor.rotation.x = -Math.PI / 2;
-  floor.position.set(-HX - t + 18, 0, 0);
+  // The room's own floor is one piece; the ground running out of frame is
+  // three more, so the light bake spends its resolution where you look.
+  const fx0 = -HX - t, fx1 = fx0 + 36, fz0 = -22, fz1 = 22;
+  const ix1 = HX + t, iz0 = -HZ - t, iz1 = HZ + 1.6;
+  const floor = groundRect(fx0, ix1, iz0, iz1);
   floor.name = "Floor";
   root.add(tag(floor, "floor", { kind: "world" }, false, true));
+  for (const [x0, x1, z0, z1] of [[fx0, fx1, fz0, iz0], [fx0, fx1, iz1, fz1], [ix1, fx1, iz0, iz1]]) {
+    const g = groundRect(x0, x1, z0, z1);
+    g.name = "FloorFar";
+    root.add(tag(g, "floor", { kind: "world" }, false, true, 0.06));
+  }
 
   // the courtyard beyond the door: terracotta tiles in the sun
-  const court = new THREE.Mesh(new THREE.PlaneGeometry(16, 44));
-  court.rotation.x = -Math.PI / 2;
-  court.position.set(-HX - t - 8, 0.0005, 0);
+  const court = groundRect(-HX - t - 16, -HX - t, -22, 22, 0.0005);
   court.name = "CourtFloor";
-  root.add(tag(court, "courtFloor", { kind: "world" }, false, true));
+  root.add(tag(court, "courtFloor", { kind: "world" }, false, true, 0.2));
 
   /* --- walls --------------------------------------------------------------- */
   const n = ROOM.niche;

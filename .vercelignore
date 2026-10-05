@@ -7,3 +7,4 @@ tsconfig.tsbuildinfo
 run-variants.sh
 .env*
 .vercel
+scripts/bake/work

@@ -10,9 +10,10 @@ import type * as CANNON from "cannon-es";
 
 import { buildShell, buildCanopy, ROOM, type Anchors, type Tag } from "./shell";
 import { buildSitters, type Spawn } from "./objects";
-import { buildLibrary, textureList, worldUV, metricUV, ramTexture, type Library, type Role } from "./materials";
+import { buildLibrary, textureList, worldUV, metricUV, ramTexture, SPECS, type Library, type Role } from "./materials";
 import { HANG, HERO, faceOffset, type Hung } from "./hang";
 import { Rig } from "./rig";
+import { Baked, loadBake } from "./bake";
 import { activeVariant, NIGHT } from "./variants";
 import { START, MESS, resolvePoses, isNarrow } from "../chapters";
 
@@ -100,6 +101,9 @@ export class Room {
   private scene = new THREE.Scene();
   private composer?: EffectComposer;
   private ao?: RoomAO;
+  /** the baked light, when its files are there (scripts/bake) */
+  private baked?: Baked;
+  private bakeTw?: gsap.core.Tween;
   private canvas!: HTMLCanvasElement;
   private opts!: RoomOpts;
   private variant = activeVariant();
@@ -205,6 +209,8 @@ export class Room {
     const artP = Promise.all(ids.map((id) =>
       this.loadTexture(`/art/room/${id}.jpg`).then((tex) => { tick(); return [id, tex] as const; })));
 
+    // the baked light loads alongside; without it the room is lit live
+    const bakeP = loadBake(this.tier.small, this.abort.signal, (u) => this.loadTexture(u)).catch(() => null);
     const [manifest, texPairs, artPairs] = await Promise.all([manifestP, texP, artP]);
     if (this.disposed) {
       texPairs.forEach(([, t]) => t.dispose());
@@ -248,6 +254,17 @@ export class Room {
     this.buildItems();
     this.buildPost();
     this.resize();
+    const bake = await bakeP;
+    if (this.disposed) { bake?.tex.dispose(); return; }
+    if (bake) {
+      this.baked = new Baked(bake);
+      this.owned.push(this.baked);
+      const n = this.baked.apply(this.scene);
+      if (!n) { this.baked.uniform.value = 0; }
+      // development: ?bake=0 shows the live light for comparison
+      if (process.env.NODE_ENV !== "production" && new URLSearchParams(location.search).get("bake") === "0") this.baked.uniform.value = 0;
+      this.syncBakeAO();
+    }
     this.captureEnvironment();
     if (V.startDark) this.setMode("dark", true);
 
@@ -311,7 +328,7 @@ export class Room {
   private mergeStatic(root: THREE.Object3D, ceiling: THREE.Object3D | null) {
     const lib = this.lib!;
     root.updateMatrixWorld(true);
-    type Bucket = { role: Role; cast: boolean; receive: boolean; ceil: boolean; geos: THREE.BufferGeometry[] };
+    type Bucket = { role: Role; cast: boolean; receive: boolean; ceil: boolean; lm: number; geos: THREE.BufferGeometry[] };
     const buckets = new Map<string, Bucket>();
     const isCeil = (o: THREE.Object3D) => {
       for (let p: THREE.Object3D | null = o; p; p = p.parent) if (p === ceiling) return true;
@@ -329,9 +346,11 @@ export class Room {
         if (!["position", "normal", "uv", "uv1"].includes(name)) g.deleteAttribute(name);
       g.clearGroups();
       const ceil = !!ceiling && isCeil(m);
-      const key = `${t.role}|${t.cast}|${t.receive}|${ceil}`;
+      // the courtyard is seen only through the door: a fifth of the density
+      const lm = t.lm ?? (t.role === "court" ? 0.2 : 1);
+      const key = `${t.role}|${t.cast}|${t.receive}|${ceil}|${lm}`;
       let b = buckets.get(key);
-      if (!b) buckets.set(key, (b = { role: t.role, cast: t.cast, receive: t.receive, ceil, geos: [] }));
+      if (!b) buckets.set(key, (b = { role: t.role, cast: t.cast, receive: t.receive, ceil, lm, geos: [] }));
       b.geos.push(g);
     });
     root.traverse((o) => { const m = o as THREE.Mesh; if (m.isMesh) m.geometry.dispose(); });
@@ -342,7 +361,9 @@ export class Room {
       geo.computeBoundingSphere();
       geo.computeBoundingBox();
       const mesh = new THREE.Mesh(geo, lib.get(b.role));
-      mesh.name = `Merged_${b.role}`;
+      // the name is the bake's key: role, then far ground marked by its density
+      mesh.name = `Merged_${b.role}${b.lm !== 1 ? `_lm${b.lm}` : ""}${b.ceil ? "_ceil" : ""}${b.cast ? "" : "_nocast"}`;
+      mesh.userData.lm = b.lm;
       mesh.castShadow = b.cast;
       mesh.receiveShadow = b.receive;
       (b.ceil ? this.ceiling : this.world).add(mesh);
@@ -427,7 +448,8 @@ export class Room {
 
     // the canvas
     const mat = new THREE.MeshStandardMaterial({ map: tex, roughness: 0.86, metalness: 0, envMapIntensity: 0.5 });
-    const plane = new THREE.Mesh(new THREE.PlaneGeometry(w, h.h), mat);
+    // non-indexed, like the merged shell, so baked light maps vertex for vertex
+    const plane = new THREE.Mesh(new THREE.PlaneGeometry(w, h.h).toNonIndexed(), mat);
     plane.position.set(0, lift, back + h.fd - 0.012);
     plane.name = `Art_${h.id}`;
     plane.userData.artId = h.id;
@@ -472,6 +494,88 @@ export class Room {
       if (board) { holder.remove(board); board.applyMatrix4(holder.matrixWorld); frames.add(board); }
     }
     this.art.push(plane);
+  }
+
+  /* --- the light bake: export (development only) ------------------------- */
+
+  /**
+   * Everything Blender needs to bake the room's light: every surface that
+   * receives a lightmap (the merged shell and the canvases), every object
+   * that only casts (the sitters, the dish, the shadow-only canopy), the
+   * material of each, and the lights. Arrays travel as base64 Float32.
+   * See scripts/bake/README.md.
+   */
+  exportForBake() {
+    const lib = this.lib!;
+    const roleOf = new Map<THREE.Material, string>();
+    for (const r of Object.keys(SPECS) as Role[]) roleOf.set(lib.get(r), r);
+    const b64 = (a: ArrayLike<number>) => {
+      const f = new Float32Array(a);
+      const u8 = new Uint8Array(f.buffer);
+      let bin = "";
+      for (let i = 0; i < u8.length; i += 0x8000) bin += String.fromCharCode(...u8.subarray(i, i + 0x8000));
+      return btoa(bin);
+    };
+    // every object at rest, wherever the intro drop or a shake left it
+    for (const b of this.bodies) { b.group.position.copy(b.restPos); b.group.rotation.copy(b.restRot); }
+    this.scene.updateMatrixWorld(true);
+    const meshes: object[] = [];
+    const seen = new Map<string, number>();
+    this.scene.traverse((o) => {
+      const m = o as THREE.Mesh;
+      if (!m.isMesh || Array.isArray(m.material)) return;
+      const mat = m.material as THREE.Material;
+      let kind: "bake" | "occluder" | "canopy";
+      if (mat instanceof THREE.MeshBasicMaterial && !mat.colorWrite && m.castShadow) kind = "canopy";
+      else if (!(mat instanceof THREE.MeshStandardMaterial)) return;
+      else if (m.name.startsWith("Merged_") || m.name.startsWith("Art_")) kind = "bake";
+      else kind = "occluder";
+      let g = m.geometry.clone().applyMatrix4(m.matrixWorld);
+      if (g.index) {
+        if (kind === "bake") throw new Error(`bake target ${m.name} is indexed`);
+        g = g.toNonIndexed();
+      }
+      const base = m.name || `${kind}_${roleOf.get(mat) ?? "x"}`;
+      const n = seen.get(base) ?? 0;
+      seen.set(base, n + 1);
+      const std = mat as THREE.MeshStandardMaterial;
+      meshes.push({
+        name: n ? `${base}_${n}` : base,
+        runtimeName: m.name,
+        index: n,
+        kind,
+        role: roleOf.get(mat) ?? roleOf.get(mat.userData.bakeSource) ?? (m.name.startsWith("Art_") ? "art" : "other"),
+        art: m.userData.artId ?? null,
+        count: g.getAttribute("position").count,
+        position: b64(g.getAttribute("position").array),
+        normal: b64(g.getAttribute("normal").array),
+        uv: g.getAttribute("uv") ? b64(g.getAttribute("uv").array) : null,
+        lm: m.userData.lm ?? 1,
+        color: std.color ? std.color.toArray() : [1, 1, 1],
+        roughness: std.roughness ?? 1,
+        metalness: std.metalness ?? 0,
+        ceiling: (() => { for (let p: THREE.Object3D | null = m; p; p = p.parent) if (p === this.ceiling) return true; return false; })(),
+      });
+      g.dispose();
+    });
+    const v = (x: THREE.Vector3) => x.toArray();
+    const front = this.front!;
+    front.updateMatrixWorld(true);
+    return {
+      room: ROOM,
+      specs: SPECS,
+      tier: { small: this.tier.small },
+      lights: {
+        sun: { color: this.sun!.color.toArray(), intensity: this.sun!.intensity, from: v(this.sun!.position), to: v(this.sun!.target.position) },
+        door: { color: this.door!.color.toArray(), intensity: this.door!.intensity, from: v(this.door!.position), to: v(this.door!.target.position) },
+        front: { color: front.color.toArray(), intensity: front.intensity, width: front.width, height: front.height,
+          position: v(front.getWorldPosition(new THREE.Vector3())), quaternion: front.getWorldQuaternion(new THREE.Quaternion()).toArray() },
+        hemi: { sky: this.hemi!.color.toArray(), ground: this.hemi!.groundColor.toArray(), intensity: this.hemi!.intensity },
+        ambient: { color: this.ambient!.color.toArray(), intensity: this.ambient!.intensity },
+        exposure: this.renderer!.toneMappingExposure,
+      },
+      meshes,
+    };
   }
 
   /* --- light ------------------------------------------------------------ */
@@ -947,9 +1051,28 @@ export class Room {
     if (v) this.wake = 2;
   }
 
+  /** the baked light holds only for the daylight room at rest */
+  private bakeTarget() { return this.mode === "light" && !this.rearranged ? 1 : 0; }
+
+  /** contact shadow comes from the bake; screen-space AO keeps only a little, for moving things */
+  private syncBakeAO() {
+    if (this.ao && this.baked) this.ao.blendIntensity = 0.6 - 0.38 * this.baked.uniform.value;
+  }
+
+  private fadeBake(instant = false) {
+    const b = this.baked;
+    if (!b) return;
+    this.bakeTw?.kill();
+    this.bakeTw = gsap.to(b.uniform, {
+      value: this.bakeTarget(), duration: instant || this.opts.reducedMotion ? 0 : 0.9, ease: "power2.inOut",
+      onUpdate: () => { this.syncBakeAO(); this.invalidate(); },
+    });
+  }
+
   setMode(mode: "light" | "dark", instant = false) {
     if (this.disposed || !this.renderer || !this.sun || (mode === this.mode && !instant)) return;
     this.mode = mode;
+    this.fadeBake(instant);
     const V = this.variant, dark = mode === "dark", r = this.renderer;
     this.modeTl?.kill();
     const dur = instant || this.opts.reducedMotion ? 0 : 0.9;
@@ -992,6 +1115,7 @@ export class Room {
     const on = state === "rearrange";
     if (on === this.rearranged) return;
     this.rearranged = on;
+    this.fadeBake();
     this.rig.setMess(on);
     this.keepAlive(1000);
     if (on) {
