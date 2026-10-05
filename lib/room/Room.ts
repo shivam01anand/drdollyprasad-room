@@ -23,6 +23,8 @@ export type RoomOpts = {
   onProgress(p: number): void;
   onIntroFinished(): void;
   onArtwork(id: string): void;
+  /** the painting under the pointer, or null — for the cursor's word */
+  onHoverArt?(id: string | null): void;
   /** the physics engine failed to load: leave rearrange */
   onRearrangeError?(error: unknown): void;
 };
@@ -1105,7 +1107,7 @@ export class Room {
 
   private onPointerLeave = () => {
     this.rig.dropPointer();
-    if (this.hoverId) { this.hoverId = null; this.canvas.style.cursor = ""; }
+    if (this.hoverId) { this.hoverId = null; this.canvas.style.cursor = ""; this.opts.onHoverArt?.(null); }
   };
 
   private onTouch = () => { this.rig.touched(); };
@@ -1133,6 +1135,7 @@ export class Room {
     if (id !== this.hoverId) {
       this.hoverId = id;
       this.canvas.style.cursor = id ? "pointer" : this.rearranged ? "grab" : "";
+      this.opts.onHoverArt?.(id);
     }
   }
 

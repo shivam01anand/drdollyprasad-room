@@ -8,6 +8,7 @@ import { motion, gsap, scrambleTo, reducedMotion } from "@/lib/motion";
 import Preloader, { type PreloaderHandle } from "./Preloader";
 import Featured from "./Featured";
 import Lightbox, { type LightboxHandle } from "./Lightbox";
+import Cursor, { roomCursorLabel } from "./Cursor";
 import { CHAPTERS } from "@/lib/chapters";
 import { activeVariant } from "@/lib/room/variants";
 import { EMAIL } from "@/lib/works";
@@ -219,6 +220,7 @@ export default function Studio({ dims }: { dims: Dims }) {
           lock("intro", false);
         },
         onArtwork: (id) => lbRef.current?.open(id, null),
+        onHoverArt: (id) => roomCursorLabel(id ? "View" : null),
         onRearrangeError: (error) => {
           if (killed || dead) return;
           console.error("[room physics]", error);
@@ -548,6 +550,7 @@ export default function Studio({ dims }: { dims: Dims }) {
       </main>
 
       <Lightbox ref={lbRef} dims={dims} onOpenChange={onLightbox} />
+      <Cursor live={ready || failed} />
     </>
   );
 }

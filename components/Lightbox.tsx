@@ -3,6 +3,9 @@
 import { forwardRef, useEffect, useImperativeHandle, useRef } from "react";
 import { motion, gsap, Flip, scrambleTo, reducedMotion } from "@/lib/motion";
 import { BY_ID, LARGE, enquiry, quoted, type Work } from "@/lib/works";
+import { XL } from "@/lib/xl";
+import { ROOMS, hang, type Room } from "@/lib/rooms";
+import { CloseLook } from "@/lib/closelook";
 
 export type LightboxHandle = { open(id: string, from: HTMLImageElement | null): void };
 type Dims = Record<string, { w: number; h: number }>;
@@ -11,6 +14,10 @@ type Dims = Record<string, { w: number; h: number }>;
  * One work, large. The card's own image flies into place (Flip), the veil
  * comes up behind it, the details decode in. Closing flies it back to the
  * card it came from. The file upgrades to the 1800 px version once it is in.
+ *
+ * Two more ways to look, after Pascale Canal's viewer: a click goes close
+ * to the brushwork (lib/closelook), and where she has stated the size the
+ * work can be seen hanging in a room, at that size.
  */
 const Lightbox = forwardRef<LightboxHandle, { dims: Dims; onOpenChange(open: boolean): void }>(
   function Lightbox({ dims, onOpenChange }, ref) {
@@ -21,6 +28,17 @@ const Lightbox = forwardRef<LightboxHandle, { dims: Dims; onOpenChange(open: boo
     const meta = useRef<HTMLDListElement>(null);
     const ask = useRef<HTMLAnchorElement>(null);
     const closeBtn = useRef<HTMLButtonElement>(null);
+    const frame = useRef<HTMLDivElement>(null);
+    const bar = useRef<HTMLDivElement>(null);
+    const views = useRef<HTMLDivElement>(null);
+    const roomBox = useRef<HTMLDivElement>(null);
+    const roomPhoto = useRef<HTMLImageElement>(null);
+    const roomArt = useRef<HTMLDivElement>(null);
+    const roomImg = useRef<HTMLImageElement>(null);
+    const roomCap = useRef<HTMLParagraphElement>(null);
+    const hint = useRef<HTMLParagraphElement>(null);
+    const look = useRef<CloseLook | null>(null);
+    const view = useRef<string>("work");
     const cb = useRef(onOpenChange);
     cb.current = onOpenChange;
     const st = useRef<{ id: string | null; from: HTMLImageElement | null; anim: gsap.core.Animation[]; busy: boolean }>(
@@ -36,6 +54,74 @@ const Lightbox = forwardRef<LightboxHandle, { dims: Dims; onOpenChange(open: boo
       ["Size", w.size ?? "Not stated"],
       ["Status", w.status === "Enquire" ? "On enquiry" : w.status],
     ];
+
+    /** where this work sits in a room; null when she has not stated its size */
+    const placeIn = (w: Work, room: Room) => {
+      const d = dims[w.id];
+      return w.inches && d ? hang(room, w.inches, d.w / d.h) : null;
+    };
+
+    const setArt = (el: HTMLElement, pos: NonNullable<ReturnType<typeof placeIn>>) => {
+      el.style.left = `${pos.left}%`; el.style.top = `${pos.top}%`;
+      el.style.width = `${pos.width}%`; el.style.height = `${pos.height}%`;
+      el.style.setProperty("--s", String(pos.width / 100));
+    };
+
+    /** painting, or a room: a quiet crossfade inside the figure */
+    const show = (which: string, instant = false) => {
+      const w = st.current.id ? BY_ID.get(st.current.id) : null;
+      const fr = frame.current!, rb = roomBox.current!;
+      if (!w) return;
+      view.current = which;
+      views.current?.querySelectorAll<HTMLButtonElement>("button").forEach((b) =>
+        b.setAttribute("aria-pressed", String(b.dataset.view === which)));
+      const room = ROOMS.find((r) => r.id === which);
+      const reduce = reducedMotion() || instant;
+      look.current?.reset(true);
+      if (!room) {
+        own(gsap.to(rb, { autoAlpha: 0, duration: reduce ? 0 : 0.25, onComplete: () => { rb.hidden = true; fr.hidden = false;
+          own(gsap.fromTo(fr, { autoAlpha: 0 }, { autoAlpha: 1, duration: reduce ? 0 : 0.45 })); } }));
+        return;
+      }
+      const pos = placeIn(w, room)!;
+      roomPhoto.current!.src = room.src;
+      rb.style.aspectRatio = `${room.w} / ${room.h}`;
+      setArt(roomArt.current!, pos);
+      roomImg.current!.src = img.current!.currentSrc || img.current!.src;
+      roomCap.current!.textContent = `Shown to scale · ${w.size}`;
+      const swap = () => { fr.hidden = true; rb.hidden = false;
+        own(gsap.fromTo(rb, { autoAlpha: 0 }, { autoAlpha: 1, duration: reduce ? 0 : 0.5, ease: "power1.out" })); };
+      if (fr.hidden) { own(gsap.to(rb, { autoAlpha: 0, duration: reduce ? 0 : 0.2, onComplete: swap })); }
+      else own(gsap.to(fr, { autoAlpha: 0, duration: reduce ? 0 : 0.25, onComplete: swap }));
+    };
+
+    /** the view buttons: the painting, then each room it can be seen in */
+    const buildViews = (w: Work, src: string) => {
+      const v = views.current!;
+      const rooms = ROOMS.filter((r) => placeIn(w, r));
+      v.replaceChildren();
+      v.hidden = rooms.length === 0;
+      if (!rooms.length) return;
+      const btn = (id: string, label: string) => {
+        const b = document.createElement("button");
+        b.type = "button"; b.className = "lb-view"; b.dataset.view = id;
+        b.setAttribute("aria-pressed", String(id === "work")); b.setAttribute("aria-label", label); b.title = label;
+        b.addEventListener("click", (e) => { e.stopPropagation(); if (view.current !== id) show(id); });
+        return b;
+      };
+      const self = btn("work", "The painting");
+      const im = document.createElement("img"); im.src = src; im.alt = ""; self.append(im);
+      v.append(self);
+      rooms.forEach((r) => {
+        const b = btn(r.id, `In a room: ${r.label.toLowerCase()}`);
+        const ph = document.createElement("img"); ph.src = r.thumb; ph.alt = "";
+        const art = document.createElement("span"); art.className = "lb-view-art";
+        const ai = document.createElement("img"); ai.src = src; ai.alt = ""; art.append(ai);
+        setArt(art, placeIn(w, r)!);
+        b.append(ph, art);
+        v.append(b);
+      });
+    };
 
     const open = (id: string, from: HTMLImageElement | null) => {
       const w = BY_ID.get(id);
@@ -60,16 +146,25 @@ const Lightbox = forwardRef<LightboxHandle, { dims: Dims; onOpenChange(open: boo
         const dd = document.createElement("dd"); dd.textContent = ""; dd.dataset.v = v;
         return [dt, dd];
       }));
+      // every look starts at the painting itself
+      frame.current!.hidden = false; roomBox.current!.hidden = true; view.current = "work";
+      gsap.set([frame.current, roomBox.current], { clearProps: "opacity,visibility" });
+      buildViews(w, i.src);
+      if (hint.current) hint.current.textContent = matchMedia("(pointer: coarse)").matches
+        ? "Tap to look closer" : "Click to look closer · scroll to zoom";
       ask.current!.href = enquiry(w);
       ask.current!.textContent = w.status === "Sold" ? "Ask about her work →" : "Enquire about this work →";
       if (!r.open) r.showModal();
 
+      look.current?.enable(false);
+      const landed = () => { if (st.current.id === id) look.current?.enable(true); };
       if (from && !reduce) {
         const state = Flip.getState(from);
         from.style.visibility = "hidden";
-        own(Flip.from(state, { targets: i, duration: 0.6, ease: "power1.inOut", absolute: true, scale: true }));
+        own(Flip.from(state, { targets: i, duration: 0.6, ease: "power1.inOut", absolute: true, scale: true, onComplete: landed }));
       } else {
-        own(gsap.fromTo(i, { autoAlpha: 0, scale: 0.96 }, { autoAlpha: 1, scale: 1, duration: reduce ? 0 : 0.6, ease: "power2.out" }));
+        own(gsap.fromTo(i, { autoAlpha: 0, scale: 0.96 }, { autoAlpha: 1, scale: 1, duration: reduce ? 0 : 0.6, ease: "power2.out",
+          onComplete: () => { gsap.set(i, { clearProps: "transform" }); landed(); } }));
       }
       own(gsap.fromTo(veil.current, { opacity: 0 }, { opacity: 1, duration: reduce ? 0 : 0.6, delay: reduce ? 0 : 0.2 }));
       own(gsap.fromTo([title.current, meta.current], { autoAlpha: 1 }, { autoAlpha: 1, duration: 0 }));
@@ -81,7 +176,11 @@ const Lightbox = forwardRef<LightboxHandle, { dims: Dims; onOpenChange(open: boo
       if (LARGE.has(id)) {
         const hi = new Image();
         hi.src = `/art/large/${id}.jpg`;
-        hi.decode().then(() => { if (st.current.id === id && img.current) img.current.src = hi.src; }).catch(() => {});
+        hi.decode().then(() => {
+          if (st.current.id !== id || !img.current) return;
+          if (!img.current.src.includes("/art/xl/")) img.current.src = hi.src;
+          if (roomImg.current) roomImg.current.src = hi.src;
+        }).catch(() => {});
       }
       closeBtn.current?.focus({ preventScroll: true });
     };
@@ -91,6 +190,11 @@ const Lightbox = forwardRef<LightboxHandle, { dims: Dims; onOpenChange(open: boo
       if (!r || !i || !st.current.id || st.current.busy) return;
       st.current.busy = true;
       kill();
+      look.current?.enable(false);
+      if (view.current !== "work") {
+        roomBox.current!.hidden = true; frame.current!.hidden = false; view.current = "work";
+        gsap.set([frame.current, roomBox.current], { clearProps: "opacity,visibility" });
+      }
       const reduce = reducedMotion();
       const from = st.current.from;
       const finish = () => {
@@ -120,9 +224,22 @@ const Lightbox = forwardRef<LightboxHandle, { dims: Dims; onOpenChange(open: boo
 
     useImperativeHandle(ref, () => ({ open }), []);
 
-    useEffect(() => () => {
-      kill();
-      if (st.current.from) st.current.from.style.visibility = "";
+    useEffect(() => {
+      const l = new CloseLook(frame.current!, img.current!, bar.current!, reducedMotion(), () => {
+        // closeness wants the largest file there is
+        const id = st.current.id;
+        if (!id || !XL.has(id)) return;
+        const hi = new Image();
+        hi.src = `/art/xl/${id}.jpg`;
+        hi.decode().then(() => { if (st.current.id === id && img.current) img.current.src = hi.src; }).catch(() => {});
+      });
+      look.current = l;
+      return () => {
+        l.dispose();
+        look.current = null;
+        kill();
+        if (st.current.from) st.current.from.style.visibility = "";
+      };
     }, []);
 
     return (
@@ -131,13 +248,25 @@ const Lightbox = forwardRef<LightboxHandle, { dims: Dims; onOpenChange(open: boo
         <div className="lb-veil" ref={veil} onClick={close} />
         <div className="lb-grid" onClick={(e) => { if (e.target === e.currentTarget) close(); }}>
           <figure className="lb-figure">
-            {/* eslint-disable-next-line @next/next/no-img-element */}
-            <img ref={img} alt="" />
+            <div className="lb-frame" ref={frame} data-cursor="Look closer">
+              {/* eslint-disable-next-line @next/next/no-img-element */}
+              <img ref={img} alt="" />
+              <div className="lb-zoombar" ref={bar} aria-hidden="true"><i /><span /></div>
+            </div>
+            <div className="lb-room" ref={roomBox} hidden>
+              {/* eslint-disable-next-line @next/next/no-img-element */}
+              <img className="lb-room-photo" ref={roomPhoto} alt="" />
+              {/* eslint-disable-next-line @next/next/no-img-element */}
+              <div className="lb-room-art" ref={roomArt}><img ref={roomImg} alt="" /></div>
+              <p className="lb-room-cap lab" ref={roomCap} />
+            </div>
           </figure>
           <div className="lb-text">
             <button type="button" className="lb-close lab" ref={closeBtn} onClick={close}>Close (X)</button>
             <h2 id="lb-title" className="lb-title" ref={title} />
             <dl className="lb-meta" ref={meta} />
+            <div className="lb-views" ref={views} role="group" aria-label="Ways to see this work" hidden />
+            <p className="lab lb-hint" ref={hint} />
             <a className="pill pill-solid" ref={ask} href="#">Enquire →</a>
           </div>
         </div>

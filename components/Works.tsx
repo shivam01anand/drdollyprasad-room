@@ -34,7 +34,7 @@ export default function Works({ dims }: { dims: Dims }) {
               const width = Math.round(ar >= 1 ? capped : capped * ar);
               return (
                 <figure className="work" key={w.id} style={{ width }}>
-                  <a href={`/art/works/${w.id}.jpg`} data-work={w.id} aria-label={`${w.title} — open`}>
+                  <a href={`/art/works/${w.id}.jpg`} data-work={w.id} aria-label={`${w.title} — open`} data-cursor="View">
                     {/* eslint-disable-next-line @next/next/no-img-element */}
                     <img src={`/art/works/${w.id}.jpg`} alt={`${w.title} — ${w.medium.toLowerCase()}`}
                          width={d.w} height={d.h} loading="lazy" decoding="async" data-flip-id={w.id} />

@@ -132,6 +132,19 @@ html[data-rearrange="1"] .chapter-text{visibility:hidden;pointer-events:none}
 .diya-btn[aria-pressed="true"] .flame{fill:#FFB25A;stroke:#FFB25A}
 .diya-btn:hover{background:var(--pill);color:var(--pill-ink);border-color:var(--pill)}
 
+/* ---------------------------------------------------------------- cursor */
+/* the original's ring: white, in difference, trailing the pointer; it hides
+   until the room is up and whenever the pointer leaves the page */
+.cursor{position:fixed;inset:0;z-index:180;pointer-events:none;mix-blend-mode:difference;
+  opacity:0;transition:opacity .2s ease}
+.cursor[data-live="1"][data-in="1"]{opacity:1}
+.cursor-dot{position:fixed;left:0;top:0;width:38px;height:38px;border:1px solid #fff;border-radius:50%;
+  display:grid;place-items:center;will-change:transform;
+  transition:width .3s ease,height .3s ease,background-color .3s ease}
+.cursor-dot.is-control{width:12px;height:12px;background:#fff}
+.cursor-dot.is-label{width:86px;height:86px}
+.cursor-text{font-family:var(--mono);font-size:10px;letter-spacing:.08em;text-transform:uppercase;color:#fff;white-space:nowrap;line-height:1}
+
 /* ------------------------------------------------------------- copy slot */
 .copy{position:fixed;inset:0;z-index:2;pointer-events:none;transition:opacity .35s ease}
 .copy[data-yield="1"]{opacity:0}
@@ -244,9 +257,49 @@ html[data-room="off"] .sec:not(.sec-featured){display:none}
 .lb-veil{position:absolute;inset:0;background:rgb(var(--wash))}
 .lb-grid{position:absolute;inset:0;display:grid;grid-template-columns:minmax(0,1fr) minmax(280px,360px);gap:clamp(32px,4.5vw,72px);
          align-items:center;padding:clamp(32px,5vh,56px) clamp(24px,4vw,64px);pointer-events:none}
-.lb-figure{margin:0;display:flex;justify-content:flex-end;align-items:center;min-height:0;height:100%}
-.lb-figure img{display:block;max-height:calc(100vh - clamp(64px,10vh,112px));max-width:100%;width:auto;height:auto;
-  box-shadow:0 1px 2px rgba(48,39,34,.08),0 28px 70px -44px rgba(48,39,34,.5);pointer-events:auto}
+.lb-figure{margin:0;display:flex;justify-content:flex-end;align-items:center;min-height:0;height:100%;container-type:size}
+/* the painting: it clips only while zoomed, so the flight in is never cut */
+.lb-frame{position:relative;line-height:0;cursor:zoom-in;pointer-events:auto;max-width:100%}
+.lb-frame.is-zoomed{overflow:hidden;cursor:zoom-out;touch-action:none}
+.lb-frame>img{display:block;max-height:calc(100vh - clamp(64px,10vh,112px));max-width:100%;width:auto;height:auto;
+  box-shadow:0 1px 2px rgba(48,39,34,.08),0 28px 70px -44px rgba(48,39,34,.5);will-change:transform}
+.lb-frame.is-zoomed>img{box-shadow:none}
+/* the trace of a zoom: a hairline track and the level, fading once still */
+.lb-zoombar{position:absolute;right:14px;top:50%;height:120px;width:22px;margin-top:-60px;pointer-events:none;
+  opacity:0;transition:opacity .6s ease;display:flex;flex-direction:column;align-items:center;gap:8px;line-height:1}
+.lb-zoombar i{position:relative;flex:1;width:2px;border-radius:2px;background:rgba(240,234,223,.42);overflow:hidden;
+  box-shadow:0 0 0 1px rgba(48,39,34,.12)}
+.lb-zoombar i::after{content:"";position:absolute;left:0;right:0;bottom:0;height:100%;background:#F0EADF;
+  transform-origin:50% 100%;transform:scaleY(var(--k,0))}
+.lb-zoombar span{font-family:var(--mono);font-size:10px;letter-spacing:.04em;color:#F0EADF;text-shadow:0 1px 3px rgba(0,0,0,.45)}
+
+/* the painting at its size, in a room */
+.lb-room{position:relative;width:min(100cqw,calc(100cqh * 1.5));max-width:100%;overflow:hidden;pointer-events:auto;
+  box-shadow:0 1px 2px rgba(48,39,34,.08),0 28px 70px -44px rgba(48,39,34,.5)}
+.lb-room-photo{display:block;width:100%;height:100%;object-fit:cover}
+.lb-room-art{position:absolute;--s:.2}
+.lb-room-art img{display:block;width:100%;height:100%;object-fit:cover;
+  /* a stretched canvas: a dark wrapped edge, then the wall's own soft shadow, light from the left */
+  box-shadow:calc(var(--s) * .9cqw) calc(var(--s) * .9cqw) 0 -.2px rgba(52,36,26,.55),
+             calc(var(--s) * 2.4cqw) calc(var(--s) * 3.4cqw) calc(var(--s) * 5cqw) calc(var(--s) * -1cqw) rgba(58,42,28,.34),
+             calc(var(--s) * 6cqw) calc(var(--s) * 9cqw) calc(var(--s) * 16cqw) calc(var(--s) * -3cqw) rgba(58,42,28,.22)}
+/* the room's own light falls across the canvas too */
+.lb-room-art::after{content:"";position:absolute;inset:0;pointer-events:none;mix-blend-mode:multiply;
+  background:linear-gradient(100deg,rgba(255,250,242,0) 0%,rgba(120,100,80,.10) 100%)}
+.lb-room-cap{position:absolute;left:14px;bottom:12px;margin:0;padding:6px 11px 5px;border-radius:999px;
+  background:rgba(240,234,223,.9);color:#302722;line-height:1.2}
+
+/* ways to see it: the painting, then the rooms */
+.lb-views{display:flex;gap:10px}
+.lb-view{position:relative;width:72px;height:48px;padding:0;border:1px solid var(--line);border-radius:6px;overflow:hidden;
+  background:var(--page);cursor:pointer;transition:border-color .18s var(--ease),box-shadow .18s var(--ease)}
+.lb-view>img{display:block;width:100%;height:100%;object-fit:cover}
+.lb-view[data-view="work"]>img{object-fit:contain;padding:4px;background:rgba(117,75,54,.06)}
+.lb-view-art{position:absolute;display:block}
+.lb-view-art img{display:block;width:100%;height:100%;object-fit:cover;box-shadow:1px 1px 2px rgba(40,28,16,.35)}
+.lb-view:hover{border-color:var(--dim)}
+.lb-view[aria-pressed="true"]{border-color:var(--ink);box-shadow:0 0 0 1px var(--ink)}
+.lb-hint{margin:-6px 0 0}
 .lb-text{pointer-events:auto;align-self:stretch;display:flex;flex-direction:column;justify-content:center;gap:20px;position:relative}
 .lb-close{position:absolute;top:0;right:0;min-height:44px;background:none;border:0;cursor:pointer;color:var(--ink);padding:6px 0}
 .lb-close:hover{color:var(--oxide)}
@@ -261,8 +314,9 @@ html[data-room="off"] .sec:not(.sec-featured){display:none}
 @media (max-height:600px) and (min-width:901px){
   .lb-grid{grid-template-columns:1fr;align-content:start;overflow-y:auto;overscroll-behavior:contain;padding-top:24px}
   .lb-text{padding-top:44px}
-  .lb-figure{justify-content:center}
-  .lb-figure img{max-height:52vh}
+  .lb-figure{justify-content:center;height:auto;container-type:inline-size}
+  .lb-frame>img{max-height:52vh}
+  .lb-room{width:min(100%,78vh)}
 }
 
 /* --------------------------------------------------------------- collage */
@@ -339,8 +393,9 @@ html[data-room="off"] .sec:not(.sec-featured){display:none}
   .cap-title{font-size:14px}
   .lb-grid{grid-template-columns:1fr;align-content:start;overflow-y:auto;overscroll-behavior:contain;padding:24px var(--gut) 40px}
   .lb-text{padding-top:44px}
-  .lb-figure{justify-content:center;height:auto}
-  .lb-figure img{max-height:52vh}
+  .lb-figure{justify-content:center;height:auto;container-type:inline-size}
+  .lb-frame>img{max-height:52vh}
+  .lb-room{width:100%}
   .lb-title{font-size:28px}
   .statement{font-size:26px}
   .contact-grid{grid-template-columns:1fr}

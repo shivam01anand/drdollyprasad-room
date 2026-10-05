@@ -1,0 +1,2 @@
+/** works with a 2000 px+ file in /art/xl, for the lightbox's close look */
+export const XL = new Set(["rickshaw-puller-and-coin", "carriage-and-autorickshaw", "bullock-cart-and-truck", "mother-india-and-kettles", "shree-420-and-milk-cans", "bulls-and-wheel", "terracotta-pots", "monk-and-green-buddha", "prayer-and-scripture", "priest-with-flame", "yellow-turban-portrait", "patterned-turban-portrait", "mother-and-child", "milkman-on-bicycle", "temple-bells", "boy-with-bananas"]);

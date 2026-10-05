@@ -201,7 +201,8 @@ export default function Featured({ dims, onOpen }: { dims: Dims; onOpen(id: stri
         </div>
       </div>
 
-      <div className="feat-viewport" ref={viewport} tabIndex={0} aria-label="Featured works — drag, or use the arrow keys">
+      <div className="feat-viewport" ref={viewport} tabIndex={0} aria-label="Featured works — drag, or use the arrow keys"
+           data-cursor="← Drag →">
         <div className="feat-track" ref={track}>
           {FEATURED.map((id, i) => {
             const w = BY_ID.get(id)!;
