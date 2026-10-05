@@ -1,0 +1,9 @@
+# local only: build caches, test recordings, variant tooling
+.next
+.next-*
+node_modules
+review
+tsconfig.tsbuildinfo
+run-variants.sh
+.env*
+.vercel

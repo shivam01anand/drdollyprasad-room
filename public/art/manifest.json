@@ -1,0 +1,267 @@
+{
+ "room": [
+  {
+   "id": "rickshaw-puller-and-coin",
+   "ratio": 0.7644
+  },
+  {
+   "id": "carriage-and-autorickshaw",
+   "ratio": 1.0
+  },
+  {
+   "id": "bullock-cart-and-truck",
+   "ratio": 0.9989
+  },
+  {
+   "id": "mother-india-and-kettles",
+   "ratio": 0.7578
+  },
+  {
+   "id": "postbox-and-stamps",
+   "ratio": 0.751
+  },
+  {
+   "id": "bulls-and-wheel",
+   "ratio": 1.0
+  },
+  {
+   "id": "temple-bells",
+   "ratio": 1.2228
+  },
+  {
+   "id": "boy-with-bananas",
+   "ratio": 1.0
+  },
+  {
+   "id": "child-among-flowers",
+   "ratio": 1.2676
+  },
+  {
+   "id": "terracotta-pots",
+   "ratio": 1.0262
+  },
+  {
+   "id": "weathered-door-ring",
+   "ratio": 0.9911
+  },
+  {
+   "id": "red-and-teal-door-lock",
+   "ratio": 1.0563
+  },
+  {
+   "id": "teal-door-bolt",
+   "ratio": 0.95
+  },
+  {
+   "id": "carved-door-knocker",
+   "ratio": 0.9578
+  }
+ ],
+ "works": [
+  {
+   "id": "boy-and-kettle",
+   "w": 967,
+   "h": 1030
+  },
+  {
+   "id": "boy-with-bananas",
+   "w": 1100,
+   "h": 1100
+  },
+  {
+   "id": "bullock-cart-and-truck",
+   "w": 1099,
+   "h": 1100
+  },
+  {
+   "id": "bulls-and-wheel",
+   "w": 1100,
+   "h": 1100
+  },
+  {
+   "id": "carriage-and-autorickshaw",
+   "w": 1100,
+   "h": 1100
+  },
+  {
+   "id": "carved-door-knocker",
+   "w": 1053,
+   "h": 1100
+  },
+  {
+   "id": "child-among-flowers",
+   "w": 1100,
+   "h": 867
+  },
+  {
+   "id": "coins-and-clay-bank",
+   "w": 1088,
+   "h": 1100
+  },
+  {
+   "id": "cycle-rickshaw",
+   "w": 1100,
+   "h": 820
+  },
+  {
+   "id": "elder-woman-portrait",
+   "w": 218,
+   "h": 220
+  },
+  {
+   "id": "horse-cart-and-autorickshaw",
+   "w": 254,
+   "h": 252
+  },
+  {
+   "id": "man-among-metal-pans",
+   "w": 1100,
+   "h": 829
+  },
+  {
+   "id": "milkman-on-bicycle",
+   "w": 834,
+   "h": 1100
+  },
+  {
+   "id": "monk-and-green-buddha",
+   "w": 833,
+   "h": 1100
+  },
+  {
+   "id": "monks-and-blue-buddha",
+   "w": 1100,
+   "h": 872
+  },
+  {
+   "id": "mother-and-child",
+   "w": 821,
+   "h": 1100
+  },
+  {
+   "id": "mother-india-and-kettles",
+   "w": 833,
+   "h": 1100
+  },
+  {
+   "id": "newspaper-reader",
+   "w": 1100,
+   "h": 1097
+  },
+  {
+   "id": "offering-of-light",
+   "w": 824,
+   "h": 1100
+  },
+  {
+   "id": "patterned-turban-portrait",
+   "w": 1095,
+   "h": 1100
+  },
+  {
+   "id": "postbox-and-stamps",
+   "w": 543,
+   "h": 723
+  },
+  {
+   "id": "prayer-and-scripture",
+   "w": 827,
+   "h": 1100
+  },
+  {
+   "id": "priest-with-flame",
+   "w": 816,
+   "h": 1099
+  },
+  {
+   "id": "red-and-teal-door-lock",
+   "w": 1100,
+   "h": 1041
+  },
+  {
+   "id": "red-turban-portrait",
+   "w": 1100,
+   "h": 1087
+  },
+  {
+   "id": "rickshaw-and-autorickshaw",
+   "w": 255,
+   "h": 250
+  },
+  {
+   "id": "rickshaw-puller-and-coin",
+   "w": 841,
+   "h": 1100
+  },
+  {
+   "id": "rickshaw-rest-framed",
+   "w": 659,
+   "h": 881
+  },
+  {
+   "id": "rickshaw-rest",
+   "w": 1093,
+   "h": 1100
+  },
+  {
+   "id": "riverside-figures",
+   "w": 159,
+   "h": 130
+  },
+  {
+   "id": "sacred-tree",
+   "w": 1100,
+   "h": 1098
+  },
+  {
+   "id": "shree-420-and-milk-cans",
+   "w": 834,
+   "h": 1100
+  },
+  {
+   "id": "teal-door-bolt",
+   "w": 1046,
+   "h": 1100
+  },
+  {
+   "id": "temple-bells",
+   "w": 1100,
+   "h": 900
+  },
+  {
+   "id": "terracotta-pots",
+   "w": 1100,
+   "h": 1073
+  },
+  {
+   "id": "three-veiled-women",
+   "w": 1100,
+   "h": 1084
+  },
+  {
+   "id": "weathered-door-ring",
+   "w": 1091,
+   "h": 1100
+  },
+  {
+   "id": "woman-with-bird",
+   "w": 1100,
+   "h": 1100
+  },
+  {
+   "id": "woman-with-poppies",
+   "w": 1100,
+   "h": 784
+  },
+  {
+   "id": "woman-with-red-flower",
+   "w": 1071,
+   "h": 1100
+  },
+  {
+   "id": "yellow-turban-portrait",
+   "w": 1100,
+   "h": 1091
+  }
+ ]
+}
