@@ -64,6 +64,8 @@ export const CHAPTERS: Chapter[] = [
       "out as an auto-rickshaw arrives. What is leaving she paints in full oil; what is " +
       "arriving she draws as a single bare line.",
     pose: aim([-HX, 1.5, 0.05], Math.PI / 2, 4.35, -0.03),
+    // a phone holds the painting in the upper half, clear of the label
+    narrow: aim([-HX, 1.06, 0.05], Math.PI / 2, 4.0, -0.03),
   },
   {
     id: "still",
@@ -91,7 +93,7 @@ export const CHAPTERS: Chapter[] = [
       // from inside the room the leaf's free edge is on the left, so the
       // hardware sits left of centre; aim below it so it rides in the upper
       // half of the frame, clear of the copy
-      const along = new THREE.Vector3(-a.leafNormal.z, 0, a.leafNormal.x).multiplyScalar(-0.3);
+      const along = new THREE.Vector3(-a.leafNormal.z, 0, a.leafNormal.x).multiplyScalar(-0.35);
       return aim([a.lock.x + along.x, a.lock.y - 0.07, a.lock.z + along.z], yaw, 0.8, 0);
     },
     narrow: (a) => {

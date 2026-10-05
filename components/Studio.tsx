@@ -352,8 +352,9 @@ export default function Studio({ dims }: { dims: Dims }) {
       hud.querySelectorAll<HTMLElement>("[data-hud-text]").forEach((el) => { el.textContent = ""; });
       gsap.set(hud.querySelectorAll(".hud-pill"), { yPercent: 300, autoAlpha: 0 });
       gsap.set(hud.querySelector(".diya-btn"), { yPercent: -180, autoAlpha: 0 });
-      // the hint shares a corner with the preloader's "New Delhi"
-      gsap.set(hud.querySelector(".hud-hint"), { autoAlpha: 0 });
+      // the hint shares a corner with the preloader's "New Delhi"; the
+      // chips would show as empty capsules while their text waits to type in
+      gsap.set(hud.querySelectorAll(".hud-hint, .hud-meta, .hud-mail"), { autoAlpha: 0 });
     }
     hud.dataset.state = "live";
   }, []);
@@ -368,6 +369,7 @@ export default function Studio({ dims }: { dims: Dims }) {
     tweens.push(gsap.to(hud.querySelectorAll(".hud-pill"),
       { yPercent: 0, autoAlpha: 1, duration: quick ? 0 : 0.5, ease: "genEase", stagger: { amount: quick ? 0 : 0.5 } }));
     tweens.push(gsap.to(hud.querySelector(".diya-btn"), { yPercent: 0, autoAlpha: 1, duration: quick ? 0 : 0.5, ease: "genEase" }));
+    tweens.push(gsap.to(hud.querySelectorAll(".hud-meta, .hud-mail"), { autoAlpha: 1, duration: quick ? 0 : 0.35, ease: "power1.out" }));
     tweens.push(gsap.to(hud.querySelector(".hud-hint"), { autoAlpha: 1, duration: quick ? 0 : 0.6, delay: quick ? 0 : 0.4 }));
     return () => tweens.forEach((t) => t.kill());
   }, [ready, failed]);

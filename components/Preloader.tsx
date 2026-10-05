@@ -184,6 +184,13 @@ const Preloader = forwardRef<PreloaderHandle, Props>(function Preloader(props, r
         if (welcome.current) own(scrambleTo(welcome.current, "Welcome to my studio", { speed: 0.6, duration: 1.2, delay: 0.95 }));
       }, 3.2);
 
+      // 5.25 s — the words step back first, so nothing slides across the
+      // painting as the panel goes. Made at that moment, not up front: the
+      // welcome's scramble overwrites every earlier tween on its element.
+      tl.add(() => {
+        own(gsap.to([welcome.current, root.current?.querySelector(".pre-foot")].filter(Boolean),
+          { autoAlpha: 0, duration: 0.3, ease: "power1.in" }));
+      }, 5.25);
       // 5.6 s — the panel lifts and the room is there, around the painting
       tl.add(() => {
         lift();

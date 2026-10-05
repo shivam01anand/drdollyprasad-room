@@ -98,16 +98,17 @@ html[data-rearrange="1"] .stage canvas:active{cursor:grabbing}
 .hud[data-state="pre"] :is(.hud-meta,.hud-mail,.hud-hint,.hud-pills,.diya-btn){visibility:hidden}
 .hud .brand,.hud .hud-meta,.hud .hud-mail,.hud .hud-hint{transition:color .5s ease}
 html[data-hud="light"]:not([data-rearrange="1"]) .hud .brand,
-html[data-hud="light"]:not([data-rearrange="1"]) .hud .hud-meta,
-html[data-hud="light"]:not([data-rearrange="1"]) .hud .hud-mail,
 html[data-hud="light"]:not([data-rearrange="1"]) .hud .brand-target .pre-big{color:#F2ECE2}
 /* shaking the room clears the stage of everything but the room */
 html[data-rearrange="1"] .sec-featured,
 html[data-rearrange="1"] .chapter-text{visibility:hidden;pointer-events:none}
-.hud-top{display:grid;grid-template-columns:1fr auto auto auto;align-items:start;gap:clamp(18px,4vw,64px)}
-.hud-meta{display:flex;gap:2.4em;padding-top:.5em;color:var(--ink)}
-.hud-mail{text-decoration:none;padding-top:.5em;color:var(--ink)}
-.hud-mail:hover{color:var(--oxide)}
+.hud-top{display:grid;grid-template-columns:1fr auto auto auto;align-items:start;gap:clamp(10px,1.2vw,16px)}
+/* every fact and control sits on the same quiet chip; the name alone is free type */
+.hud-meta,.hud-mail{align-self:center;background:var(--chip);border:1px solid var(--line);border-radius:999px;
+  padding:7px 13px 6px;line-height:1.2;color:var(--chip-ink)}
+.hud-meta{display:flex;gap:1.6em}
+.hud-mail{text-decoration:none;transition:background-color .18s var(--ease),color .18s var(--ease),border-color .18s var(--ease)}
+.hud-mail:hover{background:var(--pill);color:var(--pill-ink);border-color:var(--pill)}
 .hud-bottom{display:flex;justify-content:space-between;align-items:flex-end;gap:16px}
 /* the hint wears the controls' chip, so it reads over dark wood as over plaster */
 .hud-hint{align-self:flex-start;color:var(--ink);background:var(--chip);border:1px solid var(--line);border-radius:999px;padding:7px 13px 6px;line-height:1.2}
@@ -139,9 +140,11 @@ html[data-rearrange="1"] .chapter-text{visibility:hidden;pointer-events:none}
 .copy-panel{
   position:absolute;left:var(--gut);bottom:calc(var(--hud-bottom) + 32px);
   width:min(31rem,42vw);max-height:calc(100vh - var(--hud-top) - var(--hud-bottom) - 64px);
-  padding:20px 24px 22px;background:rgba(var(--wash),.95);border:1px solid var(--line);
+  padding:20px 24px 22px;background:var(--page);border:1px solid var(--rule);
   visibility:hidden;opacity:0;
 }
+/* a verse label hugs the verse; prose keeps the measure */
+.copy-panel:has(.poem){width:auto;min-width:min(21rem,42vw)}
 .copy-head{display:flex;justify-content:space-between;align-items:baseline;gap:16px;margin-bottom:14px}
 .copy-idx{flex:none;opacity:.75;font-variant-numeric:tabular-nums}
 .lede{font-size:clamp(16px,1.2vw,18px);line-height:1.55;letter-spacing:-.005em;margin:0;color:var(--ink);max-width:34em;text-wrap:pretty}
@@ -214,7 +217,7 @@ html[data-room="off"] .sec:not(.sec-featured){display:none}
   transition:background-color .18s var(--ease),color .18s var(--ease),border-color .18s var(--ease)}
 .feat-arrow:hover{background:var(--pill);color:var(--pill-ink);border-color:var(--pill)}
 .feat-title{margin:0;font-weight:400;text-transform:uppercase;font-size:clamp(32px,3.3vw,54px);line-height:.92;letter-spacing:-.03em;min-width:5.2em}
-.feat-viewport{overflow:hidden;outline:none;padding:0 0 4px}
+.feat-viewport{overflow:hidden;outline:none;padding:8px 0}
 .feat-viewport:focus-visible{outline:1px dashed var(--dim);outline-offset:-10px}
 .feat-track{display:flex;align-items:flex-start;gap:clamp(24px,2.6vw,40px);padding:0 var(--gut);width:max-content;touch-action:pan-y;user-select:none}
 .feat-card{flex:0 0 auto;width:clamp(200px,17vw,300px);display:flex;flex-direction:column;gap:10px;cursor:pointer}
@@ -309,14 +312,15 @@ html[data-room="off"] .sec:not(.sec-featured){display:none}
 @media (max-width:900px){
   :root{--hud-top:84px;--hud-bottom:96px}
   /* a soft band behind the name, so it reads over beams and over paintings */
-  .hud::before{content:"";position:absolute;inset:0 0 auto 0;height:132px;pointer-events:none;
-    background:linear-gradient(180deg,rgba(var(--wash),.82) 0%,rgba(var(--wash),.5) 55%,rgba(var(--wash),0) 100%)}
+  .hud::before{content:"";position:absolute;inset:0 0 auto 0;height:96px;pointer-events:none;
+    background:linear-gradient(180deg,rgba(var(--wash),.74) 0%,rgba(var(--wash),0) 100%)}
   .hud-top{position:relative}
   .hud-top{grid-template-columns:1fr auto;gap:12px}
   .hud-meta{display:none}
   .hud-mail{display:none}
   .brand-target .pre-big{font-size:26px}
-  .hud-bottom{flex-direction:column;align-items:stretch;gap:12px}
+  .hud-bottom{flex-direction:column;align-items:stretch;gap:8px}
+  .hud-hint{width:max-content;padding:5px 10px 4px;font-size:10px}
   /* one quiet row: no arrows, no orphan */
   .hud-pills{justify-content:flex-start;flex-wrap:nowrap;gap:6px}
   .hud-pills .arr{display:none}
@@ -327,11 +331,9 @@ html[data-room="off"] .sec:not(.sec-featured){display:none}
   .lede{font-size:16px;line-height:1.5}
   .poem{font-size:17px;line-height:1.36}
   .pre-centre{padding-left:var(--gut)}
-  .feat-head{align-items:center}
-  .feat-title{min-width:0;font-size:28px}
-  .feat-tools{gap:10px}
-  /* touch swipes the row; the arrows step aside so All work keeps its place */
-  .feat-arrows{display:none}
+  .feat-head{flex-wrap:wrap;row-gap:14px}
+  .feat-title{min-width:0;font-size:28px;width:100%}
+  .feat-tools{width:100%;justify-content:space-between}
   .feat-card{width:58vw}
   .feat-card.is-wide{width:72vw}
   .cap-title{font-size:14px}
