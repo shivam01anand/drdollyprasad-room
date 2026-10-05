@@ -380,8 +380,66 @@ box("Floor_ArchSill", AX0 - T - 0.02, AX0 + 0.06, ARCH["cy"] - ARCH["w"] / 2, AR
     role_mat("sandstone"), bevel=0.01)
 for n, (x0, x1, y0, y1) in {"N": (AX0, AX1, AY1 - 0.34, AY1), "E": (AX1 - 0.34, AX1, AY0, AY1 - 0.34)}.items():
     box(f"Wall_Plinth{n}", x0, x1, y0, y1, 0, 0.16, role_mat("sandstone"), bevel=0.012)
-for k, x in enumerate((3.6 - 0.375, 3.6 + 0.375)):
-    box(f"Wall_FrontDoor{k}", x - 0.37, x + 0.37, AY0 - T / 2 - 0.03, AY0 - T / 2 + 0.03, 0, 2.43, role_mat("timber"), bevel=0.006)
+
+
+def door_leaf(name, w, h, t, role, studs=True, panels=(2, 4), pull_left=False):
+    """an old panelled leaf, built flat in x (width) and z (height), thickness in y:
+    stiles and rails stand proud of recessed panels; iron studs at the joints"""
+    parts, iron = [], []
+    m = role_mat(role)
+    st = 0.11
+    parts.append(box(f"{name}_back", 0, w, -t / 2, t / 2 - 0.012, 0, h, m, bevel=0.004))
+    for x0 in (0, w - st):
+        parts.append(box(f"{name}_stile", x0, x0 + st, -t / 2, t / 2, 0, h, m, bevel=0.006))
+    cols, rows = panels
+    rail_z = [0.0] + [h * (k / rows) for k in range(1, rows)] + [h - st]
+    for z in rail_z:
+        parts.append(box(f"{name}_rail", st, w - st, -t / 2, t / 2, z, z + st, m, bevel=0.006))
+    if cols > 1:
+        # the mullion runs between the rails, never through them (shared faces render black)
+        mid = w / 2 - 0.04
+        for z0, z1 in zip(rail_z, rail_z[1:]):
+            parts.append(box(f"{name}_mullion", mid, mid + 0.08, -t / 2, t / 2 - 0.004, z0 + st, z1, m, bevel=0.005))
+    if studs:
+        for z in rail_z:
+            for x in (st / 2, w / 2, w - st / 2):
+                bpy.ops.mesh.primitive_uv_sphere_add(segments=12, ring_count=6, radius=0.016,
+                                                     location=(x, t / 2 + 0.002, z + st / 2))
+                o = bpy.context.active_object
+                o.scale = (1, 0.55, 1)
+                iron.append(o)
+        # the ring pull, on the meeting stile
+        bpy.ops.mesh.primitive_torus_add(major_radius=0.055, minor_radius=0.008, major_segments=24, minor_segments=8,
+                                         location=(st / 2 if pull_left else w - st / 2, t / 2 + 0.012, h * 0.47),
+                                         rotation=(math.pi / 2, 0, 0))
+        iron.append(bpy.context.active_object)
+    leaf = join(name, parts)
+    studs_o = None
+    if iron:
+        for o in iron:
+            o.data.materials.append(role_mat("ironDark"))
+        studs_o = join(f"{name}Iron", iron)
+    return leaf, studs_o
+
+
+def place(o, loc, rot_z):
+    if o is None:
+        return
+    o.location = Vector(loc)
+    o.rotation_euler = (0, 0, rot_z)
+
+
+# the house's front doors, shut: two teak leaves in a timber frame, studded
+DW, DH = 0.75, 2.42
+for k, x0 in enumerate((3.6 - DW, 3.6)):
+    # the pulls meet at the centre: the right leaf's is on its left stile
+    leaf, iron = door_leaf(f"Wall_FrontDoor{k}", DW, DH, 0.06, "timber", pull_left=(k == 1))
+    place(leaf, (x0, AY0 - T / 2, 0), 0)
+    place(iron, (x0, AY0 - T / 2, 0), 0)
+box("Wall_FrontDoorFrameL", 3.6 - 0.75 - 0.09, 3.6 - 0.75, AY0 - T + 0.02, AY0 + 0.015, 0, 2.52, role_mat("timber"), bevel=0.01)
+box("Wall_FrontDoorFrameR", 3.6 + 0.75, 3.6 + 0.75 + 0.09, AY0 - T + 0.02, AY0 + 0.015, 0, 2.52, role_mat("timber"), bevel=0.01)
+box("Wall_FrontDoorFrameT", 3.6 - 0.75, 3.6 + 0.75, AY0 - T + 0.02, AY0 + 0.015, 2.43, 2.52, role_mat("timber"), bevel=0.01)
+box("Floor_FrontStep", 3.6 - 0.95, 3.6 + 0.95, AY0 - T - 0.02, AY0 + 0.22, 0, 0.07, role_mat("sandstone"), bevel=0.012)
 
 # --- the Quiet Room
 floor("Quiet", QX0, QX1, QY0, QY1, "floor")
@@ -612,9 +670,16 @@ charpai("charpai_red", (-1.05, -2.6, 0), math.radians(90), L=1.85, W=0.9)
 import_ph("brass_pot_01", (-1.2, -2.0, 0), 0.4, 0.95, mass=1.0)
 import_ph("brass_pot_01", (-0.95, -3.2, 0), 1.7, 0.8, mass=1.0)
 import_ph("ceramic_pot", (-1.0, -0.15, 0), 1.0, 0.75, mass=2.0)
-door = box("Deco_laneDoor", 0, 0.05, 0, 1.08, 0, 2.28, role_mat("door"), bevel=0.006)
-door.location = (RX0 + 0.02, -3.55 - 0.54, 0)
-door.rotation_euler = (0, 0, math.radians(58))
+# the lane door: one leaf ajar into the room, turquoise flaking over old wood
+lane, lane_iron = door_leaf("Deco_laneDoor", 1.06, 2.26, 0.055, "door", panels=(1, 3))
+# hinged on the door's south jamb: closed it would lie at 90° (along the wall); swung 58° into the room
+place(lane, (RX0 + 0.03, -3.55 - 0.54, 0), math.radians(90 - 58))
+place(lane_iron, (RX0 + 0.03, -3.55 - 0.54, 0), math.radians(90 - 58))
+if lane_iron:
+    lane_iron.name = "Deco_laneDoorIron"
+box("Wall_LaneDoorFrameS", RX0 - T + 0.02, RX0 + 0.015, -3.55 - 0.56 - 0.09, -3.55 - 0.56, 0, 2.4, role_mat("timber"), bevel=0.01)
+box("Wall_LaneDoorFrameN", RX0 - T + 0.02, RX0 + 0.015, -3.55 + 0.56, -3.55 + 0.56 + 0.09, 0, 2.4, role_mat("timber"), bevel=0.01)
+box("Wall_LaneDoorFrameT", RX0 - T + 0.02, RX0 + 0.015, -3.55 - 0.56, -3.55 + 0.56, 2.3, 2.4, role_mat("timber"), bevel=0.01)
 
 # ====================================================================== foliage
 def card(name, w, h, mat):
@@ -810,8 +875,8 @@ NARROW = {
     "floral":    ((4.55, 3.0, 1.55), (AX1, 3.0, 1.22)),
     "canopy":    ((5.75, 3.25, 1.55), (5.75, AY0, 1.25)),
     "threshold": ((4.4, 3.4, 1.55), (AX0, 3.4, 1.35)),
-    "bodhi":     ((-2.35, 3.4, 1.55), (QX0, 3.4, 1.3)),
-    "faith":     ((-3.8, 3.8, 1.55), (-2.95, QY0, 1.3)),
+    "bodhi":     ((-1.85, 3.4, 1.55), (QX0, 3.4, 0.98)),
+    "faith":     ((-2.75, 4.95, 1.55), (-2.65, QY0, 1.28)),
     "street":    ((-4.3, -0.4, 1.55), (-3.35, RY0, 1.3)),
     "redwall":   ((-3.55, -3.55, 1.55), (RX1, -3.55, 1.3)),
     "featured":  ((-2.66, -2.55, 3.62), (-1.2, -2.55, 0.0)),
