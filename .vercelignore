@@ -9,3 +9,4 @@ run-variants.sh
 .vercel
 scripts/bake/work
 assets/polyhaven
+scripts/house/node_modules

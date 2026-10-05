@@ -1,20 +1,22 @@
-import * as THREE from "three";
 import { aim, type Pose } from "./room/rig";
-import type { Anchors } from "./room/shell";
-import { ROOM } from "./room/shell";
+import type { HouseInfo, V3 } from "./room/house";
 
 /**
- * One chapter model owns the copy, the camera framing and the beat, so the
- * three can never drift apart.
+ * One chapter model owns the copy and the camera, so the two can never drift
+ * apart. The camera framings are the house's own views (scripts/house),
+ * made in Blender and walked in order: each turn is at most a quarter, and
+ * every move from one room to the next passes through a doorway
+ * (scripts/house/pathcheck.py proves it).
  *
- * Every framing leaves the lower left of the frame to the copy and puts the
- * work in the right two-thirds.
+ * The journey: the Aangan, the courtyard garden, opens on "Woman with
+ * Poppies"; through the arch into the Quiet Room; through its door into the
+ * Red Room by the lane; then up, out of the house, for Featured and the plan.
  */
 export type Chapter = {
   id: string;
   /** the label above the copy; also the accessible name of the beat */
   eyebrow: string;
-  /** rendered as a paragraph; omit for a beat the room carries alone */
+  /** rendered as a paragraph; omit for a beat the house carries alone */
   body?: string;
   /** her own words, set as a quotation */
   quote?: string;
@@ -24,9 +26,8 @@ export type Chapter = {
   slot?: "featured";
   /** the header sits on dark material in this framing: set it in light ink */
   ink?: "light";
-  pose: Pose | ((a: Anchors) => Pose);
-  /** a portrait screen frames one thing, above the copy */
-  narrow?: Pose | ((a: Anchors) => Pose);
+  /** the Blender view this chapter frames (house.json cams) */
+  view: string;
 };
 
 export const POEM = `They are not things,
@@ -40,82 +41,38 @@ I put them on canvas
 I don’t paint
 Am not a painter`;
 
-const HX = ROOM.w / 2, HZ = ROOM.d / 2;
-
-/** the establishing shot: square-on to Twenty Paise, the whole altar wall */
-export const START: Pose = aim([0, 1.6, -HZ + 0.05], 0, 5.3, 0.0);
-
-/** rearrange: a dollhouse view in through the open side */
-export const MESS: Pose = aim([0, 1.25, -0.2], 0, 9.8, 0, -0.12);
-
 export const CHAPTERS: Chapter[] = [
+  { id: "presence", eyebrow: "“Woman with Poppies”", view: "presence" },
   {
-    id: "presence",
-    eyebrow: "“Twenty Paise”",
-    // no copy: the painting is the whole statement
-    pose: aim([0, 1.58, -HZ + 0.05], 0, 4.15),
+    id: "floral",
+    eyebrow: "Recent work · 2024–",
+    body:
+      "Hotter reds, a darker ground, and green entering her palette for the first time. Her own " +
+      "words for these: pause, stillness, silence, listening. Two have already gone to New York " +
+      "and London.",
+    view: "floral",
+  },
+  { id: "canopy", eyebrow: "“Under Canopy of Greens” · 2025", view: "canopy" },
+  { id: "threshold", eyebrow: "Faith · c. 2005–2015", view: "threshold" },
+  { id: "bodhi", eyebrow: "Artist’s statement", verse: POEM, view: "bodhi" },
+  {
+    id: "faith",
+    eyebrow: "“Threads of Faith” · 2026",
+    body: "On view at Sacred Fragments: A Journey Home. New Delhi, 18–21 October 2026.",
+    view: "faith",
   },
   {
-    id: "leaving",
+    id: "street",
     eyebrow: "Gone Are The Days · c. 2016–2018",
     body:
       "Fourteen paintings of a country’s discarded equipment. Withdrawn coins, a pillar " +
       "postbox, hand-lettered posters for the last single-screen cinemas, a tonga going " +
       "out as an auto-rickshaw arrives. What is leaving she paints in full oil; what is " +
       "arriving she draws as a single bare line.",
-    pose: aim([-HX, 1.5, 0.05], Math.PI / 2, 4.35, -0.03),
-    // a phone holds the painting in the upper half, clear of the label
-    narrow: aim([-HX, 1.06, 0.05], Math.PI / 2, 4.0, -0.03),
+    view: "street",
   },
-  {
-    id: "still",
-    eyebrow: "Recent work · 2024–",
-    body:
-      "Then the register changes. Hotter reds, a darker ground, and green entering her " +
-      "palette for the first time. Her own words for these: pause, stillness, silence, " +
-      "listening. Two have already gone to New York and London.",
-    pose: aim([HX, 1.55, -0.05], -Math.PI / 2, 4.35, -0.03),
-    narrow: aim([HX, 1.42, -1.72], -Math.PI / 2, 3.1, -0.02),
-  },
-  {
-    id: "close",
-    eyebrow: "Bandh Darwaze · Closed Doors · 2018",
-    ink: "light",
-    body:
-      "Four paintings of old doors, one foot square. A hasp, a bolt, a heart-shaped " +
-      "knocker, and a padlock hanging open on its staple. Her only work without a figure " +
-      "in it, and the closest she comes to abstraction.",
-    // square to the leaf, a little off its normal so the hardware has depth
-    // square to the leaf and close enough that the leaf fills the frame;
-    // the hardware sits right of centre, the copy over plain planks
-    pose: (a) => {
-      const yaw = Math.atan2(a.leafNormal.x, a.leafNormal.z) - 0.06;
-      // from inside the room the leaf's free edge is on the left, so the
-      // hardware sits left of centre; aim below it so it rides in the upper
-      // half of the frame, clear of the copy
-      const along = new THREE.Vector3(-a.leafNormal.z, 0, a.leafNormal.x).multiplyScalar(-0.35);
-      return aim([a.lock.x + along.x, a.lock.y - 0.07, a.lock.z + along.z], yaw, 0.8, 0);
-    },
-    narrow: (a) => {
-      const yaw = Math.atan2(a.leafNormal.x, a.leafNormal.z) - 0.06;
-      const along = new THREE.Vector3(-a.leafNormal.z, 0, a.leafNormal.x).multiplyScalar(-0.13);
-      return aim([a.lock.x + along.x, a.lock.y - 0.16, a.lock.z + along.z], yaw, 0.95, 0);
-    },
-  },
-  {
-    id: "shrine",
-    eyebrow: "Artist’s statement",
-    verse: POEM,
-    pose: aim([ROOM.niche.x - 0.24, 1.4, -HZ], -0.1, 1.95, -0.03),
-    narrow: aim([ROOM.niche.x, 0.89, -HZ], 0, 2.3, 0),
-  },
-  {
-    id: "featured",
-    eyebrow: "Featured",
-    slot: "featured",
-    // the sun on the floor through the grille: a quiet ground for the cards
-    pose: aim([-0.55, 0.0, 0.05], -0.35, 3.4, 0, -1.02),
-  },
+  { id: "redwall", eyebrow: "“Shree 420” · “Three Women in Red”", view: "redwall" },
+  { id: "featured", eyebrow: "Featured", slot: "featured", view: "featured" },
   {
     id: "plan",
     eyebrow: "Eighteen solo exhibitions · 2005–2018",
@@ -127,16 +84,52 @@ export const CHAPTERS: Chapter[] = [
       "finding their place in numerous private art collections globally. My creative " +
       "expression has resonated with diverse audiences, building connections that span " +
       "continents.",
-    pose: aim([0.15, 0, 0.1], 0, 9.2, 0, -Math.PI / 2),
+    view: "plan",
   },
 ];
 
-export function resolvePoses(a: Anchors, narrow = false): Pose[] {
+/** the painting the preloader shows, and the first the house frames */
+export const HERO_ID = "woman-with-poppies";
+
+/**
+ * A Blender view as a rig pose: the pivot at the target, the camera `dist`
+ * back along the line of sight. `prevYaw` unwraps the turn, so the camera
+ * always takes the short way round.
+ */
+export function viewPose(v: { eye: V3; target: V3 }, prevYaw?: number, back = 1): Pose {
+  const d: V3 = [v.target[0] - v.eye[0], v.target[1] - v.eye[1], v.target[2] - v.eye[2]];
+  const len = Math.hypot(d[0], d[1], d[2]);
+  const n = d.map((x) => x / len) as V3;
+  // straight down: north is up the screen, as on a plan
+  let yaw = Math.abs(n[1]) < 0.999 ? Math.atan2(-n[0], -n[2]) : 0;
+  if (prevYaw !== undefined) {
+    while (yaw - prevYaw > Math.PI) yaw -= 2 * Math.PI;
+    while (yaw - prevYaw < -Math.PI) yaw += 2 * Math.PI;
+  }
+  const orbit = Math.asin(Math.max(-1, Math.min(1, n[1])));
+  return aim(v.target, yaw, len * back, 0, orbit);
+}
+
+/** portrait screens keep the framings: the rig widens the lens instead
+ *  (stepping back would put the camera through the wall behind it) */
+const NARROW_BACK = 1;
+
+/** a portrait screen has its own framing of a view where Blender made one ("n:<view>") */
+const cam = (info: HouseInfo, view: string, narrow: boolean) => (narrow && info.cams[`n:${view}`]) || info.cams[view];
+
+export function resolvePoses(info: HouseInfo, narrow = false): Pose[] {
+  let prev: number | undefined;
   return CHAPTERS.map((c) => {
-    const p = narrow && c.narrow ? c.narrow : c.pose;
-    return typeof p === "function" ? p(a) : p;
+    const p = viewPose(cam(info, c.view, narrow), prev, NARROW_BACK);
+    prev = p.pivotRot[1];
+    return p;
   });
 }
+
+/** the establishing shot: the hero's wall, from the courtyard's far side */
+export const startPose = (info: HouseInfo, narrow = false) => viewPose(cam(info, "start", narrow));
+/** rearrange: the dollhouse view, high over the house */
+export const messPose = (info: HouseInfo) => viewPose(info.cams.mess);
 
 /** portrait screens get their own framings */
 export const isNarrow = (aspect: number) => aspect < 0.85;

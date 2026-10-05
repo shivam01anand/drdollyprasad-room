@@ -42,16 +42,21 @@ def log(*a):
 
 # ------------------------------------------------------------------ 1. flatten
 bpy.ops.object.select_all(action="DESELECT")
-for o in list(bpy.data.objects):
-    if o.name.startswith("cutter"):
-        bpy.data.objects.remove(o, do_unlink=True)
-dg = bpy.context.evaluated_depsgraph_get()
-for o in [o for o in bpy.data.objects if o.type == "MESH" and o.modifiers]:
+cutters = [o for o in bpy.data.objects if o.name.startswith("cutter")]
+# the openings are cut by booleans that need their cutters: apply first, then remove them
+for o in cutters:
+    o.hide_set(False)
+    o.hide_viewport = False
+for o in [o for o in bpy.data.objects if o.type == "MESH" and o.modifiers and not o.name.startswith("cutter")]:
+    before = len(o.data.polygons)
+    bpy.ops.object.select_all(action="DESELECT")
     bpy.context.view_layer.objects.active = o
     o.select_set(True)
     bpy.ops.object.convert(target="MESH")
-    o.select_set(False)
-log("modifiers applied")
+for o in cutters:
+    bpy.data.objects.remove(o, do_unlink=True)
+walls = {o.name: len(o.data.polygons) for o in bpy.data.objects if o.name in ("Wall_AanganW", "Wall_QuietS", "Wall_RedW")}
+log("modifiers applied; cut walls:", walls)
 
 
 def kind(o):
@@ -200,7 +205,9 @@ if ONLY in (None, "night"):
             o.data.energy = day_energy[n] * 0.12
         elif n.startswith("L_"):
             o.data.energy = day_energy[n] * 1.6
-    bg.inputs["Strength"].default_value = day_sky * 0.045
+        elif n.startswith("N_"):
+            o.data.energy = float(o.data.get("night", 100.0))
+    bg.inputs["Strength"].default_value = day_sky * 0.08
     night = []
     if "diya" in anchors:
         night.append(lamp("Night_diya", anchors["diya"], 38))
@@ -255,14 +262,20 @@ for im in bpy.data.images:
     if max(w, h) > cap:
         s = cap / max(w, h)
         im.scale(max(1, int(w * s)), max(1, int(h * s)))
+    # whatever the importer made of it, the exporter must be able to read it back
+    try:
+        im.pack()
+    except RuntimeError as e:
+        log("could not pack", im.name, e)
 for o in list(bpy.data.objects):
     if o.type in ("LIGHT", "CAMERA"):
         bpy.data.objects.remove(o, do_unlink=True)
 bpy.ops.export_scene.gltf(
     filepath=os.path.join(OUT, "house.glb"),
     export_format="GLB",
-    export_image_format="WEBP",
-    export_image_quality=82,
+    # WebP cannot hold the single-channel roughness maps the importer makes
+    export_image_format="AUTO",
+    export_jpeg_quality=82,
     export_draco_mesh_compression_enable=True,
     export_draco_mesh_compression_level=6,
     export_draco_position_quantization=14,

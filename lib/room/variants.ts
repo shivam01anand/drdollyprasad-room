@@ -35,7 +35,8 @@ export type Variant = {
 
 const base = {
   clear: 0xefe9df,
-  exposure: 1.0,
+  // the house's afternoon reads as Blender's AgX frame did at +0.4 EV
+  exposure: 1.18,
   sun: { color: 0xffe7c9, intensity: 4.0, pos: [7.8, 4.6, 0.9] as [number, number, number] },
   door: { color: 0xffd7a8, intensity: 1.35 },
   front: { color: 0xfff1e0, intensity: 9.0 },
@@ -85,7 +86,7 @@ export function activeVariant(): Variant {
 /** what the dark mode becomes: the diya, a little moonlight at the grille */
 export const NIGHT = {
   clear: 0x0d0a08,
-  exposure: 1.08,
+  exposure: 1.2,
   sun: { color: 0x8ea4c8, intensity: 0.32 },
   door: 0.0,
   // a breath of fill from the open side, so the hero still reads by lamplight

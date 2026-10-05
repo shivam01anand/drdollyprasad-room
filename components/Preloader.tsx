@@ -221,7 +221,7 @@ const Preloader = forwardRef<PreloaderHandle, Props>(function Preloader(props, r
         <div className="pre-foot lab">New Delhi</div>
       </div>
       {/* eslint-disable-next-line @next/next/no-img-element */}
-      <img className="pre-hero" ref={hero} src="/art/large/rickshaw-puller-and-coin.jpg" alt="" decoding="async" />
+      <img className="pre-hero" ref={hero} src="/art/large/woman-with-poppies.jpg" alt="" decoding="async" />
     </div>
   );
 });

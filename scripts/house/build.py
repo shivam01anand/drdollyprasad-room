@@ -253,6 +253,7 @@ def cutter(kind, cx, cy, w, h, z0, depth, axis):
     above) or 'rect'. axis 'x' cuts a north-south wall, 'y' an east-west one."""
     spring = h - w / 2 if kind == "arch" else h
     sx, sy = (depth, w) if axis == "x" else (w, depth)
+    INFO.setdefault("openings", []).append([cx - sx / 2, cx + sx / 2, cy - sy / 2, cy + sy / 2, z0, z0 + h])
     bpy.ops.mesh.primitive_cube_add(size=1, location=(cx, cy, z0 + spring / 2 - 0.02))
     b = bpy.context.active_object
     b.scale = (sx, sy, spring + 0.04)
@@ -474,14 +475,14 @@ painting("woman-with-poppies", "N", AY1, 3.6, 1.72, 1.32)
 painting("child-among-flowers", "E", AX1, 1.25, 1.62, 0.96)
 painting("woman-with-red-flower", "E", AX1, 3.0, 1.62, 0.61)
 painting("woman-with-bird", "E", AX1, 4.45, 1.62, 0.61)
-painting("boy-with-bananas", "W", AX0, 1.35, 1.66, 0.914)
+painting("boy-with-bananas", "S", AY0, 5.75, 1.66, 0.914)
 painting("monk-and-green-buddha", "W", QX0, ARCH["cy"], 1.62, 1.3)
-painting("monks-and-blue-buddha", "N", QY1, -3.0, 1.6, 1.25)
-painting("temple-bells", "E", QX1, 1.75, 1.6, 0.914)
-painting("bulls-and-wheel", "S", RY0 + 0.012, -3.0, 1.66, 1.1)
+painting("monks-and-blue-buddha", "S", QY0, -2.62, 1.62, 1.2)
+painting("temple-bells", "S", QY0, -1.12, 1.6, 0.86)
+painting("bulls-and-wheel", "S", RY0 + 0.012, -3.15, 1.66, 1.1)
 painting("shree-420-and-milk-cans", "E", RX1, -1.55, 1.62, 1.0)
 painting("three-veiled-women", "E", RX1, -3.55, 1.6, 0.92)
-painting("terracotta-pots", "N", RY1, -1.75, 1.6, 0.92)
+painting("terracotta-pots", "S", RY0 + 0.012, -1.32, 1.6, 0.86)
 
 # ====================================================================== things
 def import_ph(ph_id, loc, rot_z=0.0, scale=1.0, decimate=None, prop=True, mass=1.0):
@@ -606,7 +607,7 @@ lamp_tower("lamp", (-5.1, 5.45, 0))
 milk_can("can_0", (-5.15, -2.85, 0))
 milk_can("can_1", (-4.85, -2.62, 0), 0.85)
 milk_can("can_2", (-5.18, -2.35, 0), 0.92)
-cart_wheel("wheel", (-5.42, -4.3, 0), math.radians(90))
+cart_wheel("wheel", (-4.95, -4.58, 0), 0.0)
 charpai("charpai_red", (-1.05, -2.6, 0), math.radians(90), L=1.85, W=0.9)
 import_ph("brass_pot_01", (-1.2, -2.0, 0), 0.4, 0.95, mass=1.0)
 import_ph("brass_pot_01", (-0.95, -3.2, 0), 1.7, 0.8, mass=1.0)
@@ -754,7 +755,8 @@ def gallery_light(art_id, power=42, size=0.35, dist=1.45):
     d.energy = power
     d.color = (1.0, 0.86, 0.68)
     o = link(bpy.data.objects.new(f"L_{art_id}", d))
-    o.location = Vector((cx, cy, H_ROOM - 0.22)) + n * 0.95
+    # in the rooms from the ceiling; in the courtyard from a bracket high on the facing side
+    o.location = Vector((cx, cy, min(H_ROOM - 0.22, cz + 1.9))) + n * 0.95
     o.rotation_euler = (Vector((cx, cy, cz)) - o.location).to_track_quat("-Z", "Y").to_euler()
     INFO["lights"][f"L_{art_id}"] = {"pos": list(o.location), "target": [cx, cy, cz], "power": power}
     return o
@@ -779,18 +781,42 @@ fill("Fill_red", RX0, RX1, RY0, RY1, float(opt.get("--fillr", 90)))
 for k in ("monk-and-green-buddha", "monks-and-blue-buddha", "temple-bells",
           "bulls-and-wheel", "shree-420-and-milk-cans", "three-veiled-women", "terracotta-pots"):
     gallery_light(k, power=float(opt.get("--gallery", 135)))
+# the courtyard's own lights: off in the afternoon, they come on with the evening (export.py)
+for k in ("woman-with-poppies", "child-among-flowers", "woman-with-red-flower", "woman-with-bird", "boy-with-bananas"):
+    o = gallery_light(k, power=0.0)
+    o.name = f"N_{k}"
+    o.data["night"] = 120.0
 
 # ====================================================================== the chapters' views
 VIEWS = {
-    "presence": ((3.6, 2.05, 1.62), (3.6, AY1, 1.86)),
-    "floral":   ((3.1, 3.0, 1.6), (AX1, 2.85, 1.6)),
-    "canopy":   ((5.6, 2.15, 1.62), (AX0, 2.55, 1.6)),
-    "bodhi":    ((-1.45, 3.4, 1.6), (QX0, 3.4, 1.62)),
-    "faith":    ((-4.6, 2.35, 1.6), (QX1, 2.55, 1.58)),
-    "street":   ((-1.55, -0.05, 1.6), (-3.75, RY0, 1.5)),
-    "redwall":  ((-4.75, -2.55, 1.5), (RX1, -2.55, 1.38)),
-    "featured": ((2.6, 0.9, 2.9), (4.4, 3.4, 0.0)),
-    "overhead": ((0.6, 0.55, 26.0), (0.6, 0.55, 0.0)),
+    # the walk, in order: each turn at most a quarter, every room change through a doorway
+    "start":     ((3.6, 0.55, 1.62), (3.6, AY1, 1.86)),
+    "presence":  ((3.6, 2.05, 1.62), (3.6, AY1, 1.86)),
+    "floral":    ((3.25, 3.0, 1.6), (AX1, 2.85, 1.6)),
+    "canopy":    ((4.9, 3.85, 1.6), (4.9, AY0, 1.62)),
+    "threshold": ((4.8, 3.4, 1.6), (AX0, 3.4, 1.7)),
+    "bodhi":     ((-1.45, 3.4, 1.6), (QX0, 3.4, 1.62)),
+    "faith":     ((-3.35, 4.45, 1.6), (-2.55, QY0, 1.55)),
+    "street":    ((-4.3, -0.05, 1.6), (-3.25, RY0, 1.6)),
+    "redwall":   ((-4.85, -2.55, 1.55), (RX1, -2.55, 1.45)),
+    "featured":  ((-2.66, -2.55, 3.62), (-1.2, -2.55, 0.0)),
+    "plan":      ((-2.4, 0.6, 23.0), (-2.4, 0.6, 0.0)),
+    "mess":      ((10.5, -10.5, 11.5), (0.4, 0.4, 0.4)),
+}
+# portrait screens: one painting per chapter, centred, high in the frame (the copy sits below)
+NARROW = {
+    "start":     ((3.6, 0.9, 1.55), (3.6, AY1, 1.3)),
+    "presence":  ((3.6, 2.55, 1.55), (3.6, AY1, 1.3)),
+    "floral":    ((4.55, 3.0, 1.55), (AX1, 3.0, 1.22)),
+    "canopy":    ((5.75, 3.25, 1.55), (5.75, AY0, 1.25)),
+    "threshold": ((4.4, 3.4, 1.55), (AX0, 3.4, 1.35)),
+    "bodhi":     ((-2.35, 3.4, 1.55), (QX0, 3.4, 1.3)),
+    "faith":     ((-3.8, 3.8, 1.55), (-2.95, QY0, 1.3)),
+    "street":    ((-4.3, -0.4, 1.55), (-3.35, RY0, 1.3)),
+    "redwall":   ((-3.55, -3.55, 1.55), (RX1, -3.55, 1.3)),
+    "featured":  ((-2.66, -2.55, 3.62), (-1.2, -2.55, 0.0)),
+    "plan":      ((0.8, -3.2, 34.0), (0.8, -3.2, 0.0)),
+    "mess":      ((10.5, -10.5, 11.5), (0.4, 0.4, 0.4)),
 }
 FOV = 40.0
 
@@ -809,6 +835,8 @@ def camera(name, eye, at, fov=FOV):
 
 
 cams = {k: camera(k, *v) for k, v in VIEWS.items()}
+for k, (eye, at) in NARROW.items():
+    INFO["cams"][f"n:{k}"] = {"eye": list(eye), "target": list(at), "fov": 62.0}
 
 # ====================================================================== out
 json.dump(INFO, open(os.path.join(OUT, "house.json"), "w"), indent=1)
@@ -821,7 +849,7 @@ ceil = [o for o in bpy.data.objects if o.name.startswith("Ceil_")]
 for name in RENDER:
     sc.camera = cams[name]
     for o in ceil:
-        o.hide_render = name == "overhead"
+        o.hide_render = name in ("plan", "featured", "mess")
     sc.render.filepath = os.path.join(OUT, f"{name}.png")
     bpy.ops.render.render(write_still=True)
     print("rendered", name, flush=True)

@@ -91,14 +91,15 @@ export const SERIES: { label: string; note: string }[] = [
 
 /** the featured row, in hanging order; the large files exist for these */
 export const FEATURED = [
-  "temple-bells", "rickshaw-puller-and-coin", "boy-with-bananas", "red-and-teal-door-lock",
-  "woman-with-bird", "terracotta-pots", "child-among-flowers", "boy-and-kettle",
-  "woman-with-red-flower", "man-among-metal-pans", "mother-india-and-kettles",
+  "woman-with-poppies", "temple-bells", "bulls-and-wheel", "boy-with-bananas",
+  "monk-and-green-buddha", "woman-with-bird", "three-veiled-women", "child-among-flowers",
+  "shree-420-and-milk-cans", "woman-with-red-flower", "monks-and-blue-buddha", "terracotta-pots",
 ];
 
 /** the works with an 1800 px file in /art/large — the lightbox upgrades to it */
 export const LARGE = new Set([
-  ...FEATURED, "bullock-cart-and-truck", "weathered-door-ring", "teal-door-bolt", "carved-door-knocker",
+  ...FEATURED, "rickshaw-puller-and-coin", "red-and-teal-door-lock", "boy-and-kettle", "man-among-metal-pans",
+  "mother-india-and-kettles", "bullock-cart-and-truck", "weathered-door-ring", "teal-door-bolt", "carved-door-knocker",
 ]);
 
 export const EMAIL = "drdollyprasad@gmail.com";

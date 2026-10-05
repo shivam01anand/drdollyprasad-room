@@ -17,7 +17,7 @@ import { BY_ID, FEATURED, details, quoted, statusLabel } from "@/lib/works";
  */
 
 // the original's two widths, in its 15/20 rhythm
-const WIDE = [true, false, true, false, false, true, false, true, false, true, false];
+const WIDE = [true, false, true, false, false, true, false, true, false, true, false, true];
 
 type Dims = Record<string, { w: number; h: number }>;
 

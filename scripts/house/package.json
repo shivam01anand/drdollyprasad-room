@@ -1,0 +1,1 @@
+{ "name": "house-tools", "private": true, "description": "Blender house → site: glTF compression", "dependencies": { "@gltf-transform/cli": "4.5.1" } }

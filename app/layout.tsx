@@ -38,7 +38,7 @@ export default function RootLayout({ children }: { children: React.ReactNode }) 
           href="https://fonts.googleapis.com/css2?family=Instrument+Sans:ital,wght@0,400;0,500;0,600;1,400&family=IBM+Plex+Mono:wght@400;500&family=IBM+Plex+Sans+Devanagari:wght@500&display=swap"
           rel="stylesheet"
         />
-        <link rel="preload" as="image" href="/art/large/rickshaw-puller-and-coin.jpg" />
+        <link rel="preload" as="image" href="/art/large/woman-with-poppies.jpg" />
       </head>
       <body>{children}</body>
     </html>

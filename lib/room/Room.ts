@@ -4,18 +4,13 @@ import { EffectComposer } from "three/examples/jsm/postprocessing/EffectComposer
 import { RenderPass } from "three/examples/jsm/postprocessing/RenderPass.js";
 import { OutputPass } from "three/examples/jsm/postprocessing/OutputPass.js";
 import { GTAOPass } from "three/examples/jsm/postprocessing/GTAOPass.js";
-import { RectAreaLightUniformsLib } from "three/examples/jsm/lights/RectAreaLightUniformsLib.js";
-import { mergeGeometries } from "three/examples/jsm/utils/BufferGeometryUtils.js";
 import type * as CANNON from "cannon-es";
 
-import { buildShell, buildCanopy, ROOM, type Anchors, type Tag } from "./shell";
-import { buildSitters, type Spawn } from "./objects";
-import { buildLibrary, textureList, worldUV, metricUV, ramTexture, SPECS, type Library, type Role } from "./materials";
-import { HANG, HERO, faceOffset, type Hung } from "./hang";
+import { buildLibrary, textureList, type Library } from "./materials";
 import { Rig } from "./rig";
-import { Baked, loadBake } from "./bake";
+import { loadHouse, assemble, artMaterial, BakedLight, ROOF, type HouseInfo, type HouseParts } from "./house";
 import { activeVariant, NIGHT } from "./variants";
-import { START, MESS, resolvePoses, isNarrow } from "../chapters";
+import { resolvePoses, isNarrow, startPose, messPose, HERO_ID } from "../chapters";
 
 export type RoomOpts = {
   manifestUrl: string;
@@ -101,9 +96,10 @@ export class Room {
   private scene = new THREE.Scene();
   private composer?: EffectComposer;
   private ao?: RoomAO;
-  /** the baked light, when its files are there (scripts/bake) */
-  private baked?: Baked;
+  /** the house's baked light: afternoon and evening (scripts/house) */
+  private baked?: BakedLight;
   private bakeTw?: gsap.core.Tween;
+  private nightTw?: gsap.core.Tween;
   private canvas!: HTMLCanvasElement;
   private opts!: RoomOpts;
   private variant = activeVariant();
@@ -114,20 +110,17 @@ export class Room {
   /** everything static — it tilts as one in rearrange */
   private world = new THREE.Group();
   private ceiling = new THREE.Group();
-  private anchors!: Anchors;
+  private info!: HouseInfo;
+  private parts!: HouseParts;
 
   private sun!: THREE.DirectionalLight;
-  private door!: THREE.DirectionalLight;
-  private front!: THREE.RectAreaLight;
   private hemi!: THREE.HemisphereLight;
   private ambient!: THREE.AmbientLight;
   private diya!: THREE.PointLight;
   private flame!: THREE.Mesh;
   private glow!: THREE.Sprite;
-  private shaft!: THREE.Mesh;
   private sky!: THREE.Mesh;
 
-  sitters: Spawn[] = [];
   private bodies: Body[] = [];
   private C?: typeof CANNON;
   private physics?: CANNON.World;
@@ -187,84 +180,73 @@ export class Room {
     renderer.shadowMap.autoUpdate = false;
     renderer.setClearColor(V.clear, 1);
 
-    const { root, ceiling, anchors } = buildShell();
-    this.anchors = anchors;
-    const aspect = (canvas.clientWidth || innerWidth) / Math.max(1, canvas.clientHeight || innerHeight);
-    this.narrow = isNarrow(aspect);
-    this.rig = new Rig(resolvePoses(anchors, this.narrow), START, MESS, aspect, opts.reducedMotion);
-    this.scene.add(this.rig.pivot, this.world);
-
-    /* every asset is counted, so the counter means something */
+    /* every asset is counted, so the counter means something: the house
+       (its plan, its model, two lightmaps), the room's surfaces, the paintings */
     const texList = textureList(this.tier.small);
-    const ids = [...new Set(HANG.map((h) => h.id))];
-    const total = 1 + texList.length + ids.length;
+    let total = 4 + texList.length + 12;
     let done = 0;
-    const tick = () => { if (!this.disposed) opts.onProgress(++done / total); };
+    const tick = () => { if (!this.disposed) opts.onProgress(Math.min(1, ++done / total)); };
 
-    const manifestP = fetch(opts.manifestUrl, { signal: this.abort.signal })
-      .then((r) => { if (!r.ok) throw new Error(`manifest ${r.status}`); return r.json(); })
-      .then((m: { room: { id: string; ratio: number }[] }) => { tick(); return m; });
     const texP = Promise.all(texList.map((t) =>
       this.loadTexture(t.url).then((tex) => { tick(); return [`${t.set}:${t.kind}`, tex] as const; })));
+    const houseP = loadHouse(this.tier.small, this.abort.signal, (u) => this.loadTexture(u), tick);
+    const house = await houseP;
+    const ids = Object.keys(house.info.art);
+    total = 4 + texList.length + ids.length;
     const artP = Promise.all(ids.map((id) =>
       this.loadTexture(`/art/room/${id}.jpg`).then((tex) => { tick(); return [id, tex] as const; })));
-
-    // the baked light loads alongside; without it the room is lit live
-    const bakeP = loadBake(this.tier.small, this.abort.signal, (u) => this.loadTexture(u)).catch(() => null);
-    const [manifest, texPairs, artPairs] = await Promise.all([manifestP, texP, artP]);
+    const [texPairs, artPairs] = await Promise.all([texP, artP]);
     if (this.disposed) {
       texPairs.forEach(([, t]) => t.dispose());
       artPairs.forEach(([, t]) => t.dispose());
+      house.lmDay.dispose(); house.lmNight?.dispose();
       return;
     }
+    this.info = house.info;
+
+    const aspect = (canvas.clientWidth || innerWidth) / Math.max(1, canvas.clientHeight || innerHeight);
+    this.narrow = isNarrow(aspect);
+    this.rig = new Rig(resolvePoses(this.info, this.narrow), startPose(this.info, this.narrow), messPose(this.info), aspect, opts.reducedMotion);
+    this.scene.add(this.rig.pivot, this.world);
 
     const anisotropy = Math.min(8, renderer.capabilities.getMaxAnisotropy());
-    const lib = buildLibrary(new Map(texPairs), V, anisotropy, ROOM.h);
+    const lib = buildLibrary(new Map(texPairs), V, anisotropy, ROOF);
     this.lib = lib;
     this.owned.push(lib);
-    this.carveRam(lib);
 
-    // the shell, merged by material into a handful of draw calls
-    this.mergeStatic(root, ceiling);
-    this.world.add(this.ceiling);
-
+    // the house: architecture in its photographed materials, under its baked light
+    this.baked = new BakedLight(house);
+    this.owned.push(house.lmDay);
+    if (house.lmNight) this.owned.push(house.lmNight);
+    const edge = new THREE.MeshStandardMaterial({ color: 0x9e958a, roughness: 0.95 });
+    this.owned.push(edge);
+    this.parts = assemble(house, lib, this.baked, edge);
+    for (const m of this.parts.ceilings) this.ceiling.add(m);
+    this.world.add(house.scene, this.ceiling);
+    // the things that tumble live in the scene, not in the house that tilts under them
+    house.scene.updateMatrixWorld(true);
+    for (const pr of this.parts.props) this.scene.attach(pr.group);
     // the paintings
-    const ratios = new Map(manifest.room.map((r) => [r.id, r.ratio]));
     const textures = new Map(artPairs);
-    const frames = new THREE.Group();
-    for (const h of HANG) {
-      const tex = textures.get(h.id);
-      const ratio = ratios.get(h.id);
-      if (!tex || !ratio) throw new Error(`missing artwork ${h.id}`);
+    for (const [id, mesh] of this.parts.art) {
+      const tex = textures.get(id);
+      if (!tex) throw new Error(`missing artwork ${id}`);
       tex.colorSpace = THREE.SRGBColorSpace;
       tex.anisotropy = anisotropy;
-      this.hangWork(h, tex, ratio, frames);
+      tex.flipY = false;
+      tex.needsUpdate = true;
+      mesh.material = artMaterial(tex, this.baked);
+      this.art.push(mesh);
     }
-    this.mergeStatic(frames, null);
-
-    // the sitters
-    this.sitters = buildSitters();
-    for (const s of this.sitters) {
-      this.mergeLocal(s.group);
-      this.scene.add(s.group);
-    }
+    // development: ?bake=0 shows the live light for comparison
+    if (process.env.NODE_ENV !== "production" && new URLSearchParams(location.search).get("bake") === "0") this.baked.bake.value = 0;
 
     this.buildSky();
     this.buildLights();
     this.buildItems();
     this.buildPost();
     this.resize();
-    const bake = await bakeP;
-    if (this.disposed) { bake?.tex.dispose(); return; }
-    if (bake) {
-      this.baked = new Baked(bake);
-      this.owned.push(this.baked);
-      const n = this.baked.apply(this.scene);
-      if (!n) { this.baked.uniform.value = 0; }
-      // development: ?bake=0 shows the live light for comparison
-      if (process.env.NODE_ENV !== "production" && new URLSearchParams(location.search).get("bake") === "0") this.baked.uniform.value = 0;
-      this.syncBakeAO();
-    }
+    this.syncBakeAO();
     this.captureEnvironment();
     if (V.startDark) this.setMode("dark", true);
 
@@ -306,319 +288,27 @@ export class Room {
     });
   }
 
-  /** the sandstone round the niche, with राम cut into it */
-  private carveRam(lib: Library) {
-    const m = lib.get("ram");
-    const tex = ramTexture(6);
-    tex.channel = 1;
-    this.owned.push(tex);
-    m.normalMap = null;
-    m.bumpMap = tex;
-    m.bumpScale = 1.0;
-    m.aoMap = tex;
-    m.aoMapIntensity = 0.65;
-    m.needsUpdate = true;
-  }
-
-  /**
-   * Merge tagged static meshes by material and shadow flags. Static geometry
-   * is baked into world space, its UVs laid in metres; anything under
-   * `ceiling` goes into its own group so it can be lifted for the plan view.
-   */
-  private mergeStatic(root: THREE.Object3D, ceiling: THREE.Object3D | null) {
-    const lib = this.lib!;
-    root.updateMatrixWorld(true);
-    type Bucket = { role: Role; cast: boolean; receive: boolean; ceil: boolean; lm: number; geos: THREE.BufferGeometry[] };
-    const buckets = new Map<string, Bucket>();
-    const isCeil = (o: THREE.Object3D) => {
-      for (let p: THREE.Object3D | null = o; p; p = p.parent) if (p === ceiling) return true;
-      return false;
-    };
-    root.traverse((o) => {
-      const m = o as THREE.Mesh;
-      const t = m.userData?.tag as Tag | undefined;
-      if (!m.isMesh || !t) return;
-      let g = m.geometry.clone();
-      g.applyMatrix4(m.matrixWorld);
-      if (g.index) g = g.toNonIndexed();
-      this.layUV(g, t, m.geometry);
-      for (const name of Object.keys(g.attributes))
-        if (!["position", "normal", "uv", "uv1"].includes(name)) g.deleteAttribute(name);
-      g.clearGroups();
-      const ceil = !!ceiling && isCeil(m);
-      // the courtyard is seen only through the door: a fifth of the density
-      const lm = t.lm ?? (t.role === "court" ? 0.2 : 1);
-      const key = `${t.role}|${t.cast}|${t.receive}|${ceil}|${lm}`;
-      let b = buckets.get(key);
-      if (!b) buckets.set(key, (b = { role: t.role, cast: t.cast, receive: t.receive, ceil, lm, geos: [] }));
-      b.geos.push(g);
-    });
-    root.traverse((o) => { const m = o as THREE.Mesh; if (m.isMesh) m.geometry.dispose(); });
-    for (const b of buckets.values()) {
-      const geo = mergeGeometries(b.geos, false);
-      b.geos.forEach((g) => g.dispose());
-      if (!geo) continue;
-      geo.computeBoundingSphere();
-      geo.computeBoundingBox();
-      const mesh = new THREE.Mesh(geo, lib.get(b.role));
-      // the name is the bake's key: role, then far ground marked by its density
-      mesh.name = `Merged_${b.role}${b.lm !== 1 ? `_lm${b.lm}` : ""}${b.ceil ? "_ceil" : ""}${b.cast ? "" : "_nocast"}`;
-      mesh.userData.lm = b.lm;
-      mesh.castShadow = b.cast;
-      mesh.receiveShadow = b.receive;
-      (b.ceil ? this.ceiling : this.world).add(mesh);
-    }
-  }
-
-  /** a moving object: merged by material in its own frame */
-  private mergeLocal(group: THREE.Group) {
-    const lib = this.lib!;
-    group.updateMatrixWorld(true);
-    const inv = group.matrixWorld.clone().invert();
-    const buckets = new Map<Role, THREE.BufferGeometry[]>();
-    const meshes: THREE.Mesh[] = [];
-    group.traverse((o) => {
-      const m = o as THREE.Mesh;
-      const t = m.userData?.tag as Tag | undefined;
-      if (!m.isMesh || !t) return;
-      meshes.push(m);
-      let g = m.geometry.clone();
-      g.applyMatrix4(new THREE.Matrix4().multiplyMatrices(inv, m.matrixWorld));
-      if (g.index) g = g.toNonIndexed();
-      this.layUV(g, t, m.geometry);
-      for (const name of Object.keys(g.attributes))
-        if (!["position", "normal", "uv"].includes(name)) g.deleteAttribute(name);
-      g.clearGroups();
-      const list = buckets.get(t.role) ?? [];
-      list.push(g);
-      buckets.set(t.role, list);
-    });
-    meshes.forEach((m) => { m.geometry.dispose(); m.removeFromParent(); });
-    group.clear();
-    for (const [role, geos] of buckets) {
-      const geo = mergeGeometries(geos, false);
-      geos.forEach((g) => g.dispose());
-      if (!geo) continue;
-      geo.computeBoundingSphere();
-      const mesh = new THREE.Mesh(geo, lib.get(role));
-      mesh.castShadow = true;
-      mesh.receiveShadow = true;
-      group.add(mesh);
-    }
-  }
-
-  private layUV(g: THREE.BufferGeometry, t: Tag, source: THREE.BufferGeometry) {
-    const lib = this.lib!;
-    const tile = lib.tile(t.role), rot = lib.rotate(t.role);
-    if (t.uv.kind === "keep") {
-      // the carving keeps the geometry's own 0…1 layout on the second
-      // channel; the stone itself is laid in metres like everything else
-      const uv = g.getAttribute("uv");
-      if (uv) g.setAttribute("uv1", uv.clone());
-      worldUV(g, tile, rot);
-    } else if (t.uv.kind === "world") {
-      worldUV(g, tile, rot);
-    } else {
-      metricUV(g, t.uv.su, t.uv.sv, tile, rot);
-    }
-    void source;
-  }
-
-  /* --- the paintings ---------------------------------------------------- */
-
-  private hangWork(h: Hung, tex: THREE.Texture, ratio: number, frames: THREE.Group) {
-    const w = h.h * ratio;
-    const holder = new THREE.Group();
-    const HX = ROOM.w / 2, HZ = ROOM.d / 2;
-    if (h.lean) {
-      // standing on the floor, leaning back against the plinth
-      holder.position.set(h.lean.x, 0, h.lean.z + 0.1);
-      holder.rotation.set(-h.lean.tilt, h.lean.yaw, 0, "YXZ");
-    } else if (h.wall === "back") {
-      holder.position.set(h.along, h.y, -HZ);
-    } else if (h.wall === "left") {
-      holder.position.set(-HX, h.y, h.along);
-      holder.rotation.y = Math.PI / 2;
-    } else {
-      holder.position.set(HX, h.y, h.along);
-      holder.rotation.y = -Math.PI / 2;
-    }
-    const lift = h.lean ? h.h / 2 + h.fw : 0;
-    const back = h.lean ? 0 : faceOffset(h) - h.fd + 0.012;
-
-    // the canvas
-    const mat = new THREE.MeshStandardMaterial({ map: tex, roughness: 0.86, metalness: 0, envMapIntensity: 0.5 });
-    // non-indexed, like the merged shell, so baked light maps vertex for vertex
-    const plane = new THREE.Mesh(new THREE.PlaneGeometry(w, h.h).toNonIndexed(), mat);
-    plane.position.set(0, lift, back + h.fd - 0.012);
-    plane.name = `Art_${h.id}`;
-    plane.userData.artId = h.id;
-    plane.receiveShadow = true;
-    plane.castShadow = false;
-    holder.add(plane);
-
-    // the frame: one moulding, extruded, its lip overlapping the canvas edge
-    const ow = w / 2 + h.fw, oh = h.h / 2 + h.fw, lip = 0.006;
-    const shape = new THREE.Shape();
-    shape.moveTo(-ow, -oh); shape.lineTo(ow, -oh); shape.lineTo(ow, oh); shape.lineTo(-ow, oh); shape.closePath();
-    const hole = new THREE.Path();
-    const iw = w / 2 - lip, ih = h.h / 2 - lip;
-    hole.moveTo(-iw, -ih); hole.lineTo(-iw, ih); hole.lineTo(iw, ih); hole.lineTo(iw, -ih); hole.closePath();
-    shape.holes.push(hole);
-    const bevel = Math.min(0.006, h.fw * 0.2);
-    const fg = new THREE.ExtrudeGeometry(shape, {
-      depth: h.fd - bevel * 2, bevelEnabled: true, bevelThickness: bevel, bevelSize: bevel,
-      bevelSegments: 2, curveSegments: 1,
-    });
-    const frame = new THREE.Mesh(fg);
-    frame.position.set(0, lift, back + bevel);
-    holder.add(frame);
-    frame.userData.tag = { role: "frame", uv: { kind: "metric", su: 1, sv: 1 }, cast: true, receive: true } satisfies Tag;
-
-    // a dark backing board, so a leaning canvas has a back
-    if (h.lean) {
-      const board = new THREE.Mesh(new THREE.BoxGeometry(w + h.fw * 2 - 0.01, h.h + h.fw * 2 - 0.01, 0.012));
-      board.position.set(0, lift, 0.006);
-      board.userData.tag = { role: "canvasBack", uv: { kind: "world" }, cast: true, receive: true } satisfies Tag;
-      holder.add(board);
-    }
-
-    // the canvas plane stays its own mesh; the frame joins the merge
-    holder.updateMatrixWorld(true);
-    this.world.add(holder);
-    holder.remove(frame);
-    frame.applyMatrix4(holder.matrixWorld);
-    frames.add(frame);
-    if (h.lean) {
-      const board = holder.children.find((c) => c !== plane);
-      if (board) { holder.remove(board); board.applyMatrix4(holder.matrixWorld); frames.add(board); }
-    }
-    this.art.push(plane);
-  }
-
-  /* --- the light bake: export (development only) ------------------------- */
-
-  /**
-   * Everything Blender needs to bake the room's light: every surface that
-   * receives a lightmap (the merged shell and the canvases), every object
-   * that only casts (the sitters, the dish, the shadow-only canopy), the
-   * material of each, and the lights. Arrays travel as base64 Float32.
-   * See scripts/bake/README.md.
-   */
-  exportForBake() {
-    const lib = this.lib!;
-    const roleOf = new Map<THREE.Material, string>();
-    for (const r of Object.keys(SPECS) as Role[]) roleOf.set(lib.get(r), r);
-    const b64 = (a: ArrayLike<number>) => {
-      const f = new Float32Array(a);
-      const u8 = new Uint8Array(f.buffer);
-      let bin = "";
-      for (let i = 0; i < u8.length; i += 0x8000) bin += String.fromCharCode(...u8.subarray(i, i + 0x8000));
-      return btoa(bin);
-    };
-    // every object at rest, wherever the intro drop or a shake left it
-    for (const b of this.bodies) { b.group.position.copy(b.restPos); b.group.rotation.copy(b.restRot); }
-    this.scene.updateMatrixWorld(true);
-    const meshes: object[] = [];
-    const seen = new Map<string, number>();
-    this.scene.traverse((o) => {
-      const m = o as THREE.Mesh;
-      if (!m.isMesh || Array.isArray(m.material)) return;
-      const mat = m.material as THREE.Material;
-      let kind: "bake" | "occluder" | "canopy";
-      if (mat instanceof THREE.MeshBasicMaterial && !mat.colorWrite && m.castShadow) kind = "canopy";
-      else if (!(mat instanceof THREE.MeshStandardMaterial)) return;
-      else if (m.name.startsWith("Merged_") || m.name.startsWith("Art_")) kind = "bake";
-      else kind = "occluder";
-      let g = m.geometry.clone().applyMatrix4(m.matrixWorld);
-      if (g.index) {
-        if (kind === "bake") throw new Error(`bake target ${m.name} is indexed`);
-        g = g.toNonIndexed();
-      }
-      const base = m.name || `${kind}_${roleOf.get(mat) ?? "x"}`;
-      const n = seen.get(base) ?? 0;
-      seen.set(base, n + 1);
-      const std = mat as THREE.MeshStandardMaterial;
-      meshes.push({
-        name: n ? `${base}_${n}` : base,
-        runtimeName: m.name,
-        index: n,
-        kind,
-        role: roleOf.get(mat) ?? roleOf.get(mat.userData.bakeSource) ?? (m.name.startsWith("Art_") ? "art" : "other"),
-        art: m.userData.artId ?? null,
-        count: g.getAttribute("position").count,
-        position: b64(g.getAttribute("position").array),
-        normal: b64(g.getAttribute("normal").array),
-        uv: g.getAttribute("uv") ? b64(g.getAttribute("uv").array) : null,
-        lm: m.userData.lm ?? 1,
-        color: std.color ? std.color.toArray() : [1, 1, 1],
-        roughness: std.roughness ?? 1,
-        metalness: std.metalness ?? 0,
-        ceiling: (() => { for (let p: THREE.Object3D | null = m; p; p = p.parent) if (p === this.ceiling) return true; return false; })(),
-      });
-      g.dispose();
-    });
-    const v = (x: THREE.Vector3) => x.toArray();
-    const front = this.front!;
-    front.updateMatrixWorld(true);
-    return {
-      room: ROOM,
-      specs: SPECS,
-      tier: { small: this.tier.small },
-      lights: {
-        sun: { color: this.sun!.color.toArray(), intensity: this.sun!.intensity, from: v(this.sun!.position), to: v(this.sun!.target.position) },
-        door: { color: this.door!.color.toArray(), intensity: this.door!.intensity, from: v(this.door!.position), to: v(this.door!.target.position) },
-        front: { color: front.color.toArray(), intensity: front.intensity, width: front.width, height: front.height,
-          position: v(front.getWorldPosition(new THREE.Vector3())), quaternion: front.getWorldQuaternion(new THREE.Quaternion()).toArray() },
-        hemi: { sky: this.hemi!.color.toArray(), ground: this.hemi!.groundColor.toArray(), intensity: this.hemi!.intensity },
-        ambient: { color: this.ambient!.color.toArray(), intensity: this.ambient!.intensity },
-        exposure: this.renderer!.toneMappingExposure,
-      },
-      meshes,
-    };
-  }
-
   /* --- light ------------------------------------------------------------ */
 
   private buildLights() {
     const V = this.variant;
     const sz = this.tier.shadow;
 
-    // the sun, through the grille: the one hard shape of light in the room
+    /* the afternoon sun, from the west-south-west, where Blender put it. Its
+       diffuse light is in the bake; live, it lights the things that move,
+       glints on the brass, and stands in whenever the bake steps aside. */
+    const to = new THREE.Vector3(...this.info.sun.toSun).normalize();
+    const centre = new THREE.Vector3(0.6, 1.2, -0.6);
     this.sun = new THREE.DirectionalLight(V.sun.color, V.sun.intensity);
-    this.sun.position.set(V.sun.pos[0], V.sun.pos[1], V.sun.pos[2]);
-    this.sun.target.position.set(0, 0.8, 0);
+    this.sun.position.copy(centre).addScaledVector(to, 22);
+    this.sun.target.position.copy(centre);
     this.sun.castShadow = true;
     this.sun.shadow.mapSize.set(sz, sz);
     this.sun.shadow.radius = 2.5;
     this.sun.shadow.bias = -0.0004;
-    this.sun.shadow.normalBias = 0.02;
-    Object.assign(this.sun.shadow.camera, { left: -5.5, right: 5.5, top: 5.5, bottom: -5.5, near: 0.5, far: 24 });
+    this.sun.shadow.normalBias = 0.03;
+    Object.assign(this.sun.shadow.camera, { left: -10, right: 10, top: 10, bottom: -10, near: 4, far: 44 });
     this.scene.add(this.sun, this.sun.target);
-
-    /* the open door: lower, warmer, softer, and dappled by a tree no one
-       sees — the canopy exists only in this light's shadow map */
-    this.door = new THREE.DirectionalLight(V.door.color, V.door.intensity);
-    this.door.position.set(-9.6, 5.6, 2.9);
-    this.door.target.position.set(-1.2, 0.4, 1.2);
-    this.door.castShadow = true;
-    this.door.shadow.mapSize.set(1024, 1024);
-    this.door.shadow.radius = 5;
-    this.door.shadow.bias = -0.0005;
-    this.door.shadow.normalBias = 0.03;
-    Object.assign(this.door.shadow.camera, { left: -6, right: 6, top: 6, bottom: -6, near: 0.5, far: 26 });
-    this.scene.add(this.door, this.door.target);
-    const canopy = buildCanopy();
-    this.scene.add(canopy);
-
-    /* the open side of the room, as one large soft window: no shadow, no
-       hard edge, an even wash on the walls that face it — which is to say
-       on every painting */
-    RectAreaLightUniformsLib.init();
-    this.front = new THREE.RectAreaLight(V.front.color, V.front.intensity, ROOM.w - 0.9, ROOM.h + 0.4);
-    this.front.position.set(0, ROOM.h / 2 + 0.25, ROOM.d / 2 + 4.5);
-    this.front.lookAt(0, ROOM.h / 2 - 0.25, -ROOM.d / 2);
-    this.world.add(this.front);
 
     this.hemi = new THREE.HemisphereLight(V.hemi.sky, V.hemi.ground, V.hemi.intensity);
     this.ambient = new THREE.AmbientLight(V.ambient.color, V.ambient.intensity);
@@ -626,30 +316,18 @@ export class Room {
 
     // the diya — in Vakratunda and The Aarti the flame is the only light
     // source and the only broken-out colour. It is the dark mode.
-    const a = this.anchors.diya;
+    // here the diya burns at the top of the brass lamp in the Quiet Room
+    const a = new THREE.Vector3(...(this.info.anchors.diya ?? [-5.1, 1.04, -5.45]));
     this.diya = new THREE.PointLight(0xffa04a, 0, 9, 2);
-    this.diya.position.set(a.x, a.y + 0.07, a.z + 0.06);
+    this.diya.position.set(a.x, a.y + 0.07, a.z);
     this.world.add(this.diya);
-
-    const lib = this.lib!;
-    const dish = new THREE.Mesh(
-      new THREE.LatheGeometry([
-        new THREE.Vector2(0.001, 0), new THREE.Vector2(0.045, 0.004), new THREE.Vector2(0.058, 0.02),
-        new THREE.Vector2(0.056, 0.027), new THREE.Vector2(0.038, 0.022), new THREE.Vector2(0.001, 0.02),
-      ], 32),
-      lib.get("clay")
-    );
-    dish.position.copy(a);
-    dish.castShadow = true;
-    this.world.add(dish);
-    this.owned.push(dish.geometry);
 
     this.flame = new THREE.Mesh(
       new THREE.SphereGeometry(0.011, 16, 12),
       new THREE.MeshBasicMaterial({ color: 0xffd08a, transparent: true, opacity: 0.9, toneMapped: false })
     );
     this.flame.scale.set(0.75, 1.9, 0.75);
-    this.flame.position.set(a.x, a.y + 0.045, a.z);
+    this.flame.position.set(a.x, a.y + 0.06, a.z);
     this.flame.userData.noAO = true;
     this.world.add(this.flame);
     this.owned.push(this.flame.geometry, this.flame.material as THREE.Material);
@@ -673,9 +351,6 @@ export class Room {
     this.glow.userData.noAO = true;
     this.world.add(this.glow);
     this.owned.push(glowTex, this.glow.material);
-
-    // haze in the shaft — her canvases are atmospheric, never optically clean
-    this.buildShaft();
   }
 
   /** a soft sky: what the grille, the door and the open side look out on */
@@ -717,69 +392,6 @@ export class Room {
   }
 
   /**
-   * Haze in the shaft — her canvases are atmospheric, never optically clean.
-   * The window opening is swept along the light into a box; each pixel
-   * measures how far its line of sight runs through that box, so the haze
-   * thickens where you look along the beam and thins across it.
-   */
-  private buildShaft() {
-    const w = ROOM.window, V = this.variant;
-    const dir = new THREE.Vector3(-V.sun.pos[0], -V.sun.pos[1], -V.sun.pos[2]).normalize();
-    const start = new THREE.Vector3(ROOM.w / 2 + 0.05, w.sill + w.h / 2, w.z);
-    // the beam ends where it meets the floor
-    const len = Math.min(6, start.y / Math.max(0.05, -dir.y));
-    const scale = new THREE.Vector3(w.w * 0.95, w.h * 0.9, len);
-    const geo = new THREE.BoxGeometry(1, 1, 1);
-    geo.translate(0, 0, 0.5);
-    const mat = new THREE.ShaderMaterial({
-      uniforms: {
-        uOpacity: { value: V.haze },
-        uColor: { value: new THREE.Color(0xffe2b8) },
-        uScale: { value: scale },
-      },
-      vertexShader: `
-        varying vec3 vP;
-        varying vec3 vCam;
-        void main() {
-          vP = position;
-          vCam = (inverse(modelMatrix) * vec4(cameraPosition, 1.0)).xyz;
-          gl_Position = projectionMatrix * modelViewMatrix * vec4(position, 1.0);
-        }`,
-      fragmentShader: `
-        uniform float uOpacity; uniform vec3 uColor; uniform vec3 uScale;
-        varying vec3 vP; varying vec3 vCam;
-        void main() {
-          vec3 rd = normalize(vP - vCam);
-          vec3 inv = 1.0 / rd;
-          vec3 t0 = (vec3(-0.5, -0.5, 0.0) - vCam) * inv;
-          vec3 t1 = (vec3(0.5, 0.5, 1.0) - vCam) * inv;
-          vec3 tn3 = min(t0, t1), tf3 = max(t0, t1);
-          float tn = max(max(max(tn3.x, tn3.y), tn3.z), 0.0);
-          float tf = min(min(tf3.x, tf3.y), tf3.z);
-          if (tf <= tn) discard;
-          // path length in metres, and the falloff at the middle of the path
-          float metres = length((tf - tn) * rd * uScale);
-          vec3 m = vCam + rd * (tn + tf) * 0.5;
-          float along = smoothstep(0.0, 0.08, m.z) * pow(max(1.0 - m.z, 0.0), 1.3);
-          float core = (1.0 - smoothstep(0.22, 0.5, abs(m.x))) * (1.0 - smoothstep(0.24, 0.5, abs(m.y)));
-          gl_FragColor = vec4(uColor * uOpacity * metres * along * core, 1.0);
-        }`,
-      transparent: true, depthWrite: false, blending: THREE.AdditiveBlending, side: THREE.FrontSide,
-    });
-    const m = new THREE.Mesh(geo, mat);
-    m.position.copy(start);
-    m.lookAt(start.clone().add(dir));
-    m.scale.copy(scale);
-    m.userData.noAO = true;
-    m.castShadow = false;
-    m.receiveShadow = false;
-    m.renderOrder = 2;
-    this.shaft = m;
-    this.world.add(m);
-    this.owned.push(geo, mat);
-  }
-
-  /**
    * The room's own light, captured once from its centre and given back to
    * it as image-based light: one bounce of the sun off the floor and the
    * plaster, and real reflections in the brass and aluminium.
@@ -788,9 +400,10 @@ export class Room {
     const r = this.renderer!;
     const cubeRT = new THREE.WebGLCubeRenderTarget(256, { type: THREE.HalfFloatType });
     const cam = new THREE.CubeCamera(0.05, 60, cubeRT);
-    cam.position.set(0, 1.45, 0.3);
+    // the courtyard's afternoon, seen from its middle
+    cam.position.set(3.6, 1.5, -3.0);
     this.scene.add(cam);
-    const hide = [this.shaft, this.glow, this.flame];
+    const hide = [this.glow, this.flame];
     hide.forEach((o) => (o.visible = false));
     r.shadowMap.needsUpdate = true;
     cam.update(r, this.scene);
@@ -856,8 +469,8 @@ export class Room {
   /** where every object rests, and its collider's centre — measured once */
   private buildItems() {
     const box = new THREE.Box3();
-    for (const s of this.sitters) {
-      const g = s.group;
+    for (const s of this.parts.props) {
+      const g = s.group as THREE.Group;
       box.makeEmpty();
       g.updateMatrixWorld(true);
       const inv = g.matrixWorld.clone().invert();
@@ -868,7 +481,6 @@ export class Room {
         box.union(m.geometry.boundingBox!.clone().applyMatrix4(new THREE.Matrix4().multiplyMatrices(inv, m.matrixWorld)));
       });
       const restPos = g.position.clone();
-      restPos.y = s.restY;
       // the box is in the group's unscaled frame; bodies live in world units
       this.bodies.push({
         mass: s.mass, group: g,
@@ -900,15 +512,12 @@ export class Room {
       const room = new C.Body({ mass: 0 });
       const slab = (hx: number, hy: number, hz: number, x: number, y: number, z: number) =>
         room.addShape(new C.Box(new C.Vec3(hx, hy, hz)), new C.Vec3(x, y, z));
-      const HX = ROOM.w / 2, HZ = ROOM.d / 2, H = ROOM.h;
-      slab(HX + 1, 0.5, HZ + 1, 0, -0.5, 0);                          // floor
-      slab(HX + 1, 0.5, HZ + 1, 0, H + 0.5, 0);                        // ceiling
-      slab(0.5, H / 2 + 0.5, HZ + 1, -HX - 0.5, H / 2, 0);             // left
-      slab(0.5, H / 2 + 0.5, HZ + 1, HX + 0.5, H / 2, 0);              // right
-      slab(HX + 1, H / 2 + 0.5, 0.5, 0, H / 2, -HZ - 0.5);             // back
-      slab(HX + 1, H / 2 + 0.5, 0.5, 0, H / 2, HZ + 0.5);              // an invisible front stop
-      const p = ROOM.plinth;
-      slab(ROOM.w / 2, p.h / 2, p.d / 2, 0, p.h / 2, -HZ + p.d / 2);   // the plinth
+      // the house's walls as built (openings closed: things stay in their room),
+      // a floor under everything and a lid over it
+      for (const [x0, y0, z0, x1, y1, z1] of this.info.colliders)
+        slab((x1 - x0) / 2, (y1 - y0) / 2, (z1 - z0) / 2, (x0 + x1) / 2, (y0 + y1) / 2, (z0 + z1) / 2);
+      slab(14, 0.5, 14, 0.8, -0.5, -0.6);
+      slab(14, 0.5, 14, 0.8, 4.9, -0.6);
       w.addBody(room);
       this.roomBody = room;
 
@@ -1019,13 +628,13 @@ export class Room {
       const ms = tl.duration() * 1000 + 120;
       this.keepAlive(ms, true);
     }
-    this.rig.playIntro(START, () => this.opts.onIntroFinished(), reduce ? 0 : 1.15);
+    this.rig.playIntro(startPose(this.info, this.narrow), () => this.opts.onIntroFinished(), reduce ? 0 : 1.15);
   }
 
   /** where Twenty Paise is on screen before the camera moves — the
    *  preloader puts its photograph exactly there */
   heroRect() {
-    const hero = this.art.find((m) => m.userData.artId === HERO.id);
+    const hero = this.art.find((m) => m.userData.artId === HERO_ID);
     if (!hero || !this.renderer) return null;
     this.rig.pivot.updateMatrixWorld(true);
     hero.updateMatrixWorld(true);
@@ -1051,21 +660,32 @@ export class Room {
     if (v) this.wake = 2;
   }
 
-  /** the baked light holds only for the daylight room at rest */
-  private bakeTarget() { return this.mode === "light" && !this.rearranged ? 1 : 0; }
+  /** the baked light holds whenever the house is at rest — afternoon or
+   *  evening; while it is shaken, things move, so the light is live */
+  private bakeTarget() {
+    if (process.env.NODE_ENV !== "production" && new URLSearchParams(location.search).get("bake") === "0") return 0;
+    return this.rearranged ? 0 : 1;
+  }
 
   /** contact shadow comes from the bake; screen-space AO keeps only a little, for moving things */
   private syncBakeAO() {
-    if (this.ao && this.baked) this.ao.blendIntensity = 0.6 - 0.38 * this.baked.uniform.value;
+    if (this.ao && this.baked) this.ao.blendIntensity = 0.6 - 0.38 * this.baked.bake.value;
   }
 
   private fadeBake(instant = false) {
     const b = this.baked;
     if (!b) return;
+    const d = instant || this.opts.reducedMotion ? 0 : 0.9;
     this.bakeTw?.kill();
-    this.bakeTw = gsap.to(b.uniform, {
-      value: this.bakeTarget(), duration: instant || this.opts.reducedMotion ? 0 : 0.9, ease: "power2.inOut",
+    this.bakeTw = gsap.to(b.bake, {
+      value: this.bakeTarget(), duration: d, ease: "power2.inOut",
       onUpdate: () => { this.syncBakeAO(); this.invalidate(); },
+    });
+    // the evening: the afternoon's bake gives way to the lamps'
+    this.nightTw?.kill();
+    this.nightTw = gsap.to(b.night, {
+      value: this.mode === "dark" && b.nightMap.value ? 1 : 0, duration: d * 1.4, ease: "power2.inOut",
+      onUpdate: () => this.invalidate(),
     });
   }
 
@@ -1085,13 +705,10 @@ export class Room {
     const prox = { k: 0 };
     tl.to(this.sun, { intensity: dark ? NIGHT.sun.intensity : V.sun.intensity }, 0)
       .to(this.sun.color, { r: sunColor.r, g: sunColor.g, b: sunColor.b }, 0)
-      .to(this.door, { intensity: dark ? NIGHT.door : V.door.intensity }, 0)
-      .to(this.front, { intensity: dark ? NIGHT.front : V.front.intensity }, 0)
       .to(this.ambient, { intensity: dark ? NIGHT.ambient : V.ambient.intensity }, 0)
       .to(this.hemi, { intensity: dark ? NIGHT.hemi : V.hemi.intensity }, 0)
 
       .to(r, { toneMappingExposure: dark ? NIGHT.exposure : V.exposure }, 0)
-      .to((this.shaft.material as THREE.ShaderMaterial).uniforms.uOpacity, { value: dark ? NIGHT.haze : V.haze }, 0)
       .to(this.diya, { intensity: dark ? NIGHT.diya : 0, duration: dur * 1.2 }, dark ? dur * 0.25 : 0)
       .to(this.glow.material as THREE.SpriteMaterial, { opacity: dark ? 0.95 : 0.3 }, dark ? dur * 0.2 : 0)
       .to(prox, { k: 1, onUpdate: () => r.setClearColor(mixed.copy(clear).lerp(clearTo, prox.k), 1) }, 0);
@@ -1277,7 +894,7 @@ export class Room {
     this.rig.setAspect(aspect);
     if (isNarrow(aspect) !== this.narrow) {
       this.narrow = !this.narrow;
-      this.rig.setShots(resolvePoses(this.anchors, this.narrow));
+      this.rig.setShots(resolvePoses(this.info, this.narrow));
     }
     this.wake = 2;
   };
@@ -1320,7 +937,8 @@ export class Room {
 
     // the ceiling lifts away when the camera rises through it for the plan
     this.rig.camera.getWorldPosition(tmpV);
-    const ceilingOn = tmpV.y < ROOM.h - 0.03;
+    // (a little under the beams, so the camera never grazes them on its way up)
+    const ceilingOn = tmpV.y < ROOF - 0.35;
     if (this.ceiling.visible !== ceilingOn) {
       this.ceiling.visible = ceilingOn;
       this.renderer.shadowMap.needsUpdate = true;   // the roof casts too

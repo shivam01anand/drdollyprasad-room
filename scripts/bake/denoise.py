@@ -7,9 +7,11 @@ never pulls black into an island's edge.
 import os, sys
 import bpy
 import numpy as np
-d = sys.argv[sys.argv.index("--") + 1]
-raw = np.load(os.path.join(d, "lightmap.npy")).astype(np.float32)
-np.save(os.path.join(d, "lightmap-raw.npy"), raw)
+args = sys.argv[sys.argv.index("--") + 1:]
+d = args[0]
+name = args[1] if len(args) > 1 else "lightmap"
+raw = np.load(os.path.join(d, f"{name}.npy")).astype(np.float32)
+np.save(os.path.join(d, f"{name}-raw.npy"), raw)
 H, W, _ = raw.shape
 sc = bpy.context.scene
 img = bpy.data.images.new("LM", W, H, alpha=True, float_buffer=True)
@@ -41,12 +43,12 @@ sc.render.image_settings.color_depth = "32"
 sc.view_settings.view_transform = "Standard"
 cam = bpy.data.objects.new("Cam", bpy.data.cameras.new("Cam")); sc.collection.objects.link(cam); sc.camera = cam
 sc.render.engine = "BLENDER_EEVEE_NEXT" if "BLENDER_EEVEE_NEXT" in [e.identifier for e in bpy.types.RenderSettings.bl_rna.properties["engine"].enum_items] else "BLENDER_EEVEE"
-out_path = os.path.join(d, "denoised.exr")
+out_path = os.path.join(d, f"{name}-denoised.exr")
 sc.render.filepath = out_path
 bpy.ops.render.render(write_still=True)
 res = bpy.data.images.load(out_path)
 px = np.empty(W * H * 4, np.float32); res.pixels.foreach_get(px)
 den = px.reshape(H, W, 4)[::-1, :, :3]
 cov = (raw.sum(axis=2) > 1e-6)[..., None]
-np.save(os.path.join(d, "lightmap.npy"), np.where(cov, den, 0).astype(np.float32))
+np.save(os.path.join(d, f"{name}.npy"), np.where(cov, den, 0).astype(np.float32))
 print("denoised", W, H, float(np.abs(den - raw)[cov[..., 0]].mean()))
