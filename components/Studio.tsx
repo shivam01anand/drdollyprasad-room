@@ -345,10 +345,17 @@ export default function Studio({ dims }: { dims: Dims }) {
   /* the header comes in once the camera has landed */
   useLayoutEffect(() => {
     const hud = hudRef.current;
-    if (!hud || reducedMotion()) return;
-    hud.querySelectorAll<HTMLElement>("[data-hud-text]").forEach((el) => { el.textContent = ""; });
-    gsap.set(hud.querySelectorAll(".hud-pill"), { yPercent: 300, autoAlpha: 0 });
-    gsap.set(hud.querySelector(".diya-btn"), { yPercent: -180, autoAlpha: 0 });
+    if (!hud) return;
+    // the server-rendered header waits hidden (globals.css) so it never shows
+    // over the counter; from here the entrance tweens own it
+    if (!reducedMotion()) {
+      hud.querySelectorAll<HTMLElement>("[data-hud-text]").forEach((el) => { el.textContent = ""; });
+      gsap.set(hud.querySelectorAll(".hud-pill"), { yPercent: 300, autoAlpha: 0 });
+      gsap.set(hud.querySelector(".diya-btn"), { yPercent: -180, autoAlpha: 0 });
+      // the hint shares a corner with the preloader's "New Delhi"
+      gsap.set(hud.querySelector(".hud-hint"), { autoAlpha: 0 });
+    }
+    hud.dataset.state = "live";
   }, []);
 
   useEffect(() => {
@@ -361,6 +368,7 @@ export default function Studio({ dims }: { dims: Dims }) {
     tweens.push(gsap.to(hud.querySelectorAll(".hud-pill"),
       { yPercent: 0, autoAlpha: 1, duration: quick ? 0 : 0.5, ease: "genEase", stagger: { amount: quick ? 0 : 0.5 } }));
     tweens.push(gsap.to(hud.querySelector(".diya-btn"), { yPercent: 0, autoAlpha: 1, duration: quick ? 0 : 0.5, ease: "genEase" }));
+    tweens.push(gsap.to(hud.querySelector(".hud-hint"), { autoAlpha: 1, duration: quick ? 0 : 0.6, delay: quick ? 0 : 0.4 }));
     return () => tweens.forEach((t) => t.kill());
   }, [ready, failed]);
 
@@ -422,6 +430,8 @@ export default function Studio({ dims }: { dims: Dims }) {
   };
 
   const onLightbox = useCallback((open: boolean) => lock("lightbox", open), [lock]);
+  // the chapter in view, for the header's "you are here"
+  const here = ready ? CHAPTERS[active]?.id : undefined;
 
   return (
     <>
@@ -433,7 +443,7 @@ export default function Studio({ dims }: { dims: Dims }) {
                  getHeroRect={getHeroRect} onLift={onLift} onDone={onPreDone} />
 
       {/* the header — line work and pills, as in the original */}
-      <header className="hud" ref={hudRef} inert={!ready && !failed}>
+      <header className="hud" ref={hudRef} inert={!ready && !failed} data-state="pre">
         <div className="hud-top">
           <a className="brand" href="#top" aria-label="Dr Dolly Prasad — back to the door"
              onClick={(e) => {
@@ -464,16 +474,18 @@ export default function Studio({ dims }: { dims: Dims }) {
           <nav className="hud-pills" aria-label="Site">
             {failed ? (
               <>
-                <span className="mask"><button type="button" className="pill hud-pill" onClick={() => go("#works")}>Works →</button></span>
-                <span className="mask"><button type="button" className="pill hud-pill" onClick={() => go("#contact")}>Contact →</button></span>
+                <span className="mask"><button type="button" className="pill hud-pill" onClick={() => go("#works")}>Works<span className="arr"> →</span></button></span>
+                <span className="mask"><button type="button" className="pill hud-pill" onClick={() => go("#contact")}>Contact<span className="arr"> →</span></button></span>
               </>
             ) : !rearrange ? (
               <>
                 <span className="mask"><button type="button" className="pill hud-pill" disabled={!ready}
-                      onClick={() => setRearrange(true)}>Shake the room <span aria-hidden="true">⁂</span></button></span>
-                <span className="mask"><button type="button" className="pill hud-pill" onClick={() => go("[data-chapter='featured']")}>Works →</button></span>
-                <span className="mask"><button type="button" className="pill hud-pill" onClick={() => go("[data-chapter='plan']", true)}>Exhibitions →</button></span>
-                <span className="mask"><button type="button" className="pill hud-pill" onClick={() => go("#contact")}>Contact →</button></span>
+                      onClick={() => setRearrange(true)}>Shake<span className="long"> the room</span> <span aria-hidden="true">⁂</span></button></span>
+                <span className="mask"><button type="button" className="pill hud-pill" aria-current={here === "featured" || undefined}
+                      onClick={() => go("[data-chapter='featured']")}>Works<span className="arr"> →</span></button></span>
+                <span className="mask"><button type="button" className="pill hud-pill" aria-current={here === "plan" || undefined}
+                      onClick={() => go("[data-chapter='plan']", true)}>Exhibitions<span className="arr"> →</span></button></span>
+                <span className="mask"><button type="button" className="pill hud-pill" onClick={() => go("#contact")}>Contact<span className="arr"> →</span></button></span>
               </>
             ) : (
               <>
@@ -489,7 +501,11 @@ export default function Studio({ dims }: { dims: Dims }) {
       <div className="copy" ref={copyRef} data-has="0" aria-hidden="true">
         {CHAPTERS.map((c, i) => (c.body || c.verse || c.quote) ? (
           <div className="copy-panel" data-i={i} data-on="0" key={c.id}>
-            <div className="lab" data-eyebrow={c.eyebrow}>{c.eyebrow}</div>
+            <div className="copy-head">
+              <div className="lab" data-eyebrow={c.eyebrow}>{c.eyebrow}</div>
+              {/* the label's place in the hang, as a catalogue numbers it */}
+              <div className="lab copy-idx">{String(i + 1).padStart(2, "0")} / {String(CHAPTERS.length).padStart(2, "0")}</div>
+            </div>
             {c.verse && (
               <p className="poem">
                 {c.verse.split("\n").map((ln, k) => <span className="poem-line" key={k} data-line={ln}>{ln}</span>)}

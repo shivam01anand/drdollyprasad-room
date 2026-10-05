@@ -1,21 +1,31 @@
 /* ==========================================================================
    Dr Dolly Prasad — the studio
    Palette measured from all 41 canvases (AESTHETIC-DIRECTION.md).
-   Two faces, as in the original: a grotesk for the name, the headings and
-   the copy; a mono for every label.
+   Two faces, as in the original: a grotesk for the name, the titles and the
+   copy; a mono for facts and controls. The chrome is quiet and square to the
+   room; the paintings carry the colour. Labels read like a gallery's: a
+   paper card, a title, then size and year, a red dot when a work is sold.
    ========================================================================== */
 
 :root{
   --bone:#C3B8A7; --stone:#9B866D; --bark:#754B36; --umber:#332521;
   --verm:#BB2B17; --ochre:#DD8430; --teal:#3B5D62; --forest:#25482E;
 
-  --page:#EFE9DF;
-  --ink:#2E2220;
-  --dim:#776654;
-  --rule:rgba(117,75,54,.28);
-  --pill:#2E2220;
-  --pill-ink:#F2ECE2;
-  --wash:239,233,223;
+  --page:#F0EADF;
+  --ink:#302722;
+  --dim:#716459;
+  --rule:#D3C7B8;
+  /* a control's hairline, and its resting surface over the room */
+  --line:rgba(48,39,34,.14);
+  --chip:rgba(240,234,223,.92);
+  --chip-ink:#302722;
+  /* the solid control: primary actions and every hover */
+  --pill:#302722;
+  --pill-ink:#F0EADF;
+  /* the one accent: oxide, used sparingly (hover, focus, the sold dot) */
+  --oxide:#A33C2B;
+  --wash:240,234,223;
+  --ease:cubic-bezier(.22,1,.36,1);
 
   --display:"Instrument Sans","Helvetica Neue",Arial,sans-serif;
   --mono:"IBM Plex Mono",ui-monospace,SFMono-Regular,Menlo,monospace;
@@ -25,8 +35,9 @@
   color-scheme:light;
 }
 html[data-mode="dark"]{
-  --page:#0F0B09; --ink:#E6DBCB; --dim:#A08F7A; --rule:rgba(205,191,172,.22);
-  --pill:#E6DBCB; --pill-ink:#16110E; --wash:15,11,9;
+  --page:#181411; --ink:#EEE5D7; --dim:#B8A998; --rule:#3E342C;
+  --line:rgba(238,229,215,.16); --chip:rgba(33,27,23,.9); --chip-ink:#EEE5D7;
+  --pill:#EEE5D7; --pill-ink:#211B17; --oxide:#D58A6A; --wash:24,20,17;
   color-scheme:dark;
 }
 
@@ -41,23 +52,27 @@ canvas{display:block}
 img{max-width:100%}
 a{color:inherit}
 button{font:inherit;color:inherit}
-:focus-visible{outline:2px solid var(--verm);outline-offset:3px}
+:focus-visible{outline:2px solid var(--oxide);outline-offset:3px}
 
 /* every label is line work: one face, one size, one tracking */
-.lab{font-family:var(--mono);font-size:11.5px;letter-spacing:.12em;text-transform:uppercase;color:var(--dim);line-height:1.5}
+.lab{font-family:var(--mono);font-size:11px;letter-spacing:.08em;text-transform:uppercase;color:var(--dim);line-height:1.45}
 .mask{display:inline-block;overflow:hidden;vertical-align:top}
 
-/* the pill — the original's control, in her umber */
+/* the pill — the original's control, quietened: a paper chip with a hairline
+   at rest, solid ink on hover; .pill-solid is the primary action */
 .pill{
-  display:inline-flex;align-items:center;gap:.6em;
-  font-family:var(--mono);font-size:11px;letter-spacing:.14em;text-transform:uppercase;
-  padding:.95em 1.6em;border:0;border-radius:999px;cursor:pointer;
-  background:var(--pill);color:var(--pill-ink);text-decoration:none;white-space:nowrap;
-  transition:background-color .25s ease,color .25s ease,transform .25s ease;
+  display:inline-flex;align-items:center;justify-content:center;gap:.5em;
+  height:42px;padding:0 18px;line-height:1;
+  font-family:var(--mono);font-size:11px;letter-spacing:.08em;text-transform:uppercase;
+  border:1px solid var(--line);border-radius:999px;cursor:pointer;
+  background:var(--chip);color:var(--chip-ink);text-decoration:none;white-space:nowrap;
+  transition:background-color .18s var(--ease),color .18s var(--ease),border-color .18s var(--ease);
 }
-.pill:hover{background:var(--verm);color:#fff}
+.pill:hover{background:var(--pill);color:var(--pill-ink);border-color:var(--pill)}
+.pill-solid{background:var(--pill);color:var(--pill-ink);border-color:var(--pill)}
+.pill-solid:hover{background:var(--oxide);border-color:var(--oxide);color:#fff}
 .pill:disabled{opacity:.45;cursor:default}
-.pill:disabled:hover{background:var(--pill);color:var(--pill-ink)}
+.pill:disabled:hover{background:var(--chip);color:var(--chip-ink);border-color:var(--line)}
 
 /* ---------------------------------------------------------------- stage */
 .stage{position:fixed;inset:0;z-index:0;transform-origin:50% 40%;will-change:transform;overflow:hidden}
@@ -79,11 +94,12 @@ html[data-rearrange="1"] .stage canvas:active{cursor:grabbing}
   transition:opacity .2s linear;
 }
 .hud a,.hud button{pointer-events:auto}
+/* before hydration the header is held back, so nothing flashes over the counter */
+.hud[data-state="pre"] :is(.hud-meta,.hud-mail,.hud-hint,.hud-pills,.diya-btn){visibility:hidden}
 .hud .brand,.hud .hud-meta,.hud .hud-mail,.hud .hud-hint{transition:color .5s ease}
 html[data-hud="light"]:not([data-rearrange="1"]) .hud .brand,
 html[data-hud="light"]:not([data-rearrange="1"]) .hud .hud-meta,
 html[data-hud="light"]:not([data-rearrange="1"]) .hud .hud-mail,
-html[data-hud="light"]:not([data-rearrange="1"]) .hud .hud-hint,
 html[data-hud="light"]:not([data-rearrange="1"]) .hud .brand-target .pre-big{color:#F2ECE2}
 /* shaking the room clears the stage of everything but the room */
 html[data-rearrange="1"] .sec-featured,
@@ -91,10 +107,13 @@ html[data-rearrange="1"] .chapter-text{visibility:hidden;pointer-events:none}
 .hud-top{display:grid;grid-template-columns:1fr auto auto auto;align-items:start;gap:clamp(18px,4vw,64px)}
 .hud-meta{display:flex;gap:2.4em;padding-top:.5em;color:var(--ink)}
 .hud-mail{text-decoration:none;padding-top:.5em;color:var(--ink)}
-.hud-mail:hover{color:var(--verm)}
+.hud-mail:hover{color:var(--oxide)}
 .hud-bottom{display:flex;justify-content:space-between;align-items:flex-end;gap:16px}
-.hud-hint{color:var(--ink)}
+/* the hint wears the controls' chip, so it reads over dark wood as over plaster */
+.hud-hint{align-self:flex-start;color:var(--ink);background:var(--chip);border:1px solid var(--line);border-radius:999px;padding:7px 13px 6px;line-height:1.2}
 .hud-pills{display:flex;gap:8px;flex-wrap:wrap;justify-content:flex-end}
+/* the control for where you are is solid: a quiet "you are here" */
+.hud-pill[aria-current="true"]{background:var(--pill);color:var(--pill-ink);border-color:var(--pill)}
 
 .brand{display:block;text-decoration:none;color:var(--ink);justify-self:start}
 .brand-target{display:flex;flex-direction:column;min-width:9em;min-height:2.1em}
@@ -102,33 +121,32 @@ html[data-rearrange="1"] .chapter-text{visibility:hidden;pointer-events:none}
 
 /* the diya — the original's lamp icon is the dark mode; so is hers */
 .diya-btn{
-  width:46px;height:46px;border-radius:50%;border:0;padding:9px;cursor:pointer;
-  background:var(--pill);color:var(--pill-ink);display:grid;place-items:center;
-  transition:background-color .3s ease;
+  width:44px;height:44px;border-radius:50%;border:1px solid var(--line);padding:10px;cursor:pointer;
+  background:var(--chip);color:var(--chip-ink);display:grid;place-items:center;
+  transition:background-color .18s var(--ease),color .18s var(--ease),border-color .18s var(--ease);
 }
 .diya-btn svg{width:100%;height:100%}
 .diya-btn .dish{fill:currentColor}
 .diya-btn .flame{fill:none;stroke:currentColor;stroke-width:1.6;transition:fill .4s ease,stroke .4s ease}
 .diya-btn[aria-pressed="true"] .flame{fill:#FFB25A;stroke:#FFB25A}
-.diya-btn:hover{background:var(--verm);color:#fff}
+.diya-btn:hover{background:var(--pill);color:var(--pill-ink);border-color:var(--pill)}
 
 /* ------------------------------------------------------------- copy slot */
 .copy{position:fixed;inset:0;z-index:2;pointer-events:none;transition:opacity .35s ease}
 .copy[data-yield="1"]{opacity:0}
-/* a soft, bounded ground behind the words only — the room stays clear */
-.copy-panel::before{
-  content:"";position:absolute;inset:-24px -32px -24px -40px;z-index:-1;border-radius:40px;
-  background:rgba(var(--wash),.72);filter:blur(20px);
-}
+/* each chapter's words sit on a wall label: a flat paper card, square and
+   bounded, so the room around it stays untouched */
 .copy-panel{
-  position:absolute;left:var(--gut);bottom:calc(var(--hud-bottom) + 36px);
-  width:min(36rem,40vw);max-height:calc(100vh - var(--hud-top) - var(--hud-bottom) - 72px);
+  position:absolute;left:var(--gut);bottom:calc(var(--hud-bottom) + 32px);
+  width:min(31rem,42vw);max-height:calc(100vh - var(--hud-top) - var(--hud-bottom) - 64px);
+  padding:20px 24px 22px;background:rgba(var(--wash),.95);border:1px solid var(--line);
   visibility:hidden;opacity:0;
 }
-.copy-panel .lab{margin-bottom:16px}
-.lede{font-size:clamp(16px,1.25vw,19px);line-height:1.62;margin:0;color:var(--ink);max-width:34em;text-wrap:pretty}
-.quote{margin:20px 0 0;font-size:clamp(16px,1.2vw,18px);line-height:1.6;font-style:italic;color:var(--ink);max-width:34em}
-.poem{margin:0;font-size:clamp(19px,1.75vw,27px);line-height:1.42;letter-spacing:-.005em}
+.copy-head{display:flex;justify-content:space-between;align-items:baseline;gap:16px;margin-bottom:14px}
+.copy-idx{flex:none;opacity:.75;font-variant-numeric:tabular-nums}
+.lede{font-size:clamp(16px,1.2vw,18px);line-height:1.55;letter-spacing:-.005em;margin:0;color:var(--ink);max-width:34em;text-wrap:pretty}
+.quote{margin:16px 0 0;padding-top:14px;border-top:1px solid var(--rule);font-size:clamp(15px,1.1vw,17px);line-height:1.55;font-style:italic;color:var(--ink);max-width:34em}
+.poem{margin:0;font-size:clamp(18px,1.45vw,21px);line-height:1.4;letter-spacing:-.008em}
 .poem-line{display:block;min-height:1.42em}
 html[data-rearrange="1"] .copy{opacity:0;transition:opacity .4s ease}
 
@@ -178,53 +196,61 @@ html[data-room="off"] .sec:not(.sec-featured){display:none}
 }
 
 /* -------------------------------------------------------------- featured */
+/* the slider lies on a band of paper with crisp, ruled edges: a catalogue
+   page passing over the room, rather than a fog */
 .featured{
   position:relative;min-height:100vh;min-height:100svh;
-  padding:calc(var(--hud-top) + 4vh) 0 calc(var(--hud-bottom) + 3vh);
-  display:flex;flex-direction:column;justify-content:center;gap:clamp(28px,6vh,72px);
-  background:linear-gradient(180deg,rgba(var(--wash),0) 0%,rgba(var(--wash),.9) 16%,rgba(var(--wash),.9) 84%,rgba(var(--wash),0) 100%);
+  padding:calc(var(--hud-top) + 5vh) 0 calc(var(--hud-bottom) + 5vh);
+  display:flex;flex-direction:column;justify-content:center;gap:clamp(24px,4.5vh,48px);
 }
-.feat-head{display:flex;align-items:center;justify-content:flex-end;gap:clamp(24px,5vw,96px);padding:0 var(--gut)}
-.feat-arrows{display:flex;gap:clamp(18px,2.4vw,40px)}
-.feat-arrow{background:none;border:0;cursor:pointer;font-size:clamp(24px,2vw,32px);line-height:1;padding:6px;color:var(--ink);transition:transform .25s ease,color .25s ease}
-.feat-arrow:hover{color:var(--verm)}
-.feat-arrow[data-prev]:hover{transform:translateX(-4px)}
-.feat-arrow[data-next]:hover{transform:translateX(4px)}
-.feat-title{margin:0;font-weight:400;text-transform:uppercase;font-size:clamp(38px,4.4vw,72px);line-height:1;letter-spacing:-.02em;min-width:5.2em;text-align:center}
+.featured::before{content:"";position:absolute;inset:0;background:rgba(var(--wash),.97);
+  border-block:1px solid var(--line);pointer-events:none}
+.featured>*{position:relative}
+.feat-head{display:flex;align-items:flex-end;justify-content:space-between;gap:24px;padding:0 var(--gut)}
+.feat-tools{display:flex;align-items:center;gap:clamp(12px,1.6vw,24px)}
+.feat-arrows{display:flex;gap:8px}
+.feat-arrow{width:44px;height:44px;border-radius:50%;border:1px solid var(--line);background:transparent;cursor:pointer;
+  display:grid;place-items:center;font-size:18px;line-height:1;padding:0;color:var(--ink);
+  transition:background-color .18s var(--ease),color .18s var(--ease),border-color .18s var(--ease)}
+.feat-arrow:hover{background:var(--pill);color:var(--pill-ink);border-color:var(--pill)}
+.feat-title{margin:0;font-weight:400;text-transform:uppercase;font-size:clamp(32px,3.3vw,54px);line-height:.92;letter-spacing:-.03em;min-width:5.2em}
 .feat-viewport{overflow:hidden;outline:none;padding:0 0 4px}
 .feat-viewport:focus-visible{outline:1px dashed var(--dim);outline-offset:-10px}
-.feat-track{display:flex;align-items:flex-start;gap:clamp(24px,3.1vw,48px);padding:0 var(--gut);width:max-content;touch-action:pan-y;user-select:none}
-.feat-card{flex:0 0 auto;width:clamp(200px,17vw,300px);display:flex;flex-direction:column;gap:12px;cursor:pointer}
+.feat-track{display:flex;align-items:flex-start;gap:clamp(24px,2.6vw,40px);padding:0 var(--gut);width:max-content;touch-action:pan-y;user-select:none}
+.feat-card{flex:0 0 auto;width:clamp(200px,17vw,300px);display:flex;flex-direction:column;gap:10px;cursor:pointer}
 .feat-card.is-wide{width:clamp(240px,23vw,400px)}
 .feat-card.is-above{padding-top:clamp(18px,3vh,40px)}
-.feat-media{position:relative;overflow:hidden;background:rgba(117,75,54,.08)}
+.feat-media{position:relative;overflow:hidden;background:rgba(117,75,54,.07)}
 .feat-media img{display:block;width:100%;height:auto;pointer-events:none;transform-origin:50% 50%}
-.feat-pill{
-  position:absolute;right:10px;bottom:10px;
-  font-family:var(--mono);font-size:10px;letter-spacing:.14em;text-transform:uppercase;
-  padding:.75em 1.15em;border-radius:999px;background:rgba(30,22,19,.86);color:#F2ECE2;white-space:nowrap;
-}
-.feat-cap{display:flex;justify-content:space-between;gap:14px;font-family:var(--mono);font-size:11.5px;letter-spacing:.09em;text-transform:uppercase;color:var(--ink);min-height:1.5em}
-.feat-cap span:first-child{color:var(--ink);white-space:normal}
-.feat-cap span:nth-child(2){color:var(--dim);white-space:nowrap}
-.feat-card:focus-visible{outline:2px solid var(--verm);outline-offset:6px}
+/* a gallery label: the title, then size and year, then the status */
+.feat-cap,.work figcaption{display:flex;flex-direction:column;gap:2px}
+.cap-title{font-family:var(--display);font-size:14.5px;line-height:1.3;letter-spacing:-.003em;color:var(--ink);min-height:1.3em;text-wrap:balance}
+.cap-details,.cap-status{font-family:var(--mono);font-size:10.5px;line-height:1.5;letter-spacing:.06em;text-transform:uppercase;color:var(--dim);min-height:1.5em}
+.cap-status{margin-top:2px}
+/* the gallery's red dot: sold */
+.cap-status.is-sold::before{content:"";display:inline-block;width:7px;height:7px;border-radius:50%;
+  background:var(--oxide);margin-right:.6em;vertical-align:.06em}
+.feat-card:focus-visible{outline:2px solid var(--oxide);outline-offset:6px}
 
 /* -------------------------------------------------------------- lightbox */
 .lb{position:fixed;inset:0;width:100%;height:100%;max-width:none;max-height:none;margin:0;padding:0;border:0;
     color:var(--ink);background:transparent;overflow:hidden}
 .lb:not([open]){display:none}
 .lb::backdrop{background:transparent}
-.lb-veil{position:absolute;inset:0;background:rgba(var(--wash),.96)}
-.lb-grid{position:absolute;inset:0;display:grid;grid-template-columns:minmax(0,1.25fr) minmax(0,1fr);gap:clamp(24px,5vw,80px);
-         align-items:center;padding:calc(var(--hud-top) + 8px) var(--gut) var(--gut);pointer-events:none}
-.lb-figure{margin:0;display:flex;justify-content:flex-end;align-items:center;min-height:0}
-.lb-figure img{display:block;max-height:78vh;max-width:100%;width:auto;height:auto;box-shadow:0 30px 80px -40px rgba(46,34,32,.45);pointer-events:auto}
-.lb-text{pointer-events:auto;align-self:stretch;display:flex;flex-direction:column;justify-content:center;gap:22px;position:relative;max-width:30rem}
-.lb-close{position:absolute;top:0;right:0;background:none;border:0;cursor:pointer;color:var(--ink);padding:6px 0}
-.lb-close:hover{color:var(--verm)}
+/* one painting, alone: the veil is opaque, so nothing of the page shows */
+.lb-veil{position:absolute;inset:0;background:rgb(var(--wash))}
+.lb-grid{position:absolute;inset:0;display:grid;grid-template-columns:minmax(0,1fr) minmax(280px,360px);gap:clamp(32px,4.5vw,72px);
+         align-items:center;padding:clamp(32px,5vh,56px) clamp(24px,4vw,64px);pointer-events:none}
+.lb-figure{margin:0;display:flex;justify-content:flex-end;align-items:center;min-height:0;height:100%}
+.lb-figure img{display:block;max-height:calc(100vh - clamp(64px,10vh,112px));max-width:100%;width:auto;height:auto;
+  box-shadow:0 1px 2px rgba(48,39,34,.08),0 28px 70px -44px rgba(48,39,34,.5);pointer-events:auto}
+.lb-text{pointer-events:auto;align-self:stretch;display:flex;flex-direction:column;justify-content:center;gap:20px;position:relative}
+.lb-close{position:absolute;top:0;right:0;min-height:44px;background:none;border:0;cursor:pointer;color:var(--ink);padding:6px 0}
+.lb-close:hover{color:var(--oxide)}
 /* the title's opening quote hangs in the margin, so the letters align with the details below */
-.lb-title{margin:0;font-weight:500;font-size:clamp(30px,3.4vw,56px);line-height:1.02;letter-spacing:-.02em;min-height:1.02em;text-indent:-.42em}
-.lb-meta{display:grid;grid-template-columns:auto 1fr;gap:10px 22px;margin:0;font-family:var(--mono);font-size:11px;letter-spacing:.12em;text-transform:uppercase}
+.lb-title{margin:0;font-weight:400;font-size:clamp(30px,2.9vw,46px);line-height:1.04;letter-spacing:-.03em;min-height:1.04em;text-indent:-.42em;text-wrap:balance}
+.lb-meta{display:grid;grid-template-columns:auto 1fr;gap:9px 20px;margin:0;padding-top:16px;border-top:1px solid var(--rule);
+  font-family:var(--mono);font-size:11px;letter-spacing:.06em;text-transform:uppercase}
 .lb-meta dt{color:var(--dim)}
 .lb-meta dd{margin:0;color:var(--ink);min-height:1.5em}
 .lb .pill{align-self:flex-start}
@@ -237,38 +263,51 @@ html[data-room="off"] .sec:not(.sec-featured){display:none}
 }
 
 /* --------------------------------------------------------------- collage */
-.collage{position:relative;z-index:3;background:var(--page);padding:clamp(72px,12vw,160px) var(--gut) clamp(64px,8vw,120px)}
+.collage{position:relative;z-index:3;background:var(--page);padding:clamp(80px,10vw,150px) var(--gut) clamp(64px,8vw,120px)}
 .collage-head{max-width:46rem}
-.collage-title{margin:14px 0 0;font-weight:500;font-size:clamp(24px,2.6vw,40px);line-height:1.15;letter-spacing:-.015em;text-wrap:balance}
-.series-block{margin-top:clamp(48px,7vw,96px)}
-.series{display:flex;justify-content:space-between;gap:12px;border-top:1px solid var(--rule);padding-top:12px;
-        font-family:var(--mono);font-size:10.5px;letter-spacing:.16em;text-transform:uppercase;color:var(--dim)}
-.hang{display:flex;flex-wrap:wrap;gap:clamp(26px,4.5vw,72px);align-items:flex-end;margin-top:36px}
-.work{margin:0;display:flex;flex-direction:column;gap:10px;max-width:100%}
+.collage-title{margin:14px 0 0;font-weight:400;font-size:clamp(24px,2.5vw,38px);line-height:1.18;letter-spacing:-.022em;text-wrap:balance}
+.series-block{margin-top:clamp(64px,7.5vw,112px)}
+.series{display:flex;justify-content:space-between;align-items:baseline;gap:16px;border-top:1px solid var(--rule);padding-top:16px}
+.series-name{margin:0;font-weight:400;font-size:clamp(20px,1.7vw,26px);line-height:1.2;letter-spacing:-.018em}
+.hang{display:flex;flex-wrap:wrap;column-gap:clamp(32px,4vw,64px);row-gap:clamp(44px,4.6vw,68px);align-items:flex-end;margin-top:clamp(28px,3vw,40px)}
+.work{margin:0;display:flex;flex-direction:column;gap:12px;max-width:100%}
 .work a{display:block;cursor:zoom-in}
-.work img{display:block;width:100%;height:auto;box-shadow:0 16px 36px -18px rgba(46,34,32,.4);transition:transform .5s cubic-bezier(.2,.7,.2,1)}
-.work a:hover img{transform:translateY(-3px)}
-.work figcaption{display:flex;justify-content:space-between;gap:10px;font-family:var(--mono);font-size:10px;letter-spacing:.12em;text-transform:uppercase;color:var(--dim)}
-.work figcaption span:first-child{color:var(--ink)}
+.work img{display:block;width:100%;height:auto;box-shadow:0 1px 2px rgba(48,39,34,.1),0 14px 30px -22px rgba(48,39,34,.42);
+  transition:transform .5s var(--ease),box-shadow .5s var(--ease)}
+.work a:hover img{transform:translateY(-3px);box-shadow:0 1px 2px rgba(48,39,34,.1),0 22px 40px -24px rgba(48,39,34,.5)}
+/* every label is three lines tall, so the paintings above them share a floor */
+.work figcaption{min-height:calc(14.5px * 1.3 * 2 + 10.5px * 1.5 * 2 + 6px)}
 
 /* --------------------------------------------------------------- contact */
-.contact{position:relative;z-index:3;background:var(--page);padding:clamp(64px,10vw,140px) var(--gut) var(--gut);border-top:1px solid var(--rule)}
-.contact-grid{display:grid;grid-template-columns:minmax(0,1.2fr) minmax(0,1fr);gap:clamp(32px,6vw,110px)}
-.about{font-size:clamp(17px,1.35vw,21px);line-height:1.6;margin:16px 0 0;max-width:36em;text-wrap:pretty}
+/* the close: her statement large, her biography beside the way to reach her */
+.contact{position:relative;z-index:3;background:var(--page);padding:clamp(80px,10vw,150px) var(--gut) var(--gut);border-top:1px solid var(--rule)}
+.contact-lead{max-width:64rem}
+.statement{margin:18px 0 0;font-size:clamp(26px,3.1vw,48px);line-height:1.14;letter-spacing:-.028em;text-wrap:balance}
+.contact-grid{display:grid;grid-template-columns:minmax(0,1.2fr) minmax(0,1fr);gap:clamp(40px,6vw,110px);
+  margin-top:clamp(56px,7vw,104px);padding-top:clamp(24px,2.6vw,32px);border-top:1px solid var(--rule)}
+.about{font-size:clamp(16px,1.2vw,18px);line-height:1.62;margin:0 0 1.1em;max-width:36em;text-wrap:pretty}
+.about:last-child{margin-bottom:0}
 .contact-side{display:flex;flex-direction:column;gap:14px}
-.contact-title{margin:0;font-weight:500;font-size:clamp(26px,3vw,48px);line-height:1.05;letter-spacing:-.02em;word-break:break-word}
-.contact-title a{text-decoration:none}
-.contact-title a:hover{color:var(--verm)}
+.contact-title{margin:0 0 4px;font-weight:400;font-size:clamp(22px,2.2vw,32px);line-height:1.2;letter-spacing:-.022em;word-break:break-word}
+.contact-title a{text-decoration:underline;text-decoration-thickness:1px;text-underline-offset:6px;text-decoration-color:var(--rule);
+  transition:color .18s var(--ease),text-decoration-color .18s var(--ease)}
+.contact-title a:hover{color:var(--oxide);text-decoration-color:currentColor}
 .contact-note{margin:0}
-.contact-foot{display:flex;justify-content:space-between;gap:12px;margin-top:clamp(64px,9vw,120px);padding-top:14px;border-top:1px solid var(--rule)}
+.contact-note a{text-decoration-color:var(--rule);text-underline-offset:4px}
+.contact-note a:hover{color:var(--oxide)}
+.contact-foot{display:flex;justify-content:space-between;gap:12px;margin-top:clamp(72px,9vw,120px);padding-top:16px;border-top:1px solid var(--rule)}
 
 /* ------------------------------------------------------------- small screens */
 @media (pointer:coarse){
   .pill,.feat-arrow,.lb-close{min-height:44px}
   .feat-arrow,.lb-close{min-width:44px}
 }
+@media (max-width:1100px){
+  /* the four controls must share one row; the long words go first */
+  .hud-pills .long{display:none}
+}
 @media (max-width:900px){
-  :root{--hud-top:84px;--hud-bottom:118px}
+  :root{--hud-top:84px;--hud-bottom:96px}
   /* a soft band behind the name, so it reads over beams and over paintings */
   .hud::before{content:"";position:absolute;inset:0 0 auto 0;height:132px;pointer-events:none;
     background:linear-gradient(180deg,rgba(var(--wash),.82) 0%,rgba(var(--wash),.5) 55%,rgba(var(--wash),0) 100%)}
@@ -277,23 +316,33 @@ html[data-room="off"] .sec:not(.sec-featured){display:none}
   .hud-meta{display:none}
   .hud-mail{display:none}
   .brand-target .pre-big{font-size:26px}
-  .hud-bottom{flex-direction:column;align-items:stretch}
-  .hud-pills{justify-content:flex-start}
-  .pill{font-size:10px;padding:.85em 1.25em}
-  .copy-wash{background:linear-gradient(0deg,rgba(var(--wash),.94) 0%,rgba(var(--wash),.74) 34%,rgba(var(--wash),0) 60%)}
-  .copy-panel{left:var(--gut);right:var(--gut);width:auto}
-  .poem{font-size:17px}
+  .hud-bottom{flex-direction:column;align-items:stretch;gap:12px}
+  /* one quiet row: no arrows, no orphan */
+  .hud-pills{justify-content:flex-start;flex-wrap:nowrap;gap:6px}
+  .hud-pills .arr{display:none}
+  .pill{font-size:10.5px;height:40px;padding:0 14px}
+  .diya-btn{width:42px;height:42px}
+  .copy-panel{left:var(--gut);right:var(--gut);width:auto;bottom:calc(var(--hud-bottom) + 12px);padding:16px 18px 18px}
+  .copy-head{margin-bottom:10px}
+  .lede{font-size:16px;line-height:1.5}
+  .poem{font-size:17px;line-height:1.36}
   .pre-centre{padding-left:var(--gut)}
-  .feat-head{justify-content:space-between;flex-wrap:wrap}
-  .feat-title{order:-1;text-align:left;min-width:0}
-  .feat-arrows{order:1}
+  .feat-head{align-items:center}
+  .feat-title{min-width:0;font-size:28px}
+  .feat-tools{gap:10px}
+  /* touch swipes the row; the arrows step aside so All work keeps its place */
+  .feat-arrows{display:none}
   .feat-card{width:58vw}
   .feat-card.is-wide{width:72vw}
-  .lb-grid{grid-template-columns:1fr;align-content:start;overflow-y:auto;overscroll-behavior:contain;padding-top:24px}
+  .cap-title{font-size:14px}
+  .lb-grid{grid-template-columns:1fr;align-content:start;overflow-y:auto;overscroll-behavior:contain;padding:24px var(--gut) 40px}
   .lb-text{padding-top:44px}
-  .lb-figure{justify-content:center}
+  .lb-figure{justify-content:center;height:auto}
   .lb-figure img{max-height:52vh}
+  .lb-title{font-size:28px}
+  .statement{font-size:26px}
   .contact-grid{grid-template-columns:1fr}
+  .series{flex-direction:column;align-items:flex-start;gap:4px}
   .work{max-width:100%}
 }
 

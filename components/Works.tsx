@@ -1,4 +1,4 @@
-import { WORKS, SERIES, EMAIL, INSTAGRAM, quoted } from "@/lib/works";
+import { WORKS, SERIES, EMAIL, INSTAGRAM, details, quoted, statusLabel } from "@/lib/works";
 
 type Dims = Record<string, { w: number; h: number }>;
 
@@ -21,7 +21,7 @@ export default function Works({ dims }: { dims: Dims }) {
 
       {SERIES.map((s) => (
         <div className="series-block" key={s.label}>
-          <div className="series"><span>{s.label}</span><span>{s.note}</span></div>
+          <div className="series"><h3 className="series-name">{s.label}</h3><span className="lab">{s.note}</span></div>
           <div className="hang">
             {WORKS.filter((w) => w.series === s.label).map((w) => {
               const d = dims[w.id];
@@ -40,8 +40,9 @@ export default function Works({ dims }: { dims: Dims }) {
                          width={d.w} height={d.h} loading="lazy" decoding="async" data-flip-id={w.id} />
                   </a>
                   <figcaption>
-                    <span>{quoted(w.title)}</span>
-                    <span>{w.size ?? "—"}</span>
+                    <span className="cap-title">{quoted(w.title)}</span>
+                    {details(w) && <span className="cap-details">{details(w)}</span>}
+                    <span className={`cap-status is-${w.status.toLowerCase()}`}>{statusLabel(w)}</span>
                   </figcaption>
                 </figure>
               );
@@ -53,15 +54,23 @@ export default function Works({ dims }: { dims: Dims }) {
   );
 }
 
+/** her approved introduction (the Sacred Fragments catalogue, Oct 2026) */
+const STATEMENT =
+  "Dr. Dolly Prasad’s art is the everyday held sacred. A\u00A0self-taught painter, she catches the hues of " +
+  "India in its waiting and its wishing, its worship and its whispers.";
+
 /**
- * Her biography, verbatim, and the way to reach her.
+ * Her statement, her biography verbatim, and the way to reach her.
  */
 export function Contact() {
   return (
     <footer className="contact" id="contact" aria-labelledby="contact-title">
+      <div className="contact-lead">
+        <div className="lab">About</div>
+        <p className="statement">{STATEMENT}</p>
+      </div>
       <div className="contact-grid">
-        <div>
-          <div className="lab">About</div>
+        <div className="contact-bio">
           <p className="about">
             Dr. Dolly Prasad is as much an artist as she is a doctor, and her multi-faceted persona has,
             indubitably, made her the person that she is. Play of emotions, be it on the faces around her or on
@@ -85,7 +94,7 @@ export function Contact() {
         </div>
       </div>
       <div className="contact-foot lab">
-        <span>© Dr Dolly Prasad</span>
+        <span>© {new Date().getFullYear()} Dr Dolly Prasad</span>
         <span>Oil on canvas · New Delhi</span>
       </div>
     </footer>

@@ -37,7 +37,7 @@ They give me a brush
 Then sit quietly
 In front of me
 I put them on canvas
-I don't paint
+I don’t paint
 Am not a painter`;
 
 const HX = ROOM.w / 2, HZ = ROOM.d / 2;
@@ -59,7 +59,7 @@ export const CHAPTERS: Chapter[] = [
     id: "leaving",
     eyebrow: "Gone Are The Days · c. 2016–2018",
     body:
-      "Fourteen paintings of a country's discarded equipment. Withdrawn coins, a pillar " +
+      "Fourteen paintings of a country’s discarded equipment. Withdrawn coins, a pillar " +
       "postbox, hand-lettered posters for the last single-screen cinemas, a tonga going " +
       "out as an auto-rickshaw arrives. What is leaving she paints in full oil; what is " +
       "arriving she draws as a single bare line.",
@@ -102,7 +102,7 @@ export const CHAPTERS: Chapter[] = [
   },
   {
     id: "shrine",
-    eyebrow: "Artist's statement",
+    eyebrow: "Artist’s statement",
     verse: POEM,
     pose: aim([ROOM.niche.x - 0.24, 1.4, -HZ], -0.1, 1.95, -0.03),
     narrow: aim([ROOM.niche.x, 0.89, -HZ], 0, 2.3, 0),

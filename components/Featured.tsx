@@ -2,14 +2,15 @@
 
 import { useEffect, useLayoutEffect, useRef } from "react";
 import { motion, gsap, Draggable, scrambleTo, reducedMotion } from "@/lib/motion";
-import { BY_ID, FEATURED, pill, quoted } from "@/lib/works";
+import { BY_ID, FEATURED, details, quoted, statusLabel } from "@/lib/works";
 
 /**
  * Featured — the original's slider, rebuilt for her work.
  *
  * A heading with arrows and an "All work" pill; a row of cards in two widths,
- * captions alternating above and below so the row has a vertical rhythm;
- * title left and her stated size right; the status pill on the image. Cards
+ * captions alternating above and below so the row has a vertical rhythm.
+ * Each caption reads as a gallery label: the title, then size and year, then
+ * the status, with the red dot on a sold work. Nothing sits on a painting. Cards
  * open by clip, bottom-up and top-down in turn, settling from 1.2×; the
  * captions decode out of their own letters. Drag with inertia, snap card to
  * card, arrows, or a sideways trackpad swipe. A click opens the work.
@@ -35,7 +36,6 @@ export default function Featured({ dims, onOpen }: { dims: Dims; onOpen(id: stri
     root.querySelectorAll<HTMLElement>(".feat-media").forEach((m, i) =>
       gsap.set(m, { clipPath: i % 2 ? "inset(0% 0% 100% 0%)" : "inset(100% 0% 0% 0%)" }));
     gsap.set(root.querySelectorAll(".feat-media img"), { scale: 1.2 });
-    gsap.set(root.querySelectorAll(".feat-pill"), { xPercent: 101, autoAlpha: 0 });
     gsap.set(root.querySelector(".feat-all"), { yPercent: 101 });
     root.querySelectorAll<HTMLElement>("[data-cap]").forEach((el) => { el.textContent = ""; });
   }, []);
@@ -129,7 +129,6 @@ export default function Featured({ dims, onOpen }: { dims: Dims; onOpen(id: stri
     // reveal on enter, reset on leave — in both directions, as the original
     const media = [...root.querySelectorAll<HTMLElement>(".feat-media")];
     const imgs = media.map((m) => m.querySelector("img")!);
-    const pills = [...root.querySelectorAll<HTMLElement>(".feat-pill")];
     const caps = [...root.querySelectorAll<HTMLElement>("[data-cap]")];
     const all = root.querySelector<HTMLElement>(".feat-all")!;
     let live: gsap.core.Timeline | null = null;
@@ -139,7 +138,6 @@ export default function Featured({ dims, onOpen }: { dims: Dims; onOpen(id: stri
       const tl = gsap.timeline();
       tl.to(media, { clipPath: "inset(0% 0% 0% 0%)", duration: 2, ease: "power2.out", stagger: 0.06 }, 0.5)
         .to(imgs, { scale: 1, duration: 2, ease: "power2.out", stagger: 0.06 }, 0.5)
-        .to(pills, { xPercent: 0, autoAlpha: 1, duration: 0.6, ease: "power2.out", stagger: 0.04 }, 0.9)
         .to(all, { yPercent: 0, duration: 0.6, ease: "power2.out" }, 1);
       caps.forEach((el) => tl.add(scrambleTo(el, el.dataset.cap!, { anagram: true, speed: 0.6, duration: 1 }), 1));
       live = tl;
@@ -149,7 +147,6 @@ export default function Featured({ dims, onOpen }: { dims: Dims; onOpen(id: stri
       const tl = gsap.timeline();
       tl.set(media, { clipPath: (i: number) => (i % 2 ? "inset(0% 0% 100% 0%)" : "inset(100% 0% 0% 0%)") })
         .set(imgs, { scale: 1.2 })
-        .set(pills, { xPercent: 101, autoAlpha: 0 })
         .set(all, { yPercent: 101 });
       caps.forEach((el) => tl.add(scrambleTo(el, "", { anagram: false, chars: el.dataset.cap, speed: 0.6, duration: 0.6 }), 0));
       live = tl;
@@ -192,13 +189,15 @@ export default function Featured({ dims, onOpen }: { dims: Dims; onOpen(id: stri
   return (
     <section className="featured" ref={section} aria-label="Featured works">
       <div className="feat-head">
-        <div className="feat-arrows">
-          <button type="button" className="feat-arrow" data-prev aria-label="Previous works">←</button>
-          <button type="button" className="feat-arrow" data-next aria-label="Next works">→</button>
-        </div>
         <h2 id="featured-title" className="feat-title" data-cap="Featured">Featured</h2>
-        <div className="mask">
-          <a className="pill pill-solid feat-all" href="#works">All work →</a>
+        <div className="feat-tools">
+          <div className="feat-arrows">
+            <button type="button" className="feat-arrow" data-prev aria-label="Previous works">←</button>
+            <button type="button" className="feat-arrow" data-next aria-label="Next works">→</button>
+          </div>
+          <div className="mask">
+            <a className="pill feat-all" href="#works">All work →</a>
+          </div>
         </div>
       </div>
 
@@ -208,10 +207,13 @@ export default function Featured({ dims, onOpen }: { dims: Dims; onOpen(id: stri
             const w = BY_ID.get(id)!;
             const d = dims[id];
             const above = i % 2 === 1;
+            const line = details(w);
+            const status = statusLabel(w);
             const caption = (
               <div className="feat-cap">
-                <span data-cap={quoted(w.title)}>{quoted(w.title)}</span>
-                {w.size && <span data-cap={w.size}>{w.size}</span>}
+                <span className="cap-title" data-cap={quoted(w.title)}>{quoted(w.title)}</span>
+                {line && <span className="cap-details" data-cap={line}>{line}</span>}
+                <span className={`cap-status is-${w.status.toLowerCase()}`} data-cap={status}>{status}</span>
               </div>
             );
             return (
@@ -228,7 +230,6 @@ export default function Featured({ dims, onOpen }: { dims: Dims; onOpen(id: stri
                   {/* eslint-disable-next-line @next/next/no-img-element */}
                   <img src={`/art/works/${id}.jpg`} alt={`${w.title} — ${w.medium.toLowerCase()}`}
                        width={d?.w} height={d?.h} draggable={false} data-flip-id={id} loading="lazy" decoding="async" />
-                  <span className="feat-pill">{pill(w)}</span>
                 </div>
                 {!above && caption}
               </article>

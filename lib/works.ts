@@ -110,5 +110,11 @@ export const enquiry = (w: Work) =>
 /** a painting's title as it is shown: in quotation marks */
 export const quoted = (title: string) => `“${title}”`;
 
+/** a caption's second line: her stated size and the year, where known */
+export const details = (w: Work) => [w.size, w.year].filter(Boolean).join(" · ");
+
+/** the status as a caption states it; a sold work also carries the gallery's red dot */
+export const statusLabel = (w: Work) => (w.status === "Enquire" ? "On enquiry" : w.status);
+
 /** what the status pill says */
 export const pill = (w: Work) => (w.status === "Enquire" ? "Enquire ↗" : w.status);
