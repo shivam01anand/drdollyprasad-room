@@ -1178,6 +1178,14 @@ VIEWS = {
     "plan":      ((-2.4, 0.6, 23.0), (-2.4, 0.6, 0.0)),
     "mess":      ((10.5, -10.5, 11.5), (0.4, 0.4, 0.4)),
 }
+# a step closer to the work on a wide screen: the paintings at about 1.3× where a wall has one,
+# less where a view must hold several (the eye slides toward the target, along the line of sight)
+CLOSER = {"presence": 0.76, "canopy": 0.86, "bodhi": 0.8,
+          "street": 0.86}
+for k, f in CLOSER.items():
+    e, t = Vector(VIEWS[k][0]), Vector(VIEWS[k][1])
+    VIEWS[k] = (tuple(t + (e - t) * f), VIEWS[k][1])
+
 # portrait screens: one painting per chapter, centred, high in the frame (the copy sits below)
 NARROW = {
     "start":     ((3.6, 0.9, 1.55), (3.6, AY1, 1.3)),

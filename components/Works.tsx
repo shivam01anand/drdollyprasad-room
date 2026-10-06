@@ -6,7 +6,8 @@ const DEFAULT_IN = 34;
 
 /**
  * Every painting, laid out at true scale where she has stated a size: a one
- * foot door panel is never the size of a three-foot canvas. A click opens
+ * foot door panel is never the size of a three-foot canvas; the heading is her
+ * own sentence from her studio page. A click opens
  * the work (the page's one lightbox, wired in Studio).
  */
 export default function Works({ dims }: { dims: Dims }) {
@@ -15,7 +16,7 @@ export default function Works({ dims }: { dims: Dims }) {
       <div className="collage-head">
         <div className="lab">The work · {WORKS.length} paintings</div>
         <h2 id="works-title" className="collage-title">
-          Shown to relative scale where she has given the size. A one-foot door panel is never the size of a three-foot canvas.
+          “My paintings are just a representation of some and many others of the shades and paradigms that I picked up at different stages in my life.”
         </h2>
       </div>
 

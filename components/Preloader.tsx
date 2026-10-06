@@ -2,7 +2,6 @@
 
 import { forwardRef, useEffect, useImperativeHandle, useLayoutEffect, useRef, useState } from "react";
 import { motion, gsap, Flip, reducedMotion } from "@/lib/motion";
-import * as music from "@/lib/music";
 
 export type HeroRect = { left: number; top: number; width: number; height: number };
 export type PreloaderHandle = { finish(): void };
@@ -25,15 +24,15 @@ const WORDS = ["Welcome", "to", "my", "studio"];
 /**
  * The welcome. Warm paper, lamplight from above, and her greeting, word by
  * word — नमस्ते, then "Welcome to my studio" — with her name beneath and a
- * hairline that fills as the house loads. When it is ready, an invitation:
- * Step inside. That step is the gesture that lets the music begin (a
- * tanpura, lib/music.ts); her name rises into the header, one painting is
- * shown clean exactly where the room has it, and the panel lifts with the
- * house around the painting.
+ * hairline that fills as the house loads. As soon as the house is ready and
+ * the greeting has been said, the visitor is taken in: her name rises into
+ * the header, one painting is shown clean exactly where the room has it, and
+ * the panel lifts with the house around the painting. (The music waits for
+ * the visitor's first touch or key: a browser lets sound begin only then.)
  *
  * The brand nodes are made outside React and moved with Flip, so the name
  * never cuts between the welcome and the header. A second visit in the same
- * session is welcomed back and goes straight in.
+ * session is welcomed back.
  */
 const Preloader = forwardRef<PreloaderHandle, Props>(function Preloader(props, ref) {
   const root = useRef<HTMLDivElement>(null);
@@ -41,10 +40,8 @@ const Preloader = forwardRef<PreloaderHandle, Props>(function Preloader(props, r
   const greet = useRef<HTMLDivElement>(null);
   const sign = useRef<HTMLDivElement>(null);
   const bar = useRef<HTMLElement>(null);
-  const invite = useRef<HTMLDivElement>(null);
   const hero = useRef<HTMLImageElement>(null);
   const [ready, setReady] = useState(false);
-  const [withMusic, setWithMusic] = useState(true);
   const [again, setAgain] = useState(false);
 
   const nodes = useRef<{ b1: HTMLSpanElement; b2: HTMLSpanElement } | null>(null);
@@ -69,7 +66,7 @@ const Preloader = forwardRef<PreloaderHandle, Props>(function Preloader(props, r
     const b1 = mk("→ Dr Dolly"), b2 = mk("Prasad");
     sign.current!.append(b1, b2);
     nodes.current = { b1, b2 };
-    try { setWithMusic(music.wanted()); setAgain(sessionStorage.getItem(SEEN) === "1"); } catch { /* private mode */ }
+    try { setAgain(sessionStorage.getItem(SEEN) === "1"); } catch { /* private mode */ }
     return () => {
       owned.current.forEach((a) => a.kill());
       removeEventListener("resize", place);
@@ -105,10 +102,10 @@ const Preloader = forwardRef<PreloaderHandle, Props>(function Preloader(props, r
     if (props.loaded && !props.failed && state.current.said) setReady(true);
   }, [props.loaded, props.failed]);
   useEffect(() => {
-    if (!ready || !invite.current) return;
-    if (again) { enter(false); return; }
-    own(gsap.fromTo(invite.current, { autoAlpha: 0, y: 10 }, { autoAlpha: 1, y: 0, duration: reducedMotion() ? 0 : 0.8, ease: "power2.out" }));
-    invite.current.querySelector<HTMLButtonElement>(".pre-enter")?.focus({ preventScroll: true });
+    if (!ready) return;
+    // a beat to read the greeting, then in
+    const t = window.setTimeout(() => enter(), again ? 150 : 700);
+    return () => clearTimeout(t);
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [ready, again]);
 
@@ -160,18 +157,17 @@ const Preloader = forwardRef<PreloaderHandle, Props>(function Preloader(props, r
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [props.failed]);
 
-  /** step inside: the music (this is the gesture it needs), the name to the header,
-   *  the painting where the room has it, and the panel lifts */
-  const enter = (gesture: boolean) => {
+  /** in: the name to the header, the painting where the room has it, and the panel lifts */
+  const enter = () => {
     if (state.current.started || state.current.done) return;
     state.current.started = true;
-    if (gesture && withMusic) music.start();
     if (reducedMotion()) { finish(); return; }
     const n = nodes.current!;
     addEventListener("resize", place);
     const tl = own(gsap.timeline({ onComplete: done }));
     const words = [...(greet.current?.querySelectorAll("[data-in]:not(.pre-sign)") ?? [])];
-    tl.to([...words, invite.current], { autoAlpha: 0, y: -12, filter: "blur(6px)", duration: 0.7, ease: "power2.in", stagger: 0.04 }, 0);
+    tl.to(words, { autoAlpha: 0, y: -12, filter: "blur(6px)", duration: 0.7, ease: "power2.in", stagger: 0.04 }, 0);
+    tl.to(root.current?.querySelector(".pre-bar") ?? {}, { autoAlpha: 0, duration: 0.4 }, 0);
     tl.add(() => {
       const target = document.querySelector<HTMLElement>("[data-brand-target]");
       if (!target) return;
@@ -192,20 +188,6 @@ const Preloader = forwardRef<PreloaderHandle, Props>(function Preloader(props, r
     tl.to({}, { duration: 0.05 }, 3.65);
   };
 
-  // Enter or Space on the welcome steps inside
-  useEffect(() => {
-    if (!ready || again) return;
-    const onKey = (e: KeyboardEvent) => {
-      if (e.key !== "Enter" && e.key !== " ") return;
-      if ((e.target as HTMLElement)?.closest?.(".pre-music, .pre-enter")) return;
-      e.preventDefault();
-      enter(true);
-    };
-    addEventListener("keydown", onKey);
-    return () => removeEventListener("keydown", onKey);
-    // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [ready, again, withMusic]);
-
   return (
     <div className="pre" ref={root}>
       <div className="pre-panel" ref={panel}>
@@ -221,19 +203,6 @@ const Preloader = forwardRef<PreloaderHandle, Props>(function Preloader(props, r
             <div className="pre-bar" role="progressbar" aria-label="Opening the house" aria-valuemin={0} aria-valuemax={100}
                  aria-valuenow={Math.round(props.pct)} data-ready={ready ? "1" : "0"}>
               <i ref={bar} />
-            </div>
-            <div className="pre-invite" ref={invite}>
-              <button type="button" className="pre-enter" onClick={() => enter(true)} disabled={!ready}>
-                Step inside <span aria-hidden="true">→</span>
-              </button>
-              <button type="button" className="pre-music lab" aria-pressed={withMusic}
-                      onClick={() => {
-                        const on = !withMusic;
-                        setWithMusic(on);
-                        try { localStorage.setItem("dp:music", on ? "1" : "0"); } catch { /* private mode */ }
-                      }}>
-                {withMusic ? "♪ With music · turn off" : "Without music · turn on"}
-              </button>
             </div>
           </div>
         </div>

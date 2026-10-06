@@ -190,6 +190,8 @@ html[data-gliding="1"]{scroll-snap-type:none}
 .copy-head{display:flex;justify-content:space-between;align-items:baseline;gap:16px;margin-bottom:14px}
 .copy-idx{flex:none;opacity:.75;font-variant-numeric:tabular-nums}
 .lede{font-size:clamp(16px,1.2vw,18px);line-height:1.55;letter-spacing:-.005em;margin:0;color:var(--ink);max-width:34em;text-wrap:pretty}
+/* a label that is only her words: no rule above them, set a little larger */
+.copy-head + .quote{margin-top:0;padding-top:0;border-top:0;font-size:clamp(16px,1.25vw,19px);line-height:1.5}
 .quote{margin:16px 0 0;padding-top:14px;border-top:1px solid var(--rule);font-size:clamp(15px,1.1vw,17px);line-height:1.55;font-style:italic;color:var(--ink);max-width:34em}
 .poem{margin:0;font-size:clamp(18px,1.45vw,21px);line-height:1.4;letter-spacing:-.008em}
 .poem-line{display:block;min-height:1.42em}
@@ -247,19 +249,10 @@ html[data-room="off"] .sec:not(.sec-featured){display:none}
 .pre-big{display:block;font-family:var(--display);font-weight:500;color:var(--ink);white-space:nowrap;
   font-size:clamp(20px,1.7vw,26px);line-height:1;letter-spacing:-.02em}
 .pre-note{margin:10px 0 0}
-.pre-foot{position:relative;margin-top:clamp(30px,6vh,64px);min-height:92px;display:flex;flex-direction:column;align-items:center}
+.pre-foot{position:relative;margin-top:clamp(30px,6vh,64px);min-height:40px;display:flex;flex-direction:column;align-items:center}
 .pre-bar{position:absolute;top:22px;width:140px;height:1px;background:var(--rule);overflow:hidden;transition:opacity .5s ease}
 .pre-bar i{position:absolute;inset:0;background:var(--ink);transform-origin:0 50%;transform:scaleX(.02);transition:transform .4s ease}
 .pre-bar[data-ready="1"]{opacity:0}
-.pre-invite{display:flex;flex-direction:column;align-items:center;gap:12px;visibility:hidden;opacity:0}
-.pre-enter{height:52px;padding:0 30px;border-radius:999px;border:1px solid var(--pill);background:var(--pill);color:var(--pill-ink);
-  font-family:var(--mono);font-size:12px;letter-spacing:.1em;text-transform:uppercase;cursor:pointer;
-  box-shadow:0 10px 28px -16px rgba(48,32,22,.6);transition:background-color .2s var(--ease),border-color .2s var(--ease),transform .2s var(--ease)}
-.pre-enter:hover{background:var(--oxide);border-color:var(--oxide);color:#fff;transform:translateY(-1px)}
-.pre-enter span{display:inline-block;margin-left:.5em;transition:transform .2s var(--ease)}
-.pre-enter:hover span{transform:translateX(3px)}
-.pre-music{background:none;border:0;padding:8px 10px;cursor:pointer;color:var(--dim)}
-.pre-music:hover{color:var(--ink)}
 .pre-hero{
   position:fixed;left:50%;top:50%;width:1px;height:1px;z-index:2;
   visibility:hidden;opacity:0;object-fit:fill;transform-origin:50% 50%;

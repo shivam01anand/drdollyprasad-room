@@ -62,15 +62,17 @@ export const CHAPTERS: Chapter[] = [
     eyebrow: "Recent work · 2024–",
     stop: "Recent work",
     room: "The courtyard",
-    body:
-      "Hotter reds, a darker ground, and green entering her palette for the first time. Her own " +
-      "words for these: pause, stillness, silence, listening. Two have already gone to New York " +
-      "and London.",
+    // her own words, written for "Petals of Thought"
+    quote:
+      "Sometimes thoughts don’t need words… they just sit quietly, like a flower beside you. " +
+      "A pause, a breath, a space where the mind softens and listens.",
     view: "floral",
     labels: ["child-among-flowers", "woman-with-red-flower", "woman-with-bird"],
   },
   { id: "canopy", eyebrow: "“Under Canopy of Greens” · 2025", stop: "Under Canopy of Greens", room: "The courtyard", view: "canopy", dusk: 0.04, labels: ["boy-with-bananas"],
-    labelSide: "left" },
+    labelSide: "left",
+    // her own words for the painting
+    quote: "A young boy stands quietly beneath the shelter of large banana leaves. The bananas on his head look like a natural crown from the earth." },
   // from the canopy the walk turns to the arch and goes straight through it into the Quiet Room
   { id: "bodhi", eyebrow: "Artist’s statement", stop: "Artist’s statement", room: "The Quiet Room", verse: POEM, view: "bodhi",
     via: "threshold", dusk: 0.22, labels: ["monk-and-green-buddha"] },
@@ -80,7 +82,9 @@ export const CHAPTERS: Chapter[] = [
     via: "faithvia",
     stop: "Threads of Faith",
     room: "The Quiet Room",
-    body: "On view at Sacred Fragments: A Journey Home. New Delhi, 18–21 October 2026.",
+    // her own words for the painting, then where it is showing
+    quote: "Every thread representing a hope, desire, promise, or prayer.",
+    body: "Showing at Sacred Fragments: A Journey Home, New Delhi, 18–21 October 2026.",
     view: "faith",
     dusk: 0.28,
     labels: ["monks-and-blue-buddha", "temple-bells"],
@@ -93,11 +97,10 @@ export const CHAPTERS: Chapter[] = [
     // a portrait screen faces Threads of Faith: it turns to the passage before going through
     via: "streetvia",
     asides: [{ anchor: "press", title: "The artist, in conversation", line: "Beside “The Bullocks”, at her exhibition" }],
-    body:
-      "Fourteen paintings of a country’s discarded equipment. Withdrawn coins, a pillar " +
-      "postbox, hand-lettered posters for the last single-screen cinemas, a tonga going " +
-      "out as an auto-rickshaw arrives. What is leaving she paints in full oil; what is " +
-      "arriving she draws as a single bare line.",
+    // her own words (her studio page, drdollyprasad.wordpress.com, 2018)
+    quote:
+      "The shades that touched me, the live frames that seemed to tell a story larger than the " +
+      "attention they seemed to draw.",
     ink: "light",
     view: "street",
     dusk: 0.38,
@@ -113,11 +116,11 @@ export const CHAPTERS: Chapter[] = [
     body:
       "Triveni Kala Sangam · India Habitat Centre · ICCR · Travancore Art Gallery · " +
       "Lalit Kala Akademi · Nehru Art Gallery, Bombay.",
+    // the close of her studio page (drdollyprasad.wordpress.com, 2018)
     quote:
-      "As an artist whose work knows no borders, my pieces have journeyed far and wide, " +
-      "finding their place in numerous private art collections globally. My creative " +
-      "expression has resonated with diverse audiences, building connections that span " +
-      "continents.",
+      "Each of these paintings reminds me I have yet to pick up many more hues to fill up some " +
+      "empty lines, some yet to be filled up nooks. I hope it would be a life-long unraveling " +
+      "with these tinges, an affair to last a lifetime…",
     view: "plan",
     dusk: 0.4,
   },
