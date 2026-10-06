@@ -216,8 +216,3 @@ export function assemble(house: House, lib: Library, baked: BakedLight, edgeMat:
   return parts;
 }
 
-/** the canvas material: her painting, the bake on it */
-export function artMaterial(tex: THREE.Texture, baked: BakedLight) {
-  const m = new THREE.MeshStandardMaterial({ map: tex, roughness: 0.86, metalness: 0, envMapIntensity: 0.5 });
-  return baked.apply(m);
-}

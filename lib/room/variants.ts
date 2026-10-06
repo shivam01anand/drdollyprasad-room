@@ -96,5 +96,7 @@ export const NIGHT = {
   hemi: 0.08,
   env: 0.12,
   diya: 1.5,
+  /** the lamp by the arch, five wicks */
+  deepa: 2.2,
   haze: 0.0,
 };

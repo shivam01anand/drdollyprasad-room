@@ -31,7 +31,7 @@ import sys
 
 import bmesh
 import bpy
-from mathutils import Euler, Vector
+from mathutils import Euler, Matrix, Vector
 
 argv = sys.argv[sys.argv.index("--") + 1:]
 OUT = argv[0]
@@ -99,6 +99,7 @@ SITE = {
     "sandstone": ("sandstone", lin(0xF2DCC0), 1.4),
     "timber": ("timber", (1.25, 1.1, 0.95), 2.0),
     "door": ("door", (1.85, 1.85, 1.78), 1.15),
+    "artFrame": ("timber", (0.30, 0.205, 0.14), 0.9),
     "courtFloor": ("terracotta", (1.25, 0.95, 0.78), 2.08),
     "iron": ("iron", lin(0x8A8178), 0.55),
     "ironDark": ("iron", lin(0x4A433D), 0.6),
@@ -528,8 +529,42 @@ def painting(art_id, side, face, along, centre_z, longest_m, depth=0.035):
            "E": (face - off, along, centre_z), "W": (face + off, along, centre_z)}[side]
     o.location = loc
     o["artId"] = art_id
-    INFO["art"][art_id] = {"w": w, "h": h, "side": side, "centre": list(loc)}
+    INFO["art"][art_id] = {"w": w, "h": h, "side": side, "centre": list(loc), "frame": FRAME_LIP + FRAME_GAP}
+    float_frame(art_id, w, h, depth, Matrix.Translation(loc) @ Matrix.Rotation(rot, 4, "Z"))
     return o
+
+
+FRAME_LIP, FRAME_GAP = 0.016, 0.009
+
+
+def float_frame(art_id, w, h, depth, M):
+    """the frame she would hang it in, made modern: a 16 mm dark lip around a 9 mm
+    shadow gap, a tray behind the canvas, the back on the wall. In the canvas's own
+    axes (x across, y into the wall, z up); static, so the bake holds its shadow."""
+    lip, gap = FRAME_LIP, FRAME_GAP
+    o, p = w / 2 + gap, h / 2 + gap
+    y0, y1 = -depth / 2 - 0.004, depth / 2 + 0.008          # 4 mm proud of the paint, back to the wall
+    pieces = [(-o - lip, o + lip, p, p + lip), (-o - lip, o + lip, -p - lip, -p),
+              (-o - lip, -o, -p, p), (o, o + lip, -p, p)]
+    bm = bmesh.new()
+    def cube(x0, x1, ya, yb, z0, z1):
+        r = bmesh.ops.create_cube(bm, size=1.0)
+        bmesh.ops.scale(bm, vec=(x1 - x0, yb - ya, z1 - z0), verts=r["verts"])
+        bmesh.ops.translate(bm, vec=((x0 + x1) / 2, (ya + yb) / 2, (z0 + z1) / 2), verts=r["verts"])
+    for x0, x1, z0, z1 in pieces:
+        cube(x0, x1, y0, y1, z0, z1)
+    cube(-o, o, depth / 2, y1, -p, p)                          # the tray, seen in the gap
+    bmesh.ops.transform(bm, matrix=M, verts=bm.verts)
+    me = bpy.data.meshes.new(f"Wall_Frame_{art_id}")
+    bm.to_mesh(me)
+    bm.free()
+    fr = link(bpy.data.objects.new(f"Wall_Frame_{art_id}", me))
+    fr.data.materials.append(role_mat("artFrame"))
+    bv = fr.modifiers.new("soft", "BEVEL")
+    bv.width = 0.0022
+    bv.segments = 2
+    bv.limit_method = "ANGLE"
+    return fr
 
 
 painting("woman-with-poppies", "N", AY1, 3.6, 1.72, 1.32)
@@ -665,6 +700,51 @@ INFO["anchors"]["lantern"] = [3.55, 0.95, 0.27]
 import_ph("wooden_stool_02", (-1.35, 5.35, 0), 0.3, 1.25, mass=1.2)
 import_ph("brass_vase_03", (-1.35, 5.35, 0.23), 0.0, 1.0, mass=0.4)
 lamp_tower("lamp", (-5.1, 5.45, 0))
+
+
+def deepa(name, loc, H=1.45):
+    """the lamp at the centre of her exhibitions: a taller kuthu vilakku, five
+    wicks round a wide cup, standing in a ring of marigolds (42-ctx-gallery-view)"""
+    prof = [(0, 0), (0.19, 0), (0.19, 0.025), (0.15, 0.05), (0.07, 0.11), (0.045, 0.16), (0.032, 0.24),
+            (0.05, 0.27), (0.032, 0.30), (0.028, H * 0.50), (0.06, H * 0.52), (0.028, H * 0.54),
+            (0.026, H * 0.70), (0.16, H * 0.72), (0.17, H * 0.745), (0.15, H * 0.75), (0.03, H * 0.765),
+            (0.024, H * 0.86), (0.07, H * 0.875), (0.075, H * 0.89), (0.022, H * 0.905), (0.02, H * 0.95),
+            (0.045, H * 0.965), (0.03, H * 0.99), (0.0, H)]
+    o = lathe(f"Prop_{name}", prof, M_BRASS, segs=48, loc=loc)
+    register_prop(o, 2.5)
+    INFO["anchors"]["deepa"] = [loc[0], loc[1], loc[2] + H * 0.75, 0.15]     # centre of the rim, its radius
+    # the marigolds: three rings of heads, saffron outside, yellow within
+    rnd = random.Random(42)
+    rows = ((0.38, lin(0xD9561A)), (0.32, lin(0xEB7F1C)), (0.26, lin(0xF2A81E)))
+    bm = bmesh.new()
+    mats = []
+    for k, (r, rgb) in enumerate(rows):
+        mats.append(flat(f"marigold{k}", rgb, 0.85))
+        n = int(2 * math.pi * r / 0.047)
+        for i in range(n):
+            a = 2 * math.pi * (i + rnd.random() * 0.4) / n
+            rr = 0.024 + rnd.random() * 0.006
+            res = bmesh.ops.create_icosphere(bm, subdivisions=2, radius=rr)
+            vs = res["verts"]
+            for v in vs:
+                j = 1.0 + (rnd.random() - 0.5) * 0.42          # ruffled petals
+                v.co = Vector((v.co.x * j, v.co.y * j, v.co.z * j * 0.62))
+            for f in {f for v in vs for f in v.link_faces}:
+                f.material_index = k
+                f.smooth = True
+            bmesh.ops.translate(bm, vec=(loc[0] + (r + (rnd.random() - 0.5) * 0.012) * math.cos(a),
+                                         loc[1] + (r + (rnd.random() - 0.5) * 0.012) * math.sin(a),
+                                         loc[2] + rr * 0.55), verts=vs)
+    me = bpy.data.meshes.new(f"Deco_{name}Marigolds")
+    bm.to_mesh(me)
+    bm.free()
+    m = link(bpy.data.objects.new(f"Deco_{name}Marigolds", me))
+    for mt in mats:
+        m.data.materials.append(mt)
+    return o
+
+
+deepa("deepa", (0.72, 2.25, 0))
 milk_can("can_0", (-5.15, -2.85, 0))
 milk_can("can_1", (-4.85, -2.62, 0), 0.85)
 milk_can("can_2", (-5.18, -2.35, 0), 0.92)
@@ -862,7 +942,7 @@ VIEWS = {
     "presence":  ((3.6, 2.05, 1.62), (3.6, AY1, 1.86)),
     "floral":    ((3.25, 3.0, 1.6), (AX1, 2.85, 1.6)),
     "canopy":    ((4.9, 3.85, 1.6), (4.9, AY0, 1.62)),
-    "threshold": ((4.8, 3.4, 1.6), (AX0, 3.4, 1.7)),
+    "threshold": ((4.8, 3.4, 1.6), (AX0, 3.4, 1.42)),
     "bodhi":     ((-1.45, 3.4, 1.6), (QX0, 3.4, 1.62)),
     "faith":     ((-3.35, 4.45, 1.6), (-2.55, QY0, 1.55)),
     "street":    ((-4.3, -0.05, 1.6), (-3.25, RY0, 1.6)),

@@ -8,9 +8,10 @@ import type * as CANNON from "cannon-es";
 
 import { buildLibrary, textureList, type Library } from "./materials";
 import { Rig } from "./rig";
-import { loadHouse, assemble, artMaterial, BakedLight, ROOF, type HouseInfo, type HouseParts } from "./house";
+import { loadHouse, assemble, BakedLight, ROOF, type HouseInfo, type HouseParts } from "./house";
+import { paintMaterial, reliefMap, flatRelief, galleryLight } from "./paint";
 import { activeVariant, NIGHT } from "./variants";
-import { resolvePoses, isNarrow, startPose, messPose, HERO_ID } from "../chapters";
+import { resolvePoses, isNarrow, startPose, messPose, duskAt, HERO_ID } from "../chapters";
 
 export type RoomOpts = {
   manifestUrl: string;
@@ -89,6 +90,13 @@ type Body = {
 };
 
 const tmpV = new THREE.Vector3();
+const tmpC = new THREE.Color();
+/** the lamp's wicks, round the rim of its cup (scripts/house/build.py deepa) */
+const DEEPA_WICK = 0.14;
+/** a canvas's frame beyond its edge: the lip and the shadow gap (build.py float_frame) */
+const FRAME = 0.025;
+/** each wall's outward normal on the floor plane, three's (x, z) */
+const SIDE_OUT: Record<string, [number, number]> = { N: [0, 1], S: [0, -1], E: [-1, 0], W: [1, 0] };
 
 export class Room {
   rig!: Rig;
@@ -99,7 +107,14 @@ export class Room {
   /** the house's baked light: afternoon and evening (scripts/house) */
   private baked?: BakedLight;
   private bakeTw?: gsap.core.Tween;
-  private nightTw?: gsap.core.Tween;
+  /** the evening, 0…1: all of it in dark mode; by day, as much as the walk
+   *  has reached (each chapter's dusk). `v` is what is applied. */
+  private eve = { mode: 0, walk: 0, v: -1 };
+  /** how lit the lamps are, from the evening */
+  private lampK = 0;
+  private envMats?: THREE.MeshStandardMaterial[];
+  /** afternoon → evening, for each colour the evening moves */
+  private evePal?: Record<"sun" | "clear" | "top" | "horizon" | "bottom", [THREE.Color, THREE.Color]>;
   private canvas!: HTMLCanvasElement;
   private opts!: RoomOpts;
   private variant = activeVariant();
@@ -119,6 +134,8 @@ export class Room {
   private diya!: THREE.PointLight;
   private flame!: THREE.Mesh;
   private glow!: THREE.Sprite;
+  /** the lamp by the arch: five wicks round its cup */
+  private deepa?: { light: THREE.PointLight; flames: THREE.Mesh[]; glow: THREE.Sprite };
   private sky!: THREE.Mesh;
 
   private bodies: Body[] = [];
@@ -228,6 +245,8 @@ export class Room {
     for (const pr of this.parts.props) this.scene.attach(pr.group);
     // the paintings
     const textures = new Map(artPairs);
+    const flat = flatRelief();
+    this.owned.push(flat);
     for (const [id, mesh] of this.parts.art) {
       const tex = textures.get(id);
       if (!tex) throw new Error(`missing artwork ${id}`);
@@ -235,7 +254,9 @@ export class Room {
       tex.anisotropy = anisotropy;
       tex.flipY = false;
       tex.needsUpdate = true;
-      mesh.material = artMaterial(tex, this.baked);
+      // paint, not a print: the varnish under its gallery light now, the brushwork's
+      // relief read once the room is open (reliefs())
+      mesh.material = paintMaterial(tex, this.baked, galleryLight(this.info.art[id]), flat);
       this.art.push(mesh);
     }
     // development: ?bake=0 shows the live light for comparison
@@ -247,7 +268,9 @@ export class Room {
     this.buildPost();
     this.resize();
     this.syncBakeAO();
-    this.captureEnvironment();
+    await this.captureEnvironment();
+    if (this.disposed) { this.release(); return; }
+    this.applyEve();
     if (V.startDark) this.setMode("dark", true);
 
     canvas.addEventListener("pointermove", this.onPointerMove);
@@ -264,14 +287,37 @@ export class Room {
     // compile every program and warm every pass while the panel still covers
     // the room, so the first visible frame costs nothing. three polls the
     // programs from a timer, so teardown waits for this to settle.
-    this.compiling = renderer.compileAsync(this.scene, this.rig.camera);
+    this.compiling = this.warm(this.composer!.readBuffer);
     try { await this.compiling; } finally { this.compiling = undefined; }
     if (this.disposed) { this.release(); return; }
     renderer.shadowMap.needsUpdate = true;
     this.composer!.render();
     this.ready = true;
     this.wake = 2;
+    this.reliefs();
     if (process.env.NODE_ENV !== "production") (window as unknown as { __room?: Room }).__room = this;
+  }
+
+  /** each canvas's relief, read from its photograph one at a time in idle moments, off the load path */
+  private reliefs() {
+    const queue = [...this.art];
+    const idle = (fn: () => void) =>
+      "requestIdleCallback" in window ? requestIdleCallback(fn, { timeout: 600 }) : setTimeout(fn, 40);
+    const next = () => {
+      if (this.disposed) return;
+      const mesh = queue.shift();
+      if (!mesh) return;
+      const mat = mesh.material as THREE.MeshStandardMaterial;
+      const img = mat.map?.image as HTMLImageElement | undefined;
+      if (img?.width) {
+        const relief = reliefMap(img, this.tier.small ? 512 : 768);
+        this.owned.push(relief);
+        mat.normalMap = relief;
+        this.invalidate();
+      }
+      idle(next);
+    };
+    idle(next);
   }
 
   private loadTexture(url: string) {
@@ -351,6 +397,67 @@ export class Room {
     this.glow.userData.noAO = true;
     this.world.add(this.glow);
     this.owned.push(glowTex, this.glow.material);
+
+    // the lamp at her openings, by the arch: a wick at each of five spouts
+    const d = this.info.anchors.deepa;
+    if (d) {
+      const c = new THREE.Vector3(...d);
+      const light = new THREE.PointLight(0xffa04a, 0, 4, 2);
+      light.position.set(c.x, c.y + 0.06, c.z);
+      const flames: THREE.Mesh[] = [];
+      for (let k = 0; k < 5; k++) {
+        const a = (k / 5) * Math.PI * 2 + 0.3;
+        const f = new THREE.Mesh(this.flame.geometry, this.flame.material);
+        f.scale.set(0.75, 1.9, 0.75);
+        f.position.set(c.x + Math.cos(a) * DEEPA_WICK, c.y + 0.03, c.z + Math.sin(a) * DEEPA_WICK);
+        f.userData.noAO = true;
+        flames.push(f);
+      }
+      const glow = new THREE.Sprite(this.glow.material);
+      glow.scale.setScalar(0.5);
+      glow.position.set(c.x, c.y + 0.05, c.z);
+      glow.userData.noAO = true;
+      this.world.add(light, glow, ...flames);
+      this.deepa = { light, flames, glow };
+    }
+  }
+
+  /**
+   * One evening for the whole house. Dark mode is all of it; by day the walk
+   * brings some (the afternoon goes as you go in): the bake moves toward its
+   * evening, the sun and sky go down, and the lamps come up a little behind.
+   */
+  private applyEve() {
+    if (!this.sun || !this.renderer || !this.diya) return;
+    const e = Math.max(this.eve.mode, this.eve.walk);
+    if (e === this.eve.v) return;
+    this.eve.v = e;
+    const V = this.variant, r = this.renderer, L = THREE.MathUtils.lerp;
+    const P = (this.evePal ??= {
+      sun: [new THREE.Color(V.sun.color), new THREE.Color(NIGHT.sun.color)],
+      clear: [new THREE.Color(V.clear), new THREE.Color(NIGHT.clear)],
+      top: [new THREE.Color(0xcad8e4), new THREE.Color(0x0b1018)],
+      horizon: [new THREE.Color(0xf6ead8), new THREE.Color(0x1a1612)],
+      bottom: [new THREE.Color(0xe7d9c4), new THREE.Color(0x0d0b09)],
+    });
+    if (this.baked) this.baked.night.value = this.baked.nightMap.value ? e : 0;
+    this.sun.intensity = L(V.sun.intensity, NIGHT.sun.intensity, e);
+    this.sun.color.lerpColors(P.sun[0], P.sun[1], e);
+    this.ambient.intensity = L(V.ambient.intensity, NIGHT.ambient, e);
+    this.hemi.intensity = L(V.hemi.intensity, NIGHT.hemi, e);
+    r.toneMappingExposure = L(V.exposure, NIGHT.exposure, e);
+    r.setClearColor(tmpC.lerpColors(P.clear[0], P.clear[1], e), 1);
+    this.lampK = THREE.MathUtils.smoothstep(e, 0.12, 0.85);
+    this.diya.intensity = NIGHT.diya * this.lampK;
+    (this.glow.material as THREE.SpriteMaterial).opacity = L(0.3, 0.95, this.lampK);
+    if (this.deepa) this.deepa.light.intensity = NIGHT.deepa * this.lampK;
+    this.envMats ??= this.envMaterials();
+    for (const mat of this.envMats) mat.envMapIntensity = mat.userData.envFactor * L(V.env, NIGHT.env, e);
+    const u = (this.sky.material as THREE.ShaderMaterial).uniforms;
+    u.uTop.value.lerpColors(P.top[0], P.top[1], e);
+    u.uHorizon.value.lerpColors(P.horizon[0], P.horizon[1], e);
+    u.uBottom.value.lerpColors(P.bottom[0], P.bottom[1], e);
+    this.invalidate();
   }
 
   /** a soft sky: what the grille, the door and the open side look out on */
@@ -396,14 +503,20 @@ export class Room {
    * it as image-based light: one bounce of the sun off the floor and the
    * plaster, and real reflections in the brass and aluminium.
    */
-  private captureEnvironment() {
+  private async captureEnvironment() {
     const r = this.renderer!;
     const cubeRT = new THREE.WebGLCubeRenderTarget(256, { type: THREE.HalfFloatType });
+    // every program first, in parallel and off the main thread, as the capture
+    // (and the composer after it) will draw them: into a render target. Left
+    // to the capture's six renders, they compile one by one and hold the page.
+    this.compiling = this.warm(cubeRT);
+    try { await this.compiling; } finally { this.compiling = undefined; }
+    if (this.disposed) { cubeRT.dispose(); return; }
     const cam = new THREE.CubeCamera(0.05, 60, cubeRT);
     // the courtyard's afternoon, seen from its middle
     cam.position.set(3.6, 1.5, -3.0);
     this.scene.add(cam);
-    const hide = [this.glow, this.flame];
+    const hide = [this.glow, this.flame, ...(this.deepa ? [this.deepa.glow, ...this.deepa.flames] : [])];
     hide.forEach((o) => (o.visible = false));
     r.shadowMap.needsUpdate = true;
     cam.update(r, this.scene);
@@ -427,6 +540,16 @@ export class Room {
         mat.needsUpdate = true;
       }
     });
+  }
+
+  /** compile the scene's programs in parallel for drawing into `target` */
+  private warm(target: THREE.WebGLRenderTarget) {
+    const r = this.renderer!;
+    const was = r.getRenderTarget();
+    r.setRenderTarget(target);
+    const p = r.compileAsync(this.scene, this.rig.camera);
+    r.setRenderTarget(was);
+    return p;
   }
 
   private envMaterials() {
@@ -681,50 +804,19 @@ export class Room {
       value: this.bakeTarget(), duration: d, ease: "power2.inOut",
       onUpdate: () => { this.syncBakeAO(); this.invalidate(); },
     });
-    // the evening: the afternoon's bake gives way to the lamps'
-    this.nightTw?.kill();
-    this.nightTw = gsap.to(b.night, {
-      value: this.mode === "dark" && b.nightMap.value ? 1 : 0, duration: d * 1.4, ease: "power2.inOut",
-      onUpdate: () => this.invalidate(),
-    });
   }
 
   setMode(mode: "light" | "dark", instant = false) {
     if (this.disposed || !this.renderer || !this.sun || (mode === this.mode && !instant)) return;
     this.mode = mode;
     this.fadeBake(instant);
-    const V = this.variant, dark = mode === "dark", r = this.renderer;
     this.modeTl?.kill();
-    const dur = instant || this.opts.reducedMotion ? 0 : 0.9;
-    const tl = gsap.timeline({ defaults: { duration: dur, ease: "power2.inOut" },
-      onUpdate: () => this.invalidate(), onComplete: () => this.invalidate() });
-    const sunColor = new THREE.Color(dark ? NIGHT.sun.color : V.sun.color);
-    const clear = r.getClearColor(new THREE.Color());
-    const clearTo = new THREE.Color(dark ? NIGHT.clear : V.clear);
-    const mixed = new THREE.Color();
-    const prox = { k: 0 };
-    tl.to(this.sun, { intensity: dark ? NIGHT.sun.intensity : V.sun.intensity }, 0)
-      .to(this.sun.color, { r: sunColor.r, g: sunColor.g, b: sunColor.b }, 0)
-      .to(this.ambient, { intensity: dark ? NIGHT.ambient : V.ambient.intensity }, 0)
-      .to(this.hemi, { intensity: dark ? NIGHT.hemi : V.hemi.intensity }, 0)
-
-      .to(r, { toneMappingExposure: dark ? NIGHT.exposure : V.exposure }, 0)
-      .to(this.diya, { intensity: dark ? NIGHT.diya : 0, duration: dur * 1.2 }, dark ? dur * 0.25 : 0)
-      .to(this.glow.material as THREE.SpriteMaterial, { opacity: dark ? 0.95 : 0.3 }, dark ? dur * 0.2 : 0)
-      .to(prox, { k: 1, onUpdate: () => r.setClearColor(mixed.copy(clear).lerp(clearTo, prox.k), 1) }, 0);
-    for (const mat of this.envMaterials())
-      tl.to(mat, { envMapIntensity: mat.userData.envFactor * (dark ? NIGHT.env : V.env) }, 0);
-    const u = (this.sky.material as THREE.ShaderMaterial).uniforms;
-    const sky = dark
-      ? { t: 0x0b1018, h: 0x1a1612, b: 0x0d0b09 }
-      : { t: 0xcad8e4, h: 0xf6ead8, b: 0xe7d9c4 };
-    for (const [k, hex] of [["uTop", sky.t], ["uHorizon", sky.h], ["uBottom", sky.b]] as const) {
-      const c = new THREE.Color(hex);
-      tl.to(u[k].value, { r: c.r, g: c.g, b: c.b }, 0);
-    }
+    const dur = instant || this.opts.reducedMotion ? 0 : 1.1;
+    const tl = gsap.timeline({ onUpdate: () => this.applyEve(), onComplete: () => this.applyEve() });
+    tl.to(this.eve, { mode: mode === "dark" ? 1 : 0, duration: dur, ease: "power2.inOut" });
     if (dur === 0) tl.progress(1);
     this.modeTl = tl;
-    this.keepAlive(dur * 1300 + 50);
+    this.keepAlive(dur * 1000 + 50);
   }
 
   setState(state: "presentation" | "rearrange") {
@@ -909,6 +1001,12 @@ export class Room {
     this.last = now;
 
     let draw = this.rig.update(dt);
+    const walk = duskAt(this.rig.progress);
+    if (Math.abs(walk - this.eve.walk) > 1e-4) {
+      this.eve.walk = walk;
+      this.applyEve();
+      draw = true;
+    }
     if (this.physicsOn) {
       const d = this.drag;
       const tilting = d.active || Math.abs(d.tx) + Math.abs(d.ty) + Math.abs(d.rx) + Math.abs(d.ry) > 1e-4;
@@ -930,7 +1028,14 @@ export class Room {
       const t = now / 1000;
       const f = 1 + 0.07 * Math.sin(t * 13.1) + 0.05 * Math.sin(t * 7.3 + 1.7) + 0.03 * Math.sin(t * 23.9 + 0.4);
       this.flame.scale.set(0.75 / Math.sqrt(f), 1.9 * f, 0.75 / Math.sqrt(f));
-      if (!this.modeTl?.isActive()) this.diya.intensity = NIGHT.diya * (0.9 + 0.1 * f);
+      if (!this.modeTl?.isActive()) this.diya.intensity = NIGHT.diya * this.lampK * (0.9 + 0.1 * f);
+      if (this.deepa) {
+        this.deepa.flames.forEach((m, k) => {
+          const g = 1 + 0.08 * Math.sin(t * 11.3 + k * 1.9) + 0.05 * Math.sin(t * 6.1 + k * 0.7);
+          m.scale.set(0.75 / Math.sqrt(g), 1.9 * g, 0.75 / Math.sqrt(g));
+        });
+        if (!this.modeTl?.isActive()) this.deepa.light.intensity = NIGHT.deepa * this.lampK * (0.9 + 0.1 * f);
+      }
       draw = true;
     }
     if (!draw || !this.visible) return;
@@ -947,6 +1052,30 @@ export class Room {
   }
 
   get introDone() { return this.rig?.isEnabled ?? false; }
+
+  /** the camera's place on the walk, 0 at the first chapter, 1 at the last */
+  get at() { return this.rig?.progress ?? 0; }
+  /** the camera has arrived where the scroll put it, and the house is at rest */
+  get landed() { return this.ready && !!this.rig && this.rig.isEnabled && this.rig.travel < 0.0015 && !this.rearranged; }
+
+  /** a canvas with its frame, on screen in CSS pixels; null unless wholly in front of the camera */
+  artRect(id: string) {
+    const a = this.info?.art[id];
+    if (!a || !this.rig || !this.canvas) return null;
+    const [nx, nz] = SIDE_OUT[a.side] ?? [0, 1];
+    const hw = a.w / 2 + FRAME, hh = a.h / 2 + FRAME;
+    const r = this.canvas.getBoundingClientRect();
+    let x0 = Infinity, y0 = Infinity, x1 = -Infinity, y1 = -Infinity;
+    for (const sx of [-1, 1])
+      for (const sy of [-1, 1]) {
+        // along the wall: the viewer's right is (nz, 0, -nx) when facing the canvas
+        tmpV.set(a.centre[0] + nz * hw * sx, a.centre[1] + hh * sy, a.centre[2] - nx * hw * sx).project(this.rig.camera);
+        if (tmpV.z < -1 || tmpV.z > 1) return null;
+        const px = r.left + (tmpV.x * 0.5 + 0.5) * r.width, py = r.top + (0.5 - tmpV.y * 0.5) * r.height;
+        x0 = Math.min(x0, px); x1 = Math.max(x1, px); y0 = Math.min(y0, py); y1 = Math.max(y1, py);
+      }
+    return { x0, y0, x1, y1 };
+  }
 
   /* --- teardown --------------------------------------------------------------- */
 

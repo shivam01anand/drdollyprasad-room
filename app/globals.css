@@ -166,6 +166,19 @@ html[data-rearrange="1"] .chapter-text{visibility:hidden;pointer-events:none}
 .poem-line{display:block;min-height:1.42em}
 html[data-rearrange="1"] .copy{opacity:0;transition:opacity .4s ease}
 
+/* the wall labels: a printed card beside each canvas, as a gallery hangs it */
+.wall-labels{position:fixed;inset:0;z-index:2;pointer-events:none;overflow:hidden}
+.wall-label{position:absolute;left:0;top:0;display:flex;flex-direction:column;gap:1px;max-width:214px;
+  padding:9px 12px 10px;margin:0;border:0;border-radius:1px;background:#F3EEE5;text-align:left;font:inherit;
+  box-shadow:0 1px 1px rgba(48,32,22,.14),0 8px 16px -10px rgba(48,32,22,.45);
+  cursor:pointer;pointer-events:auto;visibility:hidden;opacity:0;will-change:transform}
+.wall-label .cap-title{font-size:13.5px;color:#302722;min-height:0}
+.wall-label .cap-details,.wall-label .cap-status{font-size:9.5px;letter-spacing:.07em;color:#76685c;min-height:0}
+.wall-label .cap-status{margin-top:3px}
+.wall-label:focus-visible{outline:2px solid var(--oxide);outline-offset:3px}
+html[data-mode="dark"] .wall-label{background:#DDD4C6;box-shadow:0 1px 1px rgba(0,0,0,.3),0 8px 18px -10px rgba(0,0,0,.6)}
+html[data-rearrange="1"] .wall-labels,html[data-room="off"] .wall-labels{display:none}
+
 .room-off{position:relative;z-index:2;margin:0;padding:calc(var(--hud-top) + 24px) var(--gut) 0;color:var(--ink)}
 html[data-room="off"] .stage,
 html[data-room="off"] .copy,
@@ -381,6 +394,8 @@ html[data-room="off"] .sec:not(.sec-featured){display:none}
   .pill{font-size:10.5px;height:40px;padding:0 14px}
   .diya-btn{width:42px;height:42px}
   .copy-panel{left:var(--gut);right:var(--gut);width:auto;bottom:calc(var(--hud-bottom) + 12px);padding:16px 18px 18px}
+  .wall-label{max-width:176px;padding:7px 10px 8px}
+  .wall-label .cap-title{font-size:12.5px}
   .copy-head{margin-bottom:10px}
   .lede{font-size:16px;line-height:1.5}
   .poem{font-size:17px;line-height:1.36}

@@ -9,6 +9,7 @@ import Preloader, { type PreloaderHandle } from "./Preloader";
 import Featured from "./Featured";
 import Lightbox, { type LightboxHandle } from "./Lightbox";
 import Cursor, { roomCursorLabel } from "./Cursor";
+import WallLabels from "./WallLabels";
 import { CHAPTERS } from "@/lib/chapters";
 import { activeVariant } from "@/lib/room/variants";
 import { EMAIL } from "@/lib/works";
@@ -520,6 +521,9 @@ export default function Studio({ dims }: { dims: Dims }) {
           </div>
         ) : null)}
       </div>
+
+      <WallLabels room={roomRef} active={active} live={ready && !failed && !rearrange}
+                  onOpen={(id) => lbRef.current?.open(id, null)} />
 
       {failed && (
         <p className="room-off lab" role="status">

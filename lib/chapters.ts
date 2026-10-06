@@ -28,6 +28,10 @@ export type Chapter = {
   ink?: "light";
   /** the Blender view this chapter frames (house.json cams) */
   view: string;
+  /** how far the afternoon has gone when you stand here, 0…1 (1 is the evening) */
+  dusk?: number;
+  /** the canvases in this framing that get a wall label */
+  labels?: string[];
 };
 
 export const POEM = `They are not things,
@@ -42,7 +46,7 @@ I don’t paint
 Am not a painter`;
 
 export const CHAPTERS: Chapter[] = [
-  { id: "presence", eyebrow: "“Woman with Poppies”", view: "presence" },
+  { id: "presence", eyebrow: "“Woman with Poppies”", view: "presence", labels: ["woman-with-poppies"] },
   {
     id: "floral",
     eyebrow: "Recent work · 2024–",
@@ -51,15 +55,18 @@ export const CHAPTERS: Chapter[] = [
       "words for these: pause, stillness, silence, listening. Two have already gone to New York " +
       "and London.",
     view: "floral",
+    labels: ["child-among-flowers", "woman-with-red-flower", "woman-with-bird"],
   },
-  { id: "canopy", eyebrow: "“Under Canopy of Greens” · 2025", view: "canopy" },
-  { id: "threshold", eyebrow: "Faith · c. 2005–2015", view: "threshold" },
-  { id: "bodhi", eyebrow: "Artist’s statement", verse: POEM, view: "bodhi" },
+  { id: "canopy", eyebrow: "“Under Canopy of Greens” · 2025", view: "canopy", dusk: 0.04, labels: ["boy-with-bananas"] },
+  { id: "threshold", eyebrow: "Faith · c. 2005–2015", view: "threshold", dusk: 0.1 },
+  { id: "bodhi", eyebrow: "Artist’s statement", verse: POEM, view: "bodhi", dusk: 0.22, labels: ["monk-and-green-buddha"] },
   {
     id: "faith",
     eyebrow: "“Threads of Faith” · 2026",
     body: "On view at Sacred Fragments: A Journey Home. New Delhi, 18–21 October 2026.",
     view: "faith",
+    dusk: 0.28,
+    labels: ["monks-and-blue-buddha", "temple-bells"],
   },
   {
     id: "street",
@@ -71,9 +78,11 @@ export const CHAPTERS: Chapter[] = [
       "arriving she draws as a single bare line.",
     ink: "light",
     view: "street",
+    dusk: 0.38,
+    labels: ["terracotta-pots", "bulls-and-wheel"],
   },
-  { id: "redwall", eyebrow: "“Shree 420” · “Three Women in Red”", view: "redwall" },
-  { id: "featured", eyebrow: "Featured", slot: "featured", view: "featured" },
+  { id: "redwall", eyebrow: "“Shree 420” · “Three Women in Red”", view: "redwall", dusk: 0.45, labels: ["shree-420-and-milk-cans", "three-veiled-women"] },
+  { id: "featured", eyebrow: "Featured", slot: "featured", view: "featured", dusk: 0.45 },
   {
     id: "plan",
     eyebrow: "Eighteen solo exhibitions · 2005–2018",
@@ -86,8 +95,21 @@ export const CHAPTERS: Chapter[] = [
       "expression has resonated with diverse audiences, building connections that span " +
       "continents.",
     view: "plan",
+    dusk: 0.4,
   },
 ];
+
+/**
+ * The afternoon goes as you go in: the evening the walk has reached at
+ * camera progress p (0…1), eased within each step as the camera is.
+ */
+export function duskAt(p: number) {
+  const x = Math.min(1, Math.max(0, p)) * (CHAPTERS.length - 1);
+  const i = Math.min(CHAPTERS.length - 2, Math.floor(x));
+  const k = x - i, s = k * k * (3 - 2 * k);
+  const a = CHAPTERS[i].dusk ?? 0, b = CHAPTERS[i + 1].dusk ?? 0;
+  return a + (b - a) * s;
+}
 
 /** the painting the preloader shows, and the first the house frames */
 export const HERO_ID = "woman-with-poppies";

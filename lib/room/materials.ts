@@ -24,7 +24,7 @@ export type SetName =
 export type Role =
   | "wall" | "wallShade" | "field" | "court" | "floor" | "stone" | "sandstone" | "ram"
   | "timber" | "frame" | "door" | "iron" | "ironDark" | "clay" | "postbox"
-  | "courtFloor" | "aluminium" | "brass" | "thread" | "leaf" | "canvasBack";
+  | "courtFloor" | "aluminium" | "brass" | "thread" | "leaf" | "canvasBack" | "artFrame";
 
 type Spec = {
   set?: SetName;
@@ -78,6 +78,9 @@ export const SPECS: Record<Role, Spec> = {
   thread:    { tint: 0x9e2b1d, tile: 1, roughness: 0.95, env: 0.5, tunable: false },
   leaf:      { tint: 0x46603d, tile: 1, roughness: 0.9, env: 0.5, tunable: false },
   canvasBack:{ tint: 0x3a2e26, tile: 1, roughness: 0.95, env: 0.4 },
+  // the float frames: dark walnut, a 16 mm lip round a shadow gap (scripts/house/build.py)
+  // one continuous moulding, stained: no plank photograph, whose joints would read as segments
+  artFrame:  { tint: 0x2f231b, tile: 1, roughness: 0.5, env: 0.7, tunable: false },
 };
 
 const SET_TILE_PATH = (set: SetName, kind: "diff" | "nor" | "arm", small: boolean) =>

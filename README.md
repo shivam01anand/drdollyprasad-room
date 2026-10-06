@@ -17,11 +17,16 @@ it are hers: a gallery inside a Delhi home, built and lit in Blender.
    lifts (`bounce.out` from two metres, as the original drops its furniture).
 3. **A ten-step walk**, one section each, one source (`lib/chapters.ts`) for copy and camera:
    - **the Aangan**, a courtyard garden open to the sky: "Woman with Poppies", the floral works,
-     "Under Canopy of Greens", then the arch;
+     "Under Canopy of Greens", then the arch, with the tall brass lamp of her openings standing
+     beside it in a ring of marigolds (as in her exhibition photographs);
    - **the Quiet Room**: the Bodhi Buddha under one light with her poem, then "The Blue Buddha"
      and "Threads of Faith" by the door;
    - **the Red Room** by the lane: "The Bullocks" and "Terracotta" on the red wall, then
      "Shree 420" and "Three Women in Red";
+   - every canvas hangs in a float frame (a dark lip round a shadow gap, nothing of the canvas
+     covered) and carries a printed wall label, typed in once the camera lands (`WallLabels`);
+   - **the afternoon goes as you go in**: each chapter has a `dusk`, and the light moves toward
+     the evening bake along the walk, the lamps coming up behind it; dark mode is all of it;
    - then up out of the house for **Featured** and **the plan** (exhibitions, her own words).
 
    Each turn is at most a quarter; every room change passes through a doorway
@@ -30,6 +35,10 @@ it are hers: a gallery inside a Delhi home, built and lit in Blender.
    be looked at closely (click, scroll, pinch) or seen in a room at its stated size.
 5. **The collage** — every work, shown to relative scale where she has stated the size.
 6. **About and contact** — her statement, her biography verbatim.
+
+The canvases are paint, not prints (`lib/room/paint.ts`): a relief normal map read from each
+photograph's fine detail, and a soft varnish sheen from its gallery light that slides as the camera
+moves.
 
 Also: **Shake the room** (the dollhouse view; drag tilts the house, her things tumble; Reset
 hops them home) and **the diya** (dark mode: evening falls, the gallery lights and the brass

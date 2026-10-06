@@ -229,6 +229,8 @@ export class Rig {
   }
 
   get progress() { return this.camProgress; }
+  /** how far the camera still has to travel to where the scroll says (pointer drift aside) */
+  get travel() { return Math.abs(this.camProgress - this.scrollTarget); }
   get isEnabled() { return this.enabled; }
   /** how far the camera has travelled from the scroll target — 0 once it has landed */
   get settling() { return Math.abs(this.camProgress - this.scrollTarget) + Math.abs(this.ptrSmooth.x) + Math.abs(this.ptrSmooth.y); }

@@ -1,7 +1,7 @@
 {
  "lightmap": {
-  "day": 2.1933380603790287,
-  "night": 1.841311252117157
+  "day": 2.1866972327232364,
+  "night": 1.6068881869316103
  },
  "art": {
   "woman-with-poppies": {
@@ -186,7 +186,7 @@
    ],
    "target": [
     0.0,
-    1.7,
+    1.42,
     -3.4
    ],
    "fov": 40.0
@@ -449,6 +449,11 @@
    -5.1,
    1.0374999999999999,
    -5.45
+  ],
+  "deepa": [
+   0.72,
+   1.0875,
+   -2.25
   ]
  },
  "sun": {
@@ -584,13 +589,14 @@
   "Prop_wooden_stool_02_8",
   "Prop_brass_vase_03_9",
   "Prop_lamp",
+  "Prop_deepa",
   "Prop_can_0",
   "Prop_can_1",
   "Prop_can_2",
   "Prop_wheel",
   "Prop_charpai_red",
-  "Prop_brass_pot_01_16",
   "Prop_brass_pot_01_17",
-  "Prop_ceramic_pot_18"
+  "Prop_brass_pot_01_18",
+  "Prop_ceramic_pot_19"
  ]
 }

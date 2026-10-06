@@ -213,6 +213,9 @@ if ONLY in (None, "night"):
         night.append(lamp("Night_diya", anchors["diya"], 38))
     if "lantern" in anchors:
         night.append(lamp("Night_lantern", anchors["lantern"], 26))
+    if "deepa" in anchors:
+        x, y, z = anchors["deepa"][:3]
+        night.append(lamp("Night_deepa", (x, y, z + 0.05), 34, radius=0.08))
     # light from the rooms into the courtyard, and the courtyard's own low glow
     bake("night")
     for o in night:
