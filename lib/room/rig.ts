@@ -213,13 +213,14 @@ export class Rig {
       }
     } else if (this.enabled) {
       // the camera walks: it follows the scroll softly, and never faster than one
-      // step in STEP_S (a long jump — the list of stops — may go a little quicker,
-      // so it is there in a few seconds, not a crawl)
+      // step in STEP_S as it arrives (a long jump — the list of stops — covers the
+      // walls on the way quickly, so it is there in a few seconds, not a crawl)
       this.scrollSmooth = follow(this.scrollSmooth, this.scrollTarget, 0.08, dt);
       const want = follow(this.camProgress, this.scrollSmooth, 0.05, dt) - this.camProgress;
       const step = 1 / Math.max(1, this.shots.length - 1);
       const far = Math.abs(this.scrollSmooth - this.camProgress);
-      const vmax = Math.max(step / Rig.STEP_S, far > step * 1.5 ? far / 2.4 : 0) * (dt / 1000);
+      // all but the last wall of a long jump goes quickly; the arrival is always at a walk
+      const vmax = Math.max(step / Rig.STEP_S, far - step * 0.6) * (dt / 1000);
       this.camProgress += THREE.MathUtils.clamp(want, -vmax, vmax);
       if (Math.abs(this.camProgress - this.scrollTarget) < 1e-5) this.camProgress = this.scrollTarget;
       if (this.camProgress !== this.lastProgress) {
