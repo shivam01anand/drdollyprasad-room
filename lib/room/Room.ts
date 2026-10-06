@@ -687,7 +687,7 @@ export class Room {
     const k = 1 - Math.pow(0.9, f);
     d.rx += (d.tx - d.rx) * k;
     d.ry += (d.ty - d.ry) * k;
-    if (!d.active) {
+    if (!d.active && !this.motion) {
       const decay = Math.pow(0.95, f);
       d.tx *= decay; d.ty *= decay;
     }
@@ -945,6 +945,59 @@ export class Room {
 
   private onTouch = () => { this.rig.touched(); };
 
+  /* --- a phone shakes the room itself ------------------------------------ */
+
+  /** the phone's own tilt, while the room is being shaken: where it was held is level */
+  private motion?: { beta0: number | null; gamma0: number | null; lastShake: number };
+  private onOrient = (e: DeviceOrientationEvent) => {
+    const m = this.motion;
+    if (!m || !this.rearranged || e.beta == null || e.gamma == null) return;
+    if (m.beta0 == null || m.gamma0 == null) { m.beta0 = e.beta; m.gamma0 = e.gamma; }
+    const d = this.drag;
+    d.tx = THREE.MathUtils.clamp(((e.beta - m.beta0) / 40) * 0.5, -0.5, 0.5);
+    d.ty = THREE.MathUtils.clamp((-(e.gamma - m.gamma0) / 40) * 0.3, -0.3, 0.3);
+    this.bodies.forEach((b) => b.body?.wakeUp());
+  };
+  private onDeviceMotion = (e: DeviceMotionEvent) => {
+    const m = this.motion, a = e.acceleration;
+    if (!m || !this.rearranged || !a || a.x == null) return;
+    const g = Math.hypot(a.x, a.y ?? 0, a.z ?? 0);
+    const now = performance.now();
+    if (g < 12 || now - m.lastShake < 320) return;
+    m.lastShake = now;
+    this.shake(Math.min(1.6, g / 12));
+  };
+
+  /** throw her things about: a kick for each, up and every way */
+  shake(k = 1) {
+    if (!this.physics || !this.rearranged) return;
+    for (const b of this.bodies) {
+      const B = b.body;
+      if (!B) continue;
+      B.wakeUp();
+      B.velocity.x += (Math.random() - 0.5) * 3 * k;
+      B.velocity.y += (1.4 + Math.random() * 2) * k;
+      B.velocity.z += (Math.random() - 0.5) * 3 * k;
+      B.angularVelocity.x += (Math.random() - 0.5) * 5 * k;
+      B.angularVelocity.z += (Math.random() - 0.5) * 5 * k;
+    }
+    this.keepAlive(1600, true);
+  }
+
+  /** tilt and shake by the phone itself (once the visitor has allowed motion) */
+  useMotion(on: boolean) {
+    if (on && !this.motion) {
+      this.motion = { beta0: null, gamma0: null, lastShake: 0 };
+      addEventListener("deviceorientation", this.onOrient);
+      addEventListener("devicemotion", this.onDeviceMotion);
+    } else if (!on && this.motion) {
+      this.motion = undefined;
+      removeEventListener("deviceorientation", this.onOrient);
+      removeEventListener("devicemotion", this.onDeviceMotion);
+      this.drag.tx = this.drag.ty = 0;
+    }
+  }
+
   private pick(e: PointerEvent | MouseEvent) {
     this.ray.setFromCamera(this.toNDC(e), this.rig.camera);
     const hit = this.ray.intersectObjects(this.art, false)[0];
@@ -1082,6 +1135,7 @@ export class Room {
   dispose() {
     if (this.disposed) return;
     this.disposed = true;
+    this.useMotion(false);
     this.ready = false;
     this.abort.abort();
     this.modeTl?.kill();

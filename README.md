@@ -8,11 +8,14 @@ it are hers: a gallery inside a Delhi home, built and lit in Blender.
 
 ## The journey
 
-1. **Preloader** — the original beat for beat: `%` and a counter in the corners, the counter
-   becomes the name (`→ Dr Dolly` / `Prasad`), both Flip into a centred lockup, then into the
-   header. Then hers: *Woman with Poppies* is shown clean with "Welcome to my studio", placed at
-   the exact rectangle the 3D painting occupies (`Room.heroRect()`), so when the panel lifts the
-   courtyard appears around the painting.
+1. **The lighting of the lamp** — every exhibition of hers opens with the tall brass lamp lit
+   in a ring of marigolds (her gallery photograph), so the site does too. On paper, the lamp
+   (a Cycles render of the house's own, `scripts/intro`) waits while a garland of marigolds is
+   laid round its foot as the house loads — the garland is the progress. When it closes, the
+   five wicks catch one by one, her name forms beneath the light and rises into the header, and
+   *Woman with Poppies* is shown clean with "Welcome to my studio", at the exact rectangle the 3D
+   painting occupies (`Room.heroRect()`), so when the panel lifts the courtyard appears around
+   it. A second visit in a session finds the lamp lit; a tap goes straight in.
 2. **The house is shown, then the camera moves in.** Her things fall into place as the panel
    lifts (`bounce.out` from two metres, as the original drops its furniture).
 3. **A ten-step walk**, one section each, one source (`lib/chapters.ts`) for copy and camera:
@@ -43,6 +46,22 @@ moves.
 Also: **Shake the room** (the dollhouse view; drag tilts the house, her things tumble; Reset
 hops them home) and **the diya** (dark mode: evening falls, the gallery lights and the brass
 lamp come on — a second bake, not a filter).
+
+## On a phone
+
+Designed for the thumb, not shrunk from the desktop:
+
+- **one stop to a swipe** — on touch screens the walk takes the gesture itself (Studio's touch
+  paging) and glides exactly one stop, up or down; sideways drags go to the carousel; past the
+  last stop the page scrolls freely through the works and the contact;
+- **the dock** — one bar where the desktop has four pills: where you are (`05/10 · Artist's
+  statement`) and a menu; the menu is a sheet from the bottom edge (`Stops`) with the ten stops,
+  all her works, Shake the room, contact, mail and Instagram;
+- every copy label sits clear of its painting (the portrait cameras frame each painting high,
+  and on a short phone the poem sets in its two stanzas side by side);
+- Featured is a carousel with its plate number (`03 / 12`); a painting opens on a tap, closes
+  from a round chip in the corner or with a pull down;
+- **Shake the room** uses the phone: tilt it and the house tilts, shake it and her things fly.
 
 ## How it is built
 

@@ -10,6 +10,7 @@ import Featured from "./Featured";
 import Lightbox, { type LightboxHandle } from "./Lightbox";
 import Cursor, { roomCursorLabel } from "./Cursor";
 import WallLabels from "./WallLabels";
+import Stops from "./Stops";
 import { CHAPTERS } from "@/lib/chapters";
 import { activeVariant } from "@/lib/room/variants";
 import { EMAIL } from "@/lib/works";
@@ -44,6 +45,10 @@ export default function Studio({ dims }: { dims: Dims }) {
   const [ready, setReady] = useState(false);
   const [mode, setMode] = useState<"light" | "dark">(activeVariant().startDark ? "dark" : "light");
   const [rearrange, setRearrange] = useState(false);
+  /** the phone's sheet of stops */
+  const [stops, setStops] = useState(false);
+  /** the room is shaken by the phone itself, not by a finger */
+  const [moving, setMoving] = useState(false);
   const [active, setActive] = useState(0);
   const [loadEpoch, setLoadEpoch] = useState(0);
   const ranOnce = useRef(false);
@@ -175,6 +180,73 @@ export default function Studio({ dims }: { dims: Dims }) {
     };
 
     lenis.on("scroll", (l: Lenis) => apply(l.scroll));
+
+    /* On a phone the walk goes one stop to a swipe — never two, never half.
+       Browsers' own snapping lets a hard fling run past a painting, so the
+       walk takes the gesture itself: a swipe glides to the next stop or the
+       last, a sideways drag is left to the carousel, and past the last stop
+       the page is the page again (the works, the contact) until a swipe
+       down from the top of the works brings the walk back. */
+    const coarse = matchMedia("(pointer: coarse)").matches;
+    const swipe = { on: false, back: false, horiz: false, x0: 0, y0: 0, t0: 0 };
+    let heading = -1;
+    const nearestStop = (sc: number) => {
+      let k = 0, best = Infinity;
+      centers.forEach((c, i) => { const d = Math.abs(c - sc); if (d < best) { best = d; k = i; } });
+      return k;
+    };
+    const glideTo = (y: number, i: number) => {
+      heading = i;
+      const quick = reducedMotion();
+      html.dataset.gliding = "1";
+      lenis.scrollTo(y, {
+        duration: quick ? 0 : 1.15, immediate: quick, force: true,
+        easing: (t: number) => (t < 0.5 ? 4 * t * t * t : 1 - Math.pow(-2 * t + 2, 3) / 2),
+        onComplete: () => { heading = -1; delete html.dataset.gliding; },
+      });
+    };
+    const onTouchStart = (e: TouchEvent) => {
+      swipe.on = false;
+      if (!coarse || e.touches.length !== 1 || locks.current.size || !centers.length) return;
+      const last = centers[centers.length - 1];
+      const inWalk = lastScroll <= last + 4;
+      const atWorks = !inWalk && Math.abs(lastScroll - worksTop) < 8;
+      if (!inWalk && !atWorks) return;
+      const t = e.touches[0];
+      Object.assign(swipe, { on: true, back: atWorks, horiz: false, x0: t.clientX, y0: t.clientY, t0: performance.now() });
+    };
+    const onTouchMove = (e: TouchEvent) => {
+      if (!swipe.on) return;
+      const t = e.touches[0];
+      const dx = t.clientX - swipe.x0, dy = t.clientY - swipe.y0;
+      if (!swipe.horiz && Math.abs(dx) > 10 && Math.abs(dx) > Math.abs(dy)) swipe.horiz = true;
+      if (swipe.horiz) return;
+      // from the top of the works, only a swipe down returns to the walk
+      if (swipe.back && dy < -6) { swipe.on = false; return; }
+      if (e.cancelable) e.preventDefault();
+      // Lenis would read this touch as native scrolling and stop the glide
+      (e as TouchEvent & { lenisStopPropagation?: boolean }).lenisStopPropagation = true;
+    };
+    const onTouchEnd = (e: TouchEvent) => {
+      if (!swipe.on || swipe.horiz) return;
+      swipe.on = false;
+      (e as TouchEvent & { lenisStopPropagation?: boolean }).lenisStopPropagation = true;
+      const t = e.changedTouches[0];
+      const dy = t.clientY - swipe.y0, v = dy / Math.max(1, performance.now() - swipe.t0);
+      if (Math.abs(dy) < 34 && Math.abs(v) < 0.3) return;
+      const n = centers.length;
+      if (swipe.back) { if (dy > 0) glideTo(centers[n - 1], n - 1); return; }
+      const from = heading >= 0 ? heading : nearestStop(lastScroll);
+      const next = from + (dy < 0 ? 1 : -1);
+      if (next < 0) return;
+      if (next >= n) glideTo(worksTop, n);
+      else glideTo(centers[next], next);
+    };
+    if (coarse) {
+      document.addEventListener("touchstart", onTouchStart, { passive: true });
+      document.addEventListener("touchmove", onTouchMove, { passive: false });
+      document.addEventListener("touchend", onTouchEnd, { passive: true });
+    }
 
     const frame = (time: number) => {
       if (document.hidden) return;
@@ -314,6 +386,9 @@ export default function Studio({ dims }: { dims: Dims }) {
       ro.disconnect();
       removeEventListener("resize", measure);
       document.removeEventListener("click", onDocClick);
+      document.removeEventListener("touchstart", onTouchStart);
+      document.removeEventListener("touchmove", onTouchMove);
+      document.removeEventListener("touchend", onTouchEnd);
       lenis.destroy();
       room?.dispose();
       if (roomRef.current === room) roomRef.current = null;
@@ -431,10 +506,36 @@ export default function Studio({ dims }: { dims: Dims }) {
     if (!el || !l) return;
     const offset = center ? -(innerHeight - el.offsetHeight) / 2 : 0;
     const quick = reducedMotion();
-    l.scrollTo(el, { offset, duration: quick ? 0 : 2.2, immediate: quick, easing: (t: number) => 1 - Math.pow(1 - t, 4) });
+    // a glide is a glide: snapping would catch it at every stop on the way
+    const html = document.documentElement;
+    html.dataset.gliding = "1";
+    l.scrollTo(el, { offset, duration: quick ? 0 : 2.2, immediate: quick, easing: (t: number) => 1 - Math.pow(1 - t, 4),
+      onComplete: () => { delete html.dataset.gliding; } });
   };
 
   const onLightbox = useCallback((open: boolean) => lock("lightbox", open), [lock]);
+  const closeStops = useCallback(() => setStops(false), []);
+
+  /** shake the room; on a phone, ask (inside the tap, as iOS insists) to feel the phone move */
+  const shake = () => {
+    type Askable = { requestPermission?: () => Promise<"granted" | "denied"> };
+    const DOE = (window as unknown as { DeviceOrientationEvent?: Askable }).DeviceOrientationEvent;
+    const DME = (window as unknown as { DeviceMotionEvent?: Askable }).DeviceMotionEvent;
+    const coarse = matchMedia("(pointer: coarse)").matches;
+    if (coarse && DOE?.requestPermission) {
+      Promise.all([DOE.requestPermission(), DME?.requestPermission?.() ?? Promise.resolve("granted")])
+        .then(([a]) => setMoving(a === "granted")).catch(() => setMoving(false));
+    } else setMoving(coarse && "DeviceOrientationEvent" in window);
+    setRearrange(true);
+  };
+  useEffect(() => {
+    roomRef.current?.useMotion(rearrange && moving);
+    if (!rearrange && moving) setMoving(false);
+  }, [rearrange, moving]);
+  useEffect(() => { lock("sheet", stops); }, [stops, lock]);
+  /** a stop of the walk, by its index: its section, centred */
+  // the sheet holds the page still while it is open: move once it has let go
+  const goStop = (i: number) => setTimeout(() => go(`[data-chapter='${CHAPTERS[i].id}']`, true), 120);
   // the chapter in view, for the header's "you are here"
   const here = ready ? CHAPTERS[active]?.id : undefined;
 
@@ -474,8 +575,22 @@ export default function Studio({ dims }: { dims: Dims }) {
         </div>
         <div className="hud-bottom">
           <span className="lab hud-hint" key={rearrange ? "tilt" : "scroll"}>
-            {rearrange ? "Drag to tilt the room" : "Scroll ↓"}
+            {rearrange ? (moving ? "Tilt your phone · give it a shake" : "Drag to tilt the room") : "Scroll ↓"}
           </span>
+          {/* the phone's dock: where you are in the house, the works, and the rest in a sheet */}
+          {ready && !failed && !rearrange && (
+            <div className="dock">
+              <button type="button" className="dock-where" disabled={!ready} onClick={() => setStops(true)}
+                      aria-label={`Stop ${active + 1} of ${CHAPTERS.length}: ${CHAPTERS[active]?.stop}. All stops`}>
+                <span className="lab dock-n">{String(active + 1).padStart(2, "0")}<i>/{String(CHAPTERS.length).padStart(2, "0")}</i></span>
+                <span className="dock-name" key={active}>{CHAPTERS[active]?.stop}</span>
+              </button>
+              <button type="button" className="dock-menu" disabled={!ready} aria-label="Menu" aria-expanded={stops}
+                      onClick={() => setStops(true)}>
+                <svg viewBox="0 0 24 24" aria-hidden="true"><path d="M5 8.5h14M5 15.5h14" /></svg>
+              </button>
+            </div>
+          )}
           <nav className="hud-pills" aria-label="Site">
             {failed ? (
               <>
@@ -485,7 +600,7 @@ export default function Studio({ dims }: { dims: Dims }) {
             ) : !rearrange ? (
               <>
                 <span className="mask"><button type="button" className="pill hud-pill" disabled={!ready}
-                      onClick={() => setRearrange(true)}>Shake<span className="long"> the room</span> <span aria-hidden="true">⁂</span></button></span>
+                      onClick={shake}>Shake<span className="long"> the room</span> <span aria-hidden="true">⁂</span></button></span>
                 <span className="mask"><button type="button" className="pill hud-pill" aria-current={here === "featured" || undefined}
                       onClick={() => go("[data-chapter='featured']")}>Works<span className="arr"> →</span></button></span>
                 <span className="mask"><button type="button" className="pill hud-pill" aria-current={here === "plan" || undefined}
@@ -553,6 +668,8 @@ export default function Studio({ dims }: { dims: Dims }) {
         )}
       </main>
 
+      <Stops open={stops} active={active} onClose={closeStops} onGo={goStop}
+             onShake={shake} onContact={() => go("#contact")} onWorks={() => go("#works")} />
       <Lightbox ref={lbRef} dims={dims} onOpenChange={onLightbox} />
       <Cursor live={ready || failed} />
     </>

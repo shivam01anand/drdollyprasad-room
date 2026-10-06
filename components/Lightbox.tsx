@@ -41,8 +41,8 @@ const Lightbox = forwardRef<LightboxHandle, { dims: Dims; onOpenChange(open: boo
     const view = useRef<string>("work");
     const cb = useRef(onOpenChange);
     cb.current = onOpenChange;
-    const st = useRef<{ id: string | null; from: HTMLImageElement | null; anim: gsap.core.Animation[]; busy: boolean }>(
-      { id: null, from: null, anim: [], busy: false });
+    const st = useRef<{ id: string | null; from: HTMLImageElement | null; anim: gsap.core.Animation[]; busy: boolean; at: number }>(
+      { id: null, from: null, anim: [], busy: false, at: 0 });
 
     const kill = () => { st.current.anim.forEach((a) => a.kill()); st.current.anim = []; };
     const own = <T extends gsap.core.Animation>(a: T) => { st.current.anim.push(a); return a; };
@@ -127,6 +127,7 @@ const Lightbox = forwardRef<LightboxHandle, { dims: Dims; onOpenChange(open: boo
       const w = BY_ID.get(id);
       const r = root.current, i = img.current;
       if (!w || !r || !i || st.current.id) return;
+      st.current.at = performance.now();
       motion();
       kill();
       const reduce = reducedMotion();
@@ -222,7 +223,54 @@ const Lightbox = forwardRef<LightboxHandle, { dims: Dims; onOpenChange(open: boo
       }
     };
 
+    /** a click on the backdrop closes — but not the tap that opened it: on a touch
+     *  screen its click arrives after the work is open, wherever the work now isn't */
+    const backdrop = () => { if (performance.now() - st.current.at > 450) close(); };
+
     useImperativeHandle(ref, () => ({ open }), []);
+
+    // on a phone, a pull down from the top of the sheet puts the work away
+    useEffect(() => {
+      const r = root.current;
+      const grid = r?.querySelector<HTMLElement>(".lb-grid");
+      if (!r || !grid) return;
+      let y0 = -1, dy = 0, pulling = false;
+      const start = (e: TouchEvent) => {
+        y0 = -1;
+        if (e.touches.length !== 1 || frame.current?.classList.contains("is-zoomed") || grid.scrollTop > 0) return;
+        y0 = e.touches[0].clientY; dy = 0; pulling = false;
+      };
+      const move = (e: TouchEvent) => {
+        if (y0 < 0) return;
+        dy = e.touches[0].clientY - y0;
+        if (!pulling && dy > 10 && grid.scrollTop <= 0) pulling = true;
+        if (!pulling) return;
+        e.preventDefault();
+        gsap.set(grid, { y: Math.max(0, dy) * 0.55 });
+        gsap.set(veil.current, { opacity: Math.max(0.4, 1 - dy / 520) });
+      };
+      const end = () => {
+        if (y0 < 0) return;
+        y0 = -1;
+        if (!pulling) return;
+        pulling = false;
+        gsap.to(grid, { y: 0, duration: 0.25, ease: "power2.out" });
+        if (dy > 110) close();
+        else gsap.to(veil.current, { opacity: 1, duration: 0.25 });
+      };
+      grid.addEventListener("touchstart", start, { passive: true });
+      grid.addEventListener("touchmove", move, { passive: false });
+      grid.addEventListener("touchend", end);
+      grid.addEventListener("touchcancel", end);
+      return () => {
+        grid.removeEventListener("touchstart", start);
+        grid.removeEventListener("touchmove", move);
+        grid.removeEventListener("touchend", end);
+        grid.removeEventListener("touchcancel", end);
+      };
+      // close reads only refs
+      // eslint-disable-next-line react-hooks/exhaustive-deps
+    }, []);
 
     useEffect(() => {
       const l = new CloseLook(frame.current!, img.current!, bar.current!, reducedMotion(), () => {
@@ -245,8 +293,8 @@ const Lightbox = forwardRef<LightboxHandle, { dims: Dims; onOpenChange(open: boo
     return (
       <dialog className="lb" ref={root} aria-labelledby="lb-title" data-lenis-prevent=""
               onCancel={(e) => { e.preventDefault(); close(); }}>
-        <div className="lb-veil" ref={veil} onClick={close} />
-        <div className="lb-grid" onClick={(e) => { if (e.target === e.currentTarget) close(); }}>
+        <div className="lb-veil" ref={veil} onClick={backdrop} />
+        <div className="lb-grid" onClick={(e) => { if (e.target === e.currentTarget) backdrop(); }}>
           <figure className="lb-figure">
             <div className="lb-frame" ref={frame} data-cursor="Look closer">
               {/* eslint-disable-next-line @next/next/no-img-element */}
@@ -262,7 +310,10 @@ const Lightbox = forwardRef<LightboxHandle, { dims: Dims; onOpenChange(open: boo
             </div>
           </figure>
           <div className="lb-text">
-            <button type="button" className="lb-close lab" ref={closeBtn} onClick={close}>Close (X)</button>
+            <button type="button" className="lb-close lab" ref={closeBtn} onClick={close} aria-label="Close">
+              <span className="lb-close-word" aria-hidden="true">Close (X)</span>
+              <svg className="lb-close-x" viewBox="0 0 24 24" aria-hidden="true"><path d="M6.5 6.5l11 11M17.5 6.5l-11 11" /></svg>
+            </button>
             <h2 id="lb-title" className="lb-title" ref={title} />
             <dl className="lb-meta" ref={meta} />
             <div className="lb-views" ref={views} role="group" aria-label="Ways to see this work" hidden />

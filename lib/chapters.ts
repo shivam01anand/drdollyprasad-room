@@ -32,6 +32,10 @@ export type Chapter = {
   dusk?: number;
   /** the canvases in this framing that get a wall label */
   labels?: string[];
+  /** the stop's short name, for the phone's dock and the list of stops */
+  stop: string;
+  /** where in the house it is */
+  room?: string;
 };
 
 export const POEM = `They are not things,
@@ -46,10 +50,12 @@ I don’t paint
 Am not a painter`;
 
 export const CHAPTERS: Chapter[] = [
-  { id: "presence", eyebrow: "“Woman with Poppies”", view: "presence", labels: ["woman-with-poppies"] },
+  { id: "presence", eyebrow: "“Woman with Poppies”", stop: "Woman with Poppies", room: "The courtyard", view: "presence", labels: ["woman-with-poppies"] },
   {
     id: "floral",
     eyebrow: "Recent work · 2024–",
+    stop: "Recent work",
+    room: "The courtyard",
     body:
       "Hotter reds, a darker ground, and green entering her palette for the first time. Her own " +
       "words for these: pause, stillness, silence, listening. Two have already gone to New York " +
@@ -57,12 +63,14 @@ export const CHAPTERS: Chapter[] = [
     view: "floral",
     labels: ["child-among-flowers", "woman-with-red-flower", "woman-with-bird"],
   },
-  { id: "canopy", eyebrow: "“Under Canopy of Greens” · 2025", view: "canopy", dusk: 0.04, labels: ["boy-with-bananas"] },
-  { id: "threshold", eyebrow: "Faith · c. 2005–2015", view: "threshold", dusk: 0.1 },
-  { id: "bodhi", eyebrow: "Artist’s statement", verse: POEM, view: "bodhi", dusk: 0.22, labels: ["monk-and-green-buddha"] },
+  { id: "canopy", eyebrow: "“Under Canopy of Greens” · 2025", stop: "Under Canopy of Greens", room: "The courtyard", view: "canopy", dusk: 0.04, labels: ["boy-with-bananas"] },
+  { id: "threshold", eyebrow: "Faith · c. 2005–2015", stop: "The arch", room: "The courtyard", view: "threshold", dusk: 0.1 },
+  { id: "bodhi", eyebrow: "Artist’s statement", stop: "Artist’s statement", room: "The Quiet Room", verse: POEM, view: "bodhi", dusk: 0.22, labels: ["monk-and-green-buddha"] },
   {
     id: "faith",
     eyebrow: "“Threads of Faith” · 2026",
+    stop: "Threads of Faith",
+    room: "The Quiet Room",
     body: "On view at Sacred Fragments: A Journey Home. New Delhi, 18–21 October 2026.",
     view: "faith",
     dusk: 0.28,
@@ -71,6 +79,8 @@ export const CHAPTERS: Chapter[] = [
   {
     id: "street",
     eyebrow: "Gone Are The Days · c. 2016–2018",
+    stop: "Gone Are The Days",
+    room: "The Red Room",
     body:
       "Fourteen paintings of a country’s discarded equipment. Withdrawn coins, a pillar " +
       "postbox, hand-lettered posters for the last single-screen cinemas, a tonga going " +
@@ -81,11 +91,12 @@ export const CHAPTERS: Chapter[] = [
     dusk: 0.38,
     labels: ["terracotta-pots", "bulls-and-wheel"],
   },
-  { id: "redwall", eyebrow: "“Shree 420” · “Three Women in Red”", view: "redwall", dusk: 0.45, labels: ["shree-420-and-milk-cans", "three-veiled-women"] },
-  { id: "featured", eyebrow: "Featured", slot: "featured", view: "featured", dusk: 0.45 },
+  { id: "redwall", eyebrow: "“Shree 420” · “Three Women in Red”", stop: "Shree 420 · Three Women", room: "The Red Room", view: "redwall", dusk: 0.45, labels: ["shree-420-and-milk-cans", "three-veiled-women"] },
+  { id: "featured", eyebrow: "Featured", stop: "Featured works", slot: "featured", view: "featured", dusk: 0.45 },
   {
     id: "plan",
     eyebrow: "Eighteen solo exhibitions · 2005–2018",
+    stop: "Exhibitions",
     body:
       "Triveni Kala Sangam · India Habitat Centre · ICCR · Travancore Art Gallery · " +
       "Lalit Kala Akademi · Nehru Art Gallery, Bombay.",

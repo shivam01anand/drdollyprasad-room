@@ -57,6 +57,22 @@ export default function Featured({ dims, onOpen }: { dims: Dims; onOpen(id: stri
     measure();
     const nearest = (x: number) => snapXs.reduce((best, c) => (Math.abs(c - x) < Math.abs(best - x) ? c : best), 0);
 
+    // which card leads the row: "03 / 12", as a catalogue numbers its plates
+    const countEl = root.querySelector<HTMLElement>(".feat-count b");
+    let shown = -1;
+    const count = () => {
+      if (!countEl) return;
+      const x = gsap.getProperty(tr, "x") as number;
+      let k = 0, best = Infinity;
+      cards.forEach((c, i) => {
+        const d = Math.abs(Math.max(minX, -(c.offsetLeft - cards[0].offsetLeft)) - x);
+        if (d < best - 1) { best = d; k = i; }
+      });
+      // at the row's end, the last card is the one in hand
+      if (x <= minX + 2) k = cards.length - 1;
+      if (k !== shown) { shown = k; countEl.textContent = String(k + 1).padStart(2, "0"); }
+    };
+
     // one owner for the row's movement: a new input cancels the last one
     let slide: gsap.core.Tween | undefined;
     let settle = 0;
@@ -64,7 +80,7 @@ export default function Featured({ dims, onOpen }: { dims: Dims; onOpen(id: stri
     const glide = (x: number, d = 0.9) => {
       cancel();
       slide = gsap.to(tr, { x: Math.max(minX, Math.min(0, x)), duration: reduce ? 0 : d, ease: "power3.out",
-        onUpdate: () => { drag.update(); } });
+        onUpdate: () => { drag.update(); count(); } });
     };
 
     const [drag] = Draggable.create(tr, {
@@ -79,6 +95,9 @@ export default function Featured({ dims, onOpen }: { dims: Dims; onOpen(id: stri
       cursor: "grab",
       activeCursor: "grabbing",
       onPress: () => { slide?.kill(); clearTimeout(settle); },
+      onDrag: () => count(),
+      onThrowUpdate: () => count(),
+      onThrowComplete: () => count(),
       onClick(e: PointerEvent) {
         const card = (e.target as HTMLElement).closest<HTMLElement>(".feat-card");
         const img = card?.querySelector<HTMLImageElement>(".feat-media img");
@@ -109,6 +128,7 @@ export default function Featured({ dims, onOpen }: { dims: Dims; onOpen(id: stri
       const x = gsap.getProperty(tr, "x") as number;
       gsap.set(tr, { x: Math.max(minX, Math.min(0, x - e.deltaX * unit)) });
       drag.update();
+      count();
       settle = window.setTimeout(() => glide(nearest(gsap.getProperty(tr, "x") as number), 0.6), 140);
     };
     vp.addEventListener("wheel", onWheel, { passive: false });
@@ -191,6 +211,7 @@ export default function Featured({ dims, onOpen }: { dims: Dims; onOpen(id: stri
       <div className="feat-head">
         <h2 id="featured-title" className="feat-title" data-cap="Featured">Featured</h2>
         <div className="feat-tools">
+          <p className="lab feat-count" aria-hidden="true"><b>01</b> / {String(FEATURED.length).padStart(2, "0")}</p>
           <div className="feat-arrows">
             <button type="button" className="feat-arrow" data-prev aria-label="Previous works">←</button>
             <button type="button" className="feat-arrow" data-next aria-label="Next works">→</button>
