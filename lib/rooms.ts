@@ -5,10 +5,12 @@ import type { Work } from "./works";
  *
  * A tailored room is one photograph made for one painting: the house, the wall,
  * its colour, the light and the furniture chosen so that this work looks its
- * best (generated with Codex, Oct 2026; designs, prompts and calibration notes
- * in review/rooms). Her painting is never in the photograph: the wall is left
- * empty and the real photograph of the work is hung on it here, in a float
- * frame like the house's, under the room's own light.
+ * best (designs in review/rooms/prompts.py). Each is a real interior built and
+ * path-traced in Blender (review/rooms/blender), with her painting hung in it:
+ * the original photograph of the work, unaltered, on a satin canvas in the
+ * house's float frame, at its true size where she has stated one, lit as a
+ * collector would light it. The painting is part of the photograph (`inPhoto`),
+ * so nothing is hung over it here; its calibration below records where it falls.
  *
  * The generic rooms (a hallway, a living room) are the fallback for a work she
  * has given a size but that has no room of its own. A work with neither is not
@@ -17,7 +19,7 @@ import type { Work } from "./works";
  * Every photograph is calibrated on its wall plane, in its own pixels:
  * `pxPerCm` from furniture of standard height measured against the wall's
  * floor line `floor` (where the depth of a front edge matters, through the
- * horizon). A painting hangs centred on `cx` with its lower edge `sill` cm
+ * horizon); a rendered room's, from its camera, exactly. A painting hangs centred on `cx` with its lower edge `sill` cm
  * above the floor: about 22 cm above the furniture, or with its centre near
  * 150 cm over low furniture. Where she has stated the size, it hangs at that
  * size; where she has not, a tailored room shows it at `cm` and says nothing
@@ -41,6 +43,8 @@ export type Room = {
   light?: string;
   /** the frame's shadow on the wall, from the room's light: offset x, y and blur in cm, and its colour */
   shadow?: { x: number; y: number; blur: number; color: string };
+  /** the painting is in the photograph (rendered there): the room is shown as it is, nothing hung over it */
+  inPhoto?: boolean;
 };
 
 export type Tailored = Room & {
@@ -51,7 +55,56 @@ export type Tailored = Room & {
 };
 
 /** one room per work, made for it (see review/rooms for each room's brief and calibration) */
-export const TAILORED: Tailored[] = [];
+export const TAILORED: Tailored[] = [
+  // centre 145 cm, 27% of the frame's width; hung at 115 cm, a size she has not stated
+  { id: "woman-with-poppies", work: "woman-with-poppies", label: "A drawing room, Lutyens’ Delhi",
+    src: "/art/rooms/woman-with-poppies.webp", thumb: "/art/rooms/woman-with-poppies-thumb.webp",
+    w: 1800, h: 1200, pxPerCm: 3.977, floor: 996, cx: 900, sill: 104, cm: 115, inPhoto: true },
+  // centre 139.4 cm, 26% of the frame's width; hung at its stated 91.4 cm
+  { id: "temple-bells", work: "temple-bells", label: "An entrance hall, a farmhouse in Chhatarpur",
+    src: "/art/rooms/temple-bells.webp", thumb: "/art/rooms/temple-bells-thumb.webp",
+    w: 1800, h: 1200, pxPerCm: 4.861, floor: 1020, cx: 900, sill: 102, cm: 91.4, inPhoto: true },
+  // centre 143 cm, 26% of the frame's width; hung at 90 cm, a size she has not stated
+  { id: "bulls-and-wheel", work: "bulls-and-wheel", label: "A dining room, a Gurgaon penthouse",
+    src: "/art/rooms/bulls-and-wheel.webp", thumb: "/art/rooms/bulls-and-wheel-thumb.webp",
+    w: 1800, h: 1200, pxPerCm: 4.793, floor: 1082, cx: 602, sill: 98, cm: 90, inPhoto: true },
+  // centre 145.7 cm, 25% of the frame's width; hung at its stated 91.4 cm
+  { id: "boy-with-bananas", work: "boy-with-bananas", label: "A verandah, a villa in Goa",
+    src: "/art/rooms/boy-with-bananas.webp", thumb: "/art/rooms/boy-with-bananas-thumb.webp",
+    w: 1800, h: 1200, pxPerCm: 4.667, floor: 1047, cx: 900, sill: 100, cm: 91.4, inPhoto: true },
+  // centre 150 cm, 22% of the frame's width; hung at 100 cm, a size she has not stated
+  { id: "monk-and-green-buddha", work: "monk-and-green-buddha", label: "A reading room, Bengaluru",
+    src: "/art/rooms/monk-and-green-buddha.webp", thumb: "/art/rooms/monk-and-green-buddha-thumb.webp",
+    w: 1800, h: 1200, pxPerCm: 4.861, floor: 1083, cx: 900, sill: 100, cm: 100, inPhoto: true },
+  // centre 137.5 cm, 21% of the frame's width; hung at its stated 61 cm
+  { id: "woman-with-bird", work: "woman-with-bird", label: "A bedroom by the sea, Mumbai",
+    src: "/art/rooms/woman-with-bird.webp", thumb: "/art/rooms/woman-with-bird-thumb.webp",
+    w: 1800, h: 1200, pxPerCm: 5.556, floor: 1059, cx: 872, sill: 107, cm: 61, inPhoto: true },
+  // centre 143.8 cm, 27% of the frame's width; hung at 95 cm, a size she has not stated
+  { id: "three-veiled-women", work: "three-veiled-women", label: "A sitting room, a haveli in Jodhpur",
+    src: "/art/rooms/three-veiled-women.webp", thumb: "/art/rooms/three-veiled-women-thumb.webp",
+    w: 1800, h: 1200, pxPerCm: 4.730, floor: 992, cx: 709, sill: 97, cm: 95, inPhoto: true },
+  // centre 143.4 cm, 26% of the frame's width; hung at 105 cm, a size she has not stated
+  { id: "child-among-flowers", work: "child-among-flowers", label: "A sitting room, Pondicherry",
+    src: "/art/rooms/child-among-flowers.webp", thumb: "/art/rooms/child-among-flowers-thumb.webp",
+    w: 1800, h: 1200, pxPerCm: 4.268, floor: 982, cx: 900, sill: 102, cm: 105, inPhoto: true },
+  // centre 143 cm, 22% of the frame's width; hung at 90 cm, a size she has not stated
+  { id: "shree-420-and-milk-cans", work: "shree-420-and-milk-cans", label: "A den on Marine Drive, Mumbai",
+    src: "/art/rooms/shree-420-and-milk-cans.webp", thumb: "/art/rooms/shree-420-and-milk-cans-thumb.webp",
+    w: 1800, h: 1200, pxPerCm: 5.385, floor: 1100, cx: 900, sill: 98, cm: 90, inPhoto: true },
+  // centre 138.5 cm, 20% of the frame's width; hung at its stated 61 cm
+  { id: "woman-with-red-flower", work: "woman-with-red-flower", label: "A library, Ballygunge, Kolkata",
+    src: "/art/rooms/woman-with-red-flower.webp", thumb: "/art/rooms/woman-with-red-flower-thumb.webp",
+    w: 1800, h: 1200, pxPerCm: 5.645, floor: 1098, cx: 900, sill: 108, cm: 61, inPhoto: true },
+  // centre 139.6 cm, 28% of the frame's width; hung at 120 cm, a size she has not stated
+  { id: "monks-and-blue-buddha", work: "monks-and-blue-buddha", label: "A living room, Jubilee Hills, Hyderabad",
+    src: "/art/rooms/monks-and-blue-buddha.webp", thumb: "/art/rooms/monks-and-blue-buddha-thumb.webp",
+    w: 1800, h: 1200, pxPerCm: 3.933, floor: 908, cx: 900, sill: 92, cm: 120, inPhoto: true },
+  // centre 145.9 cm, 25% of the frame's width; hung at 90 cm, a size she has not stated
+  { id: "terracotta-pots", work: "terracotta-pots", label: "A dining hall, a Chettinad mansion",
+    src: "/art/rooms/terracotta-pots.webp", thumb: "/art/rooms/terracotta-pots-thumb.webp",
+    w: 1800, h: 1200, pxPerCm: 4.730, floor: 1056, cx: 900, sill: 102, cm: 90, inPhoto: true },
+];
 
 /** the fallback rooms, for works with a stated size and no room of their own */
 export const GENERIC: Room[] = [

@@ -116,8 +116,13 @@ const Lightbox = forwardRef<LightboxHandle, { dims: Dims; onOpenChange(open: boo
       const hangIt = () => {
         if (st.current.id !== id || view.current !== which) return;
         rb.style.aspectRatio = `${v.room.w} / ${v.room.h}`;
-        setArt(roomArt.current!, v);
-        roomImg.current!.src = img.current!.currentSrc || img.current!.src;
+        // a room rendered with the painting in it is shown as photographed; any other gets the canvas hung on it
+        const ra = roomArt.current!;
+        ra.hidden = !!v.room.inPhoto;
+        if (!v.room.inPhoto) {
+          setArt(ra, v);
+          roomImg.current!.src = img.current!.currentSrc || img.current!.src;
+        }
         roomCap.current!.textContent = v.trueSize ? `${v.room.label} · shown at its true size` : v.room.label;
         rb.setAttribute("aria-label", `${quoted(w.title)} in ${lower(v.room.label)}${v.trueSize ? ", shown at its true size" : ""}`);
         if (fr.hidden) own(gsap.to(rb, { autoAlpha: 0, duration: reduce ? 0 : 0.2, onComplete: swap }));
@@ -151,10 +156,13 @@ const Lightbox = forwardRef<LightboxHandle, { dims: Dims; onOpenChange(open: boo
       rooms.current.forEach((r) => {
         const b = btn(r.room.id, `In a room: ${lower(r.room.label)}`);
         const ph = document.createElement("img"); ph.src = r.room.thumb; ph.alt = "";
-        const art = document.createElement("span"); art.className = "lb-view-art";
-        const ai = document.createElement("img"); ai.src = src; ai.alt = ""; art.append(ai);
-        setArt(art, r, false);
-        b.append(ph, art);
+        b.append(ph);
+        if (!r.room.inPhoto) {
+          const art = document.createElement("span"); art.className = "lb-view-art";
+          const ai = document.createElement("img"); ai.src = src; ai.alt = ""; art.append(ai);
+          setArt(art, r, false);
+          b.append(art);
+        }
         const intent = () => warm(r.room.src);
         b.addEventListener("pointerenter", intent);
         b.addEventListener("focus", intent);
