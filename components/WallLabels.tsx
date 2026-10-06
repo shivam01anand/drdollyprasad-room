@@ -20,8 +20,10 @@ import type { Room } from "@/lib/room/Room";
  */
 
 const IDS = [...new Set(CHAPTERS.flatMap((c) => c.labels ?? []))];
+/** captions for what is not her work (her photograph on its easel), keyed chapter:anchor */
+const ASIDES = CHAPTERS.flatMap((c) => (c.asides ?? []).map((a) => ({ key: `${c.id}:${a.anchor}`, chapter: c.id, ...a })));
 type Rect = { x0: number; y0: number; x1: number; y1: number };
-type Side = "right" | "left" | "below";
+type Side = "right" | "left" | "below" | "above";
 const GAP = 18;
 
 const overlaps = (a: Rect, b: Rect, m = 8) => a.x0 < b.x1 + m && a.x1 > b.x0 - m && a.y0 < b.y1 + m && a.y1 > b.y0 - m;
@@ -29,6 +31,7 @@ const overlaps = (a: Rect, b: Rect, m = 8) => a.x0 < b.x1 + m && a.x1 > b.x0 - m
 function spot(side: Side, f: Rect, w: number, h: number) {
   if (side === "right") return { x: f.x1 + GAP, y: f.y1 - h };
   if (side === "left") return { x: f.x0 - GAP - w, y: f.y1 - h };
+  if (side === "above") return { x: f.x0, y: f.y0 - GAP * 0.75 - h };
   return { x: f.x0, y: f.y1 + GAP * 0.75 };
 }
 
@@ -43,9 +46,11 @@ export default function WallLabels({ room, active, live, onOpen }: {
   useEffect(() => {
     const el = root.current;
     const ids = CHAPTERS[active]?.labels ?? [];
-    if (!el || !live || !ids.length) return;
+    const asides = ASIDES.filter((a) => a.chapter === CHAPTERS[active]?.id);
+    if (!el || !live || (!ids.length && !asides.length)) return;
     const quick = reducedMotion();
-    const nodes = new Map(ids.map((id) => [id, el.querySelector<HTMLElement>(`[data-label='${id}']`)!]));
+    const nodes = new Map([...ids.map((id) => [id, el.querySelector<HTMLElement>(`[data-label='${id}']`)!] as const),
+      ...asides.map((a) => [a.key, el.querySelector<HTMLElement>(`[data-label='${a.key}']`)!] as const)]);
     let placed: Map<string, Side> | null = null;
     let reveal: gsap.core.Timeline | null = null;
     let fade: gsap.core.Tween | null = null;
@@ -61,13 +66,13 @@ export default function WallLabels({ room, active, live, onOpen }: {
     };
 
     /** choose each card's side once, when the camera lands */
-    const place = (rects: Map<string, Rect>) => {
+    const place = (rects: Map<string, Rect>, others: Rect[]) => {
       const vw = innerWidth, vh = innerHeight;
       const gut = Math.max(16, Math.min(30, vw * 0.022));
       const avoid: Rect[] = [];
       document.querySelectorAll<HTMLElement>(".copy-panel[data-on='1'], .brand, .hud-meta, .hud-mail, .diya-btn, .hud-bottom")
         .forEach((n) => { const b = n.getBoundingClientRect(); if (b.width && b.height) avoid.push({ x0: b.left, y0: b.top, x1: b.right, y1: b.bottom }); });
-      const frames = [...rects.values()];
+      const frames = [...rects.values(), ...others];
       const out = new Map<string, Side>();
       const taken: Rect[] = [];
       // left to right, as the eye reads a wall: each canvas claims the space on its right first
@@ -75,7 +80,7 @@ export default function WallLabels({ room, active, live, onOpen }: {
         const n = nodes.get(id)!;
         const w = n.offsetWidth, h = n.offsetHeight;
         const first = CHAPTERS[active]?.labelSide;
-        const sides: Side[] = ["right", "left", "below"];
+        const sides: Side[] = ["right", "left", "below", "above"];
         for (const side of first ? [first, ...sides.filter((x) => x !== first)] : sides) {
           const p = spot(side, f, w, h);
           const r = { x0: p.x, y0: p.y, x1: p.x + w, y1: p.y + h };
@@ -100,8 +105,36 @@ export default function WallLabels({ room, active, live, onOpen }: {
         // only a canvas wholly on screen is labelled
         if (f && f.x0 > 0 && f.y0 > 0 && f.x1 < innerWidth && f.y1 < innerHeight) rects.set(id, f);
       }
+      // the works' labels, where they will stand this frame, and the chapter's words and the
+      // header: an aside must crowd none of them
+      const labelRects: Rect[] = [];
+      document.querySelectorAll<HTMLElement>(".copy-panel[data-on='1'], .brand, .hud-meta, .hud-mail, .diya-btn, .hud-bottom, .dock")
+        .forEach((x) => { const b = x.getBoundingClientRect(); if (b.width && b.height) labelRects.push({ x0: b.left, y0: b.top, x1: b.right, y1: b.bottom }); });
+      for (const [id, side] of placed ?? []) {
+        const f = rects.get(id), n = nodes.get(id)!;
+        if (!f) continue;
+        const p = spot(side, f, n.offsetWidth, n.offsetHeight);
+        labelRects.push({ x0: p.x, y0: p.y, x1: p.x + n.offsetWidth, y1: p.y + n.offsetHeight });
+      }
+      // an aside sits beside its anchor: right of it, left, or below
+      const asideAt = new Map<string, { x: number; y: number }>();
+      for (const a of asides) {
+        const p = R.anchorPoint(a.anchor), n = nodes.get(a.key)!;
+        if (!p) continue;
+        const w = n.offsetWidth, h = n.offsetHeight;
+        const tries = [{ x: p.x + 50, y: p.y - h / 2 }, { x: p.x - 50 - w, y: p.y - h / 2 },
+          { x: p.x - w / 2, y: p.y + 64 }, { x: p.x - 24, y: p.y + 64 }, { x: p.x - w + 24, y: p.y + 64 }];
+        const fits = (q: { x: number; y: number }) => {
+          const r = { x0: q.x, y0: q.y, x1: q.x + w, y1: q.y + h };
+          return q.x > 16 && q.x + w < innerWidth - 16 && q.y > 70 && q.y + h < innerHeight - 90
+            && ![...rects.values(), ...labelRects].some((f) => overlaps(r, f, 10));
+        };
+        const q = tries.find(fits);
+        if (q) asideAt.set(a.key, q);
+      }
       if (!placed) {
-        placed = place(rects);
+        placed = place(rects, R.artRects());
+        for (const k of asideAt.keys()) placed.set(k, "right");
         reveal = gsap.timeline();
         let k = 0;
         for (const [id, side] of placed) {
@@ -117,7 +150,10 @@ export default function WallLabels({ room, active, live, onOpen }: {
       }
       // the cards stay on the wall while the view sways
       for (const [id, side] of placed) {
-        const f = rects.get(id), n = nodes.get(id)!;
+        const n = nodes.get(id)!;
+        const q = asideAt.get(id);
+        if (q) { n.style.transform = `translate3d(${Math.round(q.x)}px, ${Math.round(q.y)}px, 0)`; continue; }
+        const f = rects.get(id);
         if (!f) continue;
         const p = spot(side, f, n.offsetWidth, n.offsetHeight);
         n.style.transform = `translate3d(${Math.round(p.x)}px, ${Math.round(p.y)}px, 0)`;
@@ -148,6 +184,12 @@ export default function WallLabels({ room, active, live, onOpen }: {
           </button>
         );
       })}
+      {ASIDES.map((a) => (
+        <div className="wall-label is-aside" data-label={a.key} key={a.key}>
+          <span className="cap-title" data-cap={a.title}>{a.title}</span>
+          <span className="cap-details" data-cap={a.line}>{a.line}</span>
+        </div>
+      ))}
     </div>
   );
 }

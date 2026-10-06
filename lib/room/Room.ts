@@ -26,21 +26,28 @@ export type RoomOpts = {
   onRearrangeError?(error: unknown): void;
 };
 
-type Tier = { small: boolean; dpr: number; msaa: number; ao: boolean; shadow: number };
+type Tier = { small: boolean; dpr: number; msaa: number; ao: boolean; shadow: number; phone: boolean };
 
-/** one quality decision, made once: phones and small machines get 1k
- *  textures, no AO and a lower pixel ratio; everything else the full set */
+/** one quality decision, made once: weak machines get 1k textures, the 2k
+ *  lightmaps, no AO and a low pixel ratio; phones the full set, sharp, without
+ *  AO; everything else the full set with AO */
 function pickTier(): Tier {
   const mem = (navigator as Navigator & { deviceMemory?: number }).deviceMemory ?? 8;
   const cores = navigator.hardwareConcurrency ?? 8;
-  const small = innerWidth < 820 || matchMedia("(pointer: coarse)").matches || mem <= 4 || cores <= 4;
+  const phone = innerWidth < 820 || matchMedia("(pointer: coarse)").matches;
+  // only a genuinely weak machine gets the light set: a modern phone renders the house
+  // sharp (iOS reports few cores and no memory, so those cannot mark it weak)
+  const small = mem <= 2 || cores <= 2;
   // colour targets are HalfFloat and there are two of them: 4× MSAA at
   // DPR 1.5 alone is ~220 MB. Two samples look the same here at half that.
   return {
     small,
-    dpr: Math.min(devicePixelRatio || 1, small ? 1.25 : 1.5),
-    msaa: small ? 0 : 2,
-    ao: !small,
+    phone,
+    // a phone's screen is small and close: it needs its own pixels (the frames' thin
+    // lines stair-step at 1.25×) and real antialiasing; it skips the screen-space AO
+    dpr: Math.min(devicePixelRatio || 1, small ? 1.25 : phone ? 2 : 1.5),
+    msaa: small ? 0 : phone ? 4 : 2,
+    ao: !small && !phone,
     shadow: small ? 1024 : 2048,
   };
 }
@@ -924,6 +931,7 @@ export class Room {
   };
 
   private onPointerDown = (e: PointerEvent) => {
+    if (e.pointerType === "touch") this.tap = { id: e.pointerId, x: e.clientX, y: e.clientY, t: performance.now() };
     if (!this.rearranged || this.drag.active || e.button !== 0) return;
     const d = this.drag;
     d.active = true; d.id = e.pointerId;
@@ -932,6 +940,15 @@ export class Room {
   };
 
   private onPointerUp = (e: Event) => {
+    const pe = e as PointerEvent, tp = this.tap;
+    if (tp && pe.pointerId === tp.id && e.type === "pointerup") {
+      this.tap = undefined;
+      const still = Math.hypot(pe.clientX - tp.x, pe.clientY - tp.y) < 10 && performance.now() - tp.t < 500;
+      if (still && this.rig.isEnabled && !this.rearranged) {
+        const id = this.pick(pe);
+        if (id) { this.tapOpened = performance.now(); this.opts.onArtwork(id); }
+      }
+    }
     const d = this.drag;
     if (!d.active) return;
     d.active = false;
@@ -945,6 +962,13 @@ export class Room {
   };
 
   private onTouch = () => { this.rig.touched(); };
+
+  /** a finger looking round the room (Studio's touch handling) */
+  look(nx: number, ny: number) { this.rig?.look(nx, ny); this.keepAlive(200); }
+  endLook() { this.rig?.dropPointer(); this.keepAlive(1500); }
+
+  /** a tap on a painting opens it, on the tap itself: a phone's click can be held back or lost */
+  private tap?: { id: number; x: number; y: number; t: number };
 
   /* --- a phone shakes the room itself ------------------------------------ */
 
@@ -1006,8 +1030,11 @@ export class Room {
   }
 
   private lastPointer?: PointerEvent;
+  private tapOpened = 0;
   private onClick = (e: MouseEvent) => {
     if (!this.rig.isEnabled || this.rearranged) return;
+    // the click that follows a tap the room already answered
+    if (performance.now() - this.tapOpened < 700) return;
     const id = this.pick(e);
     if (id) this.opts.onArtwork(id);
   };
@@ -1112,6 +1139,23 @@ export class Room {
   get at() { return this.rig?.progress ?? 0; }
   /** the camera has arrived where the scroll put it, and the house is at rest */
   get landed() { return this.ready && !!this.rig && this.rig.isEnabled && this.rig.travel < 0.0015 && !this.rearranged; }
+
+  /** every canvas on screen, framed, in CSS pixels (a label must cover none of them) */
+  artRects() {
+    const out: { x0: number; y0: number; x1: number; y1: number }[] = [];
+    for (const id of Object.keys(this.info?.art ?? {})) { const r = this.artRect(id); if (r) out.push(r); }
+    return out;
+  }
+
+  /** a house anchor on screen in CSS pixels; null if it is behind the camera or off the screen */
+  anchorPoint(name: string) {
+    const a = this.info?.anchors[name];
+    if (!a || !this.rig || !this.canvas) return null;
+    tmpV.set(a[0], a[1], a[2]).project(this.rig.camera);
+    if (tmpV.z < -1 || tmpV.z > 1 || Math.abs(tmpV.x) > 1 || Math.abs(tmpV.y) > 1) return null;
+    const r = this.canvas.getBoundingClientRect();
+    return { x: r.left + (tmpV.x * 0.5 + 0.5) * r.width, y: r.top + (0.5 - tmpV.y * 0.5) * r.height };
+  }
 
   /** a canvas with its frame, on screen in CSS pixels; null unless wholly in front of the camera */
   artRect(id: string) {

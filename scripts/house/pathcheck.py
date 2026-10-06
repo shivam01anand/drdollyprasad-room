@@ -16,8 +16,10 @@ import sys
 info = json.load(open(sys.argv[1]))
 NARROW = len(sys.argv) > 2 and sys.argv[2] == "narrow"
 ORDER = ["presence", "floral", "canopy", "bodhi", "faith", "street", "redwall", "featured", "plan"]
-VIA = {"bodhi": "threshold"}
+VIA = {"bodhi": "threshold", "faith": "faithvia", "street": "streetvia", "redwall": "redvia"}
 cams = {k: (info["cams"].get(f"n:{k}") if NARROW else None) or v for k, v in info["cams"].items() if not k.startswith("n:")}
+if NARROW:   # views a portrait screen alone has (a passing pose only it needs)
+    cams.update({k[2:]: v for k, v in info["cams"].items() if k.startswith("n:") and k[2:] not in cams})
 
 
 def t3(p):
@@ -76,7 +78,7 @@ def inside(e):
 poses, vias, prev = [], [], None
 for i, k in enumerate(ORDER):
     if i > 0:
-        v = pose(cams[VIA[k]], prev) if k in VIA else None
+        v = pose(cams[VIA[k]], prev) if k in VIA and VIA[k] in cams else None
         if v:
             prev = v["yaw"]
         vias.append(v)

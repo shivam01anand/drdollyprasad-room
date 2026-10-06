@@ -35,13 +35,9 @@ export default function RootLayout({ children }: { children: React.ReactNode }) 
         <link rel="preconnect" href="https://fonts.googleapis.com" />
         <link rel="preconnect" href="https://fonts.gstatic.com" crossOrigin="" />
         <link
-          href="https://fonts.googleapis.com/css2?family=Instrument+Sans:ital,wght@0,400;0,500;0,600;1,400&family=IBM+Plex+Mono:wght@400;500&family=IBM+Plex+Sans+Devanagari:wght@500&display=swap"
+          href="https://fonts.googleapis.com/css2?family=Instrument+Sans:ital,wght@0,400;0,500;0,600;1,400&family=IBM+Plex+Mono:wght@400;500&family=IBM+Plex+Sans+Devanagari:wght@500&family=Cormorant+Garamond:ital,wght@1,500&display=swap"
           rel="stylesheet"
         />
-        {/* the opening's lamp and its marigolds first: they are the progress */}
-        <link rel="preload" as="image" href="/intro/lamp.webp" fetchPriority="high" />
-        <link rel="preload" as="image" href="/intro/shadow.webp" />
-        {[0, 1, 2, 3, 4, 5].map((k) => <link key={k} rel="preload" as="image" href={`/intro/marigold-${k}.webp`} />)}
         <link rel="preload" as="image" href="/art/large/woman-with-poppies.jpg" />
       </head>
       <body>{children}</body>

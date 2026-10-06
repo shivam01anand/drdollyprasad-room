@@ -26,6 +26,17 @@ export function reliefMap(image: CanvasImageSource & { width: number; height: nu
   const px = img.data, n = w * h;
   const lum = new Float32Array(n), tmp = new Float32Array(n), hp = new Float32Array(n);
   for (let i = 0, j = 0; i < n; i++, j += 4) lum[i] = (0.2126 * px[j] + 0.7152 * px[j + 1] + 0.0722 * px[j + 2]) / 255;
+  // first a light 3×3 blur: a photograph's grain and varnish glints are not brushwork,
+  // and left in they glitter under the light like sandpaper
+  {
+    const src = lum.slice();
+    for (let y = 1; y < h - 1; y++)
+      for (let x = 1; x < w - 1; x++) {
+        const i = y * w + x;
+        lum[i] = (4 * src[i] + 2 * (src[i - 1] + src[i + 1] + src[i - w] + src[i + w])
+          + src[i - w - 1] + src[i - w + 1] + src[i + w - 1] + src[i + w + 1]) / 16;
+      }
+  }
   // high pass: the photograph less a 5×5 box of itself (two separable passes, edges clamped)
   for (let y = 0; y < h; y++) {
     const row = y * w;
@@ -42,7 +53,7 @@ export function reliefMap(image: CanvasImageSource & { width: number; height: nu
       hp[y * w + x] = lum[y * w + x] - s * 0.2;
     }
   // Sobel on the detail; v runs down the canvas (glTF), as rows do. The border keeps a flat normal.
-  const strength = 3.2;
+  const strength = 2.4;
   for (let j = 0; j < n * 4; j += 4) { px[j] = 128; px[j + 1] = 128; px[j + 2] = 255; px[j + 3] = 255; }
   for (let y = 1; y < h - 1; y++)
     for (let x = 1; x < w - 1; x++) {
@@ -83,8 +94,8 @@ export function galleryLight(a: { side: string; centre: [number, number, number]
 export function paintMaterial(tex: THREE.Texture, baked: BakedLight, light: THREE.Vector3, relief: THREE.Texture) {
   const m = new THREE.MeshStandardMaterial({ map: tex, roughness: 0.86, metalness: 0, envMapIntensity: 0.5 });
   m.normalMap = relief;
-  m.normalScale.set(0.45, 0.45);
-  const sheen = { pos: { value: light }, k: { value: 0.22 } };
+  m.normalScale.set(0.22, 0.22);
+  const sheen = { pos: { value: light }, k: { value: 0.16 } };
   m.onBeforeCompile = (shader) => {
     shader.uniforms.uSheenPos = sheen.pos;
     shader.uniforms.uSheenK = sheen.k;
@@ -100,7 +111,8 @@ export function paintMaterial(tex: THREE.Texture, baked: BakedLight, light: THRE
           vec3 sh = normalize( sl + sv );
           float nh = max( dot( normal, sh ), 0.0 );
           float fr = 0.04 + 0.96 * pow( 1.0 - max( dot( normal, sv ), 0.0 ), 5.0 );
-          reflectedLight.directSpecular += uSheenK * ( pow( nh, 14.0 ) * 0.8 + pow( nh, 90.0 ) * 1.6 ) * ( 0.5 + fr ) * vec3( 1.0, 0.93, 0.82 );
+          // broad and soft: a varnish's glow, never a glitter
+          reflectedLight.directSpecular += uSheenK * pow( nh, 12.0 ) * ( 0.5 + fr ) * vec3( 1.0, 0.93, 0.82 );
         }`);
   };
   m.customProgramCacheKey = () => "paint";

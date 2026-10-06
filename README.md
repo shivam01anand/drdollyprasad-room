@@ -8,14 +8,13 @@ it are hers: a gallery inside a Delhi home, built and lit in Blender.
 
 ## The journey
 
-1. **The lighting of the lamp** — every exhibition of hers opens with the tall brass lamp lit
-   in a ring of marigolds (her gallery photograph), so the site does too. On paper, the lamp
-   (a Cycles render of the house's own, `scripts/intro`) waits while a garland of marigolds is
-   laid round its foot as the house loads — the garland is the progress. When it closes, the
-   five wicks catch one by one, her name forms beneath the light and rises into the header, and
-   *Woman with Poppies* is shown clean with "Welcome to my studio", at the exact rectangle the 3D
-   painting occupies (`Room.heroRect()`), so when the panel lifts the courtyard appears around
-   it. A second visit in a session finds the lamp lit; a tap goes straight in.
+1. **The welcome** — warm paper, lamplight from above, and her greeting word by word: नमस्ते,
+   then "Welcome to my studio" (Cormorant Garamond italic), her name, a hairline that fills as the
+   house loads. Then the invitation, **Step inside** — the gesture that lets the music begin (a
+   tanpura synthesised in the browser, `lib/music.ts`; on unless the visitor turns it off, and a
+   control in the header). Her name rises into the header, *Woman with Poppies* is shown clean at
+   the exact rectangle the 3D painting occupies (`Room.heroRect()`), and the panel lifts with the
+   courtyard around it. A second visit in a session is welcomed back and goes straight in.
 2. **The house is shown, then the camera moves in.** Her things fall into place as the panel
    lifts (`bounce.out` from two metres, as the original drops its furniture).
 3. **A nine-step walk**, one section each, one source (`lib/chapters.ts`) for copy and camera:
@@ -24,18 +23,21 @@ it are hers: a gallery inside a Delhi home, built and lit in Blender.
      — the tall brass lamp of her openings beside it in a ring of marigolds — and goes straight
      through into the Quiet Room without stopping (a chapter's `via`: the rig runs power2.in to
      the passing pose and power2.out from it);
-   - **the Quiet Room**: the Bodhi Buddha under one light with her poem, then "The Blue Buddha"
-     and "Threads of Faith" by the door;
-   - **the Red Room** by the lane: "The Bullocks" and "Terracotta" on the red wall, then
-     "Shree 420" and "Three Women in Red";
+   - **the Quiet Room**: the Bodhi Buddha under one light with her poem, then its south-east
+     corner — "The Blue Buddha" on the wall with the door, "Threads of Faith" on the wall beside
+     it, one painting to a wall;
+   - **the Red Room** by the lane: "The Bullocks" and "Terracotta" on the red wall, with her
+     photograph — interviewed beside "The Bullocks" — on an easel between them; then "Shree 420"
+     and "Three Women in Red", with Bandh Darwaze I–IV in a row on the wall to their left;
    - every canvas hangs in a float frame (a dark lip round a shadow gap, nothing of the canvas
      covered) and carries a printed wall label, typed in once the camera lands (`WallLabels`);
    - **the afternoon goes as you go in**: each chapter has a `dusk`, and the light moves toward
      the evening bake along the walk, the lamps coming up behind it; dark mode is all of it;
    - then up out of the house for **Featured** and **the plan** (exhibitions, her own words).
 
-   Each turn is at most a quarter; every room change passes through a doorway
-   (`scripts/house/pathcheck.py` proves it for the landscape and the portrait walk).
+   Every room change passes through a doorway, through passing poses where a turn is long
+   (`scripts/house/pathcheck.py` proves it for the landscape and the portrait walk). The camera
+   walks: it follows the scroll softly and never takes a step faster than 2.6 s (`Rig.STEP_S`).
 4. **Featured** — the original's slider; a click opens the work on a card over the house (the
    room stays in view, dimmed a little; a click outside puts it away), where it can be looked at
    closely (click, scroll, pinch) or seen in a room at its stated size. Sizes appear only where
@@ -55,9 +57,12 @@ lamp come on — a second bake, not a filter).
 
 Designed for the thumb, not shrunk from the desktop:
 
-- **one stop to a swipe** — on touch screens the walk takes the gesture itself (Studio's touch
-  paging) and glides exactly one stop, up or down; sideways drags go to the carousel; past the
-  last stop the page scrolls freely through the works and the contact;
+- **the walk in the hand** — a finger dragging up moves the walk toward the next wall (never
+  further), release carries on there at a walking pace, a nudge settles back; a sideways drag
+  turns the head to look round the room; a tap on a painting opens it (on the tap itself);
+  past the last stop the page scrolls freely through the works and the contact;
+- phones render sharp: twice their pixels, 4× MSAA, the full lightmaps (only a weak machine
+  gets the light set);
 - **the dock** — one bar where the desktop has four pills: where you are (`05/10 · Artist's
   statement`) and a menu; the menu is a sheet from the bottom edge (`Stops`) with the ten stops,
   all her works, Shake the room, contact, mail and Instagram;

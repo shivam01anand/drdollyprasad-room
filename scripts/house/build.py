@@ -526,9 +526,10 @@ for n, (x0, x1, y0, y1) in {"W": (QX0, QX0 + 0.012, QY0, QY1), "N": (QX0, QX1, Q
 
 
 def ceiling(name, x0, x1, y0, y1, h, along_x=True, spacing=0.62):
-    # the roof sits inside the walls: their tops stay open to the sky (the plan
-    # shows them), and it stops at the courtyard's wall (x1), never in its plane
-    box(f"Ceil_{name}", x0, x1, y0, y1, h, h + 0.25, role_mat("timber"), bevel=0)
+    # the roof bears 8 cm into the walls (a roof meeting a wall face exactly lets a
+    # blade of sun through the seam); the rest of their tops stays open to the sky
+    # for the plan, and it stops at the courtyard's wall (x1), never in its plane
+    box(f"Ceil_{name}", x0 - 0.08, x1, y0 - 0.08, y1 + 0.08, h, h + 0.25, role_mat("timber"), bevel=0)
     span = (y1 - y0) if along_x else (x1 - x0)
     n = int(span / spacing)
     for k in range(1, n + 1):
@@ -645,12 +646,16 @@ painting("woman-with-red-flower", "E", AX1, 3.0, 1.62, 0.61)
 painting("woman-with-bird", "E", AX1, 4.45, 1.62, 0.61)
 painting("boy-with-bananas", "S", AY0, 5.75, 1.66, 0.914)
 painting("monk-and-green-buddha", "W", QX0, ARCH["cy"], 1.62, 1.5)
-painting("monks-and-blue-buddha", "S", QY0, -1.3, 1.62, 1.3)
-painting("temple-bells", "S", QY0, -2.72, 1.6, 0.914)
+# the Quiet Room's south-east corner: one painting to a wall, each given its own attention
+painting("monks-and-blue-buddha", "S", QY0, -1.78, 1.62, 1.3)
+painting("temple-bells", "E", QX1, 1.98, 1.6, 0.914)
 painting("bulls-and-wheel", "S", RY0 + 0.012, -3.2, 1.66, 1.3)
 painting("shree-420-and-milk-cans", "E", RX1 - 0.012, -1.55, 1.62, 1.2)
 painting("three-veiled-women", "E", RX1 - 0.012, -3.6, 1.6, 1.1)
 painting("terracotta-pots", "S", RY0 + 0.012, -1.3, 1.6, 1.0)
+BANDH = ("weathered-door-ring", "red-and-teal-door-lock", "teal-door-bolt", "carved-door-knocker")
+for k, bid in enumerate(BANDH):
+    painting(bid, "N", RY1, -2.42 + k * 0.44, 1.58, 0.305, depth=0.03)
 
 # ====================================================================== things
 def import_ph(ph_id, loc, rot_z=0.0, scale=1.0, decimate=None, prop=True, mass=1.0):
@@ -825,11 +830,83 @@ charpai("charpai_red", (-1.05, -2.6, 0), math.radians(90), L=1.85, W=0.9)
 import_ph("brass_pot_01", (-1.2, -2.0, 0), 0.4, 0.95, mass=1.0)
 import_ph("brass_pot_01", (-0.95, -3.2, 0), 1.7, 0.8, mass=1.0)
 import_ph("ceramic_pot", (-1.0, -0.15, 0), 1.0, 0.75, mass=2.0)
+
+
+def rod(name, p0, p1, r, mat, segs=12):
+    """a round rod from p0 to p1"""
+    p0, p1 = Vector(p0), Vector(p1)
+    d = p1 - p0
+    bpy.ops.mesh.primitive_cylinder_add(vertices=segs, radius=r, depth=d.length, location=(p0 + p1) / 2)
+    o = bpy.context.active_object
+    o.name = name
+    o.rotation_euler = d.to_track_quat("Z", "Y").to_euler()
+    bpy.ops.object.transform_apply(location=True, rotation=True)
+    o.data.materials.append(mat)
+    return o
+
+
+def press_easel(name, loc, face_deg, photo):
+    """her, in conversation beside "The Bullocks" (a press photograph from her own
+    site): printed and framed — a thin dark frame, a white mat — on a slender teak
+    easel. Built facing -y (the print's face), then turned to the room."""
+    tk = role_mat("teak")
+    top_y, H = 0.1, 1.32
+    lean = math.atan2(top_y, H)
+    parts = [rod(f"{name}_legL", (-0.22, 0, 0), (-0.12, top_y, H), 0.013, tk),
+             rod(f"{name}_legR", (0.22, 0, 0), (0.12, top_y, H), 0.013, tk),
+             rod(f"{name}_legB", (0, 0.56, 0), (0, top_y + 0.015, H - 0.03), 0.012, tk)]
+    zl = 0.62
+    yl = top_y * zl / H
+    parts.append(box(f"{name}_ledge", -0.27, 0.27, yl - 0.075, yl + 0.005, zl - 0.03, zl, tk, bevel=0.004))
+    parts.append(box(f"{name}_lip", -0.27, 0.27, yl - 0.075, yl - 0.065, zl, zl + 0.02, tk, bevel=0.002))
+    zb = 1.08
+    parts.append(box(f"{name}_bar", -0.2, 0.2, top_y * zb / H - 0.01, top_y * zb / H + 0.015, zb, zb + 0.03, tk, bevel=0.004))
+    easel = join(f"Deco_{name}", apply_mods(parts))
+    # the print: 3:2 in a mat and a thin dark frame, its face at -y
+    pw, ph, mw, fr = 0.5, 0.5 / 1.494, 0.055, 0.016
+    W, Hh = pw + 2 * mw + 2 * fr, ph + 2 * mw + 2 * fr
+    fparts = [box(f"{name}_frame", -W / 2, W / 2, 0.0, 0.014, 0, Hh, flat("photoFrame", lin(0x1E1A17), 0.45), bevel=0.003),
+              box(f"{name}_mat", -W / 2 + fr, W / 2 - fr, -0.002, 0.0, fr, Hh - fr, flat("photoMat", lin(0xF2EEE6), 0.85), bevel=0)]
+    frame = join(f"Deco_{name}Frame", apply_mods(fparts))
+    bpy.ops.mesh.primitive_plane_add(size=1)
+    po = bpy.context.active_object
+    po.name = f"Deco_{name}Photo"
+    po.scale = (pw, ph, 1)
+    bpy.ops.object.transform_apply(scale=True)
+    po.rotation_euler = (math.pi / 2, 0, 0)            # plane's +z normal turned to -y
+    bpy.ops.object.transform_apply(rotation=True)
+    po.location = (0, -0.0025, fr + mw + ph / 2)
+    bpy.ops.object.transform_apply(location=True)
+    m = bpy.data.materials.new("pressPhoto")
+    m.use_nodes = True
+    t = m.node_tree.nodes.new("ShaderNodeTexImage")
+    t.image = img(photo, True)
+    b = m.node_tree.nodes["Principled BSDF"]
+    b.inputs["Roughness"].default_value = 0.35          # a satin print
+    m.node_tree.links.new(t.outputs["Color"], b.inputs["Base Color"])
+    po.data.materials.append(m)
+    # the framed print stands on the ledge, leaning back with the easel
+    for o in (frame, po):
+        o.rotation_euler = (-lean, 0, 0)
+        o.location = (0, yl - 0.05, zl)
+    group = link(bpy.data.objects.new(f"Deco_{name}Group", None))
+    for o in (easel, frame, po):
+        o.parent = group
+    group.location = Vector(loc)
+    group.rotation_euler = (0, 0, math.radians(face_deg))
+    return group
+
+
+# beside "The Bullocks", in the gap before "Terracotta", turned a little toward the door from the Quiet Room
+press_easel("press", (-2.16, -4.28, 0), 180 + 28, os.path.join(HT, "press-interview.jpg"))
+INFO["anchors"]["press"] = [-2.16, -4.24, 0.86]       # the print's middle, for its caption
+
 # the lane door: one leaf ajar into the room, turquoise flaking over old wood
 lane, lane_iron = door_leaf("Deco_laneDoor", 1.06, 2.26, 0.055, "door", panels=(2, 3), hardware="iron", hinge_left=True)
-# hinged on the door's south jamb: closed it would lie at 90° (along the wall); swung 58° into the room
-place(lane, (RX0 + 0.03, -3.55 - 0.54, 0), math.radians(90 - 58))
-place(lane_iron, (RX0 + 0.03, -3.55 - 0.54, 0), math.radians(90 - 58))
+# shut in its frame, a few centimetres back from the room's face: hinged on the north jamb,
+# the panelled face and its iron to the room
+place(lane, (RX0 - 0.06, -3.55 + 0.53, 0), math.radians(-90))
+place(lane_iron, (RX0 - 0.06, -3.55 + 0.53, 0), math.radians(-90))
 box("Wall_LaneDoorFrameS", RX0 - T + 0.02, RX0 + 0.03, -3.55 - 0.56 - 0.11, -3.55 - 0.56, 0, 2.42, role_mat("teak"), bevel=0.01, segs=3)
 box("Wall_LaneDoorFrameN", RX0 - T + 0.02, RX0 + 0.03, -3.55 + 0.56, -3.55 + 0.56 + 0.11, 0, 2.42, role_mat("teak"), bevel=0.01, segs=3)
 box("Wall_LaneDoorFrameT", RX0 - T + 0.02, RX0 + 0.04, -3.55 - 0.56 - 0.15, -3.55 + 0.56 + 0.15, 2.3, 2.46, role_mat("teakRail"),
@@ -1000,6 +1077,8 @@ fill("Fill_red", RX0, RX1, RY0, RY1, float(opt.get("--fillr", 90)))
 for k in ("monk-and-green-buddha", "monks-and-blue-buddha", "temple-bells",
           "bulls-and-wheel", "shree-420-and-milk-cans", "three-veiled-women", "terracotta-pots"):
     gallery_light(k, power=float(opt.get("--gallery", 135)))
+for k in BANDH:
+    gallery_light(k, power=float(opt.get("--gallery", 135)) * 0.32)
 
 
 def studio_lamp(name, plate, aim, out=Vector((0, 1, 0)), reach=0.62):
@@ -1086,9 +1165,15 @@ VIEWS = {
     "canopy":    ((4.9, 3.85, 1.6), (4.9, AY0, 1.62)),
     "threshold": ((4.8, 3.4, 1.6), (AX0, 3.4, 1.42)),
     "bodhi":     ((-1.45, 3.4, 1.6), (QX0, 3.4, 1.62)),
-    "faith":     ((-3.35, 4.45, 1.6), (-2.55, QY0, 1.55)),
-    "street":    ((-4.3, -0.05, 1.6), (-3.25, RY0, 1.6)),
-    "redwall":   ((-4.85, -2.55, 1.55), (RX1, -2.55, 1.45)),
+    # the Quiet Room's south-east corner, two walls, a painting on each
+    "faith":     ((-3.28, 3.63, 1.6), (-0.95, 1.3, 1.55)),
+    # passing poses: the walk goes through them without stopping (lib/chapters.ts `via`)
+    "faithvia":  ((-2.6, 4.3, 1.6), (-2.6, QY0, 1.55)),
+    "redvia":    ((-4.2, -2.0, 1.58), (RX1, -2.4, 1.5)),
+    # the red wall, turned a little east so her photograph stands clear of the chapter's words
+    "street":    ((-4.0, 0.0, 1.6), (-2.3, RY0, 1.5)),
+    # three-quarters on the east wall, Bandh Darwaze on the north wall to the left
+    "redwall":   ((-5.35, -4.2, 1.55), (-1.1, -1.75, 1.45)),
     "featured":  ((-2.66, -2.55, 3.62), (-1.2, -2.55, 0.0)),
     "plan":      ((-2.4, 0.6, 23.0), (-2.4, 0.6, 0.0)),
     "mess":      ((10.5, -10.5, 11.5), (0.4, 0.4, 0.4)),
@@ -1101,7 +1186,10 @@ NARROW = {
     "canopy":    ((5.75, 3.25, 1.55), (5.75, AY0, 1.45)),
     "threshold": ((4.4, 3.4, 1.55), (AX0, 3.4, 1.35)),
     "bodhi":     ((-1.85, 3.4, 1.55), (QX0, 3.4, 0.98)),
-    "faith":     ((-2.55, 3.65, 1.55), (-2.7, QY0, 1.28)),
+    # a portrait screen holds one wall: Threads of Faith, frontal; the Blue Buddha comes round on the turn
+    "faith":     ((-3.05, 1.98, 1.55), (QX1, 1.98, 1.3)),
+    # from facing Threads of Faith, turn first to the passage, then go through it
+    "streetvia": ((-4.0, 2.2, 1.58), (-4.3, -0.5, 1.5)),
     "street":    ((-4.3, -0.4, 1.55), (-3.35, RY0, 1.3)),
     "redwall":   ((-3.55, -3.55, 1.55), (RX1, -3.55, 1.3)),
     "featured":  ((-2.66, -2.55, 3.62), (-1.2, -2.55, 0.0)),

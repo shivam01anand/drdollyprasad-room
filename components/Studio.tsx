@@ -11,6 +11,7 @@ import Lightbox, { type LightboxHandle } from "./Lightbox";
 import Cursor, { roomCursorLabel } from "./Cursor";
 import WallLabels from "./WallLabels";
 import Stops from "./Stops";
+import * as music from "@/lib/music";
 import { CHAPTERS } from "@/lib/chapters";
 import { activeVariant } from "@/lib/room/variants";
 import { EMAIL } from "@/lib/works";
@@ -47,6 +48,24 @@ export default function Studio({ dims }: { dims: Dims }) {
   const [rearrange, setRearrange] = useState(false);
   /** the phone's sheet of stops */
   const [stops, setStops] = useState(false);
+  /** the tanpura (lib/music.ts) */
+  const [playing, setPlaying] = useState(false);
+  useEffect(() => music.onChange(setPlaying), []);
+  // a visitor who chose music and came straight back in (no Step inside): the first
+  // touch or key brings it back, since a browser starts sound only from a gesture
+  useEffect(() => {
+    if (!ready) return;
+    const wake = () => {
+      if (music.wanted() && !music.isPlaying()) music.start();
+      off();
+    };
+    const off = () => { removeEventListener("pointerup", wake, true); removeEventListener("keydown", wake, true); };
+    if (music.wanted() && !music.isPlaying()) {
+      addEventListener("pointerup", wake, true);
+      addEventListener("keydown", wake, true);
+    }
+    return off;
+  }, [ready]);
   /** the room is shaken by the phone itself, not by a finger */
   const [moving, setMoving] = useState(false);
   const [active, setActive] = useState(0);
@@ -181,71 +200,96 @@ export default function Studio({ dims }: { dims: Dims }) {
 
     lenis.on("scroll", (l: Lenis) => apply(l.scroll));
 
-    /* On a phone the walk goes one stop to a swipe — never two, never half.
-       Browsers' own snapping lets a hard fling run past a painting, so the
-       walk takes the gesture itself: a swipe glides to the next stop or the
-       last, a sideways drag is left to the carousel, and past the last stop
-       the page is the page again (the works, the contact) until a swipe
-       down from the top of the works brings the walk back. */
+    /* On a phone the walk is in the hand. A finger on the house moves it:
+       drag up and the walk follows the finger toward the next wall (never
+       further), let go and it carries on there at a walking pace — or, for a
+       small nudge, settles back. A sideways drag turns the head to look round
+       the room, and eases back on release. The carousel keeps its own
+       sideways drags; past the last stop the page is the page again (the
+       works, the contact) until a pull down from the top of the works brings
+       the walk back. */
     const coarse = matchMedia("(pointer: coarse)").matches;
-    const swipe = { on: false, back: false, horiz: false, x0: 0, y0: 0, t0: 0 };
+    const swipe = { on: false, back: false, mode: "" as "" | "walk" | "look", x0: 0, y0: 0, t0: 0, s0: 0, from: 0, lastY: 0, lastT: 0, v: 0 };
     let heading = -1;
     const nearestStop = (sc: number) => {
       let k = 0, best = Infinity;
       centers.forEach((c, i) => { const d = Math.abs(c - sc); if (d < best) { best = d; k = i; } });
       return k;
     };
-    const glideTo = (y: number, i: number) => {
+    const glideTo = (y: number, i: number, dur = 1.6) => {
       heading = i;
       const quick = reducedMotion();
       html.dataset.gliding = "1";
       lenis.scrollTo(y, {
-        duration: quick ? 0 : 1.15, immediate: quick, force: true,
-        easing: (t: number) => (t < 0.5 ? 4 * t * t * t : 1 - Math.pow(-2 * t + 2, 3) / 2),
+        duration: quick ? 0 : dur, immediate: quick, force: true,
+        easing: (t: number) => 1 - Math.pow(1 - t, 3),
         onComplete: () => { heading = -1; delete html.dataset.gliding; },
       });
     };
+    const ownTouch = (e: TouchEvent) => (e as TouchEvent & { lenisStopPropagation?: boolean }).lenisStopPropagation = true;
     const onTouchStart = (e: TouchEvent) => {
       swipe.on = false;
       if (!coarse || e.touches.length !== 1 || locks.current.size || !centers.length) return;
+      const target = e.target as Element;
+      // the carousel, the sheet, the labels and the header keep their own touches
+      if (target.closest(".sec-featured, .sheet, .lb, .hud a, .hud button, .wall-label")) return;
       const last = centers[centers.length - 1];
       const inWalk = lastScroll <= last + 4;
       const atWorks = !inWalk && Math.abs(lastScroll - worksTop) < 8;
       if (!inWalk && !atWorks) return;
-      const t = e.touches[0];
-      Object.assign(swipe, { on: true, back: atWorks, horiz: false, x0: t.clientX, y0: t.clientY, t0: performance.now() });
+      const t = e.touches[0], now = performance.now();
+      const from = heading >= 0 ? heading : nearestStop(lastScroll);
+      Object.assign(swipe, { on: true, back: atWorks, mode: "", x0: t.clientX, y0: t.clientY, t0: now, s0: lastScroll, from, lastY: t.clientY, lastT: now, v: 0 });
     };
     const onTouchMove = (e: TouchEvent) => {
       if (!swipe.on) return;
-      const t = e.touches[0];
+      const t = e.touches[0], now = performance.now();
       const dx = t.clientX - swipe.x0, dy = t.clientY - swipe.y0;
-      if (!swipe.horiz && Math.abs(dx) > 10 && Math.abs(dx) > Math.abs(dy)) swipe.horiz = true;
-      if (swipe.horiz) return;
-      // from the top of the works, only a swipe down returns to the walk
+      if (!swipe.mode) {
+        if (Math.abs(dx) < 8 && Math.abs(dy) < 8) return;
+        swipe.mode = Math.abs(dx) > Math.abs(dy) * 1.2 && !swipe.back ? "look" : "walk";
+      }
       if (swipe.back && dy < -6) { swipe.on = false; return; }
       if (e.cancelable) e.preventDefault();
-      // Lenis would read this touch as native scrolling and stop the glide
-      (e as TouchEvent & { lenisStopPropagation?: boolean }).lenisStopPropagation = true;
+      ownTouch(e);
+      if (swipe.mode === "look") {
+        // the head turns with the finger: a finger's width across the screen is a long look
+        room?.look(-dx / (innerWidth * 0.5), -dy / (innerHeight * 0.8));
+        return;
+      }
+      swipe.v = 0.7 * swipe.v + 0.3 * ((t.clientY - swipe.lastY) / Math.max(1, now - swipe.lastT));
+      swipe.lastY = t.clientY; swipe.lastT = now;
+      if (swipe.back) return;
+      // the page follows the finger, from this stop as far as the next one either way
+      const n = centers.length;
+      const lo = swipe.from > 0 ? centers[swipe.from - 1] : centers[0];
+      const hi = swipe.from < n - 1 ? centers[swipe.from + 1] : centers[n - 1];
+      const y = Math.min(hi, Math.max(lo, swipe.s0 - dy * 1.15));
+      heading = -1;
+      lenis.scrollTo(y, { immediate: true, force: true });
     };
     const onTouchEnd = (e: TouchEvent) => {
-      if (!swipe.on || swipe.horiz) return;
+      if (!swipe.on) return;
       swipe.on = false;
-      (e as TouchEvent & { lenisStopPropagation?: boolean }).lenisStopPropagation = true;
+      if (swipe.mode === "look") { room?.endLook(); ownTouch(e); return; }
+      if (swipe.mode !== "walk") return;      // a tap: the room and the page have it
+      ownTouch(e);
       const t = e.changedTouches[0];
-      const dy = t.clientY - swipe.y0, v = dy / Math.max(1, performance.now() - swipe.t0);
-      if (Math.abs(dy) < 34 && Math.abs(v) < 0.3) return;
+      const dy = t.clientY - swipe.y0, v = swipe.v;
       const n = centers.length;
-      if (swipe.back) { if (dy > 0) glideTo(centers[n - 1], n - 1); return; }
-      const from = heading >= 0 ? heading : nearestStop(lastScroll);
-      const next = from + (dy < 0 ? 1 : -1);
-      if (next < 0) return;
+      if (swipe.back) { if (dy > 40) glideTo(centers[n - 1], n - 1); return; }
+      // a real swipe goes on to the next stop; a nudge settles back where it was
+      const go = Math.abs(dy) > innerHeight * 0.12 || Math.abs(v) > 0.45;
+      const next = go ? swipe.from + (dy < 0 ? 1 : -1) : swipe.from;
+      if (next < 0) { glideTo(centers[0], 0, 0.9); return; }
       if (next >= n) glideTo(worksTop, n);
-      else glideTo(centers[next], next);
+      else glideTo(centers[next], next, go ? 1.6 : 0.9);
     };
     if (coarse) {
       document.addEventListener("touchstart", onTouchStart, { passive: true });
       document.addEventListener("touchmove", onTouchMove, { passive: false });
       document.addEventListener("touchend", onTouchEnd, { passive: true });
+      document.addEventListener("touchcancel", onTouchEnd, { passive: true });
     }
 
     const frame = (time: number) => {
@@ -325,6 +369,7 @@ export default function Studio({ dims }: { dims: Dims }) {
         top(y: number) { lenis.scrollTo(y, { immediate: true, force: true }); apply(y, true); },
         mode: (m: "light" | "dark") => setMode(m),
         rearrange: (on: boolean) => setRearrange(on),
+        music,
       };
       if (q.get("mode") === "dark") setMode("dark");
       if (!q.has("fast") && !q.has("shot")) return;
@@ -389,6 +434,7 @@ export default function Studio({ dims }: { dims: Dims }) {
       document.removeEventListener("touchstart", onTouchStart);
       document.removeEventListener("touchmove", onTouchMove);
       document.removeEventListener("touchend", onTouchEnd);
+      document.removeEventListener("touchcancel", onTouchEnd);
       lenis.destroy();
       room?.dispose();
       if (roomRef.current === room) roomRef.current = null;
@@ -429,7 +475,7 @@ export default function Studio({ dims }: { dims: Dims }) {
     if (!reducedMotion()) {
       hud.querySelectorAll<HTMLElement>("[data-hud-text]").forEach((el) => { el.textContent = ""; });
       gsap.set(hud.querySelectorAll(".hud-pill"), { yPercent: 300, autoAlpha: 0 });
-      gsap.set(hud.querySelector(".diya-btn"), { yPercent: -180, autoAlpha: 0 });
+      gsap.set(hud.querySelectorAll(".diya-btn"), { yPercent: -180, autoAlpha: 0 });
       // the hint shares a corner with the preloader's "New Delhi"; the
       // chips would show as empty capsules while their text waits to type in
       gsap.set(hud.querySelectorAll(".hud-hint, .hud-meta, .hud-mail"), { autoAlpha: 0 });
@@ -446,7 +492,7 @@ export default function Studio({ dims }: { dims: Dims }) {
     const quick = reducedMotion();
     tweens.push(gsap.to(hud.querySelectorAll(".hud-pill"),
       { yPercent: 0, autoAlpha: 1, duration: quick ? 0 : 0.5, ease: "genEase", stagger: { amount: quick ? 0 : 0.5 } }));
-    tweens.push(gsap.to(hud.querySelector(".diya-btn"), { yPercent: 0, autoAlpha: 1, duration: quick ? 0 : 0.5, ease: "genEase" }));
+    tweens.push(gsap.to(hud.querySelectorAll(".diya-btn"), { yPercent: 0, autoAlpha: 1, duration: quick ? 0 : 0.5, ease: "genEase", stagger: 0.08 }));
     tweens.push(gsap.to(hud.querySelectorAll(".hud-meta, .hud-mail"), { autoAlpha: 1, duration: quick ? 0 : 0.35, ease: "power1.out" }));
     tweens.push(gsap.to(hud.querySelector(".hud-hint"), { autoAlpha: 1, duration: quick ? 0 : 0.6, delay: quick ? 0 : 0.4 }));
     return () => tweens.forEach((t) => t.kill());
@@ -564,6 +610,15 @@ export default function Studio({ dims }: { dims: Dims }) {
             <span ref={clockRef} />
           </div>
           <a className="hud-mail lab" href={`mailto:${EMAIL}`} data-hud-text="↳ Write to me">↳ Write to me</a>
+          <button type="button" className="diya-btn music-btn" aria-pressed={playing}
+                  aria-label={playing ? "Pause the music" : "Play the music"} onClick={() => music.toggle()}>
+            <svg viewBox="0 0 32 32" aria-hidden="true">
+              <path d="M12 22.5V9.5l11-2.5v12.5" className="dish-line" />
+              <circle cx="9.5" cy="22.5" r="2.8" className="dish" />
+              <circle cx="20.5" cy="19.5" r="2.8" className="dish" />
+              {!playing && <path d="M6 6l20 20" className="dish-line" />}
+            </svg>
+          </button>
           <button type="button" className="diya-btn" aria-pressed={mode === "dark"}
                   aria-label={mode === "dark" ? "Put out the diya" : "Light the diya"}
                   onClick={() => setMode(mode === "dark" ? "light" : "dark")}>

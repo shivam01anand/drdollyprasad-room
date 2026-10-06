@@ -34,6 +34,8 @@ export type Chapter = {
   dusk?: number;
   /** the canvases in this framing that get a wall label */
   labels?: string[];
+  /** captions for things in the framing that are not her works (a house anchor and its words) */
+  asides?: { anchor: string; title: string; line: string }[];
   /** which side of its canvas a label tries first (a door or a corner on the other) */
   labelSide?: "left" | "right" | "below";
   /** the stop's short name, for the phone's dock and the list of stops */
@@ -75,6 +77,7 @@ export const CHAPTERS: Chapter[] = [
   {
     id: "faith",
     eyebrow: "“Threads of Faith” · 2026",
+    via: "faithvia",
     stop: "Threads of Faith",
     room: "The Quiet Room",
     body: "On view at Sacred Fragments: A Journey Home. New Delhi, 18–21 October 2026.",
@@ -87,6 +90,9 @@ export const CHAPTERS: Chapter[] = [
     eyebrow: "Gone Are The Days · c. 2016–2018",
     stop: "Gone Are The Days",
     room: "The Red Room",
+    // a portrait screen faces Threads of Faith: it turns to the passage before going through
+    via: "streetvia",
+    asides: [{ anchor: "press", title: "The artist, in conversation", line: "Beside “The Bullocks”, at her exhibition" }],
     body:
       "Fourteen paintings of a country’s discarded equipment. Withdrawn coins, a pillar " +
       "postbox, hand-lettered posters for the last single-screen cinemas, a tonga going " +
@@ -97,7 +103,8 @@ export const CHAPTERS: Chapter[] = [
     dusk: 0.38,
     labels: ["terracotta-pots", "bulls-and-wheel"],
   },
-  { id: "redwall", eyebrow: "“Shree 420” · “Three Women in Red”", stop: "Shree 420 · Three Women", room: "The Red Room", view: "redwall", dusk: 0.45, labels: ["shree-420-and-milk-cans", "three-veiled-women"] },
+  { id: "redwall", eyebrow: "“Shree 420” · “Three Women in Red”", stop: "Shree 420 · Three Women", room: "The Red Room", view: "redwall",
+    via: "redvia", dusk: 0.45, labels: ["shree-420-and-milk-cans", "three-veiled-women"] },
   { id: "featured", eyebrow: "Featured", stop: "Featured works", slot: "featured", view: "featured", dusk: 0.45 },
   {
     id: "plan",
@@ -167,7 +174,9 @@ export function resolveWalk(info: HouseInfo, narrow = false): { shots: Pose[]; v
   const shots: Pose[] = [], vias: (Pose | null)[] = [];
   CHAPTERS.forEach((c, i) => {
     if (i > 0) {
-      const v = c.via ? viewPose(cam(info, c.via, narrow), prev, NARROW_BACK) : null;
+      // a passing pose the house has (an older build may not): otherwise straight on
+      const vc = c.via ? cam(info, c.via, narrow) : undefined;
+      const v = vc ? viewPose(vc, prev, NARROW_BACK) : null;
       if (v) prev = v.pivotRot[1];
       vias.push(v);
     }

@@ -102,7 +102,7 @@ html[data-hud="light"]:not([data-rearrange="1"]) .hud .brand-target .pre-big{col
 /* shaking the room clears the stage of everything but the room */
 html[data-rearrange="1"] .sec-featured,
 html[data-rearrange="1"] .chapter-text{visibility:hidden;pointer-events:none}
-.hud-top{display:grid;grid-template-columns:1fr auto auto auto;align-items:start;gap:clamp(10px,1.2vw,16px)}
+.hud-top{display:grid;grid-template-columns:1fr auto auto auto auto;align-items:start;gap:clamp(10px,1.2vw,16px)}
 /* every fact and control sits on the same quiet chip; the name alone is free type */
 .hud-meta,.hud-mail{align-self:center;background:var(--chip);border:1px solid var(--line);border-radius:999px;
   padding:7px 13px 6px;line-height:1.2;color:var(--chip-ink)}
@@ -131,6 +131,8 @@ html[data-rearrange="1"] .chapter-text{visibility:hidden;pointer-events:none}
 .diya-btn .flame{fill:none;stroke:currentColor;stroke-width:1.6;transition:fill .4s ease,stroke .4s ease}
 .diya-btn[aria-pressed="true"] .flame{fill:#FFB25A;stroke:#FFB25A}
 .diya-btn:hover{background:var(--pill);color:var(--pill-ink);border-color:var(--pill)}
+.music-btn .dish-line{fill:none;stroke:currentColor;stroke-width:1.6;stroke-linecap:round;stroke-linejoin:round}
+.music-btn[aria-pressed="true"] .dish{fill:var(--oxide)}
 
 /* ----------------------------------------------------- the phone's dock and sheet */
 .dock{display:none}
@@ -203,6 +205,7 @@ html[data-rearrange="1"] .copy{opacity:0;transition:opacity .4s ease}
 .wall-label .cap-details,.wall-label .cap-status{font-size:9.5px;letter-spacing:.07em;color:#76685c;min-height:0}
 .wall-label .cap-status{margin-top:3px}
 .wall-label:focus-visible{outline:2px solid var(--oxide);outline-offset:3px}
+.wall-label.is-aside{cursor:default;pointer-events:none;background:rgba(243,238,229,.92)}
 html[data-mode="dark"] .wall-label{background:#DDD4C6;box-shadow:0 1px 1px rgba(0,0,0,.3),0 8px 18px -10px rgba(0,0,0,.6)}
 html[data-rearrange="1"] .wall-labels,html[data-room="off"] .wall-labels{display:none}
 
@@ -225,57 +228,38 @@ html[data-room="off"] .sec:not(.sec-featured){display:none}
   .chapter-text .lede,.chapter-text .quote{font-size:15px;line-height:1.55}
 }
 
-/* ------------------------------------------------------------- preloader */
-/* the lighting of the lamp: the brass lamp of her openings on paper, a
-   garland of marigolds laid as the house loads, five wicks, her name */
+/* ------------------------------------------------------------- the welcome */
+/* warm paper, lamplight from above, her greeting; then an invitation to step inside */
 .pre{position:fixed;inset:0;z-index:150;pointer-events:none}
-.pre-panel{position:absolute;inset:0;background:var(--page);overflow:hidden;pointer-events:auto;
-  --stage-top:clamp(44px,7.5vh,96px);--stage-h:min(62vh,680px)}
-.pre-stage{position:absolute;left:50%;top:var(--stage-top);height:var(--stage-h);transform:translateX(-50%);
-  container-type:size;pointer-events:none}
-.pre-shadow,.pre-lamp{position:absolute;inset:0;width:100%;height:100%;user-select:none;-webkit-user-drag:none}
-.pre-shadow{opacity:.85}
-.pre-ring{position:absolute;inset:0}
-.pre-head{position:absolute;aspect-ratio:1;background:center/contain no-repeat;opacity:0;
-  transform:translate(-50%,-50%) translateY(-2.2cqh) scale(.4) rotate(var(--lean)) scaleX(var(--flip));
-  transition:opacity .3s ease,transform .55s cubic-bezier(.34,1.5,.6,1)}
-.pre-head[data-on="1"]{opacity:1;transform:translate(-50%,-50%) rotate(var(--lean)) scaleX(var(--flip))}
-/* a wick: the flame grows when it catches, then lives */
-.pre-flame{position:absolute;width:1.5cqh;height:3.5cqh;transform:translate(-50%,-96%) scale(0);transform-origin:50% 100%;
-  transition:transform .5s cubic-bezier(.2,1.5,.4,1)}
-.pre-flame[data-lit="1"]{transform:translate(-50%,-96%) scale(1)}
-.pre-flame::before{content:"";position:absolute;inset:0;border-radius:50% 50% 46% 46%/64% 64% 36% 36%;
-  background:radial-gradient(58% 72% at 50% 76%,#fffdf3 0%,#ffeab0 24%,#ffc25a 46%,#ff8d2c 68%,rgba(255,110,24,0) 84%);
-  transform-origin:50% 100%;animation:pre-flicker 1.7s ease-in-out infinite alternate}
-.pre-flame::after{content:"";position:absolute;left:50%;top:58%;width:640%;height:330%;transform:translate(-50%,-50%);
-  border-radius:50%;background:radial-gradient(closest-side,rgba(255,178,92,.5),rgba(255,178,92,0))}
-.pre-flame:nth-child(odd)::before{animation-duration:1.3s;animation-delay:-.4s}
-@keyframes pre-flicker{
-  0%{transform:scale(1,1) skewX(0)}
-  30%{transform:scale(.95,1.07) skewX(-2.5deg)}
-  55%{transform:scale(1.04,.94) skewX(1.5deg)}
-  80%{transform:scale(.97,1.05) skewX(-1deg)}
-  100%{transform:scale(1.02,.98) skewX(1deg)}
-}
-/* the light the five wicks make together, round the cup and on the paper */
-.pre-glow{position:absolute;left:50%;top:26.5%;width:190%;aspect-ratio:1;transform:translate(-50%,-50%);
-  border-radius:50%;opacity:0;visibility:hidden;
-  background:radial-gradient(closest-side,rgba(255,184,104,.46),rgba(255,196,124,.17) 42%,rgba(255,204,140,0) 100%)}
-/* her name forms beneath the light, then rises into the header */
-.pre-centre{position:absolute;left:0;right:0;top:calc(var(--stage-top) + var(--stage-h) + 2.6vh);
-  display:flex;flex-direction:column;align-items:center;pointer-events:none}
-.pre-land{min-height:1px}
-.pre-big{
-  display:block;font-family:var(--display);font-weight:500;
-  font-size:clamp(56px,10.5vw,176px);line-height:.92;letter-spacing:-.035em;
-  color:var(--ink);white-space:nowrap;
-}
-.pre-land .pre-big{font-size:clamp(34px,4.4vw,62px);text-align:center;letter-spacing:-.03em}
-.pre-welcome{
-  position:absolute;left:0;right:0;bottom:clamp(56px,9vh,112px);margin:0;text-align:center;
-  font-size:clamp(18px,1.6vw,26px);letter-spacing:-.01em;color:var(--ink);min-height:1.4em;
-}
-.pre-foot{position:absolute;left:var(--gut);bottom:calc(var(--gut) + env(safe-area-inset-bottom,0px))}
+.pre-panel{position:absolute;inset:0;background:var(--page);overflow:hidden;pointer-events:auto}
+.pre-light{position:absolute;inset:-20% -10% 0;pointer-events:none;
+  background:radial-gradient(60% 55% at 50% 30%,rgba(255,206,150,.38),rgba(255,214,168,.12) 45%,rgba(255,220,180,0) 70%),
+             radial-gradient(120% 90% at 50% 120%,rgba(120,80,50,.10),rgba(120,80,50,0) 60%)}
+.pre-welcome{position:absolute;inset:0;display:flex;flex-direction:column;align-items:center;justify-content:center;
+  text-align:center;padding:0 var(--gut);gap:0}
+.pre-welcome [data-in]{visibility:hidden}
+.pre-namaste{margin:0 0 clamp(10px,1.6vh,18px);font-family:"IBM Plex Sans Devanagari",var(--display);font-weight:500;
+  font-size:clamp(14px,1.1vw,17px);letter-spacing:.06em;color:var(--dim)}
+.pre-hello{margin:0;font-family:"Cormorant Garamond",Georgia,serif;font-style:italic;font-weight:500;
+  font-size:clamp(46px,7.2vw,116px);line-height:1.02;letter-spacing:-.012em;color:var(--ink);text-wrap:balance}
+.pre-hello span{display:inline-block;margin:0 .16em}
+.pre-sign{display:flex;gap:.32em;justify-content:center;margin-top:clamp(18px,3vh,30px)}
+.pre-big{display:block;font-family:var(--display);font-weight:500;color:var(--ink);white-space:nowrap;
+  font-size:clamp(20px,1.7vw,26px);line-height:1;letter-spacing:-.02em}
+.pre-note{margin:10px 0 0}
+.pre-foot{position:relative;margin-top:clamp(30px,6vh,64px);min-height:92px;display:flex;flex-direction:column;align-items:center}
+.pre-bar{position:absolute;top:22px;width:140px;height:1px;background:var(--rule);overflow:hidden;transition:opacity .5s ease}
+.pre-bar i{position:absolute;inset:0;background:var(--ink);transform-origin:0 50%;transform:scaleX(.02);transition:transform .4s ease}
+.pre-bar[data-ready="1"]{opacity:0}
+.pre-invite{display:flex;flex-direction:column;align-items:center;gap:12px;visibility:hidden;opacity:0}
+.pre-enter{height:52px;padding:0 30px;border-radius:999px;border:1px solid var(--pill);background:var(--pill);color:var(--pill-ink);
+  font-family:var(--mono);font-size:12px;letter-spacing:.1em;text-transform:uppercase;cursor:pointer;
+  box-shadow:0 10px 28px -16px rgba(48,32,22,.6);transition:background-color .2s var(--ease),border-color .2s var(--ease),transform .2s var(--ease)}
+.pre-enter:hover{background:var(--oxide);border-color:var(--oxide);color:#fff;transform:translateY(-1px)}
+.pre-enter span{display:inline-block;margin-left:.5em;transition:transform .2s var(--ease)}
+.pre-enter:hover span{transform:translateX(3px)}
+.pre-music{background:none;border:0;padding:8px 10px;cursor:pointer;color:var(--dim)}
+.pre-music:hover{color:var(--ink)}
 .pre-hero{
   position:fixed;left:50%;top:50%;width:1px;height:1px;z-index:2;
   visibility:hidden;opacity:0;object-fit:fill;transform-origin:50% 50%;
@@ -353,21 +337,34 @@ html[data-mode="dark"] .lb-veil{background:rgba(0,0,0,.5)}
   transform-origin:50% 100%;transform:scaleY(var(--k,0))}
 .lb-zoombar span{font-family:var(--mono);font-size:10px;letter-spacing:.04em;color:#F0EADF;text-shadow:0 1px 3px rgba(0,0,0,.45)}
 
-/* the painting at its size, in a room */
+/* the painting in a room made for it: the room is a container, so one centimetre on
+   its wall (--cm, in cqw, set per room) draws the frame and its shadow at their size */
 .lb-room{position:relative;width:min(100cqw,calc(100cqh * 1.5));max-width:100%;overflow:hidden;pointer-events:auto;
+  container-type:inline-size;
   box-shadow:0 1px 2px rgba(48,39,34,.08),0 28px 70px -44px rgba(48,39,34,.5)}
 .lb-room-photo{display:block;width:100%;height:100%;object-fit:cover}
-.lb-room-art{position:absolute;--s:.2}
-.lb-room-art img{display:block;width:100%;height:100%;object-fit:cover;
-  /* a stretched canvas: a dark wrapped edge, then the wall's own soft shadow, light from the left */
-  box-shadow:calc(var(--s) * .9cqw) calc(var(--s) * .9cqw) 0 -.2px rgba(52,36,26,.55),
-             calc(var(--s) * 2.4cqw) calc(var(--s) * 3.4cqw) calc(var(--s) * 5cqw) calc(var(--s) * -1cqw) rgba(58,42,28,.34),
-             calc(var(--s) * 6cqw) calc(var(--s) * 9cqw) calc(var(--s) * 16cqw) calc(var(--s) * -3cqw) rgba(58,42,28,.22)}
-/* the room's own light falls across the canvas too */
-.lb-room-art::after{content:"";position:absolute;inset:0;pointer-events:none;mix-blend-mode:multiply;
-  background:linear-gradient(100deg,rgba(255,250,242,0) 0%,rgba(120,100,80,.10) 100%)}
+.lb-room-art{position:absolute;--cm:.2cqw;isolation:isolate}
+.lb-room-art img{display:block;width:100%;height:100%;object-fit:cover}
+/* the float frame, as in the house: a 1.6 cm dark walnut lip round a 0.9 cm shadow gap,
+   lit from above; it stands off the wall, so it throws a soft shadow away from the
+   room's light (--shx/--shy/--shb in cm, --shc) and a little contact shade all round */
+.lb-room-art::before{content:"";position:absolute;z-index:-1;inset:calc(var(--cm) * -2.5);
+  border:calc(var(--cm) * 1.6) solid #2a1f18;border-top-color:#3b2d23;border-bottom-color:#211812;
+  background:#0d0906;
+  box-shadow:inset 0 0 0 max(.5px,calc(var(--cm) * .12)) rgba(255,236,214,.07),
+    calc(var(--cm) * var(--shx,1.5)) calc(var(--cm) * var(--shy,2.4)) calc(var(--cm) * var(--shb,5)) var(--shc,rgba(64,46,30,.34)),
+    0 0 calc(var(--cm) * 1.1) rgba(36,25,16,.32)}
+/* the room's own light falls across the canvas and the frame: a map of the light on
+   this wall, cut to the frame's rectangle (lib/rooms hang), or a soft fall-off */
+.lb-room-art::after{content:"";position:absolute;inset:calc(var(--cm) * -2.5);pointer-events:none;mix-blend-mode:multiply;
+  background:var(--light,linear-gradient(100deg,rgba(255,250,242,0) 0%,rgba(120,100,80,.10) 100%));
+  background-size:var(--light-size,100% 100%);background-position:var(--light-pos,0 0);background-repeat:no-repeat}
 .lb-room-cap{position:absolute;left:14px;bottom:12px;margin:0;padding:6px 11px 5px;border-radius:999px;
-  background:rgba(240,234,223,.9);color:#302722;line-height:1.2}
+  background:rgba(240,234,223,.9);color:#302722;line-height:1.2;max-width:calc(100% - 28px)}
+/* a narrow room (a phone) keeps its caption small, so it never covers the furniture */
+@container (max-width:520px){
+  .lb-room-cap{left:8px;bottom:8px;padding:4px 8px 3px;font-size:8.5px;letter-spacing:.06em;max-width:calc(100% - 16px)}
+}
 
 /* ways to see it: the painting, then the rooms */
 .lb-views{display:flex;gap:10px}
@@ -376,7 +373,8 @@ html[data-mode="dark"] .lb-veil{background:rgba(0,0,0,.5)}
 .lb-view>img{display:block;width:100%;height:100%;object-fit:cover}
 .lb-view[data-view="work"]>img{object-fit:contain;padding:4px;background:rgba(117,75,54,.06)}
 .lb-view-art{position:absolute;display:block}
-.lb-view-art img{display:block;width:100%;height:100%;object-fit:cover;box-shadow:1px 1px 2px rgba(40,28,16,.35)}
+.lb-view-art img{display:block;width:100%;height:100%;object-fit:cover;outline:1px solid rgba(42,31,24,.85);
+  box-shadow:1px 1px 2px rgba(40,28,16,.35)}
 .lb-view:hover{border-color:var(--dim)}
 .lb-view[aria-pressed="true"]{border-color:var(--ink);box-shadow:0 0 0 1px var(--ink)}
 .lb-hint{margin:-6px 0 0}
@@ -455,7 +453,7 @@ html[data-mode="dark"] .lb-veil{background:rgba(0,0,0,.5)}
   .hud::before{content:"";position:absolute;inset:0 0 auto 0;height:96px;pointer-events:none;
     background:linear-gradient(180deg,rgba(var(--wash),.74) 0%,rgba(var(--wash),0) 100%)}
   .hud-top{position:relative}
-  .hud-top{grid-template-columns:1fr auto;gap:12px}
+  .hud-top{grid-template-columns:1fr auto auto;gap:10px}
   .hud-meta{display:none}
   .hud-mail{display:none}
   .brand-target .pre-big{font-size:26px}
@@ -485,12 +483,12 @@ html[data-mode="dark"] .lb-veil{background:rgba(0,0,0,.5)}
   .diya-btn{width:42px;height:42px}
   .copy-panel{left:var(--gut);right:var(--gut);width:auto;bottom:calc(var(--hud-bottom) + 12px);padding:16px 18px 18px}
   .wall-label{max-width:176px;padding:7px 10px 8px}
+  /* the music joins the diya in the corner on a phone */
+  .hud-top{grid-template-columns:1fr auto auto}
   .wall-label .cap-title{font-size:12.5px}
   .copy-head{margin-bottom:10px}
   .lede{font-size:16px;line-height:1.5}
   .poem{font-size:17px;line-height:1.36}
-  .pre-panel{--stage-top:clamp(56px,10svh,96px);--stage-h:52svh}
-  .pre-land .pre-big{font-size:34px}
   /* on a phone the row is a carousel for the thumb: one painting large, the next one
      showing at the edge, a swipe to move, the plate number to say where you are */
   .featured{gap:clamp(14px,2.6svh,26px)}

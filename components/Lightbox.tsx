@@ -4,7 +4,7 @@ import { forwardRef, useEffect, useImperativeHandle, useRef } from "react";
 import { motion, gsap, Flip, scrambleTo, reducedMotion } from "@/lib/motion";
 import { BY_ID, LARGE, enquiry, quoted, type Work } from "@/lib/works";
 import { XL } from "@/lib/xl";
-import { ROOMS, hang, type Room } from "@/lib/rooms";
+import { roomsFor, type RoomView } from "@/lib/rooms";
 import { CloseLook } from "@/lib/closelook";
 
 export type LightboxHandle = { open(id: string, from: HTMLImageElement | null): void };
@@ -16,8 +16,8 @@ type Dims = Record<string, { w: number; h: number }>;
  * card it came from. The file upgrades to the 1800 px version once it is in.
  *
  * Two more ways to look, after Pascale Canal's viewer: a click goes close
- * to the brushwork (lib/closelook), and where she has stated the size the
- * work can be seen hanging in a room, at that size.
+ * to the brushwork (lib/closelook), and the work can be seen hanging in a
+ * room made for it (lib/rooms), at its true size where she has stated one.
  */
 const Lightbox = forwardRef<LightboxHandle, { dims: Dims; onOpenChange(open: boolean): void }>(
   function Lightbox({ dims, onOpenChange }, ref) {
@@ -41,6 +41,10 @@ const Lightbox = forwardRef<LightboxHandle, { dims: Dims; onOpenChange(open: boo
     const hint = useRef<HTMLParagraphElement>(null);
     const look = useRef<CloseLook | null>(null);
     const view = useRef<string>("work");
+    /** the rooms the open work can be seen in */
+    const rooms = useRef<RoomView[]>([]);
+    /** room photographs already asked for: they load only when wanted, never with the house */
+    const warmed = useRef(new Set<string>());
     const cb = useRef(onOpenChange);
     cb.current = onOpenChange;
     const st = useRef<{ id: string | null; from: HTMLImageElement | null; anim: gsap.core.Animation[]; busy: boolean; at: number }>(
@@ -58,16 +62,35 @@ const Lightbox = forwardRef<LightboxHandle, { dims: Dims; onOpenChange(open: boo
       ["Status", w.status === "Enquire" ? "On enquiry" : w.status],
     ];
 
-    /** where this work sits in a room; null when she has not stated its size */
-    const placeIn = (w: Work, room: Room) => {
-      const d = dims[w.id];
-      return w.inches && d ? hang(room, w.inches, d.w / d.h) : null;
+    /** the canvas on the room's wall: its place, and (in the room itself) the
+     *  centimetre the frame is drawn in, the room's light and the frame's shadow */
+    const setArt = (el: HTMLElement, v: RoomView, full = true) => {
+      const a = v.at, s = el.style;
+      s.left = `${a.left}%`; s.top = `${a.top}%`; s.width = `${a.width}%`; s.height = `${a.height}%`;
+      if (!full) return;
+      s.setProperty("--cm", `${a.cm}cqw`);
+      const { light, shadow } = v.room;
+      if (light) {
+        s.setProperty("--light", `url("${light}")`);
+        s.setProperty("--light-size", a.lightSize);
+        s.setProperty("--light-pos", a.lightPos);
+      } else ["--light", "--light-size", "--light-pos"].forEach((p) => s.removeProperty(p));
+      if (shadow) {
+        s.setProperty("--shx", String(shadow.x)); s.setProperty("--shy", String(shadow.y));
+        s.setProperty("--shb", String(shadow.blur)); s.setProperty("--shc", shadow.color);
+      } else ["--shx", "--shy", "--shb", "--shc"].forEach((p) => s.removeProperty(p));
     };
 
-    const setArt = (el: HTMLElement, pos: NonNullable<ReturnType<typeof placeIn>>) => {
-      el.style.left = `${pos.left}%`; el.style.top = `${pos.top}%`;
-      el.style.width = `${pos.width}%`; el.style.height = `${pos.height}%`;
-      el.style.setProperty("--s", String(pos.width / 100));
+    /** "A drawing room, …" inside a sentence */
+    const lower = (label: string) => label.replace(/^An? /, (a) => a.toLowerCase());
+
+    /** ask for a room's photograph ahead of the click (on intent, or once the work is in) */
+    const warm = (src: string) => {
+      if (warmed.current.has(src)) return;
+      warmed.current.add(src);
+      const i = new Image();
+      i.decoding = "async";
+      i.src = src;
     };
 
     /** painting, or a room: a quiet crossfade inside the figure */
@@ -78,33 +101,43 @@ const Lightbox = forwardRef<LightboxHandle, { dims: Dims; onOpenChange(open: boo
       view.current = which;
       views.current?.querySelectorAll<HTMLButtonElement>("button").forEach((b) =>
         b.setAttribute("aria-pressed", String(b.dataset.view === which)));
-      const room = ROOMS.find((r) => r.id === which);
+      const v = rooms.current.find((r) => r.room.id === which);
       const reduce = reducedMotion() || instant;
       look.current?.reset(true);
-      if (!room) {
+      if (!v) {
         own(gsap.to(rb, { autoAlpha: 0, duration: reduce ? 0 : 0.25, onComplete: () => { rb.hidden = true; fr.hidden = false;
           own(gsap.fromTo(fr, { autoAlpha: 0 }, { autoAlpha: 1, duration: reduce ? 0 : 0.45 })); } }));
         return;
       }
-      const pos = placeIn(w, room)!;
-      roomPhoto.current!.src = room.src;
-      rb.style.aspectRatio = `${room.w} / ${room.h}`;
-      setArt(roomArt.current!, pos);
-      roomImg.current!.src = img.current!.currentSrc || img.current!.src;
-      roomCap.current!.textContent = `Shown to scale · ${w.size}`;
+      const id = st.current.id;
       const swap = () => { fr.hidden = true; rb.hidden = false;
         own(gsap.fromTo(rb, { autoAlpha: 0 }, { autoAlpha: 1, duration: reduce ? 0 : 0.5, ease: "power1.out" })); };
-      if (fr.hidden) { own(gsap.to(rb, { autoAlpha: 0, duration: reduce ? 0 : 0.2, onComplete: swap })); }
-      else own(gsap.to(fr, { autoAlpha: 0, duration: reduce ? 0 : 0.25, onComplete: swap }));
+      // the room goes up only once its photograph is decoded, so it never paints in halves
+      const hangIt = () => {
+        if (st.current.id !== id || view.current !== which) return;
+        rb.style.aspectRatio = `${v.room.w} / ${v.room.h}`;
+        setArt(roomArt.current!, v);
+        roomImg.current!.src = img.current!.currentSrc || img.current!.src;
+        roomCap.current!.textContent = v.trueSize ? `${v.room.label} · shown at its true size` : v.room.label;
+        rb.setAttribute("aria-label", `${quoted(w.title)} in ${lower(v.room.label)}${v.trueSize ? ", shown at its true size" : ""}`);
+        if (fr.hidden) own(gsap.to(rb, { autoAlpha: 0, duration: reduce ? 0 : 0.2, onComplete: swap }));
+        else own(gsap.to(fr, { autoAlpha: 0, duration: reduce ? 0 : 0.25, onComplete: swap }));
+      };
+      const ph = roomPhoto.current!;
+      warmed.current.add(v.room.src);
+      if (ph.getAttribute("src") === v.room.src && ph.complete) { hangIt(); return; }
+      ph.src = v.room.src;
+      ph.decode().then(hangIt, hangIt);
     };
 
     /** the view buttons: the painting, then each room it can be seen in */
     const buildViews = (w: Work, src: string) => {
       const v = views.current!;
-      const rooms = ROOMS.filter((r) => placeIn(w, r));
+      const d = dims[w.id];
+      rooms.current = d ? roomsFor(w, d.w / d.h) : [];
       v.replaceChildren();
-      v.hidden = rooms.length === 0;
-      if (!rooms.length) return;
+      v.hidden = rooms.current.length === 0;
+      if (!rooms.current.length) return;
       const btn = (id: string, label: string) => {
         const b = document.createElement("button");
         b.type = "button"; b.className = "lb-view"; b.dataset.view = id;
@@ -115,13 +148,17 @@ const Lightbox = forwardRef<LightboxHandle, { dims: Dims; onOpenChange(open: boo
       const self = btn("work", "The painting");
       const im = document.createElement("img"); im.src = src; im.alt = ""; self.append(im);
       v.append(self);
-      rooms.forEach((r) => {
-        const b = btn(r.id, `In a room: ${r.label.toLowerCase()}`);
-        const ph = document.createElement("img"); ph.src = r.thumb; ph.alt = "";
+      rooms.current.forEach((r) => {
+        const b = btn(r.room.id, `In a room: ${lower(r.room.label)}`);
+        const ph = document.createElement("img"); ph.src = r.room.thumb; ph.alt = "";
         const art = document.createElement("span"); art.className = "lb-view-art";
         const ai = document.createElement("img"); ai.src = src; ai.alt = ""; art.append(ai);
-        setArt(art, placeIn(w, r)!);
+        setArt(art, r, false);
         b.append(ph, art);
+        const intent = () => warm(r.room.src);
+        b.addEventListener("pointerenter", intent);
+        b.addEventListener("focus", intent);
+        b.addEventListener("touchstart", intent, { passive: true });
         v.append(b);
       });
     };
@@ -161,7 +198,14 @@ const Lightbox = forwardRef<LightboxHandle, { dims: Dims; onOpenChange(open: boo
       if (!r.open) r.showModal();
 
       look.current?.enable(false);
-      const landed = () => { if (st.current.id === id) look.current?.enable(true); };
+      const landed = () => {
+        if (st.current.id !== id) return;
+        look.current?.enable(true);
+        // its room comes down quietly once the work is in, unless the reader is saving data
+        const first = rooms.current[0];
+        const save = (navigator as Navigator & { connection?: { saveData?: boolean } }).connection?.saveData;
+        if (first && !save) setTimeout(() => { if (st.current.id === id) warm(first.room.src); }, 900);
+      };
       if (from && !reduce) {
         const state = Flip.getState(from);
         from.style.visibility = "hidden";
@@ -320,12 +364,12 @@ const Lightbox = forwardRef<LightboxHandle, { dims: Dims; onOpenChange(open: boo
               <img ref={img} alt="" />
               <div className="lb-zoombar" ref={bar} aria-hidden="true"><i /><span /></div>
             </div>
-            <div className="lb-room" ref={roomBox} hidden>
+            <div className="lb-room" ref={roomBox} role="img" hidden>
               {/* eslint-disable-next-line @next/next/no-img-element */}
-              <img className="lb-room-photo" ref={roomPhoto} alt="" />
+              <img className="lb-room-photo" ref={roomPhoto} alt="" decoding="async" />
               {/* eslint-disable-next-line @next/next/no-img-element */}
               <div className="lb-room-art" ref={roomArt}><img ref={roomImg} alt="" /></div>
-              <p className="lb-room-cap lab" ref={roomCap} />
+              <p className="lb-room-cap lab" ref={roomCap} aria-hidden="true" />
             </div>
           </figure>
           <div className="lb-text">

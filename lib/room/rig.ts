@@ -183,8 +183,18 @@ export class Rig {
     if (this.touch || this.reduced) return;
     this.ptr.x = nx; this.ptr.y = ny; this.ptr.on = true;
   }
+  /** a finger looking round: the same sway as the pointer's, wider; let go and it eases back */
+  look(nx: number, ny: number) {
+    if (this.reduced) return;
+    this.ptr.x = THREE.MathUtils.clamp(nx, -1, 1); this.ptr.y = THREE.MathUtils.clamp(ny, -1, 1); this.ptr.on = true;
+  }
   dropPointer() { this.ptr.on = false; }
-  touched() { this.touch = true; this.ptr.on = false; }
+  touched() { this.touch = true; this.ptr.on = false; this.lookGain = 2.6; }
+
+  /** how much a look turns the head: a mouse's small sway, or a finger's wider glance */
+  private lookGain = 1;
+  /** a walking pace: no step from one wall to the next is quicker than this */
+  private static STEP_S = 2.6;
 
   setMess(on: boolean) {
     this.messTl?.kill();
@@ -202,8 +212,15 @@ export class Rig {
         this.scrollSmooth = this.camProgress = this.lastProgress = index / last;
       }
     } else if (this.enabled) {
-      this.scrollSmooth = follow(this.scrollSmooth, this.scrollTarget, 0.155, dt);
-      this.camProgress = follow(this.camProgress, this.scrollSmooth, 0.1, dt);
+      // the camera walks: it follows the scroll softly, and never faster than one
+      // step in STEP_S (a long jump — the list of stops — may go a little quicker,
+      // so it is there in a few seconds, not a crawl)
+      this.scrollSmooth = follow(this.scrollSmooth, this.scrollTarget, 0.08, dt);
+      const want = follow(this.camProgress, this.scrollSmooth, 0.05, dt) - this.camProgress;
+      const step = 1 / Math.max(1, this.shots.length - 1);
+      const far = Math.abs(this.scrollSmooth - this.camProgress);
+      const vmax = Math.max(step / Rig.STEP_S, far > step * 1.5 ? far / 2.4 : 0) * (dt / 1000);
+      this.camProgress += THREE.MathUtils.clamp(want, -vmax, vmax);
       if (Math.abs(this.camProgress - this.scrollTarget) < 1e-5) this.camProgress = this.scrollTarget;
       if (this.camProgress !== this.lastProgress) {
         this.scrollTl.progress(this.camProgress);
@@ -211,8 +228,8 @@ export class Rig {
       }
     }
     const tx = this.ptr.on ? this.ptr.x : 0, ty = this.ptr.on ? this.ptr.y : 0;
-    this.ptrSmooth.x = follow(this.ptrSmooth.x, tx, 0.15, dt);
-    this.ptrSmooth.y = follow(this.ptrSmooth.y, ty, 0.15, dt);
+    this.ptrSmooth.x = follow(this.ptrSmooth.x, tx, this.ptr.on ? 0.15 : 0.06, dt);
+    this.ptrSmooth.y = follow(this.ptrSmooth.y, ty, this.ptr.on ? 0.15 : 0.06, dt);
     if (Math.abs(this.ptrSmooth.x - tx) < 1e-5) this.ptrSmooth.x = tx;
     if (Math.abs(this.ptrSmooth.y - ty) < 1e-5) this.ptrSmooth.y = ty;
     this.apply();
@@ -231,10 +248,12 @@ export class Rig {
     // 60 cm from a padlock does not swing by a fifth of a metre
     const dist = mix(p.cam[2], m.cam[2]);
     const amt = THREE.MathUtils.clamp(dist / 2.6, 0.2, 1) * (1 - k * 0.6);
-    const e = this.ptrSmooth.x * amt, t = this.ptrSmooth.y * amt;
+    const e = this.ptrSmooth.x * amt * this.lookGain, t = this.ptrSmooth.y * amt * this.lookGain;
     this.pivot.position.set(mix(p.pivot[0], m.pivot[0]), mix(p.pivot[1], m.pivot[1]), mix(p.pivot[2], m.pivot[2]));
     this.pivot.rotation.set(mix(p.pivotRot[0], m.pivotRot[0]), mix(p.pivotRot[1], m.pivotRot[1]), mix(p.pivotRot[2], m.pivotRot[2]));
-    this.camera.position.set(mix(p.cam[0], m.cam[0]) - 0.2 * e, mix(p.cam[1], m.cam[1]) + 0.2 * t, dist);
+    // the head turns; the body barely moves (a finger's wider look must not walk the camera into a wall)
+    const shift = 0.2 / this.lookGain;
+    this.camera.position.set(mix(p.cam[0], m.cam[0]) - shift * e, mix(p.cam[1], m.cam[1]) + shift * t, dist);
     this.camera.rotation.set(mix(p.camRot[0], m.camRot[0]) - 0.1 * t, mix(p.camRot[1], m.camRot[1]) - 0.1 * e, mix(p.camRot[2], m.camRot[2]));
   }
 
