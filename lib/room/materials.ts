@@ -19,12 +19,12 @@ import type { Variant } from "./variants";
  */
 
 export type SetName =
-  | "plaster" | "floor" | "door" | "timber" | "sandstone" | "iron" | "terracotta";
+  | "plaster" | "floor" | "door" | "timber" | "sandstone" | "iron" | "terracotta" | "teak";
 
 export type Role =
   | "wall" | "wallShade" | "field" | "court" | "floor" | "stone" | "sandstone" | "ram"
   | "timber" | "frame" | "door" | "iron" | "ironDark" | "clay" | "postbox"
-  | "courtFloor" | "aluminium" | "brass" | "thread" | "leaf" | "canvasBack" | "artFrame";
+  | "courtFloor" | "aluminium" | "brass" | "thread" | "leaf" | "canvasBack" | "artFrame" | "teak" | "teakRail";
 
 type Spec = {
   set?: SetName;
@@ -81,6 +81,10 @@ export const SPECS: Record<Role, Spec> = {
   // the float frames: dark walnut, a 16 mm lip round a shadow gap (scripts/house/build.py)
   // one continuous moulding, stained: no plank photograph, whose joints would read as segments
   artFrame:  { tint: 0x2f231b, tile: 1, roughness: 0.5, env: 0.7, tunable: false },
+  // the doors and their frames: old polished teak, a fine straight grain (Poly Haven "Dark Wood"),
+  // along the stiles and jambs, across the rails and the lintel
+  teak:      { set: "teak", tint: [0.86, 0.77, 0.67], tile: 0.9, rotate: true, roughness: 0.62, env: 0.85, normal: 0.5, tunable: false },
+  teakRail:  { set: "teak", tint: [0.86, 0.77, 0.67], tile: 0.9, roughness: 0.62, env: 0.85, normal: 0.5, tunable: false },
 };
 
 const SET_TILE_PATH = (set: SetName, kind: "diff" | "nor" | "arm", small: boolean) =>

@@ -74,7 +74,9 @@ export default function WallLabels({ room, active, live, onOpen }: {
       for (const [id, f] of [...rects].sort((a, b) => a[1].x0 - b[1].x0)) {
         const n = nodes.get(id)!;
         const w = n.offsetWidth, h = n.offsetHeight;
-        for (const side of ["right", "left", "below"] as Side[]) {
+        const first = CHAPTERS[active]?.labelSide;
+        const sides: Side[] = ["right", "left", "below"];
+        for (const side of first ? [first, ...sides.filter((x) => x !== first)] : sides) {
           const p = spot(side, f, w, h);
           const r = { x0: p.x, y0: p.y, x1: p.x + w, y1: p.y + h };
           if (r.x0 < gut || r.x1 > vw - gut || r.y0 < gut || r.y1 > vh - gut) continue;

@@ -23,6 +23,8 @@ const Lightbox = forwardRef<LightboxHandle, { dims: Dims; onOpenChange(open: boo
   function Lightbox({ dims, onOpenChange }, ref) {
     const root = useRef<HTMLDialogElement>(null);
     const veil = useRef<HTMLDivElement>(null);
+    /** the paper the work is shown on: a card over the house, not a page in place of it */
+    const card = useRef<HTMLDivElement>(null);
     const img = useRef<HTMLImageElement>(null);
     const title = useRef<HTMLHeadingElement>(null);
     const meta = useRef<HTMLDListElement>(null);
@@ -51,7 +53,8 @@ const Lightbox = forwardRef<LightboxHandle, { dims: Dims; onOpenChange(open: boo
       ["Series", w.series],
       ["Year", w.year ?? "—"],
       ["Medium", w.medium],
-      ["Size", w.size ?? "Not stated"],
+      // a size only where she has stated one
+      ...(w.size ? [["Size", w.size] as [string, string]] : []),
       ["Status", w.status === "Enquire" ? "On enquiry" : w.status],
     ];
 
@@ -167,7 +170,8 @@ const Lightbox = forwardRef<LightboxHandle, { dims: Dims; onOpenChange(open: boo
         own(gsap.fromTo(i, { autoAlpha: 0, scale: 0.96 }, { autoAlpha: 1, scale: 1, duration: reduce ? 0 : 0.6, ease: "power2.out",
           onComplete: () => { gsap.set(i, { clearProps: "transform" }); landed(); } }));
       }
-      own(gsap.fromTo(veil.current, { opacity: 0 }, { opacity: 1, duration: reduce ? 0 : 0.6, delay: reduce ? 0 : 0.2 }));
+      own(gsap.fromTo(veil.current, { opacity: 0 }, { opacity: 1, duration: reduce ? 0 : 0.45 }));
+      own(gsap.fromTo(card.current, { autoAlpha: 0, y: 14 }, { autoAlpha: 1, y: 0, duration: reduce ? 0 : 0.5, ease: "power2.out" }));
       own(gsap.fromTo([title.current, meta.current], { autoAlpha: 1 }, { autoAlpha: 1, duration: 0 }));
       own(scrambleTo(title.current!, quoted(w.title), { anagram: true, speed: 0.6, duration: 1, delay: 0.4 }));
       dl.querySelectorAll<HTMLElement>("dd").forEach((dd, k) =>
@@ -183,6 +187,8 @@ const Lightbox = forwardRef<LightboxHandle, { dims: Dims; onOpenChange(open: boo
           if (roomImg.current) roomImg.current.src = hi.src;
         }).catch(() => {});
       }
+      // focus moves to the close, ringed only when the work was opened from the keyboard
+      r.classList.toggle("by-pointer", !byKey.current);
       closeBtn.current?.focus({ preventScroll: true });
     };
 
@@ -201,7 +207,8 @@ const Lightbox = forwardRef<LightboxHandle, { dims: Dims; onOpenChange(open: boo
       const finish = () => {
         if (r.open) r.close();
         if (from) from.style.visibility = "";
-        gsap.set([i, veil.current, ask.current, title.current, meta.current], { clearProps: "all" });
+        gsap.set([i, veil.current, card.current, ask.current, title.current, meta.current, r.querySelector(".lb-grid")],
+          { clearProps: "all" });
         i.removeAttribute("src");
         const back = from?.closest<HTMLElement>("[tabindex], button, a");
         st.current.id = null;
@@ -210,7 +217,8 @@ const Lightbox = forwardRef<LightboxHandle, { dims: Dims; onOpenChange(open: boo
         cb.current(false);
         back?.focus({ preventScroll: true });
       };
-      own(gsap.to(veil.current, { opacity: 0, duration: reduce ? 0 : 0.6 }));
+      own(gsap.to(veil.current, { opacity: 0, duration: reduce ? 0 : 0.5 }));
+      own(gsap.to(card.current, { autoAlpha: 0, y: 10, duration: reduce ? 0 : 0.4, delay: reduce ? 0 : 0.1, ease: "power1.in" }));
       own(gsap.to([title.current, meta.current, ask.current], { autoAlpha: 0, duration: reduce ? 0 : 0.3 }));
       const visible = !!from && from.isConnected && (() => {
         const b = from.getBoundingClientRect();
@@ -222,6 +230,16 @@ const Lightbox = forwardRef<LightboxHandle, { dims: Dims; onOpenChange(open: boo
         own(gsap.to(i, { autoAlpha: 0, duration: reduce ? 0 : 0.4, onComplete: finish }));
       }
     };
+
+    /** was the last input a key? (a dialog opened by a click focuses its close without a ring) */
+    const byKey = useRef(false);
+    useEffect(() => {
+      const key = () => { byKey.current = true; root.current?.classList.remove("by-pointer"); };
+      const ptr = () => { byKey.current = false; };
+      document.addEventListener("keydown", key, true);
+      document.addEventListener("pointerdown", ptr, true);
+      return () => { document.removeEventListener("keydown", key, true); document.removeEventListener("pointerdown", ptr, true); };
+    }, []);
 
     /** a click on the backdrop closes — but not the tap that opened it: on a touch
      *  screen its click arrives after the work is open, wherever the work now isn't */
@@ -246,7 +264,7 @@ const Lightbox = forwardRef<LightboxHandle, { dims: Dims; onOpenChange(open: boo
         if (!pulling && dy > 10 && grid.scrollTop <= 0) pulling = true;
         if (!pulling) return;
         e.preventDefault();
-        gsap.set(grid, { y: Math.max(0, dy) * 0.55 });
+        gsap.set([grid, card.current], { y: Math.max(0, dy) * 0.55 });
         gsap.set(veil.current, { opacity: Math.max(0.4, 1 - dy / 520) });
       };
       const end = () => {
@@ -254,7 +272,7 @@ const Lightbox = forwardRef<LightboxHandle, { dims: Dims; onOpenChange(open: boo
         y0 = -1;
         if (!pulling) return;
         pulling = false;
-        gsap.to(grid, { y: 0, duration: 0.25, ease: "power2.out" });
+        if (dy <= 110) gsap.to([grid, card.current], { y: 0, duration: 0.25, ease: "power2.out" });
         if (dy > 110) close();
         else gsap.to(veil.current, { opacity: 1, duration: 0.25 });
       };
@@ -294,7 +312,8 @@ const Lightbox = forwardRef<LightboxHandle, { dims: Dims; onOpenChange(open: boo
       <dialog className="lb" ref={root} aria-labelledby="lb-title" data-lenis-prevent=""
               onCancel={(e) => { e.preventDefault(); close(); }}>
         <div className="lb-veil" ref={veil} onClick={backdrop} />
-        <div className="lb-grid" onClick={(e) => { if (e.target === e.currentTarget) backdrop(); }}>
+        <div className="lb-card" ref={card} aria-hidden="true" />
+        <div className="lb-grid">
           <figure className="lb-figure">
             <div className="lb-frame" ref={frame} data-cursor="Look closer">
               {/* eslint-disable-next-line @next/next/no-img-element */}

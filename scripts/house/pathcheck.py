@@ -6,7 +6,8 @@ Does the camera ever pass through a wall?
 Replays the rig's motion between consecutive chapters — four channels (cam,
 camRot, pivot, pivotRot), each eased with power3.inOut over 10 units and
 started 0.5 apart, yaw unwrapped as the site unwraps it — and tests the eye
-against every wall collider (Blender coordinates).
+against every wall collider (Blender coordinates). A step with a passing pose
+(lib/chapters.ts `via`) runs power2.in to it and power2.out from it, 5 units each.
 """
 import json
 import math
@@ -14,7 +15,8 @@ import sys
 
 info = json.load(open(sys.argv[1]))
 NARROW = len(sys.argv) > 2 and sys.argv[2] == "narrow"
-ORDER = ["presence", "floral", "canopy", "threshold", "bodhi", "faith", "street", "redwall", "featured", "plan"]
+ORDER = ["presence", "floral", "canopy", "bodhi", "faith", "street", "redwall", "featured", "plan"]
+VIA = {"bodhi": "threshold"}
 cams = {k: (info["cams"].get(f"n:{k}") if NARROW else None) or v for k, v in info["cams"].items() if not k.startswith("n:")}
 
 
@@ -71,23 +73,41 @@ def inside(e):
     return hits
 
 
-poses, prev = [], None
-for k in ORDER:
+poses, vias, prev = [], [], None
+for i, k in enumerate(ORDER):
+    if i > 0:
+        v = pose(cams[VIA[k]], prev) if k in VIA else None
+        if v:
+            prev = v["yaw"]
+        vias.append(v)
     p = pose(cams[k], prev)
     prev = p["yaw"]
     poses.append(p)
+
+
+def mix(a, b, v, x):
+    """a channel's value at local time x (0…10 units): straight, or through a passing pose"""
+    if v is None:
+        k = ease(x / 10)
+        return lambda f: lerp(f(a), f(b), k)
+    x = max(0.0, min(10.0, x))
+    if x < 5:
+        k = (x / 5) ** 2
+        return lambda f: lerp(f(a), f(v), k)
+    k = 1 - (1 - (x - 5) / 5) ** 2
+    return lambda f: lerp(f(v), f(b), k)
+
+
 bad = 0
 for i in range(len(poses) - 1):
-    a, b = poses[i], poses[i + 1]
+    a, b, v = poses[i], poses[i + 1], vias[i]
     worst = []
-    for s in range(0, 241):
-        t = s / 240 * 11.5
-        kc = ease((t - 0.0) / 10)       # cam (distance)
-        kp = ease((t - 1.0) / 10)       # pivot
-        kr = ease((t - 1.5) / 10)       # pivot rotation
-        p = {"dist": lerp(a["dist"], b["dist"], kc),
-             "pivot": tuple(lerp(a["pivot"][j], b["pivot"][j], kp) for j in range(3)),
-             "yaw": lerp(a["yaw"], b["yaw"], kr), "orbit": lerp(a["orbit"], b["orbit"], kr)}
+    for s in range(0, 481):
+        t = s / 480 * 11.5
+        mc, mp, mr = mix(a, b, v, t - 0.0), mix(a, b, v, t - 1.0), mix(a, b, v, t - 1.5)
+        p = {"dist": mc(lambda q: q["dist"]),
+             "pivot": tuple(mp(lambda q, j=j: q["pivot"][j]) for j in range(3)),
+             "yaw": mr(lambda q: q["yaw"]), "orbit": mr(lambda q: q["orbit"])}
         e = eye(p)
         if inside(e):
             worst.append((round(t, 2), tuple(round(v, 2) for v in (e[0], -e[2], e[1]))))

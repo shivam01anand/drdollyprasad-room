@@ -18,10 +18,12 @@ it are hers: a gallery inside a Delhi home, built and lit in Blender.
    it. A second visit in a session finds the lamp lit; a tap goes straight in.
 2. **The house is shown, then the camera moves in.** Her things fall into place as the panel
    lifts (`bounce.out` from two metres, as the original drops its furniture).
-3. **A ten-step walk**, one section each, one source (`lib/chapters.ts`) for copy and camera:
+3. **A nine-step walk**, one section each, one source (`lib/chapters.ts`) for copy and camera:
    - **the Aangan**, a courtyard garden open to the sky: "Woman with Poppies", the floral works,
-     "Under Canopy of Greens", then the arch, with the tall brass lamp of her openings standing
-     beside it in a ring of marigolds (as in her exhibition photographs);
+     "Under Canopy of Greens" under two green-enamel studio lamps; then the walk turns to the arch
+     — the tall brass lamp of her openings beside it in a ring of marigolds — and goes straight
+     through into the Quiet Room without stopping (a chapter's `via`: the rig runs power2.in to
+     the passing pose and power2.out from it);
    - **the Quiet Room**: the Bodhi Buddha under one light with her poem, then "The Blue Buddha"
      and "Threads of Faith" by the door;
    - **the Red Room** by the lane: "The Bullocks" and "Terracotta" on the red wall, then
@@ -34,8 +36,10 @@ it are hers: a gallery inside a Delhi home, built and lit in Blender.
 
    Each turn is at most a quarter; every room change passes through a doorway
    (`scripts/house/pathcheck.py` proves it for the landscape and the portrait walk).
-4. **Featured** — the original's slider; a click opens the work in a Flip lightbox, where it can
-   be looked at closely (click, scroll, pinch) or seen in a room at its stated size.
+4. **Featured** — the original's slider; a click opens the work on a card over the house (the
+   room stays in view, dimmed a little; a click outside puts it away), where it can be looked at
+   closely (click, scroll, pinch) or seen in a room at its stated size. Sizes appear only where
+   she has stated them; those works hang at true size in the house, the rest a little larger.
 5. **The collage** — every work, shown to relative scale where she has stated the size.
 6. **About and contact** — her statement, her biography verbatim.
 

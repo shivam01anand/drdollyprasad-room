@@ -100,6 +100,8 @@ SITE = {
     "timber": ("timber", (1.25, 1.1, 0.95), 2.0),
     "door": ("door", (1.85, 1.85, 1.78), 1.15),
     "artFrame": ("timber", (0.30, 0.205, 0.14), 0.9),
+    "teak": ("teak", (0.86, 0.77, 0.67), 0.9),
+    "teakRail": ("teak", (0.86, 0.77, 0.67), 0.9),
     "courtFloor": ("terracotta", (1.25, 0.95, 0.78), 2.08),
     "iron": ("iron", lin(0x8A8178), 0.55),
     "ironDark": ("iron", lin(0x4A433D), 0.6),
@@ -144,7 +146,7 @@ def role_mat(role):
     nt.links.new(sep.outputs["Green"], b.inputs["Roughness"])
     if role in ("iron", "ironDark"):
         b.inputs["Metallic"].default_value = 0.8
-    if role == "door":
+    if role in ("door", "teak"):
         mp.inputs["Rotation"].default_value = (math.pi / 2, 0, 0)
     # normal maps stay out of the bake (the site adds them live); renders get them
     if opt.get("--normals", "1") == "1":
@@ -383,44 +385,107 @@ for n, (x0, x1, y0, y1) in {"N": (AX0, AX1, AY1 - 0.34, AY1), "E": (AX1 - 0.34, 
     box(f"Wall_Plinth{n}", x0, x1, y0, y1, 0, 0.16, role_mat("sandstone"), bevel=0.012)
 
 
-def door_leaf(name, w, h, t, role, studs=True, panels=(2, 4), pull_left=False):
-    """an old panelled leaf, built flat in x (width) and z (height), thickness in y:
-    stiles and rails stand proud of recessed panels; iron studs at the joints"""
-    parts, iron = [], []
-    m = role_mat(role)
-    st = 0.11
-    parts.append(box(f"{name}_back", 0, w, -t / 2, t / 2 - 0.012, 0, h, m, bevel=0.004))
+M_HW_BRASS = flat("hwBrass", lin(0xC2964E), 0.24, 1.0)       # polished where hands go
+M_HW_IRON = flat("hwIron", lin(0x2E2925), 0.55, 0.7)
+
+
+def apply_mods(objs):
+    """bake each part's own bevel in before a join, which keeps only the first part's"""
+    for o in objs:
+        if not o.modifiers:
+            continue
+        bpy.ops.object.select_all(action="DESELECT")
+        o.select_set(True)
+        bpy.context.view_layer.objects.active = o
+        for m in list(o.modifiers):
+            bpy.ops.object.modifier_apply(modifier=m.name)
+    return objs
+
+
+def door_leaf(name, w, h, t, role, rail_role=None, panels=(1, 4), pull_left=False, hardware="brass", hinge_left=True):
+    """a frame-and-panel leaf, as a joiner makes one, built flat in x (width) and z
+    (height), thickness in y, its face at +y: stiles running the full height and
+    rails between them, each opening holding a raised, softly fielded panel inside
+    a rounded bead; then its hardware (returned apart, so it stays live-lit):
+    polished brass bosses at the joints and a ring pull on a backplate, or iron
+    strap hinges and a ring latch for a painted door"""
+    m, mr = role_mat(role), role_mat(rail_role or role)
+    st, top, bot, mid, mul = 0.115, 0.12, 0.19, 0.11, 0.085
+    yb, yf = -t / 2, t / 2
+    parts, hw = [], []
+    parts.append(box(f"{name}_core", st - 0.004, w - st + 0.004, yb, yf - 0.03, bot - 0.004, h - top + 0.004, m, bevel=0))
     for x0 in (0, w - st):
-        parts.append(box(f"{name}_stile", x0, x0 + st, -t / 2, t / 2, 0, h, m, bevel=0.006))
+        parts.append(box(f"{name}_stile", x0, x0 + st, yb, yf, 0, h, m, bevel=0.006, segs=3))
     cols, rows = panels
-    rail_z = [0.0] + [h * (k / rows) for k in range(1, rows)] + [h - st]
-    for z in rail_z:
-        parts.append(box(f"{name}_rail", st, w - st, -t / 2, t / 2, z, z + st, m, bevel=0.006))
+    weights = {3: [1.0, 0.42, 1.38], 4: [1.0, 0.42, 1.3, 0.42], 2: [1.0, 1.3]}.get(rows, [1.0] * rows)
+    free = h - bot - top - (rows - 1) * mid
+    z, bands = bot, []
+    for k, wgt in enumerate(weights):
+        hz = free * wgt / sum(weights)
+        bands.append((z, z + hz))
+        z += hz + mid
+    for z0, z1 in [(0, bot)] + [(b[1], b[1] + mid) for b in bands[:-1]] + [(h - top, h)]:
+        parts.append(box(f"{name}_rail", st, w - st, yb, yf, z0, z1, mr, bevel=0.005, segs=3))
+    xs = [(st, w - st)] if cols == 1 else [(st, w / 2 - mul / 2), (w / 2 + mul / 2, w - st)]
     if cols > 1:
-        # the mullion runs between the rails, never through them (shared faces render black)
-        mid = w / 2 - 0.04
-        for z0, z1 in zip(rail_z, rail_z[1:]):
-            parts.append(box(f"{name}_mullion", mid, mid + 0.08, -t / 2, t / 2 - 0.004, z0 + st, z1, m, bevel=0.005))
-    if studs:
-        for z in rail_z:
-            for x in (st / 2, w / 2, w - st / 2):
-                bpy.ops.mesh.primitive_uv_sphere_add(segments=12, ring_count=6, radius=0.016,
-                                                     location=(x, t / 2 + 0.002, z + st / 2))
+        for z0, z1 in bands:
+            parts.append(box(f"{name}_muntin", w / 2 - mul / 2, w / 2 + mul / 2, yb, yf - 0.002, z0, z1, m, bevel=0.005, segs=3))
+    for x0, x1 in xs:
+        for z0, z1 in bands:
+            b = 0.016
+            # the bead that holds the panel, round in section
+            parts.append(box(f"{name}_bead", x0, x1, yf - 0.03, yf - 0.008, z0, z0 + b, mr, bevel=0.007, segs=3))
+            parts.append(box(f"{name}_bead", x0, x1, yf - 0.03, yf - 0.008, z1 - b, z1, mr, bevel=0.007, segs=3))
+            parts.append(box(f"{name}_bead", x0, x0 + b, yf - 0.03, yf - 0.008, z0 + b, z1 - b, m, bevel=0.007, segs=3))
+            parts.append(box(f"{name}_bead", x1 - b, x1, yf - 0.03, yf - 0.008, z0 + b, z1 - b, m, bevel=0.007, segs=3))
+            # the panel's flat margin, and its field standing proud with a soft chamfer
+            parts.append(box(f"{name}_panel", x0 + b, x1 - b, yf - 0.03, yf - 0.018, z0 + b, z1 - b, m, bevel=0))
+            parts.append(box(f"{name}_field", x0 + b + 0.032, x1 - b - 0.032, yf - 0.03, yf - 0.006, z0 + b + 0.032, z1 - b - 0.032,
+                             m, bevel=0.014, segs=3))
+    if hardware == "brass":
+        # domed bosses where the rails meet the stiles
+        for z0, z1 in [(0, bot)] + [(bb[1], bb[1] + mid) for bb in bands[:-1]] + [(h - top, h)]:
+            for x in (st / 2, w - st / 2):
+                bpy.ops.mesh.primitive_uv_sphere_add(segments=20, ring_count=10, radius=0.017, location=(x, yf + 0.001, (z0 + z1) / 2))
                 o = bpy.context.active_object
-                o.scale = (1, 0.55, 1)
-                iron.append(o)
-        # the ring pull, on the meeting stile
-        bpy.ops.mesh.primitive_torus_add(major_radius=0.055, minor_radius=0.008, major_segments=24, minor_segments=8,
-                                         location=(st / 2 if pull_left else w - st / 2, t / 2 + 0.012, h * 0.47),
-                                         rotation=(math.pi / 2, 0, 0))
-        iron.append(bpy.context.active_object)
-    leaf = join(name, parts)
-    studs_o = None
-    if iron:
-        for o in iron:
-            o.data.materials.append(role_mat("ironDark"))
-        studs_o = join(f"{name}Iron", iron)
-    return leaf, studs_o
+                o.scale = (1, 0.42, 1)
+                hw.append(o)
+        # the ring pull, hanging from a round backplate on the meeting stile
+        px = st / 2 if pull_left else w - st / 2
+        bpy.ops.mesh.primitive_cylinder_add(vertices=40, radius=0.05, depth=0.008, location=(px, yf + 0.004, h * 0.47),
+                                            rotation=(math.pi / 2, 0, 0))
+        hw.append(bpy.context.active_object)
+        bpy.ops.mesh.primitive_uv_sphere_add(segments=16, ring_count=8, radius=0.014, location=(px, yf + 0.01, h * 0.47))
+        hw.append(bpy.context.active_object)
+        bpy.ops.mesh.primitive_torus_add(major_radius=0.062, minor_radius=0.0075, major_segments=40, minor_segments=10,
+                                         location=(px, yf + 0.016, h * 0.47 - 0.062), rotation=(math.pi / 2, 0, 0))
+        hw.append(bpy.context.active_object)
+        mat = M_HW_BRASS
+    else:
+        # iron straps from the hinge side, rounded at their ends, and a ring latch
+        hx0, sgn = (0.0, 1) if hinge_left else (w, -1)
+        for zc in (h * 0.16, h * 0.84):
+            L = w * 0.62
+            x0, x1 = sorted((hx0, hx0 + sgn * L))
+            hw.append(box(f"{name}_strap", x0, x1, yf, yf + 0.006, zc - 0.022, zc + 0.022, M_HW_IRON, bevel=0.004))
+            for x in (x0 + 0.05, (x0 + x1) / 2, x1 - 0.05):
+                bpy.ops.mesh.primitive_uv_sphere_add(segments=12, ring_count=6, radius=0.009, location=(x, yf + 0.007, zc))
+                hw.append(bpy.context.active_object)
+        lx = w - st / 2 if hinge_left else st / 2
+        bpy.ops.mesh.primitive_torus_add(major_radius=0.05, minor_radius=0.007, major_segments=32, minor_segments=8,
+                                         location=(lx, yf + 0.014, h * 0.47 - 0.05), rotation=(math.pi / 2, 0, 0))
+        hw.append(bpy.context.active_object)
+        mat = M_HW_IRON
+    leaf = join(name, apply_mods(parts))
+    hwo = None
+    if hw:
+        for o in hw:
+            o.data.materials.clear()
+            o.data.materials.append(mat)
+        hwo = join(f"Deco_hw{name.replace('Wall_', '').replace('Deco_', '')}", apply_mods(hw))
+        for p in hwo.data.polygons:
+            p.use_smooth = True
+    return leaf, hwo
 
 
 def place(o, loc, rot_z):
@@ -430,16 +495,23 @@ def place(o, loc, rot_z):
     o.rotation_euler = (0, 0, rot_z)
 
 
-# the house's front doors, shut: two teak leaves in a timber frame, studded
+# the house's front doors, shut: two teak leaves in a moulded teak frame, brass at the joints
 DW, DH = 0.75, 2.42
 for k, x0 in enumerate((3.6 - DW, 3.6)):
     # the pulls meet at the centre: the right leaf's is on its left stile
-    leaf, iron = door_leaf(f"Wall_FrontDoor{k}", DW, DH, 0.06, "timber", pull_left=(k == 1))
+    leaf, hwo = door_leaf(f"Wall_FrontDoor{k}", DW, DH, 0.06, "teak", rail_role="teakRail", panels=(1, 4),
+                          pull_left=(k == 1), hardware="brass")
     place(leaf, (x0, AY0 - T / 2, 0), 0)
-    place(iron, (x0, AY0 - T / 2, 0), 0)
-box("Wall_FrontDoorFrameL", 3.6 - 0.75 - 0.09, 3.6 - 0.75, AY0 - T + 0.02, AY0 + 0.015, 0, 2.52, role_mat("timber"), bevel=0.01)
-box("Wall_FrontDoorFrameR", 3.6 + 0.75, 3.6 + 0.75 + 0.09, AY0 - T + 0.02, AY0 + 0.015, 0, 2.52, role_mat("timber"), bevel=0.01)
-box("Wall_FrontDoorFrameT", 3.6 - 0.75, 3.6 + 0.75, AY0 - T + 0.02, AY0 + 0.015, 2.43, 2.52, role_mat("timber"), bevel=0.01)
+    place(hwo, (x0, AY0 - T / 2, 0), 0)
+# the chaukhat: jambs with a stepped face, a lintel, and a thin cornice over it
+for side, (x0, x1) in (("L", (3.6 - 0.75 - 0.16, 3.6 - 0.75)), ("R", (3.6 + 0.75, 3.6 + 0.75 + 0.16))):
+    box(f"Wall_FrontDoorJamb{side}", x0, x1, AY0 - T + 0.02, AY0 + 0.035, 0, 2.5, role_mat("teak"), bevel=0.01, segs=3)
+    inner = (x1 - 0.035, x1) if side == "L" else (x0, x0 + 0.035)
+    box(f"Wall_FrontDoorStep{side}", inner[0], inner[1], AY0 - T + 0.02, AY0 + 0.055, 0, 2.47, role_mat("teak"), bevel=0.008, segs=3)
+box("Wall_FrontDoorLintel", 3.6 - 0.75 - 0.2, 3.6 + 0.75 + 0.2, AY0 - T + 0.02, AY0 + 0.055, 2.42, 2.62, role_mat("teakRail"),
+    bevel=0.01, segs=3)
+box("Wall_FrontDoorCornice", 3.6 - 0.75 - 0.25, 3.6 + 0.75 + 0.25, AY0 - T + 0.02, AY0 + 0.09, 2.62, 2.68, role_mat("teakRail"),
+    bevel=0.012, segs=3)
 box("Floor_FrontStep", 3.6 - 0.95, 3.6 + 0.95, AY0 - T - 0.02, AY0 + 0.22, 0, 0.07, role_mat("sandstone"), bevel=0.012)
 
 # --- the Quiet Room
@@ -567,18 +639,18 @@ def float_frame(art_id, w, h, depth, M):
     return fr
 
 
-painting("woman-with-poppies", "N", AY1, 3.6, 1.72, 1.32)
-painting("child-among-flowers", "E", AX1, 1.25, 1.62, 0.96)
+painting("woman-with-poppies", "N", AY1, 3.6, 1.72, 1.58)
+painting("child-among-flowers", "E", AX1, 1.3, 1.62, 1.15)
 painting("woman-with-red-flower", "E", AX1, 3.0, 1.62, 0.61)
 painting("woman-with-bird", "E", AX1, 4.45, 1.62, 0.61)
 painting("boy-with-bananas", "S", AY0, 5.75, 1.66, 0.914)
-painting("monk-and-green-buddha", "W", QX0, ARCH["cy"], 1.62, 1.3)
-painting("monks-and-blue-buddha", "S", QY0, -1.25, 1.62, 1.2)
-painting("temple-bells", "S", QY0, -2.7, 1.6, 0.86)
-painting("bulls-and-wheel", "S", RY0 + 0.012, -3.15, 1.66, 1.1)
-painting("shree-420-and-milk-cans", "E", RX1 - 0.012, -1.55, 1.62, 1.0)
-painting("three-veiled-women", "E", RX1 - 0.012, -3.55, 1.6, 0.92)
-painting("terracotta-pots", "S", RY0 + 0.012, -1.32, 1.6, 0.86)
+painting("monk-and-green-buddha", "W", QX0, ARCH["cy"], 1.62, 1.5)
+painting("monks-and-blue-buddha", "S", QY0, -1.3, 1.62, 1.3)
+painting("temple-bells", "S", QY0, -2.72, 1.6, 0.914)
+painting("bulls-and-wheel", "S", RY0 + 0.012, -3.2, 1.66, 1.3)
+painting("shree-420-and-milk-cans", "E", RX1 - 0.012, -1.55, 1.62, 1.2)
+painting("three-veiled-women", "E", RX1 - 0.012, -3.6, 1.6, 1.1)
+painting("terracotta-pots", "S", RY0 + 0.012, -1.3, 1.6, 1.0)
 
 # ====================================================================== things
 def import_ph(ph_id, loc, rot_z=0.0, scale=1.0, decimate=None, prop=True, mass=1.0):
@@ -754,15 +826,14 @@ import_ph("brass_pot_01", (-1.2, -2.0, 0), 0.4, 0.95, mass=1.0)
 import_ph("brass_pot_01", (-0.95, -3.2, 0), 1.7, 0.8, mass=1.0)
 import_ph("ceramic_pot", (-1.0, -0.15, 0), 1.0, 0.75, mass=2.0)
 # the lane door: one leaf ajar into the room, turquoise flaking over old wood
-lane, lane_iron = door_leaf("Deco_laneDoor", 1.06, 2.26, 0.055, "door", panels=(1, 3))
+lane, lane_iron = door_leaf("Deco_laneDoor", 1.06, 2.26, 0.055, "door", panels=(2, 3), hardware="iron", hinge_left=True)
 # hinged on the door's south jamb: closed it would lie at 90° (along the wall); swung 58° into the room
 place(lane, (RX0 + 0.03, -3.55 - 0.54, 0), math.radians(90 - 58))
 place(lane_iron, (RX0 + 0.03, -3.55 - 0.54, 0), math.radians(90 - 58))
-if lane_iron:
-    lane_iron.name = "Deco_laneDoorIron"
-box("Wall_LaneDoorFrameS", RX0 - T + 0.02, RX0 + 0.015, -3.55 - 0.56 - 0.09, -3.55 - 0.56, 0, 2.4, role_mat("timber"), bevel=0.01)
-box("Wall_LaneDoorFrameN", RX0 - T + 0.02, RX0 + 0.015, -3.55 + 0.56, -3.55 + 0.56 + 0.09, 0, 2.4, role_mat("timber"), bevel=0.01)
-box("Wall_LaneDoorFrameT", RX0 - T + 0.02, RX0 + 0.015, -3.55 - 0.56, -3.55 + 0.56, 2.3, 2.4, role_mat("timber"), bevel=0.01)
+box("Wall_LaneDoorFrameS", RX0 - T + 0.02, RX0 + 0.03, -3.55 - 0.56 - 0.11, -3.55 - 0.56, 0, 2.42, role_mat("teak"), bevel=0.01, segs=3)
+box("Wall_LaneDoorFrameN", RX0 - T + 0.02, RX0 + 0.03, -3.55 + 0.56, -3.55 + 0.56 + 0.11, 0, 2.42, role_mat("teak"), bevel=0.01, segs=3)
+box("Wall_LaneDoorFrameT", RX0 - T + 0.02, RX0 + 0.04, -3.55 - 0.56 - 0.15, -3.55 + 0.56 + 0.15, 2.3, 2.46, role_mat("teakRail"),
+    bevel=0.01, segs=3)
 
 # ====================================================================== foliage
 def card(name, w, h, mat):
@@ -929,6 +1000,77 @@ fill("Fill_red", RX0, RX1, RY0, RY1, float(opt.get("--fillr", 90)))
 for k in ("monk-and-green-buddha", "monks-and-blue-buddha", "temple-bells",
           "bulls-and-wheel", "shree-420-and-milk-cans", "three-veiled-women", "terracotta-pots"):
     gallery_light(k, power=float(opt.get("--gallery", 135)))
+
+
+def studio_lamp(name, plate, aim, out=Vector((0, 1, 0)), reach=0.62):
+    """a painter's studio lamp on the wall: a round plate, a gooseneck arm, a green
+    enamel shade (white inside) and its bulb, turned on the painting; and the spot
+    it throws, which the bake keeps afternoon and evening. Live-lit (Deco_), so the
+    brass-and-enamel catch the light; the bulb glows."""
+    plate, aim = Vector(plate), Vector(aim)
+    parts = []
+    bpy.ops.mesh.primitive_cylinder_add(vertices=40, radius=0.055, depth=0.018, location=plate + out * 0.009,
+                                        rotation=out.to_track_quat("Z", "Y").to_euler())
+    parts.append(bpy.context.active_object)
+    p0, p1, p2 = plate + out * 0.01, plate + out * (reach * 0.65) + Vector((0, 0, 0.12)), plate + out * reach + Vector((0, 0, 0.02))
+    cu = bpy.data.curves.new(f"{name}_arm", "CURVE")
+    cu.dimensions = "3D"
+    cu.bevel_depth = 0.0085
+    cu.bevel_resolution = 4
+    sp = cu.splines.new("BEZIER")
+    sp.bezier_points.add(2)
+    for bp, co in zip(sp.bezier_points, (p0, p1, p2)):
+        bp.co = co
+        bp.handle_left_type = bp.handle_right_type = "AUTO"
+    arm = link(bpy.data.objects.new(f"{name}_arm", cu))
+    bpy.ops.object.select_all(action="DESELECT")
+    arm.select_set(True)
+    bpy.context.view_layer.objects.active = arm
+    bpy.ops.object.convert(target="MESH")
+    parts.append(arm)
+    for o in parts:
+        o.data.materials.clear()
+        o.data.materials.append(M_HW_IRON)
+    iron = join(f"Deco_{name}Arm", apply_mods(parts))
+    # the shade: apex at the arm's end, mouth on the painting
+    d = (aim - p2).normalized()
+    prof = [(0.0, 0.0), (0.02, 0.0), (0.024, 0.012), (0.028, 0.03), (0.058, 0.09), (0.083, 0.145), (0.09, 0.16), (0.091, 0.163)]
+    shade = lathe(f"Deco_{name}Shade", prof, flat("enamelGreen", lin(0x2D4132), 0.3), segs=48, loc=p2)
+    shade.data.materials.append(flat("enamelWhite", lin(0xEFE8DA), 0.45))
+    sol = shade.modifiers.new("shell", "SOLIDIFY")
+    sol.thickness = 0.003
+    sol.material_offset = 1
+    shade.rotation_euler = d.to_track_quat("Z", "Y").to_euler()
+    bulb_at = p2 + d * 0.06
+    bpy.ops.mesh.primitive_uv_sphere_add(segments=24, ring_count=12, radius=0.027, location=bulb_at)
+    bulb = bpy.context.active_object
+    bulb.name = f"Deco_{name}Bulb"
+    bm_ = bpy.data.materials.new("bulb")
+    bm_.use_nodes = True
+    bb = bm_.node_tree.nodes["Principled BSDF"]
+    bb.inputs["Base Color"].default_value = (1.0, 0.86, 0.62, 1)
+    bb.inputs["Emission Color"].default_value = (1.0, 0.82, 0.55, 1)
+    bb.inputs["Emission Strength"].default_value = 6.0
+    bulb.data.materials.append(bm_)
+    # the light it throws
+    ld = bpy.data.lights.new(f"L_{name}", "SPOT")
+    ld.energy = float(opt.get("--studio", 68))
+    ld.spot_size = math.radians(48)
+    ld.spot_blend = 0.55
+    ld.shadow_soft_size = 0.03
+    ld.color = (1.0, 0.85, 0.66)
+    lo = link(bpy.data.objects.new(f"L_{name}", ld))
+    lo.location = bulb_at + d * 0.03
+    lo.rotation_euler = d.to_track_quat("-Z", "Y").to_euler()
+    INFO["lights"][f"L_{name}"] = {"pos": list(lo.location), "target": list(aim), "power": ld.energy}
+    return lo
+
+
+# "Under Canopy of Greens" hangs in the courtyard's shade: two studio lamps over it, as a painter would
+_c = INFO["art"]["boy-with-bananas"]["centre"]
+for k, dx in enumerate((-0.34, 0.34)):
+    studio_lamp(f"studio{k}", (_c[0] + dx, AY0, 2.6), (_c[0] + dx * 0.3, AY0, _c[2] - 0.08))
+
 # the courtyard's own lights: off in the afternoon, they come on with the evening (export.py)
 for k in ("woman-with-poppies", "child-among-flowers", "woman-with-red-flower", "woman-with-bird", "boy-with-bananas"):
     o = gallery_light(k, power=0.0)
@@ -956,7 +1098,7 @@ NARROW = {
     "start":     ((3.6, 0.9, 1.55), (3.6, AY1, 1.3)),
     "presence":  ((3.6, 2.55, 1.55), (3.6, AY1, 1.3)),
     "floral":    ((4.55, 3.0, 1.55), (AX1, 3.0, 1.22)),
-    "canopy":    ((5.75, 3.25, 1.55), (5.75, AY0, 1.25)),
+    "canopy":    ((5.75, 3.25, 1.55), (5.75, AY0, 1.45)),
     "threshold": ((4.4, 3.4, 1.55), (AX0, 3.4, 1.35)),
     "bodhi":     ((-1.85, 3.4, 1.55), (QX0, 3.4, 0.98)),
     "faith":     ((-2.55, 3.65, 1.55), (-2.7, QY0, 1.28)),

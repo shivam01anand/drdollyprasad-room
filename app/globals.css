@@ -326,15 +326,22 @@ html[data-room="off"] .sec:not(.sec-featured){display:none}
     color:var(--ink);background:transparent;overflow:hidden}
 .lb:not([open]){display:none}
 .lb::backdrop{background:transparent}
-/* one painting, alone: the veil is opaque, so nothing of the page shows */
-.lb-veil{position:absolute;inset:0;background:rgb(var(--wash))}
-.lb-grid{position:absolute;inset:0;display:grid;grid-template-columns:minmax(0,1fr) minmax(280px,360px);gap:clamp(32px,4.5vw,72px);
-         align-items:center;padding:clamp(32px,5vh,56px) clamp(24px,4vw,64px);pointer-events:none}
+/* one painting, on a card over the house: the room stays there behind it, a little
+   dimmed, and a click anywhere outside the card puts the work away */
+.lb{--lb-w:min(1080px,84vw);--lb-h:min(660px,78vh);--lb-pad:clamp(22px,2.6vw,40px);
+  --lb-y:calc((100vh - var(--lb-h)) / 2);--lb-x:calc((100vw - var(--lb-w)) / 2)}
+.lb-veil{position:absolute;inset:0;background:rgba(24,17,13,.34);cursor:pointer}
+html[data-mode="dark"] .lb-veil{background:rgba(0,0,0,.5)}
+.lb-card{position:absolute;top:var(--lb-y);bottom:var(--lb-y);left:var(--lb-x);right:var(--lb-x);pointer-events:none;
+  background:var(--page);border:1px solid var(--rule);box-shadow:0 2px 6px rgba(30,20,14,.12),0 40px 90px -40px rgba(30,20,14,.55)}
+.lb-grid{position:absolute;top:var(--lb-y);bottom:var(--lb-y);left:var(--lb-x);right:var(--lb-x);
+         display:grid;grid-template-columns:minmax(0,1fr) minmax(260px,340px);gap:clamp(28px,3.5vw,56px);
+         align-items:center;padding:var(--lb-pad);pointer-events:none}
 .lb-figure{margin:0;display:flex;justify-content:flex-end;align-items:center;min-height:0;height:100%;container-type:size}
 /* the painting: it clips only while zoomed, so the flight in is never cut */
 .lb-frame{position:relative;line-height:0;cursor:zoom-in;pointer-events:auto;max-width:100%}
 .lb-frame.is-zoomed{overflow:hidden;cursor:zoom-out;touch-action:none}
-.lb-frame>img{display:block;max-height:calc(100vh - clamp(64px,10vh,112px));max-width:100%;width:auto;height:auto;
+.lb-frame>img{display:block;max-height:calc(var(--lb-h) - 2 * var(--lb-pad));max-width:100%;width:auto;height:auto;
   box-shadow:0 1px 2px rgba(48,39,34,.08),0 28px 70px -44px rgba(48,39,34,.5);will-change:transform}
 .lb-frame.is-zoomed>img{box-shadow:none}
 /* the trace of a zoom: a hairline track and the level, fading once still */
@@ -374,9 +381,14 @@ html[data-room="off"] .sec:not(.sec-featured){display:none}
 .lb-view[aria-pressed="true"]{border-color:var(--ink);box-shadow:0 0 0 1px var(--ink)}
 .lb-hint{margin:-6px 0 0}
 .lb-text{pointer-events:auto;align-self:stretch;display:flex;flex-direction:column;justify-content:center;gap:20px;position:relative}
-.lb-close{position:absolute;top:0;right:0;min-height:44px;background:none;border:0;cursor:pointer;color:var(--ink);padding:6px 0}
-.lb-close:hover{color:var(--oxide)}
-.lb-close-x{display:none;width:20px;height:20px;stroke:currentColor;stroke-width:1.7;fill:none;stroke-linecap:round}
+/* the card closes from its corner, in a round chip, or by a click anywhere outside it */
+.lb-close{position:fixed;z-index:3;top:calc(var(--lb-y) + 14px);right:calc(var(--lb-x) + 14px);width:44px;height:44px;
+  border-radius:50%;padding:0;display:grid;place-items:center;cursor:pointer;color:var(--chip-ink);
+  background:var(--chip);border:1px solid var(--line);transition:background-color .18s var(--ease),color .18s var(--ease)}
+.lb-close:hover{background:var(--pill);color:var(--pill-ink)}
+.lb.by-pointer .lb-close:focus-visible{outline:none}
+.lb-close-word{display:none}
+.lb-close-x{display:block;width:20px;height:20px;stroke:currentColor;stroke-width:1.7;fill:none;stroke-linecap:round}
 /* the title's opening quote hangs in the margin, so the letters align with the details below */
 .lb-title{margin:0;font-weight:400;font-size:clamp(30px,2.9vw,46px);line-height:1.04;letter-spacing:-.03em;min-height:1.04em;text-indent:-.42em;text-wrap:balance}
 .lb-meta{display:grid;grid-template-columns:auto 1fr;gap:9px 20px;margin:0;padding-top:16px;border-top:1px solid var(--rule);
@@ -494,11 +506,16 @@ html[data-room="off"] .sec:not(.sec-featured){display:none}
   .feat-media{width:fit-content;max-width:100%}
   .feat-media img{width:auto;max-width:100%;max-height:50svh}
   .cap-title{font-size:14px}
+  /* on a phone the card is a sheet from the bottom edge, the house still in view above it */
+  .lb{--lb-y:0px;--lb-x:0px;--lb-w:100vw;--lb-h:92svh}
+  .lb-card,.lb-grid{top:calc(8svh + env(safe-area-inset-top,0px));bottom:0}
+  .lb-card{border-radius:22px 22px 0 0;border-width:1px 0 0}
   .lb-grid{grid-template-columns:1fr;align-content:start;overflow-y:auto;overscroll-behavior:contain;
-    padding:calc(70px + env(safe-area-inset-top,0px)) var(--gut) calc(40px + env(safe-area-inset-bottom,0px))}
+    padding:62px var(--gut) calc(40px + env(safe-area-inset-bottom,0px))}
+  .lb-frame>img{max-height:52svh}
   .lb-text{padding-top:8px}
-  /* a phone closes from the corner, in a round chip that stays put as the sheet scrolls */
-  .lb-close{position:fixed;z-index:3;top:calc(12px + env(safe-area-inset-top,0px));right:var(--gut);width:46px;height:46px;
+  /* a phone closes from the corner of the sheet, in a round chip that stays put as it scrolls */
+  .lb-close{position:fixed;z-index:3;top:calc(8svh + 10px + env(safe-area-inset-top,0px));right:var(--gut);width:46px;height:46px;
     border-radius:50%;padding:0;display:grid;place-items:center;background:var(--chip);border:1px solid var(--line);
     box-shadow:0 4px 14px -6px rgba(30,20,14,.35)}
   .lb-close-word{display:none}

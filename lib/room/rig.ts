@@ -46,6 +46,8 @@ export class Rig {
   readonly pose: Pose;
 
   private shots: Pose[];
+  /** for each step between chapters, a pose it passes through without stopping, or null */
+  private vias: (Pose | null)[];
   private scrollTl: gsap.core.Timeline;
   private introTl?: gsap.core.Timeline;
   private messTl?: gsap.core.Tween;
@@ -70,8 +72,9 @@ export class Rig {
 
   private lastMatrix = new THREE.Matrix4();
 
-  constructor(shots: Pose[], start: Pose, mess: Pose, aspect: number, reduced: boolean) {
+  constructor(shots: Pose[], start: Pose, mess: Pose, aspect: number, reduced: boolean, vias: (Pose | null)[] = []) {
     this.shots = shots.map(clonePose);
+    this.vias = vias.map((v) => (v ? clonePose(v) : null));
     this.mess = clonePose(mess);
     this.reduced = reduced;
     this.pivot.rotation.order = "YXZ";
@@ -135,18 +138,25 @@ export class Rig {
     // before the next begins, so a chapter's centre is exactly its framing
     const seg = 10, offset = 0.5, span = seg + offset * (KEYS.length - 1);
     const tl = gsap.timeline({ paused: true, defaults: { ease: "power3.inOut", duration: seg, immediateRender: false } });
+    const v3 = (p: Pose, k: (typeof KEYS)[number]) => ({ 0: p[k][0], 1: p[k][1], 2: p[k][2] });
     this.shots.slice(1).forEach((s, i) => {
-      const from = this.shots[i];
-      KEYS.forEach((k, j) => tl.fromTo(this.pose[k],
-        { 0: from[k][0], 1: from[k][1], 2: from[k][2] },
-        { 0: s[k][0], 1: s[k][1], 2: s[k][2] }, i * span + j * offset));
+      const from = this.shots[i], via = this.vias[i];
+      KEYS.forEach((k, j) => {
+        const at = i * span + j * offset;
+        if (!via) { tl.fromTo(this.pose[k], v3(from, k), v3(s, k), at); return; }
+        // through a doorway without stopping in it: gathering speed to the passing
+        // pose, carrying it through, easing out on the far side
+        tl.fromTo(this.pose[k], v3(from, k), { ...v3(via, k), ease: "power2.in", duration: seg / 2 }, at);
+        tl.fromTo(this.pose[k], v3(via, k), { ...v3(s, k), ease: "power2.out", duration: seg / 2 }, at + seg / 2);
+      });
     });
     return tl;   // (shots − 1) · 11.5 s
   }
 
   /** new framings (portrait ↔ landscape): rebuild and land where scroll is */
-  setShots(shots: Pose[]) {
+  setShots(shots: Pose[], vias: (Pose | null)[] = []) {
     this.shots = shots.map(clonePose);
+    this.vias = vias.map((v) => (v ? clonePose(v) : null));
     this.scrollTl.kill();
     this.scrollTl = this.buildScrollTimeline();
     if (this.enabled) {

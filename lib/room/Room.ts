@@ -11,7 +11,7 @@ import { Rig } from "./rig";
 import { loadHouse, assemble, BakedLight, ROOF, type HouseInfo, type HouseParts } from "./house";
 import { paintMaterial, reliefMap, flatRelief, galleryLight } from "./paint";
 import { activeVariant, NIGHT } from "./variants";
-import { resolvePoses, isNarrow, startPose, messPose, duskAt, HERO_ID } from "../chapters";
+import { resolveWalk, isNarrow, startPose, messPose, duskAt, HERO_ID } from "../chapters";
 
 export type RoomOpts = {
   manifestUrl: string;
@@ -223,7 +223,8 @@ export class Room {
 
     const aspect = (canvas.clientWidth || innerWidth) / Math.max(1, canvas.clientHeight || innerHeight);
     this.narrow = isNarrow(aspect);
-    this.rig = new Rig(resolvePoses(this.info, this.narrow), startPose(this.info, this.narrow), messPose(this.info), aspect, opts.reducedMotion);
+    const walk = resolveWalk(this.info, this.narrow);
+    this.rig = new Rig(walk.shots, startPose(this.info, this.narrow), messPose(this.info), aspect, opts.reducedMotion, walk.vias);
     this.scene.add(this.rig.pivot, this.world);
 
     const anisotropy = Math.min(8, renderer.capabilities.getMaxAnisotropy());
@@ -1039,7 +1040,8 @@ export class Room {
     this.rig.setAspect(aspect);
     if (isNarrow(aspect) !== this.narrow) {
       this.narrow = !this.narrow;
-      this.rig.setShots(resolvePoses(this.info, this.narrow));
+      const walk = resolveWalk(this.info, this.narrow);
+      this.rig.setShots(walk.shots, walk.vias);
     }
     this.wake = 2;
   };

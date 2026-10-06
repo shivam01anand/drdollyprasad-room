@@ -28,10 +28,14 @@ export type Chapter = {
   ink?: "light";
   /** the Blender view this chapter frames (house.json cams) */
   view: string;
+  /** a view the camera passes through, without stopping, on its way here */
+  via?: string;
   /** how far the afternoon has gone when you stand here, 0…1 (1 is the evening) */
   dusk?: number;
   /** the canvases in this framing that get a wall label */
   labels?: string[];
+  /** which side of its canvas a label tries first (a door or a corner on the other) */
+  labelSide?: "left" | "right" | "below";
   /** the stop's short name, for the phone's dock and the list of stops */
   stop: string;
   /** where in the house it is */
@@ -63,9 +67,11 @@ export const CHAPTERS: Chapter[] = [
     view: "floral",
     labels: ["child-among-flowers", "woman-with-red-flower", "woman-with-bird"],
   },
-  { id: "canopy", eyebrow: "“Under Canopy of Greens” · 2025", stop: "Under Canopy of Greens", room: "The courtyard", view: "canopy", dusk: 0.04, labels: ["boy-with-bananas"] },
-  { id: "threshold", eyebrow: "Faith · c. 2005–2015", stop: "The arch", room: "The courtyard", view: "threshold", dusk: 0.1 },
-  { id: "bodhi", eyebrow: "Artist’s statement", stop: "Artist’s statement", room: "The Quiet Room", verse: POEM, view: "bodhi", dusk: 0.22, labels: ["monk-and-green-buddha"] },
+  { id: "canopy", eyebrow: "“Under Canopy of Greens” · 2025", stop: "Under Canopy of Greens", room: "The courtyard", view: "canopy", dusk: 0.04, labels: ["boy-with-bananas"],
+    labelSide: "left" },
+  // from the canopy the walk turns to the arch and goes straight through it into the Quiet Room
+  { id: "bodhi", eyebrow: "Artist’s statement", stop: "Artist’s statement", room: "The Quiet Room", verse: POEM, view: "bodhi",
+    via: "threshold", dusk: 0.22, labels: ["monk-and-green-buddha"] },
   {
     id: "faith",
     eyebrow: "“Threads of Faith” · 2026",
@@ -151,13 +157,25 @@ const NARROW_BACK = 1;
 /** a portrait screen has its own framing of a view where Blender made one ("n:<view>") */
 const cam = (info: HouseInfo, view: string, narrow: boolean) => (narrow && info.cams[`n:${view}`]) || info.cams[view];
 
-export function resolvePoses(info: HouseInfo, narrow = false): Pose[] {
+/**
+ * The walk as the rig needs it: one pose per chapter, and for each step
+ * between two chapters the pose it passes through, or null. Yaw is unwrapped
+ * along the whole path, through the passing poses too.
+ */
+export function resolveWalk(info: HouseInfo, narrow = false): { shots: Pose[]; vias: (Pose | null)[] } {
   let prev: number | undefined;
-  return CHAPTERS.map((c) => {
+  const shots: Pose[] = [], vias: (Pose | null)[] = [];
+  CHAPTERS.forEach((c, i) => {
+    if (i > 0) {
+      const v = c.via ? viewPose(cam(info, c.via, narrow), prev, NARROW_BACK) : null;
+      if (v) prev = v.pivotRot[1];
+      vias.push(v);
+    }
     const p = viewPose(cam(info, c.view, narrow), prev, NARROW_BACK);
     prev = p.pivotRot[1];
-    return p;
+    shots.push(p);
   });
+  return { shots, vias };
 }
 
 /** the establishing shot: the hero's wall, from the courtyard's far side */
