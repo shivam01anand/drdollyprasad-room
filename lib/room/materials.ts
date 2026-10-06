@@ -52,11 +52,11 @@ type Spec = {
 
 export const SPECS: Record<Role, Spec> = {
   // her plaster grounds — Mother and Son, The Newspaper Reader, The Chai Boy
-  wall:      { set: "plaster", tint: [1.84, 1.71, 1.5], tile: 2.0, macro: 0.07, grime: true, env: 0.9, normal: 0.6 },
+  wall:      { set: "plaster", tint: [1.8, 1.73, 1.52], tile: 2.0, macro: 0.07, grime: true, env: 0.9, normal: 0.6 },
   wallShade: { set: "plaster", tint: [1.42, 1.32, 1.2], tile: 2.0, macro: 0.07, grime: true, env: 0.8, normal: 0.6 },
   // the red the gallery put behind her canvases (42-ctx-gallery-view)
   field:     { set: "plaster", tint: [0.66, 0.135, 0.07], tile: 2.0, macro: 0.08, grime: true, normal: 0.5, env: 0.7 },
-  court:     { set: "plaster", tint: [1.9, 1.78, 1.6], tile: 2.4, macro: 0.12, grime: true, env: 0.6 },
+  court:     { set: "plaster", tint: [1.84, 1.8, 1.6], tile: 2.4, macro: 0.12, grime: true, env: 0.6 },
   floor:     { set: "floor", tint: 0xf3ebe0, tile: 2.8, macro: 0.07, env: 0.8, roughness: 1.0 },
   stone:     { set: "floor", tint: 0xe2d6c4, tile: 1.6, macro: 0.05, env: 0.8 },
   sandstone: { set: "sandstone", tint: 0xf2dcc0, tile: 1.4, macro: 0.04, env: 0.8 },
@@ -262,10 +262,14 @@ export function buildLibrary(
 
 /** pull a colour toward grey (sat<1) or push it out (sat>1), then tint */
 function tune(c: THREE.Color, sat: number, tint: THREE.Color) {
+  // HSL lives in 0–1, and a tint above 1 (a pale photograph brightened) would
+  // clamp to white: tune the colour's hue at unit scale, then scale it back
+  const k = Math.max(c.r, c.g, c.b, 1);
+  c.multiplyScalar(1 / k);
   const hsl = { h: 0, s: 0, l: 0 };
   c.getHSL(hsl);
   c.setHSL(hsl.h, THREE.MathUtils.clamp(hsl.s * sat, 0, 1), hsl.l);
-  c.multiply(tint);
+  c.multiplyScalar(k).multiply(tint);
   return c;
 }
 

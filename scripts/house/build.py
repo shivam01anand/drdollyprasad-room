@@ -90,10 +90,10 @@ def lin(h):
 
 # the site's material roles (lib/room/materials.ts SPECS): set, tint, tile
 SITE = {
-    "wall": ("plaster", (1.84, 1.71, 1.5), 2.0),
+    "wall": ("plaster", (1.8, 1.73, 1.52), 2.0),
     "wallShade": ("plaster", (1.42, 1.32, 1.2), 2.0),
     "field": ("plaster", (0.66, 0.135, 0.07), 2.0),
-    "court": ("plaster", (1.9, 1.78, 1.6), 2.4),
+    "court": ("plaster", (1.84, 1.8, 1.6), 2.4),
     "floor": ("floor", lin(0xF3EBE0), 2.8),
     "stone": ("floor", lin(0xE2D6C4), 1.6),
     "sandstone": ("sandstone", lin(0xF2DCC0), 1.4),
@@ -453,8 +453,9 @@ for n, (x0, x1, y0, y1) in {"W": (QX0, QX0 + 0.012, QY0, QY1), "N": (QX0, QX1, Q
 
 
 def ceiling(name, x0, x1, y0, y1, h, along_x=True, spacing=0.62):
-    # the roof stops at the courtyard's wall (x1), never in its plane
-    box(f"Ceil_{name}", x0 - T, x1, y0 - T, y1 + T, h, h + 0.25, role_mat("timber"), bevel=0)
+    # the roof sits inside the walls: their tops stay open to the sky (the plan
+    # shows them), and it stops at the courtyard's wall (x1), never in its plane
+    box(f"Ceil_{name}", x0, x1, y0, y1, h, h + 0.25, role_mat("timber"), bevel=0)
     span = (y1 - y0) if along_x else (x1 - x0)
     n = int(span / spacing)
     for k in range(1, n + 1):
@@ -476,7 +477,9 @@ wall("RedE", RX1, RX1 + T, RY0, AY0 - T, 0, H_ROOM, "wall")
 wall("RedS", RX0, RX1 + T, RY0 - T, RY0, 0, H_ROOM, "wall")
 box("Wall_RedField", RX0, RX1, RY0, RY0 + 0.012, 0, H_ROOM, role_mat("field"), bevel=0.002)
 ceiling("Red", RX0, RX1, RY0, RY1, H_ROOM, along_x=True)
-box("Wall_RedSkirtE", RX1 - 0.012, RX1, RY0, RY1, 0, 0.14, role_mat("wallShade"), bevel=0.003)
+# RedE and the courtyard's west wall meet in this plane: one skin, so no joint shows
+box("Wall_RedSkinE", RX1 - 0.012, RX1, RY0 + 0.012, RY1, 0, H_ROOM, role_mat("wall"), bevel=0.002)
+box("Wall_RedSkirtE", RX1 - 0.024, RX1 - 0.012, RY0 + 0.012, RY1, 0, 0.14, role_mat("wallShade"), bevel=0.003)
 for k in range(6):
     y = -1.45 - 0.5 + (k + 0.5) * (1.0 / 6)
     box(f"Wall_Grille{k}", RX0 - T * 0.55, RX0 - T * 0.45, y - 0.018, y + 0.018, 1.05, 2.3, role_mat("timber"), bevel=0.004)
@@ -535,11 +538,11 @@ painting("woman-with-red-flower", "E", AX1, 3.0, 1.62, 0.61)
 painting("woman-with-bird", "E", AX1, 4.45, 1.62, 0.61)
 painting("boy-with-bananas", "S", AY0, 5.75, 1.66, 0.914)
 painting("monk-and-green-buddha", "W", QX0, ARCH["cy"], 1.62, 1.3)
-painting("monks-and-blue-buddha", "S", QY0, -2.62, 1.62, 1.2)
-painting("temple-bells", "S", QY0, -1.12, 1.6, 0.86)
+painting("monks-and-blue-buddha", "S", QY0, -1.25, 1.62, 1.2)
+painting("temple-bells", "S", QY0, -2.7, 1.6, 0.86)
 painting("bulls-and-wheel", "S", RY0 + 0.012, -3.15, 1.66, 1.1)
-painting("shree-420-and-milk-cans", "E", RX1, -1.55, 1.62, 1.0)
-painting("three-veiled-women", "E", RX1, -3.55, 1.6, 0.92)
+painting("shree-420-and-milk-cans", "E", RX1 - 0.012, -1.55, 1.62, 1.0)
+painting("three-veiled-women", "E", RX1 - 0.012, -3.55, 1.6, 0.92)
 painting("terracotta-pots", "S", RY0 + 0.012, -1.32, 1.6, 0.86)
 
 # ====================================================================== things
@@ -795,7 +798,7 @@ ramp.color_ramp.elements[1].color = (*lin(0x9DB6CF), 1)
 mid = ramp.color_ramp.elements.new(0.52)
 mid.color = (*lin(0xF2E6D2), 1)
 wn.links.new(ramp.outputs["Color"], bg.inputs["Color"])
-bg.inputs["Strength"].default_value = float(opt.get("--sky", 1.15))
+bg.inputs["Strength"].default_value = float(opt.get("--sky", 1.5))
 INFO["lights"]["sky"] = {"strength": bg.inputs["Strength"].default_value}
 
 SUN_AZ, SUN_EL = math.radians(float(opt.get("--sunaz", 230))), math.radians(float(opt.get("--sunel", 52)))
@@ -876,7 +879,7 @@ NARROW = {
     "canopy":    ((5.75, 3.25, 1.55), (5.75, AY0, 1.25)),
     "threshold": ((4.4, 3.4, 1.55), (AX0, 3.4, 1.35)),
     "bodhi":     ((-1.85, 3.4, 1.55), (QX0, 3.4, 0.98)),
-    "faith":     ((-2.75, 4.95, 1.55), (-2.65, QY0, 1.28)),
+    "faith":     ((-2.55, 3.65, 1.55), (-2.7, QY0, 1.28)),
     "street":    ((-4.3, -0.4, 1.55), (-3.35, RY0, 1.3)),
     "redwall":   ((-3.55, -3.55, 1.55), (RX1, -3.55, 1.3)),
     "featured":  ((-2.66, -2.55, 3.62), (-1.2, -2.55, 0.0)),

@@ -69,6 +69,7 @@ export const CHAPTERS: Chapter[] = [
       "postbox, hand-lettered posters for the last single-screen cinemas, a tonga going " +
       "out as an auto-rickshaw arrives. What is leaving she paints in full oil; what is " +
       "arriving she draws as a single bare line.",
+    ink: "light",
     view: "street",
   },
   { id: "redwall", eyebrow: "“Shree 420” · “Three Women in Red”", view: "redwall" },

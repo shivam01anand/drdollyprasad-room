@@ -35,8 +35,9 @@ export type Variant = {
 
 const base = {
   clear: 0xefe9df,
-  // the house's afternoon reads as Blender's AgX frame did at +0.4 EV
-  exposure: 1.18,
+  // the site matches Blender's PBR Neutral render of the bake; 1.12 keeps
+  // the sunlit lime wash just short of white
+  exposure: 1.12,
   sun: { color: 0xffe7c9, intensity: 4.0, pos: [7.8, 4.6, 0.9] as [number, number, number] },
   door: { color: 0xffd7a8, intensity: 1.35 },
   front: { color: 0xfff1e0, intensity: 9.0 },
