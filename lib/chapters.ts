@@ -229,3 +229,15 @@ export const messPose = (info: HouseInfo) => viewPose(info.cams.mess);
 
 /** portrait screens get their own framings */
 export const isNarrow = (aspect: number) => aspect < 0.85;
+
+/** Bandh Darwaze I–IV hang on the Red Room's north wall, seen from the Shree 420 stop (unlabelled) */
+const BANDH_WALL = ["weathered-door-ring", "red-and-teal-door-lock", "teal-door-bolt", "carved-door-knocker"];
+
+/** every work in the order the walk passes it, wall by wall (Bandh Darwaze with Shree 420) */
+export const WALK_ORDER: string[] = CHAPTERS.flatMap((c) => [...(c.labels ?? []), ...(c.id === "redwall" ? BANDH_WALL : [])]);
+
+/** the stop a work is seen at: the chapter that labels it, or the wall it hangs on; -1 if none */
+export function stopOf(id: string) {
+  const i = CHAPTERS.findIndex((c) => c.labels?.includes(id));
+  return i >= 0 ? i : BANDH_WALL.includes(id) ? CHAPTERS.findIndex((c) => c.id === "redwall") : -1;
+}

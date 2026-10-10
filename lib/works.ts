@@ -102,11 +102,32 @@ export const LARGE = new Set([
   "mother-india-and-kettles", "bullock-cart-and-truck", "weathered-door-ring", "teal-door-bolt", "carved-door-knocker",
 ]);
 
+/** her exhibition, while it is on: her words as the Threads of Faith chapter gives them, and the
+ *  works she is showing there */
+export const SHOW = {
+  line: "Showing at Sacred Fragments: A Journey Home, New Delhi, 18–21 October 2026.",
+  until: "2026-10-21",
+  works: ["temple-bells", "boy-with-bananas"],
+};
+
+export const SITE = "https://drdollyprasad.com";
+
+/** a painting's own page */
+export const workPath = (id: string) => `/work/${id}`;
+
+/** her stated size as width and height in inches, when she gives both */
+export const inchDims = (w: Work) => {
+  const m = w.size?.match(/^(\d+(?:\.\d+)?)\s*×\s*(\d+(?:\.\d+)?)\s*in$/);
+  return m ? { width: +m[1], height: +m[2] } : null;
+};
+
 export const EMAIL = "drdollyprasad@gmail.com";
 export const INSTAGRAM = { handle: "@dolly.creates", url: "https://www.instagram.com/dolly.creates/" };
 
+/** a mail to her about one work, naming it and linking its page, so she knows which it is */
 export const enquiry = (w: Work) =>
-  `mailto:${EMAIL}?subject=${encodeURIComponent(`Enquiry: ${w.title}`)}`;
+  `mailto:${EMAIL}?subject=${encodeURIComponent(`Enquiry: ${w.title}`)}&body=${encodeURIComponent(
+    `Hello Dr Prasad,\n\nI saw ${quoted(w.title)} on your website and would like to know more about it.\n\n${SITE}${workPath(w.id)}\n`)}`;
 
 /** a painting's title as it is shown: in quotation marks */
 export const quoted = (title: string) => `“${title}”`;

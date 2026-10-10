@@ -57,6 +57,13 @@ it are hers: a gallery inside a Delhi home, built and lit in Blender.
    All · Available · Sold. **Quick access**: an Index tab on the left edge (the phone's dock sheet
    on a phone) lists every stop and her work by availability, for a visitor who would rather not walk.
 6. **About and contact** — her statement, her biography verbatim.
+7. **Every painting has its own page** (`app/work/[id]`, static): the work on her paper in its
+   dark frame, its label, Enquire (a mail that names the work and links its page), Share, the room
+   made for it, and **See it in her studio**, which opens the house, walks to the wall it hangs on
+   and opens it there (`/#work=<id>`). A shared link shows the painting in the preview
+   (`public/og`, from `scripts/og/make.py`). The card over the house shares the same page, and
+   turns to the previous and next work (← →) in the order the walk or the collage shows them.
+   `sitemap.xml`, `robots.txt` and schema.org data (her, and each work) are for search.
 
 The canvases are paint, not prints (`lib/room/paint.ts`): a relief normal map read from each
 photograph's fine detail, and a soft varnish sheen from its gallery light that slides as the camera

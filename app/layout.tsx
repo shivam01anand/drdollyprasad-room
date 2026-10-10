@@ -6,7 +6,7 @@ const DESCRIPTION =
 
 export const metadata: Metadata = {
   metadataBase: new URL("https://drdollyprasad.com"),
-  title: "Dr Dolly Prasad",
+  title: "Dr Dolly Prasad · Paintings, New Delhi",
   description: DESCRIPTION,
   // the link preview when the site is shared (WhatsApp, Instagram, mail)
   openGraph: {

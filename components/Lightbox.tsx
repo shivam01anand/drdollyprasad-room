@@ -2,12 +2,13 @@
 
 import { forwardRef, useEffect, useImperativeHandle, useRef } from "react";
 import { motion, gsap, Flip, scrambleTo, reducedMotion } from "@/lib/motion";
-import { BY_ID, LARGE, enquiry, quoted, type Work } from "@/lib/works";
+import { BY_ID, LARGE, WORKS, enquiry, quoted, workPath, type Work } from "@/lib/works";
 import { XL } from "@/lib/xl";
 import { roomsFor, type RoomView } from "@/lib/rooms";
 import { CloseLook } from "@/lib/closelook";
 
-export type LightboxHandle = { open(id: string, from: HTMLImageElement | null): void };
+/** `seq`: the works the reader can turn through from this one (the walk's, the collage's) */
+export type LightboxHandle = { open(id: string, from: HTMLImageElement | null, seq?: string[]): void };
 type Dims = Record<string, { w: number; h: number }>;
 
 /**
@@ -29,6 +30,9 @@ const Lightbox = forwardRef<LightboxHandle, { dims: Dims; onOpenChange(open: boo
     const title = useRef<HTMLHeadingElement>(null);
     const meta = useRef<HTMLDListElement>(null);
     const ask = useRef<HTMLAnchorElement>(null);
+    const shareBtn = useRef<HTMLButtonElement>(null);
+    const count = useRef<HTMLSpanElement>(null);
+    const shareTimer = useRef(0);
     const closeBtn = useRef<HTMLButtonElement>(null);
     const frame = useRef<HTMLDivElement>(null);
     const bar = useRef<HTMLDivElement>(null);
@@ -47,8 +51,8 @@ const Lightbox = forwardRef<LightboxHandle, { dims: Dims; onOpenChange(open: boo
     const warmed = useRef(new Set<string>());
     const cb = useRef(onOpenChange);
     cb.current = onOpenChange;
-    const st = useRef<{ id: string | null; from: HTMLImageElement | null; anim: gsap.core.Animation[]; busy: boolean; at: number }>(
-      { id: null, from: null, anim: [], busy: false, at: 0 });
+    const st = useRef<{ id: string | null; from: HTMLImageElement | null; anim: gsap.core.Animation[]; busy: boolean; at: number;
+      seq: string[] }>({ id: null, from: null, anim: [], busy: false, at: 0, seq: [] });
 
     const kill = () => { st.current.anim.forEach((a) => a.kill()); st.current.anim = []; };
     const own = <T extends gsap.core.Animation>(a: T) => { st.current.anim.push(a); return a; };
@@ -195,17 +199,24 @@ const Lightbox = forwardRef<LightboxHandle, { dims: Dims; onOpenChange(open: boo
       });
     };
 
-    const open = (id: string, from: HTMLImageElement | null) => {
+    /** `swap`: the card is open on another work, and this one takes its place (Previous / Next) */
+    const open = (id: string, from: HTMLImageElement | null, seq?: string[], swap = false) => {
       const w = BY_ID.get(id);
       const r = root.current, i = img.current;
-      if (!w || !r || !i || st.current.id) return;
+      if (!w || !r || !i || (st.current.id && !swap)) return;
       st.current.at = performance.now();
       motion();
       kill();
       const reduce = reducedMotion();
       st.current.id = id;
-      st.current.from = from;
-      cb.current(true);
+      if (!swap) {
+        st.current.from = from;
+        st.current.seq = seq?.includes(id) ? seq : WORKS.map((x) => x.id);
+        cb.current(true);
+      }
+      const k = st.current.seq.indexOf(id);
+      if (count.current) count.current.textContent =
+        `${String(k + 1).padStart(2, "0")} / ${String(st.current.seq.length).padStart(2, "0")}`;
 
       const d = dims[id];
       if (d) { i.width = d.w; i.height = d.h; }
@@ -227,6 +238,8 @@ const Lightbox = forwardRef<LightboxHandle, { dims: Dims; onOpenChange(open: boo
         ? "Tap to look closer" : "Click to look closer · scroll to zoom";
       ask.current!.href = enquiry(w);
       ask.current!.textContent = w.status === "Sold" ? "Ask about her work →" : "Enquire about this work →";
+      clearTimeout(shareTimer.current);
+      if (shareBtn.current) shareBtn.current.textContent = "Share";
       if (!r.open) r.showModal();
 
       look.current?.enable(false);
@@ -236,13 +249,14 @@ const Lightbox = forwardRef<LightboxHandle, { dims: Dims; onOpenChange(open: boo
         // its room comes down quietly once the work is in, unless the reader is saving data
         const first = rooms.current[0];
         const save = (navigator as Navigator & { connection?: { saveData?: boolean } }).connection?.saveData;
-        if (first && !save) {
+        // turning through works, the reader is in charge: no slideshow then
+        if (first && !save && !swap) {
           warm(first.room.src);
           // and the slideshow begins: the work, then the work in its room
           playShow(id);
         }
       };
-      if (from && !reduce) {
+      if (from && !reduce && !swap) {
         const state = Flip.getState(from);
         from.style.visibility = "hidden";
         own(Flip.from(state, { targets: i, duration: 0.6, ease: "power1.inOut", absolute: true, scale: true, onComplete: landed }));
@@ -250,8 +264,10 @@ const Lightbox = forwardRef<LightboxHandle, { dims: Dims; onOpenChange(open: boo
         own(gsap.fromTo(i, { autoAlpha: 0, scale: 0.96 }, { autoAlpha: 1, scale: 1, duration: reduce ? 0 : 0.6, ease: "power2.out",
           onComplete: () => { gsap.set(i, { clearProps: "transform" }); landed(); } }));
       }
-      own(gsap.fromTo(veil.current, { opacity: 0 }, { opacity: 1, duration: reduce ? 0 : 0.45 }));
-      own(gsap.fromTo(card.current, { autoAlpha: 0, y: 14 }, { autoAlpha: 1, y: 0, duration: reduce ? 0 : 0.5, ease: "power2.out" }));
+      if (!swap) {
+        own(gsap.fromTo(veil.current, { opacity: 0 }, { opacity: 1, duration: reduce ? 0 : 0.45 }));
+        own(gsap.fromTo(card.current, { autoAlpha: 0, y: 14 }, { autoAlpha: 1, y: 0, duration: reduce ? 0 : 0.5, ease: "power2.out" }));
+      }
       own(gsap.fromTo([title.current, meta.current], { autoAlpha: 1 }, { autoAlpha: 1, duration: 0 }));
       own(scrambleTo(title.current!, quoted(w.title), { anagram: true, speed: 0.6, duration: 1, delay: 0.4 }));
       dl.querySelectorAll<HTMLElement>("dd").forEach((dd, k) =>
@@ -267,9 +283,34 @@ const Lightbox = forwardRef<LightboxHandle, { dims: Dims; onOpenChange(open: boo
           if (roomImg.current) roomImg.current.src = hi.src;
         }).catch(() => {});
       }
+      if (swap) return;
       // focus moves to the close, ringed only when the work was opened from the keyboard
       r.classList.toggle("by-pointer", !byKey.current);
       closeBtn.current?.focus({ preventScroll: true });
+    };
+
+    /** Previous / Next: the work goes, its neighbour comes into the same card */
+    const turn = (d: 1 | -1) => {
+      const { id, seq, busy } = st.current;
+      if (!id || busy || seq.length < 2) return;
+      stopShow();
+      const k = seq.indexOf(id);
+      const next = seq[(k + d + seq.length) % seq.length];
+      kill();
+      look.current?.enable(false);
+      look.current?.reset(true);
+      // the card the first work flew from shows again, and closing now fades rather than flies
+      if (st.current.from) { st.current.from.style.visibility = ""; st.current.from = null; }
+      const reduce = reducedMotion();
+      st.current.busy = true;
+      own(gsap.to([img.current, roomBox.current, title.current, meta.current, ask.current], {
+        autoAlpha: 0, duration: reduce ? 0 : 0.2, ease: "power1.in",
+        onComplete: () => {
+          st.current.busy = false;
+          gsap.set([roomBox.current, title.current, meta.current], { clearProps: "opacity,visibility" });
+          open(next, null, undefined, true);
+        },
+      }));
     };
 
     const close = () => {
@@ -326,6 +367,23 @@ const Lightbox = forwardRef<LightboxHandle, { dims: Dims; onOpenChange(open: boo
      *  screen its click arrives after the work is open, wherever the work now isn't */
     const backdrop = () => { if (performance.now() - st.current.at > 450) close(); };
 
+    /** the open work's own page: the phone's share sheet, or the link copied */
+    const share = async () => {
+      const id = st.current.id, w = id ? BY_ID.get(id) : null;
+      if (!id || !w) return;
+      const url = new URL(workPath(id), location.origin).toString();
+      try {
+        if (navigator.share && matchMedia("(pointer: coarse)").matches) {
+          await navigator.share({ title: `${quoted(w.title)} · Dr Dolly Prasad`, url });
+          return;
+        }
+        await navigator.clipboard.writeText(url);
+        if (shareBtn.current) shareBtn.current.textContent = "Link copied";
+        clearTimeout(shareTimer.current);
+        shareTimer.current = window.setTimeout(() => { if (shareBtn.current) shareBtn.current.textContent = "Share"; }, 2200);
+      } catch { /* dismissed, or the clipboard refused */ }
+    };
+
     useImperativeHandle(ref, () => ({ open }), []);
 
     // the reader takes over: any touch on the work, a wheel or a key ends the slideshow;
@@ -342,12 +400,20 @@ const Lightbox = forwardRef<LightboxHandle, { dims: Dims; onOpenChange(open: boo
         if (frame.current?.classList.contains("is-zoomed") || performance.now() - t0 > 700) return;
         if (Math.abs(dx) > 50 && Math.abs(dx) > Math.abs(dy) * 1.4) stepView(dx < 0 ? 1 : -1);
       };
+      // ← and → turn to the previous and next work while the card is open
+      const keys = (e: KeyboardEvent) => {
+        if (!st.current.id || e.metaKey || e.ctrlKey || e.altKey) return;
+        if (e.key === "ArrowRight") { e.preventDefault(); turn(1); }
+        if (e.key === "ArrowLeft") { e.preventDefault(); turn(-1); }
+      };
+      root.current?.addEventListener("keydown", keys);
       fig.addEventListener("pointerdown", down);
       fig.addEventListener("wheel", down, { passive: true });
       fig.addEventListener("touchstart", ts, { passive: true });
       fig.addEventListener("touchend", te, { passive: true });
       addEventListener("keydown", down);
       return () => {
+        root.current?.removeEventListener("keydown", keys);
         fig.removeEventListener("pointerdown", down);
         fig.removeEventListener("wheel", down);
         fig.removeEventListener("touchstart", ts);
@@ -448,7 +514,15 @@ const Lightbox = forwardRef<LightboxHandle, { dims: Dims; onOpenChange(open: boo
             <dl className="lb-meta" ref={meta} />
             <div className="lb-views" ref={views} role="group" aria-label="Ways to see this work" hidden />
             <p className="lab lb-hint" ref={hint} />
-            <a className="pill pill-solid" ref={ask} href="#">Enquire →</a>
+            <div className="lb-actions">
+              <a className="pill pill-solid" ref={ask} href="#">Enquire →</a>
+              <button type="button" className="pill" ref={shareBtn} onClick={share} aria-live="polite">Share</button>
+            </div>
+            <div className="lb-step" role="group" aria-label="Her other works">
+              <button type="button" className="lab" onClick={() => turn(-1)}>← Previous</button>
+              <span className="lab lb-count" ref={count} />
+              <button type="button" className="lab" onClick={() => turn(1)}>Next →</button>
+            </div>
           </div>
         </div>
       </dialog>

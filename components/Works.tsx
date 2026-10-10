@@ -1,7 +1,7 @@
 "use client";
 
 import { useEffect, useState } from "react";
-import { WORKS, SERIES, EMAIL, INSTAGRAM, details, quoted, statusLabel } from "@/lib/works";
+import { WORKS, SERIES, EMAIL, INSTAGRAM, details, quoted, statusLabel, workPath } from "@/lib/works";
 
 export type WorksFilter = "all" | "available" | "sold";
 /** the quick-access index (and anything else) shows the works filtered: dispatch this, then scroll to #works */
@@ -58,7 +58,7 @@ export default function Works({ dims }: { dims: Dims }) {
               const width = Math.round(ar >= 1 ? capped : capped * ar);
               return (
                 <figure className="work" key={w.id} style={{ width }}>
-                  <a href={`/art/works/${w.id}.jpg`} data-work={w.id} aria-label={`${w.title} — open`} data-cursor="View">
+                  <a href={workPath(w.id)} data-work={w.id} aria-label={`${w.title} — open`} data-cursor="View">
                     {/* eslint-disable-next-line @next/next/no-img-element */}
                     <img src={`/art/works/${w.id}.jpg`} alt={`${w.title} — ${w.medium.toLowerCase()}`}
                          width={d.w} height={d.h} loading="lazy" decoding="async" data-flip-id={w.id} />

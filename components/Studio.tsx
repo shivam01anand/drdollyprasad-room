@@ -14,9 +14,9 @@ import Stops from "./Stops";
 import QuickIndex from "./QuickIndex";
 import { WORKS_FILTER, type WorksFilter } from "./Works";
 import * as music from "@/lib/music";
-import { CHAPTERS } from "@/lib/chapters";
+import { CHAPTERS, WALK_ORDER, stopOf } from "@/lib/chapters";
 import { activeVariant } from "@/lib/room/variants";
-import { EMAIL } from "@/lib/works";
+import { BY_ID, EMAIL, FEATURED } from "@/lib/works";
 
 type Dims = Record<string, { w: number; h: number }>;
 
@@ -364,7 +364,7 @@ export default function Studio({ dims }: { dims: Dims }) {
           setReady(true);
           lock("intro", false);
         },
-        onArtwork: (id) => lbRef.current?.open(id, null),
+        onArtwork: (id) => lbRef.current?.open(id, null, WALK_ORDER),
         onHoverArt: (id) => roomCursorLabel(id ? "View" : null),
         onRearrangeError: (error) => {
           if (killed || dead) return;
@@ -443,7 +443,11 @@ export default function Studio({ dims }: { dims: Dims }) {
       const a = t.closest<HTMLElement>("[data-work]");
       if (!a) return;
       e.preventDefault();
-      lbRef.current?.open(a.dataset.work!, a.querySelector("img"));
+      // in the collage, Previous / Next follow what it shows, as filtered
+      const seq = a.closest("#works")
+        ? [...document.querySelectorAll<HTMLElement>("#works [data-work]")].map((x) => x.dataset.work!)
+        : undefined;
+      lbRef.current?.open(a.dataset.work!, a.querySelector("img"), seq);
     };
     document.addEventListener("click", onDocClick);
 
@@ -647,6 +651,32 @@ export default function Studio({ dims }: { dims: Dims }) {
   // the chapter in view, for the header's "you are here"
   const here = ready ? CHAPTERS[active]?.id : undefined;
 
+  // a link to one painting (its own page's "See it in her studio", or a shared /#work=<id>): once
+  // the house is open, walk to the wall it hangs on and open it there; /#works goes to the collage
+  useEffect(() => {
+    if (!ready || failed) return;
+    const hash = location.hash;
+    if (hash === "#works") { setTimeout(() => go("#works"), 300); return; }
+    const m = /^#work=([a-z0-9-]+)$/.exec(hash);
+    if (!m || !BY_ID.has(m[1])) return;
+    const id = m[1];
+    history.replaceState(null, "", location.pathname + location.search);   // a refresh starts at the door
+    const i = stopOf(id);
+    if (i < 0) { lbRef.current?.open(id, null, WALK_ORDER); return; }
+    goStop(i);
+    let tries = 0;
+    const t = window.setInterval(() => {
+      const r = roomRef.current;
+      const there = !!r && r.landed && Math.abs(r.at * (CHAPTERS.length - 1) - i) < 0.04;
+      if (there || ++tries > 80) {
+        clearInterval(t);
+        lbRef.current?.open(id, null, WALK_ORDER);
+      }
+    }, 150);
+    return () => clearInterval(t);
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [ready, failed]);
+
   return (
     <>
       <div className="stage" ref={stageRef} aria-hidden="true">
@@ -755,7 +785,7 @@ export default function Studio({ dims }: { dims: Dims }) {
       </div>
 
       <WallLabels room={roomRef} active={active} live={ready && !failed && !rearrange}
-                  onOpen={(id) => lbRef.current?.open(id, null)} />
+                  onOpen={(id) => lbRef.current?.open(id, null, WALK_ORDER)} />
 
       {failed && (
         <p className="room-off lab" role="status">
@@ -768,7 +798,7 @@ export default function Studio({ dims }: { dims: Dims }) {
         {CHAPTERS.map((c) =>
           c.slot === "featured" ? (
             <section className="sec sec-featured" key={c.id} data-chapter={c.id} aria-label="Featured works">
-              <Featured dims={dims} onOpen={(id, img) => lbRef.current?.open(id, img)} />
+              <Featured dims={dims} onOpen={(id, img) => lbRef.current?.open(id, img, FEATURED)} />
             </section>
           ) : (
             <section className="sec" key={c.id} data-chapter={c.id} aria-label={c.eyebrow}>

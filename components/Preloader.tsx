@@ -2,6 +2,7 @@
 
 import { forwardRef, useEffect, useImperativeHandle, useLayoutEffect, useRef, useState } from "react";
 import { motion, gsap, Flip, reducedMotion } from "@/lib/motion";
+import { SHOW } from "@/lib/works";
 
 export type HeroRect = { left: number; top: number; width: number; height: number };
 export type PreloaderHandle = { finish(): void };
@@ -43,6 +44,8 @@ const Preloader = forwardRef<PreloaderHandle, Props>(function Preloader(props, r
   const hero = useRef<HTMLImageElement>(null);
   const [ready, setReady] = useState(false);
   const [again, setAgain] = useState(false);
+  /** her exhibition, said under her name while it is on (it goes after its last day) */
+  const [showing, setShowing] = useState(false);
 
   const nodes = useRef<{ b1: HTMLSpanElement; b2: HTMLSpanElement } | null>(null);
   const cb = useRef(props);
@@ -67,6 +70,7 @@ const Preloader = forwardRef<PreloaderHandle, Props>(function Preloader(props, r
     sign.current!.append(b1, b2);
     nodes.current = { b1, b2 };
     try { setAgain(sessionStorage.getItem(SEEN) === "1"); } catch { /* private mode */ }
+    setShowing(Date.now() < Date.parse(`${SHOW.until}T23:59:59+05:30`));
     return () => {
       owned.current.forEach((a) => a.kill());
       removeEventListener("resize", place);
@@ -199,6 +203,7 @@ const Preloader = forwardRef<PreloaderHandle, Props>(function Preloader(props, r
           </h1>
           <div className="pre-sign" ref={sign} data-in="" />
           <p className="pre-note lab" data-in="">Paintings · New Delhi</p>
+          {showing && <p className="pre-note pre-show lab" data-in="">Showing at Sacred Fragments · 18–21 October</p>}
           <div className="pre-foot">
             <div className="pre-bar" role="progressbar" aria-label="Opening the house" aria-valuemin={0} aria-valuemax={100}
                  aria-valuenow={Math.round(props.pct)} data-ready={ready ? "1" : "0"}>
