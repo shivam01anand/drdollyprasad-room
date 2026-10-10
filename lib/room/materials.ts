@@ -19,12 +19,13 @@ import type { Variant } from "./variants";
  */
 
 export type SetName =
-  | "plaster" | "floor" | "door" | "timber" | "sandstone" | "iron" | "terracotta" | "teak";
+  | "plaster" | "floor" | "door" | "timber" | "sandstone" | "iron" | "terracotta" | "teak" | "brick";
 
 export type Role =
   | "wall" | "wallShade" | "field" | "court" | "floor" | "stone" | "sandstone" | "ram"
   | "timber" | "frame" | "door" | "iron" | "ironDark" | "clay" | "postbox"
-  | "courtFloor" | "aluminium" | "brass" | "thread" | "leaf" | "canvasBack" | "artFrame" | "teak" | "teakRail";
+  | "courtFloor" | "aluminium" | "brass" | "thread" | "leaf" | "canvasBack" | "artFrame" | "teak" | "teakRail"
+  | "brick" | "concrete" | "panel" | "kota";
 
 type Spec = {
   set?: SetName;
@@ -85,6 +86,12 @@ export const SPECS: Record<Role, Spec> = {
   // along the stiles and jambs, across the rails and the lintel
   teak:      { set: "teak", tint: [0.86, 0.77, 0.67], tile: 0.9, rotate: true, roughness: 0.62, env: 0.85, normal: 0.5, tunable: false },
   teakRail:  { set: "teak", tint: [0.86, 0.77, 0.67], tile: 0.9, roughness: 0.62, env: 0.85, normal: 0.5, tunable: false },
+  // the gallery hall, in the India Habitat Centre's language: red-brown brick (Poly Haven
+  // "Brick Wall 09", warmed), grey concrete bands, gallery-white panels, a grey-green Kota floor
+  brick:     { set: "brick", tint: [1.05, 0.72, 0.68], tile: 2.0, macro: 0.05, env: 0.6, normal: 0.9 },
+  concrete:  { set: "plaster", tint: [1.07, 1.02, 0.92], tile: 2.4, macro: 0.08, env: 0.6, normal: 0.7 },
+  panel:     { set: "plaster", tint: [2.05, 2.02, 1.95], tile: 2.0, macro: 0.02, env: 0.8, normal: 0.15 },
+  kota:      { set: "floor", tint: 0xb4bab0, tile: 2.4, macro: 0.06, env: 0.8 },
 };
 
 const SET_TILE_PATH = (set: SetName, kind: "diff" | "nor" | "arm", small: boolean) =>

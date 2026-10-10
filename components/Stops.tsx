@@ -84,7 +84,7 @@ export default function Stops({ open, active, onClose, onGo, onShake, onContact,
   return (
     <div className="sheet" ref={root} data-open="0" aria-hidden={!open}>
       <div className="sheet-veil" onClick={onClose} />
-      <div className="sheet-panel" ref={panel} role="dialog" aria-modal="true" aria-label="The house">
+      <div className="sheet-panel" ref={panel} role="dialog" aria-modal="true" aria-label="The house" data-lenis-prevent="">
         <div className="sheet-grip" aria-hidden="true" />
         <div className="sheet-head">
           <p className="lab">The house · {CHAPTERS.length} stops</p>

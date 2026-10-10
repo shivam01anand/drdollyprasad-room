@@ -17,7 +17,7 @@ it are hers: a gallery inside a Delhi home, built and lit in Blender.
    courtyard around it. A second visit in a session is welcomed back and goes straight in.
 2. **The house is shown, then the camera moves in.** Her things fall into place as the panel
    lifts (`bounce.out` from two metres, as the original drops its furniture).
-3. **An eleven-step walk**, one section each, one source (`lib/chapters.ts`) for copy and camera:
+3. **A fifteen-step walk**, one section each, one source (`lib/chapters.ts`) for copy and camera:
    - **the Aangan**, a courtyard garden open to the sky: "Woman with Poppies", the floral works,
      "Under Canopy of Greens" under two green-enamel studio lamps; then the walk turns to the arch
      — the tall brass lamp of her openings beside it in a ring of marigolds — and goes straight
@@ -29,9 +29,15 @@ it are hers: a gallery inside a Delhi home, built and lit in Blender.
    - **the Red Room** by the lane: "The Bullocks" and "Terracotta" on the red wall, with her
      photograph — interviewed beside "The Bullocks" — on an easel between them; then "Shree 420"
      and "Three Women in Red", with Bandh Darwaze I–IV in a row on the wall to their left;
-   - **the gallery**, through a doorway in the Red Room's east wall: a white room where the rest of
-     her work hangs salon-style, two rows to a wall: Gone Are The Days (south), the portraits
-     (east), Faith (north and west); its photographs load after the house has opened (`late`);
+   - **the gallery**, through a doorway in the Red Room's east wall: a hall in the language of the
+     India Habitat Centre, where she has shown — red-brown brick with grey concrete bands, the
+     work on white panels between brick piers, the roof open under a space frame hung with folded
+     teal and cream sunshades (the afternoon falls through it on the floor, never on a painting),
+     and at the far end a window onto a court of palms. The rest of her work hangs as an
+     exhibition hangs, one line at eye level, a series to a wall: Gone Are The Days (south, two
+     stops), Faith either side of the palm window, the portraits back along the north wall (two
+     stops); its cards sit centred under the works; its photographs load after the house has
+     opened (`late`);
    - every canvas hangs in a float frame (a dark lip round a shadow gap, nothing of the canvas
      covered) and carries a printed wall label, typed in once the camera lands (`WallLabels`);
    - **the afternoon goes as you go in**: each chapter has a `dusk`, and the light moves toward
@@ -40,7 +46,7 @@ it are hers: a gallery inside a Delhi home, built and lit in Blender.
 
    Every room change passes through a doorway, through passing poses where a turn is long
    (`scripts/house/pathcheck.py` proves it for the landscape and the portrait walk). The camera
-   walks: it follows the scroll softly and never takes a step faster than 2.6 s (`Rig.STEP_S`).
+   walks: it follows the scroll softly and never takes a step faster than 3.4 s (`Rig.STEP_S`).
 4. **Featured** — the original's slider; a click opens the work on a card over the house (the
    room stays in view, dimmed a little; a click outside puts it away), where it can be looked at
    closely (click, scroll, pinch) or seen in the room made for it (`lib/rooms.ts`, Blender renders
@@ -71,8 +77,8 @@ Designed for the thumb, not shrunk from the desktop:
   past the last stop the page scrolls freely through the works and the contact;
 - phones render sharp: twice their pixels, 4× MSAA, the full lightmaps (only a weak machine
   gets the light set);
-- **the dock** — one bar where the desktop has four pills: where you are (`05/10 · Artist's
-  statement`) and a menu; the menu is a sheet from the bottom edge (`Stops`) with the ten stops,
+- **the dock** — one bar where the desktop has four pills: where you are (`04/15 · Artist's
+  statement`) and a menu; the menu is a sheet from the bottom edge (`Stops`) with every stop,
   all her works, Shake the room, contact, mail and Instagram;
 - every copy label sits clear of its painting (the portrait cameras frame each painting high,
   and on a short phone the poem sets in its two stanzas side by side);

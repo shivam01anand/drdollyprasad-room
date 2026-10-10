@@ -155,6 +155,7 @@ html[data-rearrange="1"] .chapter-text{visibility:hidden;pointer-events:none}
 .qi-works button span{margin-left:auto;font-family:var(--mono);font-size:11px;color:var(--dim)}
 .qi-works button:hover,.qi-stops button:hover,.qi-stops button[aria-current="true"]{color:var(--oxide)}
 .qi-stops{list-style:none;margin:0;padding:0}
+.qi-stops button{padding:8px 0;font-size:16px}
 .qi-stops .lab{flex:none;width:2em}
 .qi-more{display:flex;flex-wrap:wrap;gap:8px;margin-top:22px}
 html[data-rearrange="1"] .qi{display:none}
@@ -252,6 +253,8 @@ html[data-rearrange="1"] .copy{opacity:0;transition:opacity .4s ease}
 
 /* the wall labels: a printed card beside each canvas, as a gallery hangs it */
 .wall-labels{position:fixed;inset:0;z-index:2;pointer-events:none;overflow:hidden}
+/* a hang in one line (the gallery's walls): narrower cards, centred under their canvases */
+.wall-labels[data-dense="1"] .wall-label{max-width:170px;padding:8px 10px 9px}
 .wall-label{position:absolute;left:0;top:0;display:flex;flex-direction:column;gap:1px;max-width:214px;
   padding:9px 12px 10px;margin:0;border:0;border-radius:1px;background:#F3EEE5;text-align:left;font:inherit;
   box-shadow:0 1px 1px rgba(48,32,22,.14),0 8px 16px -10px rgba(48,32,22,.45);
@@ -532,6 +535,7 @@ html[data-mode="dark"] .lb-veil{background:rgba(0,0,0,.5)}
   .diya-btn{width:42px;height:42px}
   .copy-panel{left:var(--gut);right:var(--gut);width:auto;bottom:calc(var(--hud-bottom) + 12px);padding:16px 18px 18px}
   .wall-label{max-width:176px;padding:7px 10px 8px}
+  .wall-labels[data-dense="1"] .wall-label{max-width:176px}
   /* the music joins the diya in the corner on a phone */
   .hud-top{grid-template-columns:1fr auto auto}
   .wall-label .cap-title{font-size:12.5px}

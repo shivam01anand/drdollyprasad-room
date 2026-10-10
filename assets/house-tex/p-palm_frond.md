@@ -1,0 +1,3 @@
+Use your image generation tool to create ONE image and save it in the current directory as palm_frond.png (if the tool saves elsewhere, copy it here under that name and print its path).
+
+A single fresh areca palm frond (a feather palm leaf) photographed flat from directly above, filling the frame lengthwise from top to bottom: the thin rachis running exactly vertically down the centre, long narrow pointed leaflets on both sides angled toward the tip, evenly spaced, slightly arching, the leaflets getting shorter toward the tip and the base. Vivid but natural green with a yellow-green rachis, soft even daylight. Background: pure flat white (#FFFFFF) everywhere outside the frond, with no shadow. Portrait 1024x1536. Photorealistic botanical reference.

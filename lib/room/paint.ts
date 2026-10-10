@@ -84,7 +84,8 @@ export function flatRelief() {
 }
 
 /** where a canvas's gallery light hangs (scripts/house/build.py gallery_light), in three's axes */
-export function galleryLight(a: { side: string; centre: [number, number, number] }) {
+export function galleryLight(a: { side: string; centre: [number, number, number]; light?: [number, number, number] }) {
+  if (a.light) return new THREE.Vector3(...a.light);
   const out: Record<string, [number, number]> = { N: [0, 1], S: [0, -1], E: [-1, 0], W: [1, 0] };
   const [nx, nz] = out[a.side] ?? [0, 1];
   return new THREE.Vector3(a.centre[0] + nx * 0.95, Math.min(3.38, a.centre[1] + 1.9), a.centre[2] + nz * 0.95);

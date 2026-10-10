@@ -28,11 +28,13 @@ const GAP = 18;
 
 const overlaps = (a: Rect, b: Rect, m = 8) => a.x0 < b.x1 + m && a.x1 > b.x0 - m && a.y0 < b.y1 + m && a.y1 > b.y0 - m;
 
-function spot(side: Side, f: Rect, w: number, h: number) {
+/** where a card stands by its canvas; `centred` puts one below a canvas in the middle of it,
+ *  as a hang in one line wants (the gallery's walls) */
+function spot(side: Side, f: Rect, w: number, h: number, centred = false) {
   if (side === "right") return { x: f.x1 + GAP, y: f.y1 - h };
   if (side === "left") return { x: f.x0 - GAP - w, y: f.y1 - h };
   if (side === "above") return { x: f.x0, y: f.y0 - GAP * 0.75 - h };
-  return { x: f.x0, y: f.y1 + GAP * 0.75 };
+  return { x: centred ? (f.x0 + f.x1) / 2 - w / 2 : f.x0, y: f.y1 + GAP * 0.75 };
 }
 
 export default function WallLabels({ room, active, live, onOpen }: {
@@ -52,6 +54,9 @@ export default function WallLabels({ room, active, live, onOpen }: {
     const nodes = new Map([...ids.map((id) => [id, el.querySelector<HTMLElement>(`[data-label='${id}']`)!] as const),
       ...asides.map((a) => [a.key, el.querySelector<HTMLElement>(`[data-label='${a.key}']`)!] as const)]);
     let placed: Map<string, Side> | null = null;
+    // a chapter that hangs its works in one line has narrower cards, centred below them
+    const centred = CHAPTERS[active]?.labelSide === "below";
+    el.dataset.dense = centred ? "1" : "";
     /** where each aside last fitted: it holds there while the view sways, never jumps to the corner */
     const asideAt = new Map<string, { x: number; y: number }>();
     let reveal: gsap.core.Timeline | null = null;
@@ -85,7 +90,7 @@ export default function WallLabels({ room, active, live, onOpen }: {
         const first = CHAPTERS[active]?.labelSide;
         const sides: Side[] = ["right", "left", "below", "above"];
         for (const side of first ? [first, ...sides.filter((x) => x !== first)] : sides) {
-          const p = spot(side, f, w, h);
+          const p = spot(side, f, w, h, centred);
           const r = { x0: p.x, y0: p.y, x1: p.x + w, y1: p.y + h };
           if (r.x0 < gut || r.x1 > vw - gut || r.y0 < gut || r.y1 > vh - gut) continue;
           if (frames.some((o) => overlaps(r, o)) || taken.some((o) => overlaps(r, o)) || avoid.some((o) => overlaps(r, o, 6))) continue;
@@ -120,7 +125,7 @@ export default function WallLabels({ room, active, live, onOpen }: {
       for (const [id, side] of placed) {
         const f = rects.get(id), n = nodes.get(id)!;
         if (!f) continue;
-        const p = spot(side, f, n.offsetWidth, n.offsetHeight);
+        const p = spot(side, f, n.offsetWidth, n.offsetHeight, centred);
         labelRects.push({ x0: p.x, y0: p.y, x1: p.x + n.offsetWidth, y1: p.y + n.offsetHeight });
       }
       // an aside sits beside the thing it names, clear of it: right of it, left, or below
@@ -161,7 +166,7 @@ export default function WallLabels({ room, active, live, onOpen }: {
         if (q) { n.style.transform = `translate3d(${Math.round(q.x)}px, ${Math.round(q.y)}px, 0)`; continue; }
         const f = rects.get(id);
         if (!f) continue;
-        const p = spot(side, f, n.offsetWidth, n.offsetHeight);
+        const p = spot(side, f, n.offsetWidth, n.offsetHeight, centred);
         n.style.transform = `translate3d(${Math.round(p.x)}px, ${Math.round(p.y)}px, 0)`;
       }
     };

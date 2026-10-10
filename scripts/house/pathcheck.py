@@ -15,8 +15,9 @@ import sys
 
 info = json.load(open(sys.argv[1]))
 NARROW = len(sys.argv) > 2 and sys.argv[2] == "narrow"
-ORDER = ["presence", "floral", "canopy", "bodhi", "faith", "street", "redwall", "gallery", "portraits", "featured", "plan"]
-VIA = {"bodhi": "threshold", "faith": "faithvia", "street": "streetvia", "redwall": "redvia", "gallery": "galleryvia", "portraits": "portraitsvia"}
+ORDER = ["presence", "floral", "canopy", "bodhi", "faith", "street", "redwall",
+         "gallery", "rupaya", "panels", "palms", "portraits", "doodhwala", "featured", "plan"]
+VIA = {"bodhi": "threshold", "faith": "faithvia", "street": "streetvia", "redwall": "redvia", "gallery": "galleryvia"}
 cams = {k: (info["cams"].get(f"n:{k}") if NARROW else None) or v for k, v in info["cams"].items() if not k.startswith("n:")}
 if NARROW:   # views a portrait screen alone has (a passing pose only it needs)
     cams.update({k[2:]: v for k, v in info["cams"].items() if k.startswith("n:") and k[2:] not in cams})

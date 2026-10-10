@@ -110,20 +110,36 @@ export const CHAPTERS: Chapter[] = [
   },
   { id: "redwall", eyebrow: "“Shree 420” · “Three Women in Red”", stop: "Shree 420 · Three Women", room: "The Red Room", view: "redwall",
     via: "redvia", dusk: 0.45, labels: ["shree-420-and-milk-cans", "three-veiled-women"] },
-  // through the Red Room's east doorway: the gallery, where the rest of her work hangs salon-style
-  { id: "gallery", eyebrow: "The gallery · Gone Are The Days", stop: "The gallery", room: "The gallery",
+  // through the Red Room's east doorway: the gallery hall, where the rest of her work hangs as an
+  // exhibition hangs, one line at eye level, a series to a wall (scripts/house/build.py)
+  { id: "gallery", ink: "light", eyebrow: "The gallery", stop: "The gallery", room: "The gallery",
     view: "gallery", via: "galleryvia", dusk: 0.5 },
+  { id: "rupaya", ink: "light", eyebrow: "Gone Are The Days · c. 2016–2018", stop: "Mother India · Twenty Paise", room: "The gallery",
+    view: "rupaya", dusk: 0.5, labelSide: "below",
+    labels: ["rickshaw-puller-and-coin", "postbox-and-stamps", "mother-india-and-kettles", "cycle-rickshaw", "rickshaw-rest-framed"] },
+  { id: "panels", ink: "light", eyebrow: "Gone Are The Days · c. 2016–2018", stop: "The Matka · The Rickshaw-wala", room: "The gallery",
+    view: "panels", dusk: 0.52, labelSide: "below",
+    labels: ["horse-cart-and-autorickshaw", "carriage-and-autorickshaw", "coins-and-clay-bank", "rickshaw-rest",
+      "bullock-cart-and-truck", "rickshaw-and-autorickshaw"] },
+  // either side of the window onto the palm court
+  { id: "palms", ink: "light", eyebrow: "Faith · c. 2005–2015", stop: "Faith", room: "The gallery", view: "palms", dusk: 0.52,
+    labelSide: "below", labels: ["offering-of-light", "prayer-and-scripture", "priest-with-flame", "sacred-tree"] },
   {
     id: "portraits",
+    ink: "light",
     eyebrow: "Portraits · c. 2005–2015",
     stop: "Portraits",
     room: "The gallery",
     // her own page's words about her, as written there (drdollyprasad.wordpress.com)
     body: "Play of emotions, be it on the faces around her or on the canvas, have always fascinated her.",
     view: "portraits",
-    via: "portraitsvia",
     dusk: 0.54,
+    labelSide: "below",
+    labels: ["red-turban-portrait", "yellow-turban-portrait", "elder-woman-portrait", "patterned-turban-portrait", "riverside-figures"],
   },
+  { id: "doodhwala", ink: "light", eyebrow: "Portraits · c. 2005–2015", stop: "Mother and Son · The Doodhwala", room: "The gallery",
+    view: "doodhwala", dusk: 0.55, labelSide: "below",
+    labels: ["milkman-on-bicycle", "newspaper-reader", "mother-and-child", "boy-and-kettle", "man-among-metal-pans"] },
   { id: "featured", eyebrow: "Featured", stop: "Featured works", slot: "featured", view: "featured", dusk: 0.45 },
   {
     id: "plan",

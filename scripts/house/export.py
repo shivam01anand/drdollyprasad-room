@@ -1,7 +1,10 @@
 """
 Bake the house's light and export it for the site.
 
-    blender -b <house.blend> -P scripts/house/export.py -- <out dir> [--res=4096] [--spp=160] [--only=day|night]
+    blender -b <house.blend> -P scripts/house/export.py -- <out dir> [--res=4096] [--spp=160] [--only=day|night|none]
+
+--only=none bakes nothing: it re-exports the model against the lightmaps already in <out dir>
+(the atlas layout is deterministic, so a change to props or foliage needs no new bake).
 
 1. Apply every modifier; join the static surfaces by material role (walls,
    floors, the timber ceilings apart, so the plan view can lift them), keeping

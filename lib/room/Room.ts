@@ -249,6 +249,7 @@ export class Room {
     this.owned.push(edge);
     this.parts = assemble(house, lib, this.baked, edge);
     for (const m of this.parts.ceilings) this.ceiling.add(m);
+    for (const r of this.parts.roofs) this.ceiling.add(r);
     this.world.add(house.scene, this.ceiling);
     // the things that tumble live in the scene, not in the house that tilts under them
     house.scene.updateMatrixWorld(true);

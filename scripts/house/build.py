@@ -106,6 +106,12 @@ SITE = {
     "iron": ("iron", lin(0x8A8178), 0.55),
     "ironDark": ("iron", lin(0x4A433D), 0.6),
     "clay": ("plaster", lin(0xD27A50), 0.7),
+    # the gallery hall, in the India Habitat Centre's language: red-brown brick, grey
+    # concrete bands, gallery-white panels for the work, a grey-green Kota stone floor
+    "brick": ("brick", (1.05, 0.72, 0.68), 2.0),
+    "concrete": ("plaster", (1.07, 1.02, 0.92), 2.4),
+    "panel": ("plaster", (2.05, 2.02, 1.95), 2.0),
+    "kota": ("floor", lin(0xB4BAB0), 2.4),
 }
 
 
@@ -290,22 +296,23 @@ def cut(target, pieces):
         bv.limit_method = "ANGLE"
 
 
-def skin(name, x0, x1, y0, y1, hole):
-    """a thin lime skin over a wall face, with a doorway's hole cut through it: one
-    surface, so the bake has no joint to show around the door"""
-    o = box(name, x0, x1, y0, y1, 0, H_ROOM, role_mat("wall"), bevel=0)
-    hx0, hx1, hy0, hy1, hz0, hz1 = hole
-    bpy.ops.mesh.primitive_cube_add(size=1, location=((hx0 + hx1) / 2, (hy0 + hy1) / 2, (hz0 + hz1) / 2))
-    c = bpy.context.active_object
-    c.scale = (hx1 - hx0, hy1 - hy0, hz1 - hz0)
-    bpy.ops.object.transform_apply(scale=True)
-    c.hide_render = True
-    c.hide_set(True)
-    c.name = "cutter"
-    m = o.modifiers.new("cut", "BOOLEAN")
-    m.object = c
-    m.operation = "DIFFERENCE"
-    m.solver = "EXACT"
+def skin(name, x0, x1, y0, y1, hole=None, role="wall", z1=None, lm=1.0):
+    """a thin skin over a wall face (lime, or the gallery's brick), with a doorway's hole
+    cut through it: one surface, so the bake has no joint to show around the door"""
+    o = box(name, x0, x1, y0, y1, 0, H_ROOM if z1 is None else z1, role_mat(role), bevel=0)
+    o["lm"] = lm
+    for hx0, hx1, hy0, hy1, hz0, hz1 in ([hole] if hole and not isinstance(hole[0], (tuple, list)) else hole or []):
+        bpy.ops.mesh.primitive_cube_add(size=1, location=((hx0 + hx1) / 2, (hy0 + hy1) / 2, (hz0 + hz1) / 2))
+        c = bpy.context.active_object
+        c.scale = (hx1 - hx0, hy1 - hy0, hz1 - hz0)
+        bpy.ops.object.transform_apply(scale=True)
+        c.hide_render = True
+        c.hide_set(True)
+        c.name = "cutter"
+        m = o.modifiers.new("cut", "BOOLEAN")
+        m.object = c
+        m.operation = "DIFFERENCE"
+        m.solver = "EXACT"
     bv = o.modifiers.new("soft", "BEVEL")
     bv.width = 0.002
     bv.segments = 2
@@ -384,11 +391,15 @@ def register_prop(o, mass):
 AX0, AX1, AY0, AY1 = 0.0, 7.2, 0.0, 6.0                 # the Aangan
 QX0, QX1, QY0, QY1 = -5.6, -T, 0.8, 6.0                  # the Quiet Room
 RX0, RX1, RY0, RY1 = -5.6, -T, -4.8, QY0 - T             # the Red Room
-GX0, GX1, GY0, GY1 = 0.0, 6.4, -5.45, -T                 # the gallery: through the Red Room's east wall
+GX0, GX1, GY0, GY1 = 0.0, 18.6, -8.85, -T                # the gallery hall: through the Red Room's east wall
+H_GAL = 5.6                                               # its walls; the roof is open over most of it
 GDOOR = dict(cy=-2.55, w=1.0, h=2.3)                      # its doorway, in the Red Room's east wall
+PALM = dict(cy=(GY0 + GY1) / 2, w=1.6, z0=0.3, z1=3.2)   # the window at its east end, onto the palm court
+CX0, CX1 = GX1 + T, GX1 + T + 6.0                         # the palm court, beyond the hall's east wall
 ARCH = dict(cy=3.4, w=1.5, h=2.95)
 INFO["plan"] = {"aangan": [AX0, AX1, AY0, AY1, H_AANGAN], "quiet": [QX0, QX1, QY0, QY1, H_ROOM],
-                "red": [RX0, RX1, RY0, RY1, H_ROOM], "gallery": [GX0, GX1, GY0, GY1, H_ROOM], "T": T}
+                "red": [RX0, RX1, RY0, RY1, H_ROOM], "gallery": [GX0, GX1, GY0, GY1, H_GAL],
+                "court": [CX0, CX1, GY0, GY1, 3.2], "T": T}
 
 # --- the Aangan
 floor("Aangan", AX0, AX1, AY0, AY1, "courtFloor")
@@ -400,8 +411,8 @@ wall("AanganS", AX0, AX1, AY0 - T, AY0, 0, H_AANGAN, "court",
 wall("AanganW", AX0 - T, AX0, AY0 - T, AY1, 0, H_AANGAN, "court",
      [("arch", AX0 - T / 2, ARCH["cy"], ARCH["w"], ARCH["h"], 0, T + 0.3, "x")])
 for n, (x0, x1, y0, y1) in {"N": (AX0 - T - 0.04, AX1 + T + 0.04, AY1 - 0.04, AY1 + T + 0.04),
-                            "E": (AX1 - 0.04, AX1 + T + 0.04, AY0 - T - 0.04, AY1 - 0.04),
-                            "S": (AX0 - T - 0.04, AX1 - 0.04, AY0 - T - 0.04, AY0 + 0.04),
+                            "E": (AX1 - 0.04, AX1 + T + 0.04, AY0 - T, AY1 - 0.04),
+                            "S": (AX0 - T - 0.04, AX1 - 0.04, AY0 - T, AY0 + 0.04),
                             "W": (AX0 - T - 0.04, AX0 + 0.04, AY0 + 0.04, AY1 - 0.04)}.items():
     box(f"Wall_Coping{n}", x0, x1, y0, y1, H_AANGAN, H_AANGAN + 0.09, role_mat("sandstone"), bevel=0.012)
 box("Floor_ArchSill", AX0 - T - 0.02, AX0 + 0.06, ARCH["cy"] - ARCH["w"] / 2, ARCH["cy"] + ARCH["w"] / 2, 0, 0.035,
@@ -590,16 +601,183 @@ for k, xs in enumerate(((RX1 - 0.03, RX1 + 0.02), (RX1 + T - 0.02, RX1 + T + 0.0
     box(f"Wall_GalDoorJambN{k}", xs[0], xs[1], _d1, _d1 + 0.1, 0, GDOOR["h"], role_mat("teak"), bevel=0.008, segs=3)
     box(f"Wall_GalDoorHead{k}", xs[0], xs[1], _d0 - 0.1, _d1 + 0.1, GDOOR["h"], GDOOR["h"] + 0.1, role_mat("teakRail"), bevel=0.008, segs=3)
 
-# --- the gallery: a white room for the rest of her work, hung salon-style
-floor("Gallery", GX0, GX1, GY0, GY1, "floor")
-wall("GalS", GX0 - T, GX1 + T, GY0 - T, GY0, 0, H_ROOM, "wall")
-wall("GalE", GX1, GX1 + T, GY0, GY1, 0, H_ROOM, "wall")
-wall("GalW", GX0 - T, GX0, GY0, RY0 - T, 0, H_ROOM, "wall")          # between the Red Room's south wall and the gallery's
-ceiling("Gallery", GX0, GX1, GY0, GY1, H_ROOM, along_x=True)
-# the courtyard's front wall is the gallery's north wall: a lime skin on it, round the front door
-skin("Wall_GalSkinN", GX0, GX1, GY1 - 0.012, GY1, (3.6 - 0.75 - 0.16, 3.6 + 0.75 + 0.16, GY1 - 0.05, GY1 + 0.05, -0.1, 2.68))
-for n, (x0, x1, y0, y1) in {"S": (GX0, GX1, GY0, GY0 + 0.012), "E": (GX1 - 0.012, GX1, GY0, GY1)}.items():
-    box(f"Wall_GalSkirt{n}", x0, x1, y0, y1, 0, 0.14, role_mat("wallShade"), bevel=0.003)
+# --- the gallery hall: the rest of her work, hung as an exhibition is hung, in the language of
+# the India Habitat Centre (Joseph Allen Stein, 1993), where she has shown: red-brown brick and
+# grey concrete bands; the work on white panels between brick piers, one line at eye level; the
+# roof open over most of the hall under a space frame hung with folded teal and cream sunshades,
+# so the afternoon falls on the floor in a lattice and never on a painting; and at its far end a
+# window onto a court of palms
+floor("Gallery", GX0, GX1, GY0, GY1, "kota")
+for o in (wall("GalS", GX0 - T, GX1 + T, GY0 - T, GY0, 0, H_GAL, "brick"),
+          wall("GalE", GX1, GX1 + T, GY0, GY1, 0, H_GAL, "brick",
+               [("rect", GX1 + T / 2, PALM["cy"], PALM["w"], PALM["z1"] - PALM["z0"], PALM["z0"], T + 0.3, "x")]),
+          wall("GalW", GX0 - T, GX0, GY0, RY0 - T, 0, H_GAL, "brick"),              # south of the Red Room
+          wall("GalN", AX1 + T, GX1 + T, GY1, AY0, 0, H_GAL, "brick"),              # east of the courtyard
+          # above the Red Room's roof (bearing into it) and the courtyard's coping, the hall goes on up
+          wall("GalWHigh", GX0 - T - 0.08, GX0, RY0 - T, GY1, H_ROOM, H_GAL, "brick"),
+          wall("GalNHigh", GX0 - T, AX1 + T, GY1, AY0, H_AANGAN + 0.09, H_GAL, "brick")):
+    o["lm"] = 0.35                       # their faces in the hall are skinned; outside, only the plan sees them
+# the brick inside, one skin to a wall, the doorways cut through
+_FD = (3.6 - 0.75 - 0.16, 3.6 + 0.75 + 0.16)            # the front door's chaukhat, from the courtyard
+skin("Wall_GalBrickN", GX0, GX1, GY1 - 0.012, GY1, (_FD[0], _FD[1], GY1 - 0.05, GY1 + 0.05, -0.1, 2.68), "brick", H_GAL, 0.8)
+skin("Wall_GalBrickS", GX0, GX1, GY0, GY0 + 0.012, None, "brick", H_GAL, 0.8)
+skin("Wall_GalBrickE", GX1 - 0.012, GX1, GY0, GY1,
+     (GX1 - 0.05, GX1 + 0.05, PALM["cy"] - PALM["w"] / 2, PALM["cy"] + PALM["w"] / 2, PALM["z0"], PALM["z1"]), "brick", H_GAL, 0.8)
+skin("Wall_GalBrickW", GX0, GX0 + 0.012, GY0, GY1,
+     (GX0 - 0.05, GX0 + 0.05, GDOOR["cy"] - GDOOR["w"] / 2, GDOOR["cy"] + GDOOR["w"] / 2, -0.1, GDOOR["h"]), "brick", H_GAL, 0.8)
+SKIN = 0.012
+# brick piers between the bays, and either side of the palm window
+GPIER = {"S": [(9.5, 10.1)], "N": [(11.6, 12.2)], "E": [(PALM["cy"] - PALM["w"] / 2 - 0.35, PALM["cy"] - PALM["w"] / 2),
+                                                          (PALM["cy"] + PALM["w"] / 2, PALM["cy"] + PALM["w"] / 2 + 0.35)]}
+PIER_D = 0.2
+
+
+def wall_box(name, side, a0, a1, d0, d1, z0, z1, role, bevel=0.004, segs=2):
+    """a box on the hall's inside face of wall `side`, from a0 to a1 along it, d0 to d1 out from
+    its brick skin into the hall"""
+    if side == "N":
+        return box(name, a0, a1, GY1 - SKIN - d1, GY1 - SKIN - d0, z0, z1, role_mat(role), bevel=bevel, segs=segs)
+    if side == "S":
+        return box(name, a0, a1, GY0 + SKIN + d0, GY0 + SKIN + d1, z0, z1, role_mat(role), bevel=bevel, segs=segs)
+    if side == "E":
+        return box(name, GX1 - SKIN - d1, GX1 - SKIN - d0, a0, a1, z0, z1, role_mat(role), bevel=bevel, segs=segs)
+    return box(name, GX0 + SKIN + d0, GX0 + SKIN + d1, a0, a1, z0, z1, role_mat(role), bevel=bevel, segs=segs)
+
+
+# along each wall: its length, and the doorways the plinth stops at
+_LEN = {"N": (GX0, GX1), "S": (GX0, GX1), "E": (GY0, GY1), "W": (GY0, GY1)}
+_DOORS = {"N": [_FD], "S": [], "E": [], "W": [(GDOOR["cy"] - GDOOR["w"] / 2 - 0.1, GDOOR["cy"] + GDOOR["w"] / 2 + 0.1)]}
+
+
+def runs(side):
+    """the stretches of wall `side` between its doorways"""
+    out, at = [], _LEN[side][0]
+    for g0, g1 in sorted(_DOORS[side]):
+        out.append((at, g0))
+        at = g1
+    out.append((at, _LEN[side][1]))
+    return [(x, y) for x, y in out if y - x > 0.02]
+
+
+for side in "NSEW":
+    # the concrete plinth, and a band at the height of the window's head, across the piers too
+    for k, (a0, a1) in enumerate(runs(side)):
+        wall_box(f"Wall_GalPlinth{side}{k}", side, a0, a1, 0, 0.025, 0, 0.12, "concrete", bevel=0.003)
+    wall_box(f"Wall_GalBand{side}", side, *_LEN[side], 0, 0.03, PALM["z1"], PALM["z1"] + 0.22, "concrete", bevel=0.004)
+    # the ring beam the space frame rests on
+    wall_box(f"Wall_GalBeam{side}", side, *_LEN[side], 0, 0.07, 4.9, 5.25, "concrete", bevel=0.006)
+    for k, (a0, a1) in enumerate(GPIER.get(side, [])):
+        wall_box(f"Wall_GalPier{side}{k}", side, a0, a1, 0, PIER_D, 0, 4.9, "brick", bevel=0.01)
+        wall_box(f"Wall_GalPierBand{side}{k}", side, a0 - 0.03, a1 + 0.03, PIER_D - 0.01, PIER_D + 0.03,
+                 PALM["z1"], PALM["z1"] + 0.22, "concrete", bevel=0.004)
+        wall_box(f"Wall_GalPierPlinth{side}{k}", side, a0 - 0.025, a1 + 0.025, PIER_D - 0.01, PIER_D + 0.025, 0, 0.12,
+                 "concrete", bevel=0.003)
+# the palm window: a concrete sill, the band its head, a slim dark steel frame round it and nothing
+# across it, so the court is seen whole
+box("Wall_GalPalmSill", GX1 - 0.06, GX1 + T + 0.06, PALM["cy"] - PALM["w"] / 2, PALM["cy"] + PALM["w"] / 2,
+    PALM["z0"] - 0.06, PALM["z0"], role_mat("concrete"), bevel=0.005)
+_steel = flat("steelDark", lin(0x2B2A28), 0.5, 0.6)
+_y0, _y1, _xa, _xb = PALM["cy"] - PALM["w"] / 2, PALM["cy"] + PALM["w"] / 2, GX1 + T / 2 - 0.03, GX1 + T / 2 + 0.03
+join("Deco_palmWindow", apply_mods([
+    box("bar", _xa, _xb, _y0, _y0 + 0.045, PALM["z0"], PALM["z1"], _steel, bevel=0.003),
+    box("bar", _xa, _xb, _y1 - 0.045, _y1, PALM["z0"], PALM["z1"], _steel, bevel=0.003),
+    box("bar", _xa, _xb, _y0, _y1, PALM["z1"] - 0.045, PALM["z1"], _steel, bevel=0.003),
+    box("bar", _xa, _xb, _y0, _y1, PALM["z0"], PALM["z0"] + 0.035, _steel, bevel=0.003)]))
+# the panels the work hangs on: gallery white, 4 cm proud of the brick, between the piers
+PANEL_D, PANEL_Z = 0.04, (0.3, 2.85)
+GBAYS = {"S": [(1.3, 9.1), (10.5, 17.3)], "N": [(4.8, 11.4), (12.4, 17.9)],
+         "E": [(GY0 + 0.3, PALM["cy"] - PALM["w"] / 2 - 0.5), (PALM["cy"] + PALM["w"] / 2 + 0.5, GY1 - 0.3)]}
+for side, bays in GBAYS.items():
+    for k, (a0, a1) in enumerate(bays):
+        wall_box(f"Wall_GalPanel{side}{k}", side, a0, a1, 0, PANEL_D, *PANEL_Z, "panel", bevel=0.006, segs=2)
+# where the canvases hang: the panels' faces
+GFACE = {"N": GY1 - SKIN - PANEL_D, "S": GY0 + SKIN + PANEL_D, "E": GX1 - SKIN - PANEL_D}
+
+# the roof: a concrete slab where the sun must not come in (along the north wall, whose panels
+# it would reach, and over the east end), open sky over the rest
+GSKY = (GX0 + 0.3, 15.0, GY0, -3.6)                       # x0, x1, y0, y1 of the opening
+for name, (x0, x1, y0, y1) in {"N": (GX0 - 0.08, GX1 + 0.08, GSKY[3], GY1 + 0.08),
+                               "E": (GSKY[1], GX1 + 0.08, GY0 - 0.08, GSKY[3]),
+                               "W": (GX0 - 0.08, GSKY[0], GY0 - 0.08, GSKY[3])}.items():
+    box(f"Ceil_Gal{name}", x0, x1, y0, y1, H_GAL, H_GAL + 0.22, role_mat("concrete"), bevel=0)
+
+
+def space_frame(name, x0, x1, y0, y1, z_bot, z_top, nx, ny):
+    """a square-on-square space frame: a top grid of chords, a bottom grid offset half a bay,
+    each bottom node braced to the four top nodes round it; painted steel, live-lit (Roof_),
+    lifted with the ceilings when the camera rises for the plan"""
+    bm = bmesh.new()
+    ax, ay = (x1 - x0) / nx, (y1 - y0) / ny
+
+    def tube(p0, p1, r):
+        p0, p1 = Vector(p0), Vector(p1)
+        d = p1 - p0
+        M = Matrix.Translation((p0 + p1) / 2) @ d.normalized().to_track_quat("Z", "Y").to_matrix().to_4x4()
+        bmesh.ops.create_cone(bm, cap_ends=False, segments=6, radius1=r, radius2=r, depth=d.length, matrix=M)
+
+    top = lambda i, j: (x0 + i * ax, y0 + j * ay, z_top)
+    bot = lambda i, j: (x0 + (i + 0.5) * ax, y0 + (j + 0.5) * ay, z_bot)
+    for i in range(nx + 1):
+        for j in range(ny + 1):
+            if i < nx:
+                tube(top(i, j), top(i + 1, j), 0.016)
+            if j < ny:
+                tube(top(i, j), top(i, j + 1), 0.016)
+            bmesh.ops.create_icosphere(bm, subdivisions=1, radius=0.03, matrix=Matrix.Translation(top(i, j)))
+    for i in range(nx):
+        for j in range(ny):
+            if i < nx - 1:
+                tube(bot(i, j), bot(i + 1, j), 0.014)
+            if j < ny - 1:
+                tube(bot(i, j), bot(i, j + 1), 0.014)
+            for di, dj in ((0, 0), (1, 0), (0, 1), (1, 1)):
+                tube(bot(i, j), top(i + di, j + dj), 0.011)
+            bmesh.ops.create_icosphere(bm, subdivisions=1, radius=0.026, matrix=Matrix.Translation(bot(i, j)))
+    me = bpy.data.meshes.new(name)
+    bm.to_mesh(me)
+    bm.free()
+    o = link(bpy.data.objects.new(name, me))
+    o.data.materials.append(flat("frameSteel", lin(0xC9C5BC), 0.45, 0.25))
+    for p in o.data.polygons:
+        p.use_smooth = True
+    return o, ax, ay
+
+
+def sunshades(name, x0, y0, ax, ay, nx, ny, z):
+    """the Habitat Centre's sunshades: in each bay a diamond folded along its long diagonal,
+    tilted like a louver, turned 45°; teal and cream in diagonal rows"""
+    bm = bmesh.new()
+    Ld, Sd, fold, tilt = min(ax, ay) * 1.05, min(ax, ay) * 0.56, 0.11, math.radians(28)
+    for i in range(nx):
+        for j in range(ny):
+            vs = [bm.verts.new(v) for v in ((Ld / 2, 0, 0), (0, Sd / 2, fold), (-Ld / 2, 0, 0), (0, -Sd / 2, fold))]
+            f0 = bm.faces.new((vs[0], vs[1], vs[2]))
+            f1 = bm.faces.new((vs[0], vs[2], vs[3]))
+            col = 0 if (i + j) % 3 == 0 else 1
+            f0.material_index = f1.material_index = col
+            M = (Matrix.Translation((x0 + (i + 0.5) * ax, y0 + (j + 0.5) * ay, z)) @ Matrix.Rotation(math.radians(45), 4, "Z")
+                 @ Matrix.Rotation(tilt, 4, "X"))
+            bmesh.ops.transform(bm, matrix=M, verts=vs)
+    me = bpy.data.meshes.new(name)
+    bm.to_mesh(me)
+    bm.free()
+    o = link(bpy.data.objects.new(name, me))
+    o.data.materials.append(flat("shadeTeal", lin(0x3F8A84), 0.6))
+    o.data.materials.append(flat("shadeCream", lin(0xE8E0CB), 0.6))
+    return o
+
+
+_sf, _ax, _ay = space_frame("Roof_spaceFrame", GX0 + 0.12, GX1 - 0.12, GY0 + 0.12, GY1 - 0.12, 4.62, 5.22, 16, 7)
+sunshades("Roof_sunshades", GX0 + 0.12, GY0 + 0.12, _ax, _ay, 16, 7, 5.36)
+
+# --- the palm court beyond the window: brick walls, Kota paving, a raised brick bed
+floor("Court", CX0, CX1, GY0, GY1, "stone", lm=0.6)
+for o in (wall("CourtE", CX1, CX1 + T, GY0 - T, GY1 + T, 0, 3.2, "brick"),
+          wall("CourtN", CX0, CX1, GY1, GY1 + T, 0, 3.2, "brick"),
+          wall("CourtS", CX0, CX1, GY0 - T, GY0, 0, 3.2, "brick")):
+    o["lm"] = 0.6
+box("Wall_CourtBed", CX0 + 1.6, CX1 - 0.6, GY0 + 1.9, GY1 - 1.4, 0, 0.45, role_mat("brick"), bevel=0.01)
+box("Wall_CourtBedCap", CX0 + 1.55, CX1 - 0.55, GY0 + 1.85, GY1 - 1.35, 0.45, 0.5, role_mat("concrete"), bevel=0.006)
 for k in range(6):
     y = -1.45 - 0.5 + (k + 0.5) * (1.0 / 6)
     box(f"Wall_Grille{k}", RX0 - T * 0.55, RX0 - T * 0.45, y - 0.018, y + 0.018, 1.05, 2.3, role_mat("timber"), bevel=0.004)
@@ -706,7 +884,7 @@ for k, bid in enumerate(BANDH):                                               # 
 
 def salon(side, face, lo, hi, z, works, depth=0.035):
     """a row of works along one wall between `lo` and `hi`, evenly spaced, centred at height z;
-    `works` is [(id, longest m)], in order of increasing `along`"""
+    `works` is [(id, longest m)], in order of increasing `along` (x for N and S, y for E and W)"""
     ws = []
     for wid, longest in works:
         im = img(os.path.join(ART, f"{wid}.jpg"), True)
@@ -720,23 +898,24 @@ def salon(side, face, lo, hi, z, works, depth=0.035):
         at += w + gap
 
 
-# --- the gallery's hang
-# south wall: Gone Are The Days, two rows (along x)
-salon("S", GY0, GX0 + 0.72, GX1 - 0.72, 1.38, [("rickshaw-rest-framed", 1.219), ("rickshaw-puller-and-coin", 1.1),
-                                 ("mother-india-and-kettles", 1.016), ("cycle-rickshaw", 1.0), ("postbox-and-stamps", 0.9)])
-salon("S", GY0, GX0 + 0.62, GX1 - 0.62, 2.62, [("horse-cart-and-autorickshaw", 0.457), ("carriage-and-autorickshaw", 0.61),
-                                 ("coins-and-clay-bank", 0.61), ("rickshaw-rest", 0.61), ("bullock-cart-and-truck", 0.61),
-                                 ("rickshaw-and-autorickshaw", 0.457)])
-# east wall: the portraits, two rows (along y)
-salon("E", GX1, GY0, GY1, 1.38, [("mother-and-child", 1.219), ("milkman-on-bicycle", 1.0),
-                                 ("man-among-metal-pans", 1.0), ("red-turban-portrait", 0.61)])
-salon("E", GX1, GY0, GY1, 2.62, [("yellow-turban-portrait", 0.61), ("patterned-turban-portrait", 0.61),
-                                 ("elder-woman-portrait", 0.61), ("boy-and-kettle", 0.61), ("riverside-figures", 0.61)])
-# north wall, either side of the front door: Faith
-salon("N", GY1, GX0, 3.6 - 0.75 - 0.16, 1.55, [("offering-of-light", 1.0), ("prayer-and-scripture", 1.0)])
-salon("N", GY1, 3.6 + 0.75 + 0.16, GX1, 1.55, [("priest-with-flame", 1.0)])
-# west wall, south of the doorway: Faith
-salon("W", GX0, GY0, _d0 - 0.1, 1.55, [("sacred-tree", 0.8), ("newspaper-reader", 0.8)])
+# --- the gallery's hang: one line at eye level, a series to a wall, in the panels' bays (GBAYS);
+# sizes as she gave them where she has
+GZ = 1.55
+(s0, s1), (s2, s3) = GBAYS["S"]
+salon("S", GFACE["S"], s0, s1, GZ, [("rickshaw-puller-and-coin", 1.1), ("postbox-and-stamps", 0.9),
+                                     ("mother-india-and-kettles", 1.016), ("cycle-rickshaw", 1.0), ("rickshaw-rest-framed", 1.219)])
+salon("S", GFACE["S"], s2, s3, GZ, [("horse-cart-and-autorickshaw", 0.457), ("carriage-and-autorickshaw", 0.61),
+                                     ("coins-and-clay-bank", 0.61), ("rickshaw-rest", 0.61), ("bullock-cart-and-truck", 0.61),
+                                     ("rickshaw-and-autorickshaw", 0.457)])
+(n0, n1), (n2, n3) = GBAYS["N"]
+salon("N", GFACE["N"], n0, n1, GZ, [("milkman-on-bicycle", 1.0), ("newspaper-reader", 0.8), ("mother-and-child", 1.219),
+                                     ("boy-and-kettle", 0.61), ("man-among-metal-pans", 1.0)])
+salon("N", GFACE["N"], n2, n3, GZ, [("red-turban-portrait", 0.61), ("yellow-turban-portrait", 0.61),
+                                     ("elder-woman-portrait", 0.762), ("patterned-turban-portrait", 0.61), ("riverside-figures", 0.61)])
+(e0, e1), (e2, e3) = GBAYS["E"]
+# Faith, either side of the palm window (along y, so south to north)
+salon("E", GFACE["E"], e0, e1, GZ, [("sacred-tree", 0.8), ("priest-with-flame", 1.0)])
+salon("E", GFACE["E"], e2, e3, GZ, [("prayer-and-scripture", 1.0), ("offering-of-light", 1.0)])
 
 # ====================================================================== things
 def import_ph(ph_id, loc, rot_z=0.0, scale=1.0, decimate=None, prop=True, mass=1.0):
@@ -911,11 +1090,12 @@ charpai("charpai_red", (-1.85, -0.18, 0), 0.0, L=1.85, W=0.9)
 import_ph("brass_pot_01", (-0.85, -0.55, 0), 0.4, 0.95, mass=1.0)
 import_ph("brass_pot_01", (-0.95, -4.35, 0), 1.7, 0.8, mass=1.0)
 import_ph("ceramic_pot", (-0.8, -0.05, 0), 1.0, 0.75, mass=2.0)
-# a long teak bench down the middle of the gallery
-_bench = [box("galBenchTop", 2.35, 4.05, -3.12, -2.72, 0.42, 0.47, role_mat("teak"), bevel=0.01, segs=3)]
-for x in (2.45, 3.95):
-    _bench.append(box("galBenchLeg", x - 0.04, x + 0.04, -3.08, -2.76, 0, 0.42, role_mat("teak"), bevel=0.006))
-register_prop(join("Prop_galBench", apply_mods(_bench)), 4.0)
+# two long teak benches down the middle of the gallery
+for k, x0 in enumerate((7.6, 11.3)):
+    _bench = [box("galBenchTop", x0, x0 + 1.9, -4.85, -4.45, 0.42, 0.47, role_mat("teak"), bevel=0.01, segs=3)]
+    for x in (x0 + 0.1, x0 + 1.8):
+        _bench.append(box("galBenchLeg", x - 0.04, x + 0.04, -4.81, -4.49, 0, 0.42, role_mat("teak"), bevel=0.006))
+    register_prop(join(f"Prop_galBench{k}", apply_mods(_bench)), 4.0)
 
 
 def rod(name, p0, p1, r, mat, segs=12):
@@ -1091,6 +1271,86 @@ bougainvillea("bougainvilleaE", ((AX1 + T / 2, 2.0), (AX1 + T / 2, AY1 + T / 2))
 canopy("peepal", QX0 - T - 3.2, QX0 - T - 0.5, ARCH["cy"] - 3.2, ARCH["cy"] + 3.2, 2.6, 6.2, 200)
 canopy("laneTree", RX0 - T - 3.6, RX0 - T - 1.0, RY0 - 1.5, 0.8, 3.4, 6.8, 160)
 
+
+def frond(L, mat, droop=1.0):
+    """a palm frond: the cut card (assets/house-tex/palm_frond_cut.png) bent into an arch along
+    its rachis, the leaflets folding down from it in a shallow V; built from the base along +y"""
+    W = L * 0.65
+    bpy.ops.mesh.primitive_grid_add(x_subdivisions=4, y_subdivisions=16, size=1)
+    f = bpy.context.active_object
+    f.scale = (W, L, 1)
+    bpy.ops.object.transform_apply(scale=True)
+    for v in f.data.vertices:
+        t = v.co.y / L + 0.5
+        v.co.y = t * L * 0.94
+        v.co.z = math.sin(t * math.pi * 0.7) * L * 0.2 - (t ** 2) * L * 0.4 * droop - abs(v.co.x) * 0.32
+    uvl = f.data.uv_layers.active.data
+    for poly in f.data.polygons:
+        for li in poly.loop_indices:
+            v = f.data.vertices[f.data.loops[li].vertex_index].co
+            uvl[li].uv = (v.x / W + 0.5, v.y / (L * 0.94))
+    f.data.materials.append(mat)
+    return f
+
+
+def palm(name, loc, H, n, seed, Lr=(2.0, 2.7), r0=0.17):
+    """a palm: a ringed, gently tapering trunk and a crown of arching fronds"""
+    rnd = random.Random(seed)
+    mat = cutout("foliage:palm", os.path.join(HT, "palm_frond_cut.png"), translucency=0.3, rough=0.5)
+    prof = [(0.0, 0.0), (r0 * 1.15, 0.0)]
+    for k in range(1, 15):
+        z = H * k / 15
+        prof.append((r0 * (1.0 - 0.3 * k / 15) * (1.04 if k % 2 else 0.97), z))
+    prof += [(r0 * 0.9, H * 1.01), (0.0, H * 1.03)]
+    parts = [lathe(f"{name}_trunk", prof, flat("palmTrunk", lin(0x6F6455), 0.85), segs=14)]
+    parts[0].data.uv_layers.new(name="UVMap")      # or the join drops the fronds' UVs and they vanish
+    for k in range(n):
+        f = frond(rnd.uniform(*Lr), mat, droop=rnd.uniform(0.75, 1.3))
+        f.rotation_euler = (math.radians(rnd.uniform(-28, 38)), 0, 2 * math.pi * k / n + rnd.uniform(-0.2, 0.2))
+        f.location = (0, 0, H)
+        parts.append(f)
+    o = join(f"Foliage_{name}", parts)
+    o.location = loc
+    return o
+
+
+def areca(name, loc, stems, seed):
+    """an areca clump: slim ringed yellow-green stems of different heights, leaning out a
+    little, fronds from halfway up so the leaves, not the canes, are what is seen"""
+    rnd = random.Random(seed)
+    mat = cutout("foliage:palm", os.path.join(HT, "palm_frond_cut.png"), translucency=0.3, rough=0.5)
+    cane = flat("arecaCane", lin(0x9AA35A), 0.6)
+    parts = []
+    for s_ in range(stems):
+        H = rnd.uniform(1.3, 3.0)
+        ox, oy = rnd.uniform(-0.28, 0.28), rnd.uniform(-0.28, 0.28)
+        prof = [(0.0, 0.0), (0.034, 0.0)] + [(0.028 if k % 2 else 0.031, H * k / 12) for k in range(1, 13)] + [(0.0, H + 0.02)]
+        st = lathe(f"{name}_stem", prof, cane, segs=8)
+        st.data.uv_layers.new(name="UVMap")
+        lean = Vector((ox, oy, 0)).normalized() * 0.12 if (ox or oy) else Vector((0, 0, 0))
+        st.rotation_euler = (-lean.y, lean.x, 0)
+        st.location = (ox, oy, 0)
+        parts.append(st)
+        def along(t):                                       # t of the way up the leaning cane
+            return Vector((ox + lean.x * H * t, oy + lean.y * H * t, H * t))
+        for k in range(7):
+            low = k >= 4                                    # three fronds lower down the cane
+            f = frond(rnd.uniform(0.9, 1.3) if low else rnd.uniform(1.1, 1.7), mat, droop=rnd.uniform(0.9, 1.5))
+            f.rotation_euler = (math.radians(rnd.uniform(-25, 15) if low else rnd.uniform(-5, 45)), 0,
+                                2 * math.pi * k / 7 + rnd.uniform(-0.4, 0.4))
+            f.location = along(rnd.uniform(0.55, 0.7) if low else 1.0)
+            parts.append(f)
+    o = join(f"Foliage_{name}", parts)
+    o.location = loc
+    return o
+
+
+# the court's palms, in the raised bed: three tall, and two areca clumps that fill the window
+for k, (x, y, H, n) in enumerate(((22.0, -5.3, 6.4, 14), (23.4, -3.0, 7.2, 15), (21.6, -2.4, 5.6, 13))):
+    palm(f"palm{k}", (x, y, 0.45), H, n, seed=31 + k)
+for k, (x, y, n) in enumerate(((21.3, -4.3, 8), (23.2, -6.3, 9))):
+    areca(f"areca{k}", (x, y, 0.45), n, seed=71 + k)
+
 # ====================================================================== light
 world = bpy.data.worlds.new("Sky")
 sc.world = world
@@ -1126,25 +1386,25 @@ sun.rotation_euler = (-to_sun).to_track_quat("-Z", "Y").to_euler()
 INFO["lights"]["sun"] = {"toSun": list(to_sun), "energy": sd.energy, "color": list(sd.color)}
 
 
-def gallery_light(art_id, power=42, size=0.35, dist=1.45):
+def gallery_light(art_id, power=42, size=0.35, dist=1.45, z=None, out=0.95, spot=84, color=(1.0, 0.86, 0.68)):
     a = INFO["art"][art_id]
     cx, cy, cz = a["centre"]
     n = {"N": Vector((0, -1, 0)), "S": Vector((0, 1, 0)), "E": Vector((-1, 0, 0)), "W": Vector((1, 0, 0))}[a["side"]]
     d = bpy.data.lights.new(f"L_{art_id}", "SPOT")
     d.shadow_soft_size = 0.06
-    d.spot_size = math.radians(84)
-    d.spot_blend = 1.0
+    d.spot_size = math.radians(spot)
+    d.spot_blend = 1.0 if spot >= 80 else 0.8
     d.energy = power
-    d.color = (1.0, 0.86, 0.68)
+    d.color = color
     o = link(bpy.data.objects.new(f"L_{art_id}", d))
     # in the rooms from the ceiling; in the courtyard from a bracket high on the facing side
-    o.location = Vector((cx, cy, min(H_ROOM - 0.22, cz + 1.9))) + n * 0.95
+    o.location = Vector((cx, cy, min(H_ROOM - 0.22, cz + 1.9) if z is None else z)) + n * out
     o.rotation_euler = (Vector((cx, cy, cz)) - o.location).to_track_quat("-Z", "Y").to_euler()
     INFO["lights"][f"L_{art_id}"] = {"pos": list(o.location), "target": [cx, cy, cz], "power": power}
     return o
 
 
-def fill(name, x0, x1, y0, y1, power):
+def fill(name, x0, x1, y0, y1, power, z=None):
     """the light a room gathers from its openings and bounces about: a soft panel at the ceiling"""
     d = bpy.data.lights.new(name, "AREA")
     d.shape = "RECTANGLE"
@@ -1152,24 +1412,36 @@ def fill(name, x0, x1, y0, y1, power):
     d.energy = power
     d.color = (1.0, 0.93, 0.84)
     o = link(bpy.data.objects.new(name, d))
-    o.location = ((x0 + x1) / 2, (y0 + y1) / 2, H_ROOM - 0.3)
+    o.location = ((x0 + x1) / 2, (y0 + y1) / 2, H_ROOM - 0.3 if z is None else z)
     INFO["lights"][name] = {"rect": [x0, x1, y0, y1], "power": power}
     return o
 
 
 fill("Fill_quiet", QX0, QX1, QY0, QY1, float(opt.get("--fillq", 45)))
 fill("Fill_red", RX0, RX1, RY0, RY1, float(opt.get("--fillr", 90)))
-fill("Fill_gallery", GX0, GX1, GY0, GY1, float(opt.get("--fillg", 120)))
+fill("Fill_gallery", GX0, GX1, GY0, GY1, float(opt.get("--fillg", 300)), z=4.4)
 
 for k in ("monk-and-green-buddha", "monks-and-blue-buddha", "temple-bells",
           "bulls-and-wheel", "shree-420-and-milk-cans", "three-veiled-women", "terracotta-pots"):
     gallery_light(k, power=float(opt.get("--gallery", 135)))
 for k in BANDH:
     gallery_light(k, power=float(opt.get("--gallery", 135)) * 0.45)
-# the gallery: a spot for each work, by its size
+# the gallery: a spot for each work, by its size, on a track under the space frame
 for k, a in list(INFO["art"].items()):
     if a.get("late"):
-        gallery_light(k, power=float(opt.get("--gallery", 135)) * min(1.0, 0.35 + 0.55 * max(a["w"], a["h"])))
+        gallery_light(k, power=float(opt.get("--gallery", 135)) * 2.5 * min(1.0, 0.35 + 0.55 * max(a["w"], a["h"])),
+                      z=4.45, out=1.75, spot=56, color=(1.0, 0.94, 0.86))      # a gallery's warm white, not lamplight
+# the palm court at night: lights in the bed, turned up into the palms
+for k, (x, y) in enumerate(((22.0, -5.3), (23.4, -3.0), (21.6, -2.4))):
+    d = bpy.data.lights.new(f"N_palm{k}", "SPOT")
+    d.energy = 0.0
+    d["night"] = 70.0
+    d.spot_size = math.radians(40)
+    d.spot_blend = 0.7
+    d.color = (1.0, 0.84, 0.62)
+    o = link(bpy.data.objects.new(f"N_palm{k}", d))
+    o.location = (x - 0.45, y + 0.2, 0.52)
+    o.rotation_euler = (Vector((x, y, 5.0)) - o.location).to_track_quat("-Z", "Y").to_euler()
 
 
 def studio_lamp(name, plate, aim, out=Vector((0, 1, 0)), reach=0.62):
@@ -1265,14 +1537,20 @@ VIEWS = {
     "street":    ((-4.0, 0.0, 1.6), (-2.3, RY0, 1.5)),
     # three-quarters on the east wall, Bandh Darwaze on the north wall to the left
     "redwall":   ((-5.35, -4.2, 1.55), (-1.1, -1.75, 1.45)),
-    # through the Red Room's east doorway into the gallery: Gone Are The Days, then the portraits
-    "galleryvia": ((GX0 + 0.6, -2.2, 1.62), (GX1, -1.6, 1.7)),
-    "gallery":   ((3.2, -0.95, 1.68), (3.2, GY0, 1.95)),
-    "portraitsvia": ((2.8, -1.6, 1.66), (5.2, -4.4, 1.8)),
-    "portraits": ((1.55, -2.95, 1.68), (GX1, -2.95, 1.95)),
-    # then up, out of the gallery's roof
-    "featured":  ((1.74, -2.95, 3.62), (3.2, -2.95, 0.0)),
-    "plan":      ((0.4, 0.3, 26.0), (0.4, 0.3, 0.0)),
+    # through the Red Room's east doorway into the gallery hall: down its length to the palms first,
+    # then along it, a bay to a stop: Gone Are The Days on the south wall, Faith either side of
+    # the palm window, the portraits back along the north wall
+    "galleryvia": ((-1.3, -2.55, 1.62), (6.0, -2.9, 1.66)),
+    "gallery":   ((1.3, -2.85, 1.64), (9.5, -5.0, 1.85)),
+    "rupaya":    ((5.2, -1.65, 1.62), (5.2, GY0, 1.7)),
+    "panels":    ((13.9, -2.45, 1.62), (13.9, GY0, 1.6)),
+    "palms":     ((11.2, PALM["cy"], 1.62), (GX1, PALM["cy"], 1.75)),
+    "portraits": ((15.15, -5.65, 1.62), (15.15, GY1, 1.62)),
+    "doodhwala": ((8.1, -6.65, 1.62), (8.1, GY1, 1.62)),
+    # then up, out of the hall's roof
+    "featured":  ((9.3, PALM["cy"], 3.62), (10.8, PALM["cy"], 0.0)),
+    # the house whole, high in the frame: the exhibitions and her words sit below it, to the left
+    "plan":      ((6.0, -5.4, 44.0), (6.0, -5.4, 0.0)),
     "mess":      ((10.5, -10.5, 11.5), (0.4, 0.4, 0.4)),
 }
 # a step closer to the work on a wide screen: the paintings at about 1.3× where a wall has one,
@@ -1297,10 +1575,15 @@ NARROW = {
     "streetvia": ((-4.0, 2.2, 1.58), (-4.3, -0.5, 1.5)),
     "street":    ((-4.3, -0.4, 1.55), (-3.35, RY0, 1.3)),
     "redwall":   ((-3.55, -3.9, 1.55), (RX1, -3.9, 1.3)),
-    "gallery":   ((3.2, -1.5, 1.55), (3.2, GY0, 1.5)),
-    "portraits": ((2.4, -2.25, 1.55), (GX1, -2.25, 1.45)),
-    "featured":  ((1.74, -2.95, 3.62), (3.2, -2.95, 0.0)),
-    "plan":      ((0.6, 0.0, 40.0), (0.6, 0.0, 0.0)),
+    "galleryvia": ((-1.2, -2.55, 1.58), (6.0, -2.75, 1.5)),
+    "gallery":   ((1.3, -2.75, 1.55), (9.5, -4.3, 1.75)),
+    "rupaya":    ((5.07, -5.2, 1.55), (5.07, GY0, 1.35)),
+    "panels":    ((13.89, -5.25, 1.55), (13.89, GY0, 1.4)),
+    "palms":     ((14.0, -3.3, 1.55), (GX1, -3.3, 1.6)),             # "Gayatri" and the palms beside it
+    "portraits": ((15.15, -4.05, 1.55), (15.15, GY1, 1.4)),
+    "doodhwala": ((8.1, -4.15, 1.55), (8.1, GY1, 1.45)),
+    "featured":  ((9.3, PALM["cy"], 3.62), (10.8, PALM["cy"], 0.0)),
+    "plan":      ((8.0, -19.4, 60.0), (8.0, -19.4, 0.0)),
     "mess":      ((10.5, -10.5, 11.5), (0.4, 0.4, 0.4)),
 }
 FOV = 40.0
@@ -1330,7 +1613,7 @@ if opt.get("--save", "1") == "1":
 
 sc.render.resolution_x = RES
 sc.render.resolution_y = round(RES * 10 / 16)
-ceil = [o for o in bpy.data.objects if o.name.startswith("Ceil_")]
+ceil = [o for o in bpy.data.objects if o.name.startswith(("Ceil_", "Roof_"))]
 for name in RENDER:
     sc.camera = cams[name]
     for o in ceil:
