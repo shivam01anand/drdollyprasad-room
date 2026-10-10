@@ -12,6 +12,8 @@ import { EMAIL, INSTAGRAM } from "@/lib/works";
  * and her Instagram. A tap on the veil, a drag down on the sheet, or Escape
  * puts it away.
  */
+import type { WorksFilter } from "./Works";
+
 export default function Stops({ open, active, onClose, onGo, onShake, onContact, onWorks }: {
   open: boolean;
   active: number;
@@ -19,7 +21,7 @@ export default function Stops({ open, active, onClose, onGo, onShake, onContact,
   onGo(i: number): void;
   onShake(): void;
   onContact(): void;
-  onWorks(): void;
+  onWorks(f: WorksFilter): void;
 }) {
   const root = useRef<HTMLDivElement>(null);
   const panel = useRef<HTMLDivElement>(null);
@@ -100,8 +102,13 @@ export default function Stops({ open, active, onClose, onGo, onShake, onContact,
             </li>
           ))}
         </ol>
+        <p className="lab sheet-h">Her work</p>
+        <div className="sheet-works">
+          <button type="button" className="pill pill-solid" onClick={() => { onClose(); onWorks("all"); }}>All her work</button>
+          <button type="button" className="pill" onClick={() => { onClose(); onWorks("available"); }}>Available</button>
+          <button type="button" className="pill" onClick={() => { onClose(); onWorks("sold"); }}>Sold</button>
+        </div>
         <div className="sheet-actions">
-          <button type="button" className="pill pill-solid" onClick={() => { onClose(); onWorks(); }}>All her works</button>
           <button type="button" className="pill" onClick={() => { onClose(); onShake(); }}>Shake the room ⁂</button>
           <button type="button" className="pill" onClick={() => { onClose(); onContact(); }}>Contact</button>
           <a className="pill" href={`mailto:${EMAIL}`}>Write to me</a>

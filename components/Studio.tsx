@@ -11,6 +11,8 @@ import Lightbox, { type LightboxHandle } from "./Lightbox";
 import Cursor, { roomCursorLabel } from "./Cursor";
 import WallLabels from "./WallLabels";
 import Stops from "./Stops";
+import QuickIndex from "./QuickIndex";
+import { WORKS_FILTER, type WorksFilter } from "./Works";
 import * as music from "@/lib/music";
 import { CHAPTERS } from "@/lib/chapters";
 import { activeVariant } from "@/lib/room/variants";
@@ -46,6 +48,10 @@ export default function Studio({ dims }: { dims: Dims }) {
   const [ready, setReady] = useState(false);
   const [mode, setMode] = useState<"light" | "dark">(activeVariant().startDark ? "dark" : "light");
   const [rearrange, setRearrange] = useState(false);
+  /** one wall on or back (set by the scroll effect, which knows the stops) */
+  const stepRef = useRef<(d: 1 | -1) => void>(() => {});
+  /** the first visit's hint, on a phone: how to walk */
+  const [coach, setCoach] = useState(false);
   /** the phone's sheet of stops */
   const [stops, setStops] = useState(false);
   /** the tanpura (lib/music.ts) */
@@ -203,11 +209,12 @@ export default function Studio({ dims }: { dims: Dims }) {
     /* On a phone the walk is in the hand. A finger on the house moves it:
        drag up and the walk follows the finger toward the next wall (never
        further), let go and it carries on there at a walking pace — or, for a
-       small nudge, settles back. A sideways drag turns the head to look round
-       the room, and eases back on release. The carousel keeps its own
-       sideways drags; past the last stop the page is the page again (the
-       works, the contact) until a pull down from the top of the works brings
-       the walk back. */
+       small nudge, settles back. A sideways swipe turns to the next wall (to
+       the left) or the last (to the right), the room turning under the finger
+       as it goes; so do the arrows at the screen's edges (stepRef). The
+       carousel keeps its own sideways drags; past the last stop the page is
+       the page again (the works, the contact) until a pull down from the top
+       of the works brings the walk back. */
     const coarse = matchMedia("(pointer: coarse)").matches;
     const swipe = { on: false, back: false, mode: "" as "" | "walk" | "look", x0: 0, y0: 0, t0: 0, s0: 0, from: 0, lastY: 0, lastT: 0, v: 0 };
     let heading = -1;
@@ -216,7 +223,7 @@ export default function Studio({ dims }: { dims: Dims }) {
       centers.forEach((c, i) => { const d = Math.abs(c - sc); if (d < best) { best = d; k = i; } });
       return k;
     };
-    const glideTo = (y: number, i: number, dur = 1.6) => {
+    const glideTo = (y: number, i: number, dur = 2.4) => {
       heading = i;
       const quick = reducedMotion();
       html.dataset.gliding = "1";
@@ -271,7 +278,19 @@ export default function Studio({ dims }: { dims: Dims }) {
     const onTouchEnd = (e: TouchEvent) => {
       if (!swipe.on) return;
       swipe.on = false;
-      if (swipe.mode === "look") { room?.endLook(); ownTouch(e); return; }
+      if (swipe.mode === "look") {
+        room?.endLook();
+        ownTouch(e);
+        // a sideways swipe turns to the next wall, or back to the last
+        const t = e.changedTouches[0];
+        const dx = t.clientX - swipe.x0;
+        if (Math.abs(dx) > innerWidth * 0.16 && !swipe.back) {
+          const next = swipe.from + (dx < 0 ? 1 : -1), n = centers.length;
+          if (next >= 0 && next < n) glideTo(centers[next], next);
+          else if (next >= n) glideTo(worksTop, n);
+        }
+        return;
+      }
       if (swipe.mode !== "walk") return;      // a tap: the room and the page have it
       ownTouch(e);
       const t = e.changedTouches[0];
@@ -283,7 +302,16 @@ export default function Studio({ dims }: { dims: Dims }) {
       const next = go ? swipe.from + (dy < 0 ? 1 : -1) : swipe.from;
       if (next < 0) { glideTo(centers[0], 0, 0.9); return; }
       if (next >= n) glideTo(worksTop, n);
-      else glideTo(centers[next], next, go ? 1.6 : 0.9);
+      else glideTo(centers[next], next, go ? 2.4 : 0.9);
+    };
+    // the edge arrows (and the keyboard's): one wall on, or one back
+    stepRef.current = (d: 1 | -1) => {
+      if (!centers.length || locks.current.size) return;
+      const n = centers.length;
+      const from = heading >= 0 ? heading : nearestStop(lastScroll);
+      const next = Math.max(0, Math.min(n, from + d));
+      if (next === from) return;
+      if (next >= n) glideTo(worksTop, n); else glideTo(centers[next], next);
     };
     if (coarse) {
       document.addEventListener("touchstart", onTouchStart, { passive: true });
@@ -562,6 +590,35 @@ export default function Studio({ dims }: { dims: Dims }) {
   const onLightbox = useCallback((open: boolean) => lock("lightbox", open), [lock]);
   const closeStops = useCallback(() => setStops(false), []);
 
+  // the first visit on a phone: a hint, until the visitor walks (or it has been seen)
+  useEffect(() => {
+    if (!ready || failed || !matchMedia("(pointer: coarse)").matches) return;
+    try { if (localStorage.getItem("dp:coached") === "1") return; } catch { /* private mode */ }
+    const show = window.setTimeout(() => setCoach(true), 900);
+    const done = () => {
+      setCoach(false);
+      try { localStorage.setItem("dp:coached", "1"); } catch { /* private mode */ }
+      removeEventListener("touchstart", onTouch, true);
+    };
+    const onTouch = () => window.setTimeout(done, 400);
+    addEventListener("touchstart", onTouch, true);
+    const hide = window.setTimeout(done, 9000);
+    return () => { clearTimeout(show); clearTimeout(hide); removeEventListener("touchstart", onTouch, true); };
+  }, [ready, failed]);
+
+  // the keyboard walks too: ← and → a wall at a time
+  useEffect(() => {
+    if (!ready) return;
+    const onKey = (e: KeyboardEvent) => {
+      if (e.defaultPrevented || e.metaKey || e.ctrlKey || e.altKey) return;
+      if ((e.target as HTMLElement)?.closest?.("input, textarea, dialog[open], .sec-featured")) return;
+      if (e.key === "ArrowRight") { e.preventDefault(); stepRef.current(1); }
+      if (e.key === "ArrowLeft") { e.preventDefault(); stepRef.current(-1); }
+    };
+    addEventListener("keydown", onKey);
+    return () => removeEventListener("keydown", onKey);
+  }, [ready]);
+
   /** shake the room; on a phone, ask (inside the tap, as iOS insists) to feel the phone move */
   const shake = () => {
     type Askable = { requestPermission?: () => Promise<"granted" | "denied"> };
@@ -580,6 +637,11 @@ export default function Studio({ dims }: { dims: Dims }) {
   }, [rearrange, moving]);
   useEffect(() => { lock("sheet", stops); }, [stops, lock]);
   /** a stop of the walk, by its index: its section, centred */
+  /** the works, filtered, in the collage below the house */
+  const showWorks = (f: WorksFilter) => {
+    dispatchEvent(new CustomEvent(WORKS_FILTER, { detail: f }));
+    setTimeout(() => go("#works"), 60);
+  };
   // the sheet holds the page still while it is open: move once it has let go
   const goStop = (i: number) => setTimeout(() => go(`[data-chapter='${CHAPTERS[i].id}']`, true), 120);
   // the chapter in view, for the header's "you are here"
@@ -723,8 +785,29 @@ export default function Studio({ dims }: { dims: Dims }) {
         )}
       </main>
 
+      {/* a phone's way to walk without knowing the gesture: an arrow at each edge */}
+      {ready && !failed && !rearrange && (
+        <div className="edge-nav" aria-hidden="false">
+          <button type="button" className="edge-btn is-prev" aria-label="The last wall" disabled={active === 0}
+                  onClick={() => stepRef.current(-1)}><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M14.5 5.5 8 12l6.5 6.5" /></svg></button>
+          <button type="button" className="edge-btn is-next" aria-label="The next wall"
+                  onClick={() => stepRef.current(1)}><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M9.5 5.5 16 12l-6.5 6.5" /></svg></button>
+        </div>
+      )}
+      {coach && (
+        <div className="coach" role="status">
+          <span className="coach-hand" aria-hidden="true" />
+          <span className="coach-text">Swipe up to walk through the house</span>
+          <span className="coach-sub lab">or swipe sideways · or tap ‹ ›</span>
+        </div>
+      )}
+
+      {!failed && (
+        <QuickIndex active={active} live={ready && !rearrange} onStop={goStop} onWorks={showWorks}
+                    onPlan={() => go("[data-chapter='plan']", true)} onContact={() => go("#contact")} />
+      )}
       <Stops open={stops} active={active} onClose={closeStops} onGo={goStop}
-             onShake={shake} onContact={() => go("#contact")} onWorks={() => go("#works")} />
+             onShake={shake} onContact={() => go("#contact")} onWorks={showWorks} />
       <Lightbox ref={lbRef} dims={dims} onOpenChange={onLightbox} />
       <Cursor live={ready || failed} />
     </>

@@ -290,6 +290,29 @@ def cut(target, pieces):
         bv.limit_method = "ANGLE"
 
 
+def skin(name, x0, x1, y0, y1, hole):
+    """a thin lime skin over a wall face, with a doorway's hole cut through it: one
+    surface, so the bake has no joint to show around the door"""
+    o = box(name, x0, x1, y0, y1, 0, H_ROOM, role_mat("wall"), bevel=0)
+    hx0, hx1, hy0, hy1, hz0, hz1 = hole
+    bpy.ops.mesh.primitive_cube_add(size=1, location=((hx0 + hx1) / 2, (hy0 + hy1) / 2, (hz0 + hz1) / 2))
+    c = bpy.context.active_object
+    c.scale = (hx1 - hx0, hy1 - hy0, hz1 - hz0)
+    bpy.ops.object.transform_apply(scale=True)
+    c.hide_render = True
+    c.hide_set(True)
+    c.name = "cutter"
+    m = o.modifiers.new("cut", "BOOLEAN")
+    m.object = c
+    m.operation = "DIFFERENCE"
+    m.solver = "EXACT"
+    bv = o.modifiers.new("soft", "BEVEL")
+    bv.width = 0.002
+    bv.segments = 2
+    bv.limit_method = "ANGLE"
+    return o
+
+
 def collider(x0, x1, y0, y1, z0, z1):
     INFO["colliders"].append([x0, x1, y0, y1, z0, z1])
 
@@ -361,9 +384,11 @@ def register_prop(o, mass):
 AX0, AX1, AY0, AY1 = 0.0, 7.2, 0.0, 6.0                 # the Aangan
 QX0, QX1, QY0, QY1 = -5.6, -T, 0.8, 6.0                  # the Quiet Room
 RX0, RX1, RY0, RY1 = -5.6, -T, -4.8, QY0 - T             # the Red Room
+GX0, GX1, GY0, GY1 = 0.0, 6.4, -5.45, -T                 # the gallery: through the Red Room's east wall
+GDOOR = dict(cy=-2.55, w=1.0, h=2.3)                      # its doorway, in the Red Room's east wall
 ARCH = dict(cy=3.4, w=1.5, h=2.95)
 INFO["plan"] = {"aangan": [AX0, AX1, AY0, AY1, H_AANGAN], "quiet": [QX0, QX1, QY0, QY1, H_ROOM],
-                "red": [RX0, RX1, RY0, RY1, H_ROOM], "T": T}
+                "red": [RX0, RX1, RY0, RY1, H_ROOM], "gallery": [GX0, GX1, GY0, GY1, H_ROOM], "T": T}
 
 # --- the Aangan
 floor("Aangan", AX0, AX1, AY0, AY1, "courtFloor")
@@ -413,7 +438,9 @@ def door_leaf(name, w, h, t, role, rail_role=None, panels=(1, 4), pull_left=Fals
     st, top, bot, mid, mul = 0.115, 0.12, 0.19, 0.11, 0.085
     yb, yf = -t / 2, t / 2
     parts, hw = [], []
-    parts.append(box(f"{name}_core", st - 0.004, w - st + 0.004, yb, yf - 0.03, bot - 0.004, h - top + 0.004, m, bevel=0))
+    # the core, its back a few millimetres inside the frame's: flush, the two faces would
+    # fight in the bake and the rails' backs come out black
+    parts.append(box(f"{name}_core", st - 0.004, w - st + 0.004, yb + 0.008, yf - 0.03, bot - 0.004, h - top + 0.004, m, bevel=0))
     for x0 in (0, w - st):
         parts.append(box(f"{name}_stile", x0, x0 + st, yb, yf, 0, h, m, bevel=0.006, segs=3))
     cols, rows = panels
@@ -547,13 +574,32 @@ floor("Red", RX0, RX1, RY0, RY1, "floor")
 wall("RedW", RX0 - T, RX0, RY0 - T, RY1, 0, H_ROOM, "wall",
      [("rect", RX0 - T / 2, -3.55, 1.12, 2.3, 0, T + 0.3, "x"),
       ("rect", RX0 - T / 2, -1.45, 1.0, 1.25, 1.05, T + 0.3, "x")])
-wall("RedE", RX1, RX1 + T, RY0, AY0 - T, 0, H_ROOM, "wall")
+wall("RedE", RX1, RX1 + T, RY0, AY0 - T, 0, H_ROOM, "wall",
+     [("rect", RX1 + T / 2, GDOOR["cy"], GDOOR["w"], GDOOR["h"], 0, T + 0.3, "x")])
 wall("RedS", RX0, RX1 + T, RY0 - T, RY0, 0, H_ROOM, "wall")
 box("Wall_RedField", RX0, RX1, RY0, RY0 + 0.012, 0, H_ROOM, role_mat("field"), bevel=0.002)
 ceiling("Red", RX0, RX1, RY0, RY1, H_ROOM, along_x=True)
 # RedE and the courtyard's west wall meet in this plane: one skin, so no joint shows
-box("Wall_RedSkinE", RX1 - 0.012, RX1, RY0 + 0.012, RY1, 0, H_ROOM, role_mat("wall"), bevel=0.002)
-box("Wall_RedSkirtE", RX1 - 0.024, RX1 - 0.012, RY0 + 0.012, RY1, 0, 0.14, role_mat("wallShade"), bevel=0.003)
+_d0, _d1 = GDOOR["cy"] - GDOOR["w"] / 2, GDOOR["cy"] + GDOOR["w"] / 2
+skin("Wall_RedSkinE", RX1 - 0.012, RX1, RY0 + 0.012, RY1, (RX1 - 0.05, RX1 + 0.05, _d0, _d1, -0.1, GDOOR["h"]))
+for k, (y0, y1) in enumerate(((RY0 + 0.012, _d0), (_d1, RY1))):
+    box(f"Wall_RedSkirtE{k}", RX1 - 0.024, RX1 - 0.012, y0, y1, 0, 0.14, role_mat("wallShade"), bevel=0.003)
+# the doorway's teak frame, on both faces: the jambs stand to the head, which spans them
+for k, xs in enumerate(((RX1 - 0.03, RX1 + 0.02), (RX1 + T - 0.02, RX1 + T + 0.03))):
+    box(f"Wall_GalDoorJambS{k}", xs[0], xs[1], _d0 - 0.1, _d0, 0, GDOOR["h"], role_mat("teak"), bevel=0.008, segs=3)
+    box(f"Wall_GalDoorJambN{k}", xs[0], xs[1], _d1, _d1 + 0.1, 0, GDOOR["h"], role_mat("teak"), bevel=0.008, segs=3)
+    box(f"Wall_GalDoorHead{k}", xs[0], xs[1], _d0 - 0.1, _d1 + 0.1, GDOOR["h"], GDOOR["h"] + 0.1, role_mat("teakRail"), bevel=0.008, segs=3)
+
+# --- the gallery: a white room for the rest of her work, hung salon-style
+floor("Gallery", GX0, GX1, GY0, GY1, "floor")
+wall("GalS", GX0 - T, GX1 + T, GY0 - T, GY0, 0, H_ROOM, "wall")
+wall("GalE", GX1, GX1 + T, GY0, GY1, 0, H_ROOM, "wall")
+wall("GalW", GX0 - T, GX0, GY0, RY0 - T, 0, H_ROOM, "wall")          # between the Red Room's south wall and the gallery's
+ceiling("Gallery", GX0, GX1, GY0, GY1, H_ROOM, along_x=True)
+# the courtyard's front wall is the gallery's north wall: a lime skin on it, round the front door
+skin("Wall_GalSkinN", GX0, GX1, GY1 - 0.012, GY1, (3.6 - 0.75 - 0.16, 3.6 + 0.75 + 0.16, GY1 - 0.05, GY1 + 0.05, -0.1, 2.68))
+for n, (x0, x1, y0, y1) in {"S": (GX0, GX1, GY0, GY0 + 0.012), "E": (GX1 - 0.012, GX1, GY0, GY1)}.items():
+    box(f"Wall_GalSkirt{n}", x0, x1, y0, y1, 0, 0.14, role_mat("wallShade"), bevel=0.003)
 for k in range(6):
     y = -1.45 - 0.5 + (k + 0.5) * (1.0 / 6)
     box(f"Wall_Grille{k}", RX0 - T * 0.55, RX0 - T * 0.45, y - 0.018, y + 0.018, 1.05, 2.3, role_mat("timber"), bevel=0.004)
@@ -649,13 +695,48 @@ painting("monk-and-green-buddha", "W", QX0, ARCH["cy"], 1.62, 1.5)
 # the Quiet Room's south-east corner: one painting to a wall, each given its own attention
 painting("monks-and-blue-buddha", "S", QY0, -1.78, 1.62, 1.3)
 painting("temple-bells", "E", QX1, 1.98, 1.6, 0.914)
-painting("bulls-and-wheel", "S", RY0 + 0.012, -3.2, 1.66, 1.3)
-painting("shree-420-and-milk-cans", "E", RX1 - 0.012, -1.55, 1.62, 1.2)
-painting("three-veiled-women", "E", RX1 - 0.012, -3.6, 1.6, 1.1)
-painting("terracotta-pots", "S", RY0 + 0.012, -1.3, 1.6, 1.0)
+painting("bulls-and-wheel", "S", RY0 + 0.012, -3.2, 1.66, 1.219)          # 48 × 48 in
+painting("shree-420-and-milk-cans", "E", RX1 - 0.012, -1.3, 1.62, 1.016)   # 30 × 40 in
+painting("three-veiled-women", "E", RX1 - 0.012, -3.92, 1.6, 1.0)
+painting("terracotta-pots", "S", RY0 + 0.012, -1.3, 1.6, 0.914)            # 36 × 36 in
 BANDH = ("weathered-door-ring", "red-and-teal-door-lock", "teal-door-bolt", "carved-door-knocker")
-for k, bid in enumerate(BANDH):
-    painting(bid, "N", RY1, -2.42 + k * 0.44, 1.58, 0.305, depth=0.03)
+for k, bid in enumerate(BANDH):                                               # 18 × 18 in each
+    painting(bid, "N", RY1, -2.75 + k * 0.61, 1.62, 0.457, depth=0.03)
+
+
+def salon(side, face, lo, hi, z, works, depth=0.035):
+    """a row of works along one wall between `lo` and `hi`, evenly spaced, centred at height z;
+    `works` is [(id, longest m)], in order of increasing `along`"""
+    ws = []
+    for wid, longest in works:
+        im = img(os.path.join(ART, f"{wid}.jpg"), True)
+        ar = im.size[0] / im.size[1]
+        ws.append(longest if ar >= 1 else longest * ar)
+    gap = (hi - lo - sum(ws)) / (len(ws) + 1)
+    at = lo + gap
+    for (wid, longest), w in zip(works, ws):
+        painting(wid, side, face, at + w / 2, z, longest, depth)
+        INFO["art"][wid]["late"] = True        # far from the door: the site loads these after the house opens
+        at += w + gap
+
+
+# --- the gallery's hang
+# south wall: Gone Are The Days, two rows (along x)
+salon("S", GY0, GX0 + 0.72, GX1 - 0.72, 1.38, [("rickshaw-rest-framed", 1.219), ("rickshaw-puller-and-coin", 1.1),
+                                 ("mother-india-and-kettles", 1.016), ("cycle-rickshaw", 1.0), ("postbox-and-stamps", 0.9)])
+salon("S", GY0, GX0 + 0.62, GX1 - 0.62, 2.62, [("horse-cart-and-autorickshaw", 0.457), ("carriage-and-autorickshaw", 0.61),
+                                 ("coins-and-clay-bank", 0.61), ("rickshaw-rest", 0.61), ("bullock-cart-and-truck", 0.61),
+                                 ("rickshaw-and-autorickshaw", 0.457)])
+# east wall: the portraits, two rows (along y)
+salon("E", GX1, GY0, GY1, 1.38, [("mother-and-child", 1.219), ("milkman-on-bicycle", 1.0),
+                                 ("man-among-metal-pans", 1.0), ("red-turban-portrait", 0.61)])
+salon("E", GX1, GY0, GY1, 2.62, [("yellow-turban-portrait", 0.61), ("patterned-turban-portrait", 0.61),
+                                 ("elder-woman-portrait", 0.61), ("boy-and-kettle", 0.61), ("riverside-figures", 0.61)])
+# north wall, either side of the front door: Faith
+salon("N", GY1, GX0, 3.6 - 0.75 - 0.16, 1.55, [("offering-of-light", 1.0), ("prayer-and-scripture", 1.0)])
+salon("N", GY1, 3.6 + 0.75 + 0.16, GX1, 1.55, [("priest-with-flame", 1.0)])
+# west wall, south of the doorway: Faith
+salon("W", GX0, GY0, _d0 - 0.1, 1.55, [("sacred-tree", 0.8), ("newspaper-reader", 0.8)])
 
 # ====================================================================== things
 def import_ph(ph_id, loc, rot_z=0.0, scale=1.0, decimate=None, prop=True, mass=1.0):
@@ -826,10 +907,15 @@ milk_can("can_0", (-5.15, -2.85, 0))
 milk_can("can_1", (-4.85, -2.62, 0), 0.85)
 milk_can("can_2", (-5.18, -2.35, 0), 0.92)
 cart_wheel("wheel", (-4.95, -4.58, 0), 0.0)
-charpai("charpai_red", (-1.05, -2.6, 0), math.radians(90), L=1.85, W=0.9)
-import_ph("brass_pot_01", (-1.2, -2.0, 0), 0.4, 0.95, mass=1.0)
-import_ph("brass_pot_01", (-0.95, -3.2, 0), 1.7, 0.8, mass=1.0)
-import_ph("ceramic_pot", (-1.0, -0.15, 0), 1.0, 0.75, mass=2.0)
+charpai("charpai_red", (-1.85, -0.18, 0), 0.0, L=1.85, W=0.9)
+import_ph("brass_pot_01", (-0.85, -0.55, 0), 0.4, 0.95, mass=1.0)
+import_ph("brass_pot_01", (-0.95, -4.35, 0), 1.7, 0.8, mass=1.0)
+import_ph("ceramic_pot", (-0.8, -0.05, 0), 1.0, 0.75, mass=2.0)
+# a long teak bench down the middle of the gallery
+_bench = [box("galBenchTop", 2.35, 4.05, -3.12, -2.72, 0.42, 0.47, role_mat("teak"), bevel=0.01, segs=3)]
+for x in (2.45, 3.95):
+    _bench.append(box("galBenchLeg", x - 0.04, x + 0.04, -3.08, -2.76, 0, 0.42, role_mat("teak"), bevel=0.006))
+register_prop(join("Prop_galBench", apply_mods(_bench)), 4.0)
 
 
 def rod(name, p0, p1, r, mat, segs=12):
@@ -1073,12 +1159,17 @@ def fill(name, x0, x1, y0, y1, power):
 
 fill("Fill_quiet", QX0, QX1, QY0, QY1, float(opt.get("--fillq", 45)))
 fill("Fill_red", RX0, RX1, RY0, RY1, float(opt.get("--fillr", 90)))
+fill("Fill_gallery", GX0, GX1, GY0, GY1, float(opt.get("--fillg", 120)))
 
 for k in ("monk-and-green-buddha", "monks-and-blue-buddha", "temple-bells",
           "bulls-and-wheel", "shree-420-and-milk-cans", "three-veiled-women", "terracotta-pots"):
     gallery_light(k, power=float(opt.get("--gallery", 135)))
 for k in BANDH:
-    gallery_light(k, power=float(opt.get("--gallery", 135)) * 0.32)
+    gallery_light(k, power=float(opt.get("--gallery", 135)) * 0.45)
+# the gallery: a spot for each work, by its size
+for k, a in list(INFO["art"].items()):
+    if a.get("late"):
+        gallery_light(k, power=float(opt.get("--gallery", 135)) * min(1.0, 0.35 + 0.55 * max(a["w"], a["h"])))
 
 
 def studio_lamp(name, plate, aim, out=Vector((0, 1, 0)), reach=0.62):
@@ -1174,8 +1265,14 @@ VIEWS = {
     "street":    ((-4.0, 0.0, 1.6), (-2.3, RY0, 1.5)),
     # three-quarters on the east wall, Bandh Darwaze on the north wall to the left
     "redwall":   ((-5.35, -4.2, 1.55), (-1.1, -1.75, 1.45)),
-    "featured":  ((-2.66, -2.55, 3.62), (-1.2, -2.55, 0.0)),
-    "plan":      ((-2.4, 0.6, 23.0), (-2.4, 0.6, 0.0)),
+    # through the Red Room's east doorway into the gallery: Gone Are The Days, then the portraits
+    "galleryvia": ((GX0 + 0.6, -2.2, 1.62), (GX1, -1.6, 1.7)),
+    "gallery":   ((3.2, -0.95, 1.68), (3.2, GY0, 1.95)),
+    "portraitsvia": ((2.8, -1.6, 1.66), (5.2, -4.4, 1.8)),
+    "portraits": ((1.55, -2.95, 1.68), (GX1, -2.95, 1.95)),
+    # then up, out of the gallery's roof
+    "featured":  ((1.74, -2.95, 3.62), (3.2, -2.95, 0.0)),
+    "plan":      ((0.4, 0.3, 26.0), (0.4, 0.3, 0.0)),
     "mess":      ((10.5, -10.5, 11.5), (0.4, 0.4, 0.4)),
 }
 # a step closer to the work on a wide screen: the paintings at about 1.3× where a wall has one,
@@ -1199,9 +1296,11 @@ NARROW = {
     # from facing Threads of Faith, turn first to the passage, then go through it
     "streetvia": ((-4.0, 2.2, 1.58), (-4.3, -0.5, 1.5)),
     "street":    ((-4.3, -0.4, 1.55), (-3.35, RY0, 1.3)),
-    "redwall":   ((-3.55, -3.55, 1.55), (RX1, -3.55, 1.3)),
-    "featured":  ((-2.66, -2.55, 3.62), (-1.2, -2.55, 0.0)),
-    "plan":      ((0.8, -3.2, 34.0), (0.8, -3.2, 0.0)),
+    "redwall":   ((-3.55, -3.9, 1.55), (RX1, -3.9, 1.3)),
+    "gallery":   ((3.2, -1.5, 1.55), (3.2, GY0, 1.5)),
+    "portraits": ((2.4, -2.25, 1.55), (GX1, -2.25, 1.45)),
+    "featured":  ((1.74, -2.95, 3.62), (3.2, -2.95, 0.0)),
+    "plan":      ((0.6, 0.0, 40.0), (0.6, 0.0, 0.0)),
     "mess":      ((10.5, -10.5, 11.5), (0.4, 0.4, 0.4)),
 }
 FOV = 40.0

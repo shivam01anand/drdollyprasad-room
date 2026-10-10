@@ -97,6 +97,7 @@ type Body = {
 };
 
 const tmpV = new THREE.Vector3();
+const tmpR = new THREE.Vector3(), tmpU = new THREE.Vector3();
 const tmpC = new THREE.Color();
 /** the lamp's wicks, round the rim of its cup (scripts/house/build.py deepa) */
 const DEEPA_WICK = 0.14;
@@ -215,7 +216,8 @@ export class Room {
       this.loadTexture(t.url).then((tex) => { tick(); return [`${t.set}:${t.kind}`, tex] as const; })));
     const houseP = loadHouse(this.tier.small, this.abort.signal, (u) => this.loadTexture(u), tick);
     const house = await houseP;
-    const ids = Object.keys(house.info.art);
+    // the works near the door load with the house; the gallery's after it has opened (lateArt)
+    const ids = Object.keys(house.info.art).filter((id) => !house.info.art[id].late);
     total = 4 + texList.length + ids.length;
     const artP = Promise.all(ids.map((id) =>
       this.loadTexture(`/art/room/${id}.jpg`).then((tex) => { tick(); return [id, tex] as const; })));
@@ -255,7 +257,17 @@ export class Room {
     const textures = new Map(artPairs);
     const flat = flatRelief();
     this.owned.push(flat);
+    // a canvas waiting for its photograph: a warm ground, the same program as the painting
+    const ground = new THREE.DataTexture(new Uint8Array([214, 202, 184, 255]), 1, 1);
+    ground.colorSpace = THREE.SRGBColorSpace;
+    ground.needsUpdate = true;
+    this.owned.push(ground);
     for (const [id, mesh] of this.parts.art) {
+      if (this.info.art[id]?.late) {
+        mesh.material = paintMaterial(ground, this.baked, galleryLight(this.info.art[id]), flat);
+        this.art.push(mesh);
+        continue;
+      }
       const tex = textures.get(id);
       if (!tex) throw new Error(`missing artwork ${id}`);
       tex.colorSpace = THREE.SRGBColorSpace;
@@ -303,12 +315,38 @@ export class Room {
     this.ready = true;
     this.wake = 2;
     this.reliefs();
+    this.lateArt(anisotropy);
     if (process.env.NODE_ENV !== "production") (window as unknown as { __room?: Room }).__room = this;
+  }
+
+  /** the gallery's photographs, a few at a time once the house is open; each takes its relief as it lands */
+  private lateArt(anisotropy: number) {
+    const queue = this.art.filter((m) => this.info.art[m.userData.artId]?.late);
+    const next = () => {
+      if (this.disposed) return;
+      const batch = queue.splice(0, 3);
+      if (!batch.length) return;
+      Promise.all(batch.map((mesh) => this.loadTexture(`/art/room/${mesh.userData.artId}.jpg`).then((tex) => {
+        if (this.disposed) { tex.dispose(); return; }
+        tex.colorSpace = THREE.SRGBColorSpace;
+        tex.anisotropy = anisotropy;
+        tex.flipY = false;
+        tex.needsUpdate = true;
+        this.owned.push(tex);
+        const mat = mesh.material as THREE.MeshStandardMaterial;
+        mat.map = tex;
+        const relief = reliefMap(tex.image as HTMLImageElement, 384);
+        this.owned.push(relief);
+        mat.normalMap = relief;
+        this.invalidate();
+      }).catch(() => { /* the warm ground stays */ }))).then(() => setTimeout(next, 120));
+    };
+    setTimeout(next, 600);
   }
 
   /** each canvas's relief, read from its photograph one at a time in idle moments, off the load path */
   private reliefs() {
-    const queue = [...this.art];
+    const queue = this.art.filter((m) => !this.info.art[m.userData.artId]?.late);
     const idle = (fn: () => void) =>
       "requestIdleCallback" in window ? requestIdleCallback(fn, { timeout: 600 }) : setTimeout(fn, 40);
     const next = () => {
@@ -1147,14 +1185,22 @@ export class Room {
     return out;
   }
 
-  /** a house anchor on screen in CSS pixels; null if it is behind the camera or off the screen */
-  anchorPoint(name: string) {
+  /** a thing w × h metres about a house anchor, facing the camera, on screen in CSS pixels; null if behind it */
+  anchorRect(name: string, w: number, h: number) {
     const a = this.info?.anchors[name];
     if (!a || !this.rig || !this.canvas) return null;
-    tmpV.set(a[0], a[1], a[2]).project(this.rig.camera);
-    if (tmpV.z < -1 || tmpV.z > 1 || Math.abs(tmpV.x) > 1 || Math.abs(tmpV.y) > 1) return null;
+    const cam = this.rig.camera;
+    const right = tmpR.setFromMatrixColumn(cam.matrixWorld, 0).multiplyScalar(w / 2);
+    const up = tmpU.setFromMatrixColumn(cam.matrixWorld, 1).multiplyScalar(h / 2);
     const r = this.canvas.getBoundingClientRect();
-    return { x: r.left + (tmpV.x * 0.5 + 0.5) * r.width, y: r.top + (0.5 - tmpV.y * 0.5) * r.height };
+    let x0 = Infinity, y0 = Infinity, x1 = -Infinity, y1 = -Infinity;
+    for (const [i, j] of [[-1, -1], [1, -1], [1, 1], [-1, 1]]) {
+      tmpV.set(a[0], a[1], a[2]).addScaledVector(right, i).addScaledVector(up, j).project(cam);
+      if (tmpV.z < -1 || tmpV.z > 1) return null;
+      const x = r.left + (tmpV.x * 0.5 + 0.5) * r.width, y = r.top + (0.5 - tmpV.y * 0.5) * r.height;
+      x0 = Math.min(x0, x); y0 = Math.min(y0, y); x1 = Math.max(x1, x); y1 = Math.max(y1, y);
+    }
+    return { x0, y0, x1, y1 };
   }
 
   /** a canvas with its frame, on screen in CSS pixels; null unless wholly in front of the camera */

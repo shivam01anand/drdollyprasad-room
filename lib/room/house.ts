@@ -25,7 +25,8 @@ import { worldUV, type Library, type Role } from "./materials";
 export type V3 = [number, number, number];
 export type HouseInfo = {
   lightmap: { day: number; night?: number };
-  art: Record<string, { w: number; h: number; side: string; centre: V3 }>;
+  /** `late`: far from the door (the gallery); its photograph loads after the house has opened */
+  art: Record<string, { w: number; h: number; side: string; centre: V3; late?: boolean }>;
   cams: Record<string, { eye: V3; target: V3; fov: number }>;
   anchors: Record<string, V3>;
   sun: { toSun: V3 };

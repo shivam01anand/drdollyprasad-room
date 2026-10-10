@@ -64,10 +64,10 @@ export const TAILORED: Tailored[] = [
   { id: "temple-bells", work: "temple-bells", label: "An entrance hall, a farmhouse in Chhatarpur",
     src: "/art/rooms/temple-bells.webp", thumb: "/art/rooms/temple-bells-thumb.webp",
     w: 1800, h: 1200, pxPerCm: 4.861, floor: 1020, cx: 900, sill: 102, cm: 91.4, inPhoto: true },
-  // centre 143 cm, 26% of the frame's width; hung at 90 cm, a size she has not stated
+  // centre 159 cm, 29% of the frame's width; hung at 121.9 cm, a size she has not stated
   { id: "bulls-and-wheel", work: "bulls-and-wheel", label: "A dining room, a Gurgaon penthouse",
     src: "/art/rooms/bulls-and-wheel.webp", thumb: "/art/rooms/bulls-and-wheel-thumb.webp",
-    w: 1800, h: 1200, pxPerCm: 4.793, floor: 1082, cx: 602, sill: 98, cm: 90, inPhoto: true },
+    w: 1800, h: 1200, pxPerCm: 4.034, floor: 1142, cx: 609, sill: 98, cm: 121.9, inPhoto: true },
   // centre 145.7 cm, 25% of the frame's width; hung at its stated 91.4 cm
   { id: "boy-with-bananas", work: "boy-with-bananas", label: "A verandah, a villa in Goa",
     src: "/art/rooms/boy-with-bananas.webp", thumb: "/art/rooms/boy-with-bananas-thumb.webp",
@@ -88,10 +88,10 @@ export const TAILORED: Tailored[] = [
   { id: "child-among-flowers", work: "child-among-flowers", label: "A sitting room, Pondicherry",
     src: "/art/rooms/child-among-flowers.webp", thumb: "/art/rooms/child-among-flowers-thumb.webp",
     w: 1800, h: 1200, pxPerCm: 4.268, floor: 982, cx: 900, sill: 102, cm: 105, inPhoto: true },
-  // centre 143 cm, 22% of the frame's width; hung at 90 cm, a size she has not stated
+  // centre 148.8 cm, 25% of the frame's width; hung at 101.6 cm, a size she has not stated
   { id: "shree-420-and-milk-cans", work: "shree-420-and-milk-cans", label: "A den on Marine Drive, Mumbai",
     src: "/art/rooms/shree-420-and-milk-cans.webp", thumb: "/art/rooms/shree-420-and-milk-cans-thumb.webp",
-    w: 1800, h: 1200, pxPerCm: 5.385, floor: 1100, cx: 900, sill: 98, cm: 90, inPhoto: true },
+    w: 1800, h: 1200, pxPerCm: 5.385, floor: 1100, cx: 900, sill: 98, cm: 101.6, inPhoto: true },
   // centre 138.5 cm, 20% of the frame's width; hung at its stated 61 cm
   { id: "woman-with-red-flower", work: "woman-with-red-flower", label: "A library, Ballygunge, Kolkata",
     src: "/art/rooms/woman-with-red-flower.webp", thumb: "/art/rooms/woman-with-red-flower-thumb.webp",
@@ -100,10 +100,10 @@ export const TAILORED: Tailored[] = [
   { id: "monks-and-blue-buddha", work: "monks-and-blue-buddha", label: "A living room, Jubilee Hills, Hyderabad",
     src: "/art/rooms/monks-and-blue-buddha.webp", thumb: "/art/rooms/monks-and-blue-buddha-thumb.webp",
     w: 1800, h: 1200, pxPerCm: 3.933, floor: 908, cx: 900, sill: 92, cm: 120, inPhoto: true },
-  // centre 145.9 cm, 25% of the frame's width; hung at 90 cm, a size she has not stated
+  // centre 146.6 cm, 26% of the frame's width; hung at 91.4 cm, a size she has not stated
   { id: "terracotta-pots", work: "terracotta-pots", label: "A dining hall, a Chettinad mansion",
     src: "/art/rooms/terracotta-pots.webp", thumb: "/art/rooms/terracotta-pots-thumb.webp",
-    w: 1800, h: 1200, pxPerCm: 4.730, floor: 1056, cx: 900, sill: 102, cm: 90, inPhoto: true },
+    w: 1800, h: 1200, pxPerCm: 4.730, floor: 1056, cx: 900, sill: 102, cm: 91.4, inPhoto: true },
 ];
 
 /** the fallback rooms, for works with a stated size and no room of their own */

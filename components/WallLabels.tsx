@@ -15,8 +15,8 @@ import type { Room } from "@/lib/room/Room";
  *
  * Placement is a gallery's: to the right of the frame, its foot on the
  * frame's foot; failing that, to the left; failing that, below. A card never
- * covers a painting, another card, the copy or the header, and a canvas that
- * is not wholly on screen gets none.
+ * covers a painting, her photograph on its easel, another card, the copy or
+ * the header, and a canvas that is not wholly on screen gets none.
  */
 
 const IDS = [...new Set(CHAPTERS.flatMap((c) => c.labels ?? []))];
@@ -52,6 +52,8 @@ export default function WallLabels({ room, active, live, onOpen }: {
     const nodes = new Map([...ids.map((id) => [id, el.querySelector<HTMLElement>(`[data-label='${id}']`)!] as const),
       ...asides.map((a) => [a.key, el.querySelector<HTMLElement>(`[data-label='${a.key}']`)!] as const)]);
     let placed: Map<string, Side> | null = null;
+    /** where each aside last fitted: it holds there while the view sways, never jumps to the corner */
+    const asideAt = new Map<string, { x: number; y: number }>();
     let reveal: gsap.core.Timeline | null = null;
     let fade: gsap.core.Tween | null = null;
 
@@ -60,6 +62,7 @@ export default function WallLabels({ room, active, live, onOpen }: {
       const on = [...nodes.values()].filter((n) => n.dataset.on === "1");
       on.forEach((n) => (n.dataset.on = "0"));
       placed = null;
+      asideAt.clear();
       if (!on.length) return;
       fade?.kill();
       fade = gsap.to(on, { autoAlpha: 0, duration: instant || quick ? 0 : 0.2, ease: "power1.in" });
@@ -105,35 +108,38 @@ export default function WallLabels({ room, active, live, onOpen }: {
         // only a canvas wholly on screen is labelled
         if (f && f.x0 > 0 && f.y0 > 0 && f.x1 < innerWidth && f.y1 < innerHeight) rects.set(id, f);
       }
-      // the works' labels, where they will stand this frame, and the chapter's words and the
+      // the works' labels first, their sides chosen once, as the camera lands
+      const things = asides.map((a) => R.anchorRect(a.anchor, a.size[0], a.size[1])).filter((x): x is Rect => !!x);
+      const first = !placed;
+      if (!placed) placed = place(rects, [...R.artRects(), ...things]);
+      // the works' labels, where they stand this frame, and the chapter's words and the
       // header: an aside must crowd none of them
       const labelRects: Rect[] = [];
       document.querySelectorAll<HTMLElement>(".copy-panel[data-on='1'], .brand, .hud-meta, .hud-mail, .diya-btn, .hud-bottom, .dock")
         .forEach((x) => { const b = x.getBoundingClientRect(); if (b.width && b.height) labelRects.push({ x0: b.left, y0: b.top, x1: b.right, y1: b.bottom }); });
-      for (const [id, side] of placed ?? []) {
+      for (const [id, side] of placed) {
         const f = rects.get(id), n = nodes.get(id)!;
         if (!f) continue;
         const p = spot(side, f, n.offsetWidth, n.offsetHeight);
         labelRects.push({ x0: p.x, y0: p.y, x1: p.x + n.offsetWidth, y1: p.y + n.offsetHeight });
       }
-      // an aside sits beside its anchor: right of it, left, or below
-      const asideAt = new Map<string, { x: number; y: number }>();
+      // an aside sits beside the thing it names, clear of it: right of it, left, or below
       for (const a of asides) {
-        const p = R.anchorPoint(a.anchor), n = nodes.get(a.key)!;
-        if (!p) continue;
-        const w = n.offsetWidth, h = n.offsetHeight;
-        const tries = [{ x: p.x + 50, y: p.y - h / 2 }, { x: p.x - 50 - w, y: p.y - h / 2 },
-          { x: p.x - w / 2, y: p.y + 64 }, { x: p.x - 24, y: p.y + 64 }, { x: p.x - w + 24, y: p.y + 64 }];
+        const b = R.anchorRect(a.anchor, a.size[0], a.size[1]), n = nodes.get(a.key)!;
+        if (!b || b.x1 < 0 || b.x0 > innerWidth || b.y1 < 0 || b.y0 > innerHeight) continue;
+        const w = n.offsetWidth, h = n.offsetHeight, cx = (b.x0 + b.x1) / 2, under = b.y1 + GAP * 0.75;
+        const tries = [{ x: b.x1 + GAP, y: b.y1 - h }, { x: b.x0 - GAP - w, y: b.y1 - h },
+          { x: cx - w / 2, y: under }, { x: cx - 24, y: under }, { x: cx - w + 24, y: under }];
         const fits = (q: { x: number; y: number }) => {
           const r = { x0: q.x, y0: q.y, x1: q.x + w, y1: q.y + h };
-          return q.x > 16 && q.x + w < innerWidth - 16 && q.y > 70 && q.y + h < innerHeight - 90
-            && ![...rects.values(), ...labelRects].some((f) => overlaps(r, f, 10));
+          // (the header and the controls along the foot are in labelRects already)
+          return q.x > 16 && q.x + w < innerWidth - 16 && q.y > 70 && q.y + h < innerHeight - 16
+            && ![...rects.values(), ...labelRects, ...things].some((f) => overlaps(r, f, 10));
         };
         const q = tries.find(fits);
         if (q) asideAt.set(a.key, q);
       }
-      if (!placed) {
-        placed = place(rects, R.artRects());
+      if (first) {
         for (const k of asideAt.keys()) placed.set(k, "right");
         reveal = gsap.timeline();
         let k = 0;

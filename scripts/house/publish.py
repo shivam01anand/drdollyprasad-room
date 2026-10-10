@@ -65,7 +65,8 @@ def t(p):
 
 out = {
     "lightmap": scales,
-    "art": {k: {"w": v["w"], "h": v["h"], "side": v["side"], "centre": t(v["centre"])} for k, v in info["art"].items()},
+    "art": {k: {"w": v["w"], "h": v["h"], "side": v["side"], "centre": t(v["centre"]), **({"late": True} if v.get("late") else {})}
+            for k, v in info["art"].items()},
     "cams": {k: {"eye": t(v["eye"]), "target": t(v["target"]), "fov": v["fov"]} for k, v in info["cams"].items()},
     "anchors": {k: t(v) for k, v in info["anchors"].items()},
     "sun": {"toSun": t(info["lights"]["sun"]["toSun"])},

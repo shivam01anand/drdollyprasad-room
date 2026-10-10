@@ -1,4 +1,11 @@
+"use client";
+
+import { useEffect, useState } from "react";
 import { WORKS, SERIES, EMAIL, INSTAGRAM, details, quoted, statusLabel } from "@/lib/works";
+
+export type WorksFilter = "all" | "available" | "sold";
+/** the quick-access index (and anything else) shows the works filtered: dispatch this, then scroll to #works */
+export const WORKS_FILTER = "dp:works-filter";
 
 type Dims = Record<string, { w: number; h: number }>;
 
@@ -11,20 +18,36 @@ const DEFAULT_IN = 34;
  * the work (the page's one lightbox, wired in Studio).
  */
 export default function Works({ dims }: { dims: Dims }) {
+  const [filter, setFilter] = useState<WorksFilter>("all");
+  useEffect(() => {
+    const on = (e: Event) => setFilter((e as CustomEvent<WorksFilter>).detail ?? "all");
+    addEventListener(WORKS_FILTER, on);
+    return () => removeEventListener(WORKS_FILTER, on);
+  }, []);
+  // "available" takes in the works on enquiry: neither is sold
+  const shows = (status: string) => filter === "all" || (filter === "sold" ? status === "Sold" : status !== "Sold");
+  const count = (f: WorksFilter) => WORKS.filter((w) => f === "all" || (f === "sold" ? w.status === "Sold" : w.status !== "Sold")).length;
   return (
     <section className="collage" id="works" aria-labelledby="works-title">
       <div className="collage-head">
-        <div className="lab">The work · {WORKS.length} paintings</div>
+        <div className="lab">The work</div>
         <h2 id="works-title" className="collage-title">
           “My paintings are just a representation of some and many others of the shades and paradigms that I picked up at different stages in my life.”
         </h2>
+        <div className="works-filter" role="group" aria-label="Show the works">
+          {(["all", "available", "sold"] as WorksFilter[]).map((f) => (
+            <button type="button" key={f} className="pill" aria-pressed={filter === f} onClick={() => setFilter(f)}>
+              {f === "all" ? "All" : f === "available" ? "Available" : "Sold"} <span className="works-n">{count(f)}</span>
+            </button>
+          ))}
+        </div>
       </div>
 
-      {SERIES.map((s) => (
+      {SERIES.filter((s) => WORKS.some((w) => w.series === s.label && shows(w.status))).map((s) => (
         <div className="series-block" key={s.label}>
           <div className="series"><h3 className="series-name">{s.label}</h3><span className="lab">{s.note}</span></div>
           <div className="hang">
-            {WORKS.filter((w) => w.series === s.label).map((w) => {
+            {WORKS.filter((w) => w.series === s.label && shows(w.status)).map((w) => {
               const d = dims[w.id];
               if (!d) return null;
               const inches = w.inches ?? DEFAULT_IN;

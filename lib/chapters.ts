@@ -34,8 +34,9 @@ export type Chapter = {
   dusk?: number;
   /** the canvases in this framing that get a wall label */
   labels?: string[];
-  /** captions for things in the framing that are not her works (a house anchor and its words) */
-  asides?: { anchor: string; title: string; line: string }[];
+  /** captions for things in the framing that are not her works (a house anchor and its words,
+   *  and the thing's size in metres, so no wall label covers it) */
+  asides?: { anchor: string; title: string; line: string; size: [number, number] }[];
   /** which side of its canvas a label tries first (a door or a corner on the other) */
   labelSide?: "left" | "right" | "below";
   /** the stop's short name, for the phone's dock and the list of stops */
@@ -96,7 +97,8 @@ export const CHAPTERS: Chapter[] = [
     room: "The Red Room",
     // a portrait screen faces Threads of Faith: it turns to the passage before going through
     via: "streetvia",
-    asides: [{ anchor: "press", title: "The artist, in conversation", line: "Beside “The Bullocks”, at her exhibition" }],
+    // the framed print on its easel is 0.64 × 0.48 m (scripts/house/build.py press_easel)
+    asides: [{ anchor: "press", title: "The artist, in conversation", line: "Beside “The Bullocks”, at her exhibition", size: [0.64, 0.48] }],
     // her own words (her studio page, drdollyprasad.wordpress.com, 2018)
     quote:
       "The shades that touched me, the live frames that seemed to tell a story larger than the " +
@@ -108,6 +110,20 @@ export const CHAPTERS: Chapter[] = [
   },
   { id: "redwall", eyebrow: "“Shree 420” · “Three Women in Red”", stop: "Shree 420 · Three Women", room: "The Red Room", view: "redwall",
     via: "redvia", dusk: 0.45, labels: ["shree-420-and-milk-cans", "three-veiled-women"] },
+  // through the Red Room's east doorway: the gallery, where the rest of her work hangs salon-style
+  { id: "gallery", eyebrow: "The gallery · Gone Are The Days", stop: "The gallery", room: "The gallery",
+    view: "gallery", via: "galleryvia", dusk: 0.5 },
+  {
+    id: "portraits",
+    eyebrow: "Portraits · c. 2005–2015",
+    stop: "Portraits",
+    room: "The gallery",
+    // her own page's words about her, as written there (drdollyprasad.wordpress.com)
+    body: "Play of emotions, be it on the faces around her or on the canvas, have always fascinated her.",
+    view: "portraits",
+    via: "portraitsvia",
+    dusk: 0.54,
+  },
   { id: "featured", eyebrow: "Featured", stop: "Featured works", slot: "featured", view: "featured", dusk: 0.45 },
   {
     id: "plan",

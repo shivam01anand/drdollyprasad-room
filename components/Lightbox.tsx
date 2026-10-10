@@ -93,6 +93,30 @@ const Lightbox = forwardRef<LightboxHandle, { dims: Dims; onOpenChange(open: boo
       i.src = src;
     };
 
+    /** the slideshow: the painting, then its room, and back, until the reader takes over */
+    const auto = useRef(0);
+    const stopShow = () => { clearTimeout(auto.current); auto.current = 0; };
+    const playShow = (id: string) => {
+      stopShow();
+      const order = ["work", ...rooms.current.map((r) => r.room.id)];
+      if (order.length < 2 || reducedMotion()) return;
+      const tick = () => {
+        if (st.current.id !== id) return;
+        const k = order.indexOf(view.current);
+        const next = order[(k + 1) % order.length];
+        show(next);
+        auto.current = window.setTimeout(tick, next === "work" ? 4200 : 5600);
+      };
+      auto.current = window.setTimeout(tick, 3000);
+    };
+    /** a swipe across the figure: the next way of seeing it, or the last */
+    const stepView = (d: 1 | -1) => {
+      const order = ["work", ...rooms.current.map((r) => r.room.id)];
+      if (order.length < 2) return;
+      const k = order.indexOf(view.current);
+      show(order[(k + d + order.length) % order.length]);
+    };
+
     /** painting, or a room: a quiet crossfade inside the figure */
     const show = (which: string, instant = false) => {
       const w = st.current.id ? BY_ID.get(st.current.id) : null;
@@ -147,7 +171,7 @@ const Lightbox = forwardRef<LightboxHandle, { dims: Dims; onOpenChange(open: boo
         const b = document.createElement("button");
         b.type = "button"; b.className = "lb-view"; b.dataset.view = id;
         b.setAttribute("aria-pressed", String(id === "work")); b.setAttribute("aria-label", label); b.title = label;
-        b.addEventListener("click", (e) => { e.stopPropagation(); if (view.current !== id) show(id); });
+        b.addEventListener("click", (e) => { e.stopPropagation(); stopShow(); if (view.current !== id) show(id); });
         return b;
       };
       const self = btn("work", "The painting");
@@ -212,7 +236,11 @@ const Lightbox = forwardRef<LightboxHandle, { dims: Dims; onOpenChange(open: boo
         // its room comes down quietly once the work is in, unless the reader is saving data
         const first = rooms.current[0];
         const save = (navigator as Navigator & { connection?: { saveData?: boolean } }).connection?.saveData;
-        if (first && !save) setTimeout(() => { if (st.current.id === id) warm(first.room.src); }, 900);
+        if (first && !save) {
+          warm(first.room.src);
+          // and the slideshow begins: the work, then the work in its room
+          playShow(id);
+        }
       };
       if (from && !reduce) {
         const state = Flip.getState(from);
@@ -245,6 +273,7 @@ const Lightbox = forwardRef<LightboxHandle, { dims: Dims; onOpenChange(open: boo
     };
 
     const close = () => {
+      stopShow();
       const r = root.current, i = img.current;
       if (!r || !i || !st.current.id || st.current.busy) return;
       st.current.busy = true;
@@ -298,6 +327,36 @@ const Lightbox = forwardRef<LightboxHandle, { dims: Dims; onOpenChange(open: boo
     const backdrop = () => { if (performance.now() - st.current.at > 450) close(); };
 
     useImperativeHandle(ref, () => ({ open }), []);
+
+    // the reader takes over: any touch on the work, a wheel or a key ends the slideshow;
+    // a swipe across the figure turns to the next way of seeing it
+    useEffect(() => {
+      const fig = root.current?.querySelector<HTMLElement>(".lb-figure");
+      if (!fig) return;
+      let x0 = 0, y0 = 0, t0 = 0;
+      const down = () => stopShow();
+      const ts = (e: TouchEvent) => { if (e.touches.length === 1) { x0 = e.touches[0].clientX; y0 = e.touches[0].clientY; t0 = performance.now(); } };
+      const te = (e: TouchEvent) => {
+        const t = e.changedTouches[0];
+        const dx = t.clientX - x0, dy = t.clientY - y0;
+        if (frame.current?.classList.contains("is-zoomed") || performance.now() - t0 > 700) return;
+        if (Math.abs(dx) > 50 && Math.abs(dx) > Math.abs(dy) * 1.4) stepView(dx < 0 ? 1 : -1);
+      };
+      fig.addEventListener("pointerdown", down);
+      fig.addEventListener("wheel", down, { passive: true });
+      fig.addEventListener("touchstart", ts, { passive: true });
+      fig.addEventListener("touchend", te, { passive: true });
+      addEventListener("keydown", down);
+      return () => {
+        fig.removeEventListener("pointerdown", down);
+        fig.removeEventListener("wheel", down);
+        fig.removeEventListener("touchstart", ts);
+        fig.removeEventListener("touchend", te);
+        removeEventListener("keydown", down);
+      };
+      // reads refs only
+      // eslint-disable-next-line react-hooks/exhaustive-deps
+    }, []);
 
     // on a phone, a pull down from the top of the sheet puts the work away
     useEffect(() => {

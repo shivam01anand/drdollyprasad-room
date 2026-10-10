@@ -134,6 +134,59 @@ html[data-rearrange="1"] .chapter-text{visibility:hidden;pointer-events:none}
 .music-btn .dish-line{fill:none;stroke:currentColor;stroke-width:1.6;stroke-linecap:round;stroke-linejoin:round}
 .music-btn[aria-pressed="true"] .dish{fill:var(--oxide)}
 
+/* ----------------------------------------------------------- the quick index */
+/* a quiet tab on the left edge, always there; the panel slides from the left */
+.qi{position:fixed;inset:0;z-index:175;pointer-events:none}
+.qi-tab{position:absolute;left:0;top:50%;transform:translateY(-50%) rotate(180deg);pointer-events:auto;cursor:pointer;
+  writing-mode:vertical-rl;padding:16px 9px;border:1px solid var(--line);border-right:0;border-radius:12px 0 0 12px;
+  background:var(--chip);color:var(--chip-ink);letter-spacing:.14em;opacity:0;visibility:hidden;transition:opacity .5s ease,background-color .18s var(--ease)}
+.qi[data-live="1"] .qi-tab{opacity:1;visibility:visible}
+.qi-tab:hover,.qi-tab[aria-expanded="true"]{background:var(--pill);color:var(--pill-ink)}
+.qi-panel{position:absolute;left:0;top:0;bottom:0;width:min(380px,86vw);pointer-events:auto;overflow-y:auto;overscroll-behavior:contain;
+  background:var(--page);color:var(--ink);border-right:1px solid var(--rule);
+  padding:calc(var(--gut) + 6px) 26px 30px;box-shadow:18px 0 44px -30px rgba(30,20,14,.5)}
+.qi-panel:not([data-ready]){visibility:hidden}
+.qi-head{display:flex;justify-content:space-between;align-items:center;margin-bottom:10px}
+.qi-head .lab{margin:0}
+.qi-x{background:none;border:0;cursor:pointer;color:var(--ink);padding:10px 0 10px 16px}
+.qi-h{margin:22px 0 6px}
+.qi-works button,.qi-stops button{width:100%;display:flex;align-items:baseline;gap:12px;padding:11px 0;background:none;border:0;
+  border-top:1px solid var(--rule);color:var(--ink);font:inherit;font-size:17px;letter-spacing:-.012em;text-align:left;cursor:pointer}
+.qi-works button span{margin-left:auto;font-family:var(--mono);font-size:11px;color:var(--dim)}
+.qi-works button:hover,.qi-stops button:hover,.qi-stops button[aria-current="true"]{color:var(--oxide)}
+.qi-stops{list-style:none;margin:0;padding:0}
+.qi-stops .lab{flex:none;width:2em}
+.qi-more{display:flex;flex-wrap:wrap;gap:8px;margin-top:22px}
+html[data-rearrange="1"] .qi{display:none}
+@media (max-width:900px) and (pointer:coarse){ .qi{display:none} }
+.sheet-h{margin:6px 0 8px}
+.sheet-works{display:flex;flex-wrap:wrap;gap:8px;margin-bottom:12px}
+.sheet-works .pill{height:44px}
+
+/* ------------------------------------------- a phone's edge arrows and first hint */
+.edge-nav{display:none}
+.coach{display:none}
+@media (max-width:900px) and (pointer:coarse){
+  .edge-nav{display:block;position:fixed;inset:0;z-index:3;pointer-events:none}
+  .edge-btn{position:absolute;top:50%;width:40px;height:64px;margin-top:-32px;padding:0;border:0;pointer-events:auto;
+    display:grid;place-items:center;background:rgba(var(--wash),.42);color:var(--ink);cursor:pointer;
+    -webkit-backdrop-filter:blur(6px);backdrop-filter:blur(6px);transition:opacity .3s ease}
+  .edge-btn.is-prev{left:0;border-radius:0 14px 14px 0}
+  .edge-btn.is-next{right:0;border-radius:14px 0 0 14px}
+  .edge-btn:disabled{opacity:0;pointer-events:none}
+  .edge-btn svg{width:20px;height:20px;fill:none;stroke:currentColor;stroke-width:1.7;stroke-linecap:round;stroke-linejoin:round}
+  html[data-gliding="1"] .edge-btn{opacity:.5}
+  .coach{display:flex;flex-direction:column;align-items:center;gap:6px;position:fixed;left:50%;
+    bottom:calc(var(--hud-bottom) + 34px + env(safe-area-inset-bottom,0px));transform:translateX(-50%);z-index:4;
+    padding:16px 22px 14px;border-radius:18px;background:rgba(var(--wash),.92);border:1px solid var(--line);
+    box-shadow:0 14px 34px -18px rgba(30,20,14,.55);pointer-events:none;white-space:nowrap;animation:coach-in .6s var(--ease) both}
+  @keyframes coach-in{from{opacity:0;transform:translate(-50%,10px)}}
+  .coach-hand{width:22px;height:22px;border-radius:50%;background:var(--ink);opacity:.82;animation:coach-swipe 1.8s ease-in-out infinite}
+  @keyframes coach-swipe{0%{transform:translateY(16px);opacity:0}20%{opacity:.82}70%{transform:translateY(-16px);opacity:.82}100%{transform:translateY(-22px);opacity:0}}
+  .coach-text{font-size:15px;letter-spacing:-.01em;color:var(--ink)}
+  .coach-sub{margin:0}
+}
+
 /* ----------------------------------------------------- the phone's dock and sheet */
 .dock{display:none}
 .sheet{display:none;position:fixed;inset:0;z-index:190;pointer-events:none}
@@ -399,6 +452,9 @@ html[data-mode="dark"] .lb-veil{background:rgba(0,0,0,.5)}
 /* --------------------------------------------------------------- collage */
 .collage{position:relative;z-index:3;background:var(--page);padding:clamp(80px,10vw,150px) var(--gut) clamp(64px,8vw,120px)}
 .collage-head{max-width:46rem}
+.works-filter{display:flex;flex-wrap:wrap;gap:8px;margin-top:22px}
+.works-filter .pill[aria-pressed="true"]{background:var(--pill);color:var(--pill-ink);border-color:var(--pill)}
+.works-n{opacity:.55;margin-left:.35em;font-variant-numeric:tabular-nums}
 .collage-title{margin:14px 0 0;font-weight:400;font-size:clamp(24px,2.5vw,38px);line-height:1.18;letter-spacing:-.022em;text-wrap:balance}
 .series-block{margin-top:clamp(64px,7.5vw,112px)}
 .series{display:flex;justify-content:space-between;align-items:baseline;gap:16px;border-top:1px solid var(--rule);padding-top:16px}

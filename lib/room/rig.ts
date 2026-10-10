@@ -194,7 +194,7 @@ export class Rig {
   /** how much a look turns the head: a mouse's small sway, or a finger's wider glance */
   private lookGain = 1;
   /** a walking pace: no step from one wall to the next is quicker than this */
-  private static STEP_S = 2.6;
+  private static STEP_S = 3.4;
 
   setMess(on: boolean) {
     this.messTl?.kill();

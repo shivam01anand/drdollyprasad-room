@@ -17,7 +17,7 @@ it are hers: a gallery inside a Delhi home, built and lit in Blender.
    courtyard around it. A second visit in a session is welcomed back and goes straight in.
 2. **The house is shown, then the camera moves in.** Her things fall into place as the panel
    lifts (`bounce.out` from two metres, as the original drops its furniture).
-3. **A nine-step walk**, one section each, one source (`lib/chapters.ts`) for copy and camera:
+3. **An eleven-step walk**, one section each, one source (`lib/chapters.ts`) for copy and camera:
    - **the Aangan**, a courtyard garden open to the sky: "Woman with Poppies", the floral works,
      "Under Canopy of Greens" under two green-enamel studio lamps; then the walk turns to the arch
      — the tall brass lamp of her openings beside it in a ring of marigolds — and goes straight
@@ -29,6 +29,9 @@ it are hers: a gallery inside a Delhi home, built and lit in Blender.
    - **the Red Room** by the lane: "The Bullocks" and "Terracotta" on the red wall, with her
      photograph — interviewed beside "The Bullocks" — on an easel between them; then "Shree 420"
      and "Three Women in Red", with Bandh Darwaze I–IV in a row on the wall to their left;
+   - **the gallery**, through a doorway in the Red Room's east wall: a white room where the rest of
+     her work hangs salon-style, two rows to a wall: Gone Are The Days (south), the portraits
+     (east), Faith (north and west); its photographs load after the house has opened (`late`);
    - every canvas hangs in a float frame (a dark lip round a shadow gap, nothing of the canvas
      covered) and carries a printed wall label, typed in once the camera lands (`WallLabels`);
    - **the afternoon goes as you go in**: each chapter has a `dusk`, and the light moves toward
@@ -40,9 +43,13 @@ it are hers: a gallery inside a Delhi home, built and lit in Blender.
    walks: it follows the scroll softly and never takes a step faster than 2.6 s (`Rig.STEP_S`).
 4. **Featured** — the original's slider; a click opens the work on a card over the house (the
    room stays in view, dimmed a little; a click outside puts it away), where it can be looked at
-   closely (click, scroll, pinch) or seen in a room at its stated size. Sizes appear only where
+   closely (click, scroll, pinch) or seen in the room made for it (`lib/rooms.ts`, Blender renders
+   in `review/rooms/blender`); the card shows the work, then the work in its room, and back, until
+   the reader takes over (a swipe across the figure turns between them). Sizes appear only where
    she has stated them; those works hang at true size in the house, the rest a little larger.
-5. **The collage** — every work, shown to relative scale where she has stated the size.
+5. **The collage** — every work, shown to relative scale where she has stated the size, with
+   All · Available · Sold. **Quick access**: an Index tab on the left edge (the phone's dock sheet
+   on a phone) lists every stop and her work by availability, for a visitor who would rather not walk.
 6. **About and contact** — her statement, her biography verbatim.
 
 The canvases are paint, not prints (`lib/room/paint.ts`): a relief normal map read from each
@@ -58,8 +65,9 @@ lamp come on — a second bake, not a filter).
 Designed for the thumb, not shrunk from the desktop:
 
 - **the walk in the hand** — a finger dragging up moves the walk toward the next wall (never
-  further), release carries on there at a walking pace, a nudge settles back; a sideways drag
-  turns the head to look round the room; a tap on a painting opens it (on the tap itself);
+  further), release carries on there at a walking pace, a nudge settles back; a sideways swipe
+  turns to the next wall (left) or the last (right), and so do the ‹ › arrows at the screen's
+  edges; a first visit gets a hint; a tap on a painting opens it (on the tap itself);
   past the last stop the page scrolls freely through the works and the contact;
 - phones render sharp: twice their pixels, 4× MSAA, the full lightmaps (only a weak machine
   gets the light set);
