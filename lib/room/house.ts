@@ -16,6 +16,8 @@ import { worldUV, type Library, type Role } from "./materials";
  *    the room is shaken; foliage is alpha-tested cards.
  *  - Roof_*: the gallery hall's space frame and sunshades, with their own
  *    materials, lifted with the ceilings when the camera rises for the plan.
+ *  - Figure_<name>: her, at her easel: a card the site draws from her own
+ *    photograph (/art/figure/<name>.webp), unlit, in the light of the hour.
  *
  * The light is baked twice into one atlas layout: the afternoon (lm-day) and
  * the evening with the diya lit (lm-night). A shader patch puts the baked
@@ -29,7 +31,7 @@ export type HouseInfo = {
   lightmap: { day: number; night?: number };
   /** `late`: far from the door (the gallery); its photograph loads after the house has opened.
    *  `light`: where its gallery light hangs, when it has one */
-  art: Record<string, { w: number; h: number; side: string; centre: V3; late?: boolean; light?: V3 }>;
+  art: Record<string, { w: number; h: number; side: string; centre: V3; late?: boolean; light?: V3; study?: boolean }>;
   cams: Record<string, { eye: V3; target: V3; fov: number }>;
   anchors: Record<string, V3>;
   sun: { toSun: V3 };
@@ -138,6 +140,8 @@ export type HouseParts = {
   ceilings: THREE.Mesh[];
   /** the hall's roof structure: decoration that lifts with the ceilings */
   roofs: THREE.Object3D[];
+  /** her figure cards, by name */
+  figures: Map<string, THREE.Mesh>;
   /** the canvas fronts, by id */
   art: Map<string, THREE.Mesh>;
   edges: THREE.Mesh[];
@@ -150,7 +154,7 @@ export type HouseParts = {
  * materials. `lib` holds the room's photographed materials by role.
  */
 export function assemble(house: House, lib: Library, baked: BakedLight, edgeMat: THREE.MeshStandardMaterial): HouseParts {
-  const parts: HouseParts = { statics: [], ceilings: [], roofs: [], art: new Map(), edges: [], props: [], foliage: [] };
+  const parts: HouseParts = { statics: [], ceilings: [], roofs: [], figures: new Map(), art: new Map(), edges: [], props: [], foliage: [] };
   const root = house.scene;
   root.updateMatrixWorld(true);
   // the GLB's nodes: what they are is in their names (and their extras)
@@ -190,6 +194,15 @@ export function assemble(house: House, lib: Library, baked: BakedLight, edgeMat:
         }
         m.receiveShadow = true;
         m.castShadow = true;
+      });
+    } else if (n.startsWith("Figure_")) {
+      // the bake holds her shadow; she casts none live
+      node.traverse((o) => {
+        const m = o as THREE.Mesh;
+        if (!m.isMesh) return;
+        m.castShadow = false;
+        m.receiveShadow = false;
+        parts.figures.set(n.slice(7), m);
       });
     } else if (n.startsWith("Roof_")) {
       // high and thin: the bake already holds its shadow, so it casts none live

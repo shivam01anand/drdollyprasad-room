@@ -74,9 +74,11 @@ export const CHAPTERS: Chapter[] = [
     labelSide: "left",
     // her own words for the painting
     quote: "A young boy stands quietly beneath the shelter of large banana leaves. The bananas on his head look like a natural crown from the earth." },
-  // her easel in the corner by the banana, a canvas primed and not yet begun: her statement beside it
-  { id: "easel", eyebrow: "Artist’s statement", stop: "The easel", room: "The courtyard", verse: POEM, view: "easel",
-    via: "easelvia", dusk: 0.12 },
+  // her corner by the banana: she is at her easel, painting; her statement beside her
+  { id: "easel", eyebrow: "Artist’s statement", stop: "At her easel", room: "The courtyard", verse: POEM, view: "easel",
+    via: "easelvia", dusk: 0.12,
+    // the canvas she is working on, from her own photograph (scripts/figure/make.py)
+    asides: [{ anchor: "easel", title: "On her easel", line: "A new painting, in progress", size: [1.28, 1.06] }] },
   // from the easel the walk turns to the arch and goes straight through it into the Quiet Room
   { id: "bodhi", eyebrow: "“Buddha Under the Bodhi Tree” · c. 2005–2015", stop: "Buddha Under the Bodhi Tree", room: "The Quiet Room",
     view: "bodhi", via: "threshold", dusk: 0.22, labels: ["monk-and-green-buddha"] },
@@ -117,16 +119,20 @@ export const CHAPTERS: Chapter[] = [
   // exhibition hangs, one line at eye level, a series to a wall (scripts/house/build.py)
   { id: "gallery", ink: "light", eyebrow: "The gallery", stop: "The gallery", room: "The gallery",
     view: "gallery", via: "galleryvia", dusk: 0.5 },
-  { id: "rupaya", ink: "light", eyebrow: "Gone Are The Days · c. 2016–2018", stop: "Mother India · Twenty Paise", room: "The gallery",
+  { id: "rupaya", eyebrow: "Gone Are The Days · c. 2016–2018", stop: "Twenty Paise · Mother India", room: "The gallery",
     view: "rupaya", dusk: 0.5, labelSide: "below",
-    labels: ["rickshaw-puller-and-coin", "postbox-and-stamps", "mother-india-and-kettles", "cycle-rickshaw", "rickshaw-rest-framed"] },
-  { id: "panels", ink: "light", eyebrow: "Gone Are The Days · c. 2016–2018", stop: "The Matka · The Rickshaw-wala", room: "The gallery",
+    labels: ["rickshaw-puller-and-coin", "postbox-and-stamps", "mother-india-and-kettles"] },
+  { id: "cartman", eyebrow: "Gone Are The Days · c. 2016–2018", stop: "The Cycle Rickshaw-wala · The Cart-Man", room: "The gallery",
+    view: "cartman", dusk: 0.5, labelSide: "below", labels: ["cycle-rickshaw", "rickshaw-rest-framed"] },
+  { id: "panels", eyebrow: "Gone Are The Days · c. 2016–2018", stop: "The small panels", room: "The gallery",
     view: "panels", dusk: 0.52, labelSide: "below",
-    labels: ["horse-cart-and-autorickshaw", "carriage-and-autorickshaw", "coins-and-clay-bank", "rickshaw-rest",
-      "bullock-cart-and-truck", "rickshaw-and-autorickshaw"] },
-  // either side of the window onto the palm court
-  { id: "palms", ink: "light", eyebrow: "Faith · c. 2005–2015", stop: "Faith", room: "The gallery", view: "palms", dusk: 0.52,
-    labelSide: "below", labels: ["offering-of-light", "prayer-and-scripture", "priest-with-flame", "sacred-tree"] },
+    labels: ["horse-cart-and-autorickshaw", "coins-and-clay-bank", "rickshaw-and-autorickshaw", "carriage-and-autorickshaw",
+      "rickshaw-rest", "bullock-cart-and-truck"] },
+  // Faith, either side of the window onto the palm court
+  { id: "shrine", eyebrow: "Faith · c. 2005–2015", stop: "The Peepal Shrine · The Aarti", room: "The gallery",
+    view: "shrine", dusk: 0.52, labelSide: "below", labels: ["sacred-tree", "priest-with-flame"] },
+  { id: "gayatri", eyebrow: "Faith · c. 2005–2015", stop: "Gayatri · Vakratunda", room: "The gallery",
+    view: "gayatri", dusk: 0.53, labelSide: "below", labels: ["prayer-and-scripture", "offering-of-light"] },
   {
     id: "portraits",
     ink: "light",
@@ -138,11 +144,12 @@ export const CHAPTERS: Chapter[] = [
     view: "portraits",
     dusk: 0.54,
     labelSide: "below",
-    labels: ["red-turban-portrait", "yellow-turban-portrait", "elder-woman-portrait", "patterned-turban-portrait", "riverside-figures"],
+    labels: ["red-turban-portrait", "elder-woman-portrait", "yellow-turban-portrait", "patterned-turban-portrait", "riverside-figures"],
   },
-  { id: "doodhwala", ink: "light", eyebrow: "Portraits · c. 2005–2015", stop: "Mother and Son · The Doodhwala", room: "The gallery",
-    view: "doodhwala", dusk: 0.55, labelSide: "below",
-    labels: ["milkman-on-bicycle", "newspaper-reader", "mother-and-child", "boy-and-kettle", "man-among-metal-pans"] },
+  { id: "kadhai", eyebrow: "Portraits · c. 2005–2015", stop: "The Chai Boy · The Kadhai Seller", room: "The gallery",
+    view: "kadhai", dusk: 0.55, labelSide: "below", labels: ["boy-and-kettle", "man-among-metal-pans"] },
+  { id: "doodhwala", eyebrow: "Portraits · c. 2005–2015", stop: "Mother and Son · The Doodhwala", room: "The gallery",
+    view: "doodhwala", dusk: 0.55, labelSide: "below", labels: ["milkman-on-bicycle", "newspaper-reader", "mother-and-child"] },
   { id: "featured", eyebrow: "Featured", stop: "Featured works", slot: "featured", view: "featured", dusk: 0.45 },
   {
     id: "plan",

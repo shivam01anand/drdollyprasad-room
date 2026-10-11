@@ -901,24 +901,66 @@ def salon(side, face, lo, hi, z, works, depth=0.035):
         at += w + gap
 
 
-# --- the gallery's hang: one line at eye level, a series to a wall, in the panels' bays (GBAYS);
-# sizes as she gave them where she has
+# --- the gallery's hang: close groups a stop apart, so each is seen near, as at an exhibition.
+# Along the south wall, Gone Are The Days: three, then a pair, then the six small panels in two
+# rows; on the east, Faith, a pair either side of the palm window; back along the north wall, the
+# portraits in two rows, a pair, and three. Sizes as she gave them where she has.
 GZ = 1.55
-(s0, s1), (s2, s3) = GBAYS["S"]
-salon("S", GFACE["S"], s0, s1, GZ, [("rickshaw-puller-and-coin", 1.1), ("postbox-and-stamps", 0.9),
-                                     ("mother-india-and-kettles", 1.016), ("cycle-rickshaw", 1.0), ("rickshaw-rest-framed", 1.219)])
-salon("S", GFACE["S"], s2, s3, GZ, [("horse-cart-and-autorickshaw", 0.457), ("carriage-and-autorickshaw", 0.61),
-                                     ("coins-and-clay-bank", 0.61), ("rickshaw-rest", 0.61), ("bullock-cart-and-truck", 0.61),
-                                     ("rickshaw-and-autorickshaw", 0.457)])
-(n0, n1), (n2, n3) = GBAYS["N"]
-salon("N", GFACE["N"], n0, n1, GZ, [("milkman-on-bicycle", 1.0), ("newspaper-reader", 0.8), ("mother-and-child", 1.219),
-                                     ("boy-and-kettle", 0.61), ("man-among-metal-pans", 1.0)])
-salon("N", GFACE["N"], n2, n3, GZ, [("red-turban-portrait", 0.61), ("yellow-turban-portrait", 0.61),
-                                     ("elder-woman-portrait", 0.762), ("patterned-turban-portrait", 0.61), ("riverside-figures", 0.61)])
+
+
+def width_of(wid, longest):
+    im = img(os.path.join(ART, f"{wid}.jpg"), True)
+    ar = im.size[0] / im.size[1]
+    return (longest if ar >= 1 else longest * ar), (longest / ar if ar >= 1 else longest)
+
+
+def hang_row(side, centre, z, works, gap):
+    """works in a row, `gap` apart, centred on `centre` along the wall (x on N and S, y on E)"""
+    ws = [width_of(w, l)[0] for w, l in works]
+    at = centre - (sum(ws) + gap * (len(ws) - 1)) / 2
+    for (wid, longest), w in zip(works, ws):
+        painting(wid, side, GFACE[side], at + w / 2, z, longest)
+        INFO["art"][wid]["late"] = True        # far from the door: the site loads these after the house opens
+        at += w + gap
+
+
+def hang_rows(side, centre, rows, gap=0.3, row_gap=0.22):
+    """small works in rows, centred on `centre` and on eye height: [(works), (works)], top row first"""
+    heights = [max(width_of(w, l)[1] for w, l in r) for r in rows]
+    total = sum(heights) + row_gap * (len(rows) - 1)
+    top = GZ + total / 2
+    for r, h in zip(rows, heights):
+        hang_row(side, centre, top - h / 2, r, gap)
+        top -= h + row_gap
+
+
+HALL = {   # each stop's group: the wall, its centre along it, and the camera's distance from it
+    "rupaya": ("S", 3.2, 3.45), "cartman": ("S", 7.15, 2.75), "panels": ("S", 13.9, 3.4),
+    "shrine": ("E", -7.25, 2.5), "gayatri": ("E", -2.05, 2.5),
+    "portraits": ("N", 15.15, 3.9), "kadhai": ("N", 10.13, 2.6), "doodhwala": ("N", 6.69, 3.6),
+}
+# where a stop has words, its group stands right of them: the camera looks a little to the left of it
+HALL_SHIFT = {"portraits": -0.75}
+hang_row("S", HALL["rupaya"][1], GZ, [("rickshaw-puller-and-coin", 1.1), ("postbox-and-stamps", 0.9),
+                                      ("mother-india-and-kettles", 1.016)], 0.45)
+hang_row("S", HALL["cartman"][1], GZ, [("cycle-rickshaw", 1.0), ("rickshaw-rest-framed", 1.219)], 0.5)
+hang_rows("S", HALL["panels"][1], [[("horse-cart-and-autorickshaw", 0.457), ("coins-and-clay-bank", 0.61),
+                                    ("rickshaw-and-autorickshaw", 0.457)],
+                                   [("carriage-and-autorickshaw", 0.61), ("rickshaw-rest", 0.61), ("bullock-cart-and-truck", 0.61)]])
 (e0, e1), (e2, e3) = GBAYS["E"]
-# Faith, either side of the palm window (along y, so south to north)
 salon("E", GFACE["E"], e0, e1, GZ, [("sacred-tree", 0.8), ("priest-with-flame", 1.0)])
 salon("E", GFACE["E"], e2, e3, GZ, [("prayer-and-scripture", 1.0), ("offering-of-light", 1.0)])
+hang_rows("N", HALL["portraits"][1], [[("red-turban-portrait", 0.61), ("elder-woman-portrait", 0.762),
+                                       ("yellow-turban-portrait", 0.61)],
+                                      [("patterned-turban-portrait", 0.61), ("riverside-figures", 0.61)]])
+hang_row("N", HALL["kadhai"][1], GZ, [("boy-and-kettle", 0.61), ("man-among-metal-pans", 1.0)], 0.5)
+hang_row("N", HALL["doodhwala"][1], GZ, [("milkman-on-bicycle", 1.0), ("newspaper-reader", 0.8),
+                                         ("mother-and-child", 1.219)], 0.45)
+# the work a portrait screen frames at each stop
+HALL_PHONE = {"rupaya": "mother-india-and-kettles", "cartman": "rickshaw-rest-framed", "panels": "coins-and-clay-bank",
+              "shrine": "priest-with-flame", "gayatri": "prayer-and-scripture", "portraits": "elder-woman-portrait",
+              "kadhai": "man-among-metal-pans", "doodhwala": "mother-and-child"}
+
 
 # ====================================================================== things
 def import_ph(ph_id, loc, rot_z=0.0, scale=1.0, decimate=None, prop=True, mass=1.0):
@@ -1237,42 +1279,88 @@ def blank_canvas(name, w, h, d=0.038, primed=True, brace=False, baked_face=None)
     return (canvas, front) if baked_face else canvas
 
 
-def studio_easel(name, loc, face_deg, cw, ch):
-    """a teak studio easel, its canvas on the tray: two front legs and a back leg, a mast that
-    carries the top clamp, a tray with a lip at 62 cm. Built facing -y, turned to the room."""
+def studio_easel(name, loc, face_deg, cw, ch, ledge=0.62):
+    """a teak studio easel: two front legs and a back leg, a mast that carries the top clamp, a
+    tray with a lip at `ledge`. Built facing -y, turned to the room; returns the group and the
+    canvas's place on it (in the group's axes: its foot on the tray, tilted back with the easel)"""
     tk = role_mat("teak")
     H, lean = 1.98, 0.17
-    ledge = 0.62
     yz = lambda z: lean * z / H                     # how far back the front plane is at height z
+    top = ledge + ch
+    mast = max(H + 0.08, top + 0.12)
     # the front legs meet the mast just under the canvas's top; only the mast and its clamp rise above
-    leg_top = ledge + ch - 0.06
+    leg_top = min(top - 0.06, H)
     parts = [rod(f"{name}_legL", (-0.36, 0, 0), (-0.035, yz(leg_top) + 0.02, leg_top), 0.018, tk),
              rod(f"{name}_legR", (0.36, 0, 0), (0.035, yz(leg_top) + 0.02, leg_top), 0.018, tk),
              rod(f"{name}_legB", (0, 0.82, 0), (0, yz(leg_top) + 0.05, leg_top), 0.016, tk),
-             rod(f"{name}_mast", (0, yz(0.5) + 0.03, 0.5), (0, yz(H + 0.08) + 0.03, H + 0.08), 0.017, tk),
+             rod(f"{name}_mast", (0, yz(0.5) + 0.03, 0.5), (0, yz(mast) + 0.03, mast), 0.017, tk),
              rod(f"{name}_brace", (-0.31, yz(0.3) + 0.01, 0.3), (0.31, yz(0.3) + 0.01, 0.3), 0.012, tk)]
     yl = yz(ledge)
     parts.append(box(f"{name}_tray", -0.42, 0.42, yl - 0.1, yl + 0.012, ledge - 0.03, ledge, tk, bevel=0.004))
     parts.append(box(f"{name}_lip", -0.42, 0.42, yl - 0.1, yl - 0.088, ledge, ledge + 0.025, tk, bevel=0.003))
-    top = ledge + ch
     parts.append(box(f"{name}_clamp", -0.07, 0.07, yz(top) - 0.06, yz(top) + 0.035, top - 0.004, top + 0.05, tk, bevel=0.006))
     easel = join(f"Deco_{name}", apply_mods(parts))
-    canvas, face = blank_canvas(f"Deco_{name}Canvas", cw, ch, brace=False, baked_face=f"Wall_{name}CanvasFace")
-    for o in (canvas, face):
-        o.rotation_euler = (-math.atan2(lean, H), 0, 0)
-        o.location = (0, yl - 0.05, ledge)
     group = link(bpy.data.objects.new(f"Deco_{name}Group", None))
-    for o in (easel, canvas, face):
-        o.parent = group
+    easel.parent = group
     group.location = Vector(loc)
     group.rotation_euler = (0, 0, math.radians(face_deg))
-    # the face leaves the group for the architecture, where it stands
     bpy.context.view_layer.update()
-    mw = face.matrix_world.copy()
-    face.parent = None
-    face.matrix_world = mw
-    face["lm"] = 1.5                                     # looked at closely: a finer light than the walls
-    return group
+    seat = Matrix.Translation((0, yl - 0.05, ledge)) @ Matrix.Rotation(-math.atan2(lean, H), 4, "X")
+    return group, group.matrix_world @ seat
+
+
+def easel_painting(art_id, path, cw, ch, M, depth=0.03):
+    """a canvas of hers on the easel: like painting(), but standing where M puts it (M takes the
+    canvas's own axes: x across, its face toward -y, its foot at z 0, centred on x)"""
+    im = img(path, True)
+    bpy.ops.mesh.primitive_cube_add(size=1)
+    o = bpy.context.active_object
+    o.name = f"Art_{art_id}"
+    o.scale = (cw, depth, ch)
+    bpy.ops.object.transform_apply(scale=True)
+    mat = bpy.data.materials.new(f"art:{art_id}")
+    mat.use_nodes = True
+    nt = mat.node_tree
+    t = nt.nodes.new("ShaderNodeTexImage")
+    t.image = im
+    nt.nodes["Principled BSDF"].inputs["Roughness"].default_value = 0.75
+    nt.links.new(t.outputs["Color"], nt.nodes["Principled BSDF"].inputs["Base Color"])
+    o.data.materials.append(mat)
+    o.data.materials.append(M_CANVAS_EDGE)
+    bm = bmesh.new()
+    bm.from_mesh(o.data)
+    uv = bm.loops.layers.uv.verify()
+    for f in bm.faces:
+        front = f.normal.y < -0.9
+        f.material_index = 0 if front else 1
+        for lp in f.loops:
+            lp[uv].uv = ((lp.vert.co.x / cw + 0.5), (lp.vert.co.z / ch + 0.5)) if front else (0.5, 0.5)
+    bm.to_mesh(o.data)
+    bm.free()
+    # its foot on the tray: the cube is centred, so lift it by half its height and set it back by half its depth
+    o.matrix_world = M @ Matrix.Translation((0, depth / 2, ch / 2))
+    o["artId"] = art_id
+    bpy.context.view_layer.update()
+    c = o.matrix_world.translation
+    INFO["art"][art_id] = {"w": cw, "h": ch, "side": "S", "centre": [c.x, c.y, c.z], "frame": 0.0, "study": True}
+    return o
+
+
+def teak_chair(name, loc, rot):
+    """her chair: a plain teak chair, a solid back to it; built facing -y (its back at +y)"""
+    tk, tr = role_mat("teak"), role_mat("teakRail")
+    sw, sd, sh = 0.44, 0.42, 0.45
+    parts = [box(f"{name}_seat", -sw / 2, sw / 2, -sd / 2, sd / 2, sh - 0.035, sh, tr, bevel=0.008, segs=3)]
+    for x in (-sw / 2 + 0.03, sw / 2 - 0.03):
+        parts.append(box(f"{name}_legF", x - 0.022, x + 0.022, -sd / 2 + 0.01, -sd / 2 + 0.054, 0, sh - 0.035, tk, bevel=0.004))
+        # the back legs rise into the stiles of the back
+        parts.append(box(f"{name}_stile", x - 0.022, x + 0.022, sd / 2 - 0.054, sd / 2 - 0.01, 0, 0.9, tk, bevel=0.005))
+    parts.append(box(f"{name}_back", -sw / 2 + 0.03, sw / 2 - 0.03, sd / 2 - 0.045, sd / 2 - 0.02, 0.56, 0.86, tr, bevel=0.008, segs=3))
+    parts.append(box(f"{name}_rung", -sw / 2 + 0.03, sw / 2 - 0.03, -0.02, 0.02, 0.14, 0.17, tk, bevel=0.004))
+    o = join(f"Deco_{name}", apply_mods(parts))
+    o.location = Vector(loc)
+    o.rotation_euler = (0, 0, rot)
+    return o
 
 
 def palette(name, loc, rot):
@@ -1373,18 +1461,84 @@ def paint_tube(name, loc, rot, hx):
     return o
 
 
-# clear of the sightline to "Woman with Poppies" from the courtyard (the opening shots look north
-# from x 3.6), and of the turn to the arch; in the establishing shot it stands left of her painting
-EASEL = dict(x=2.2, y=4.75, face=45.0)
-studio_easel("easel", (EASEL["x"], EASEL["y"], 0), EASEL["face"], 0.762, 1.016)          # 30 × 40 in, her size
-INFO["anchors"]["easel"] = [EASEL["x"], EASEL["y"], 1.15]
-# the side table: a stool, her palette on it with the tumbler of brushes and three tubes
-_stool = (2.82, 4.42)
+# her corner of the courtyard, clear of the opening shots' sightline to "Woman with Poppies"
+# (they look north from x 3.6) and of the turn to the arch; in the establishing shot it stands to
+# the left of her painting. On the easel, the canvas she is working on now, from her photograph
+# (scripts/figure/make.py); in front of it, her, painting it: her photograph, lifted out, on a card
+# set square to the stop's camera and placed so her brush meets the canvas where it did
+FIGMETA = json.load(open(os.path.join(ROOT, "assets", "figure", "dolly.json")))
+FIG_K = 0.00124                                  # metres per pixel of her photograph, at her (her head, crown to chin)
+EASEL = dict(x=1.95, y=4.75, face=50.0, cw=1.28)
+EASEL["ch"] = EASEL["cw"] / FIGMETA["canvas"]["aspect"]
+
+
+def her_corner(ledge):
+    th = math.radians(EASEL["face"])
+    n, rt = Vector((math.sin(th), -math.cos(th), 0)), Vector((math.cos(th), math.sin(th), 0))
+    group, M = studio_easel("easel", (EASEL["x"], EASEL["y"], 0), EASEL["face"], EASEL["cw"], EASEL["ch"], ledge)
+    art = easel_painting("in-progress", os.path.join(PUB, "art", "room", "in-progress.jpg"), EASEL["cw"], EASEL["ch"], M)
+    # where her brush touches it, in the world
+    u, v = FIGMETA["canvas"]["touch"]
+    P = M @ Vector(((u - 0.5) * EASEL["cw"], 0, (1 - v) * EASEL["ch"]))
+    centre = M @ Vector((0, 0, EASEL["ch"] / 2))
+    C = centre + n * 2.55 + rt * 0.45
+    C.z = 1.6
+    return n, rt, art, P, centre, C
+
+
+# the tray's height: her crown should sit at a seated woman's 1.22 m
+for _ledge in [0.6 + 0.01 * k for k in range(60)]:
+    th = math.radians(EASEL["face"])
+    _n = Vector((math.sin(th), -math.cos(th), 0))
+    lean = math.atan2(0.17, 1.98)
+    _M = (Matrix.Translation((EASEL["x"], EASEL["y"], 0)) @ Matrix.Rotation(th, 4, "Z")
+          @ Matrix.Translation((0, 0.17 * _ledge / 1.98 - 0.05, _ledge)) @ Matrix.Rotation(-lean, 4, "X"))
+    _u, _v = FIGMETA["canvas"]["touch"]
+    _P = _M @ Vector(((_u - 0.5) * EASEL["cw"], 0, (1 - _v) * EASEL["ch"]))
+    _ctr = _M @ Vector((0, 0, EASEL["ch"] / 2))
+    _C = _ctr + _n * 2.55 + Vector((math.cos(th), math.sin(th), 0)) * 0.45
+    _C.z = 1.6
+    _s = 0.6 / (_C - _P).dot(_n)
+    _T = _P + (_C - _P) * _s
+    _crown = _T.z + (FIGMETA["figure"]["tip"][1] - FIGMETA["figure"]["crown"]) * FIG_K
+    if _crown >= 1.22:
+        break
+LEDGE = _ledge
+n_e, rt_e, _art, P_touch, C_centre, C_easel = her_corner(LEDGE)
+INFO["art"]["in-progress"]["light"] = list(C_centre + n_e * 1.6 + Vector((0, 0, 2.2)))
+INFO["anchors"]["easel"] = list(C_centre)
+# her card: square to the stop's camera, 0.6 m in front of the canvas, the brush's tip on the line
+# from the camera to where it touches
+_s = 0.6 / (C_easel - P_touch).dot(n_e)
+T_tip = P_touch + (C_easel - P_touch) * _s
+_view = (T_tip - C_easel); _view.z = 0; _view.normalize()
+rc = Vector((_view.y, -_view.x, 0))                                   # the camera's right
+fw, fh = FIGMETA["figure"]["w"] * FIG_K, FIGMETA["figure"]["h"] * FIG_K
+TLc = T_tip - rc * FIGMETA["figure"]["tip"][0] * FIG_K + Vector((0, 0, FIGMETA["figure"]["tip"][1] * FIG_K))
+bpy.ops.mesh.primitive_plane_add(size=1)
+fig = bpy.context.active_object
+fig.name = "Figure_dolly"
+fig.scale = (fw, fh, 1)
+fig.rotation_euler = (math.pi / 2, 0, 0)                              # standing, its face toward -y
+bpy.ops.object.transform_apply(scale=True, rotation=True)
+fig.data.materials.append(cutout("figure:dolly", os.path.join(HT, "..", "figure", "dolly.png"), translucency=0.0, rough=0.85))
+fig.location = TLc + rc * (fw / 2) - Vector((0, 0, fh / 2))
+fig.rotation_euler = (0, 0, math.atan2(-_view.x, _view.y))           # its face (-y) to the camera
+INFO["anchors"]["dolly"] = list(fig.location)
+# her chair, under her: its seat a little in front of her back, toward the canvas; its back to us
+_spine = TLc + rc * FIGMETA["figure"]["spine"] * FIG_K
+_chair = Vector((_spine.x, _spine.y, 0)) - n_e * 0.13
+teak_chair("dollyChair", _chair, math.radians(EASEL["face"]) + math.pi)
+# the side table, at her right hand: a stool, her palette on it with the brushes and three tubes
+_stool = tuple(_chair + rt_e * 0.6 + n_e * 0.1)[:2]
 import_ph("wooden_stool_01", (*_stool, 0), 0.4, 1.0, prop=False)
 palette("palette", (_stool[0] + 0.02, _stool[1] - 0.06, 0.442), math.radians(30))
 brush_tumbler("brushes", (_stool[0] - 0.12, _stool[1] + 0.12, 0.437))
 for k, (dx, dy, rot, hx) in enumerate(((0.11, 0.16, 0.5, 0xBB2B17), (0.15, 0.1, 0.8, 0x2F6A6E), (-0.15, -0.14, 2.3, 0xE8B82A))):
     paint_tube(f"tube{k}", (_stool[0] + dx, _stool[1] + dy, 0.437 + 0.0085), rot, hx)
+print("her corner: tray %.2f, brush tip at %s, card %s, chair %s, camera %s" % (
+    LEDGE, tuple(round(c, 2) for c in T_tip), tuple(round(c, 2) for c in fig.location),
+    tuple(round(c, 2) for c in _chair), tuple(round(c, 2) for c in C_easel)), flush=True)
 # canvases waiting against the west wall, faces to it and backs to the room: the larger with its
 # top on the wall, the smaller leaning on the larger
 for k, (y, w, h, ang, foot) in enumerate(((4.8, 0.762, 1.016, 9.0, None), (4.72, 0.61, 0.61, 14.0, 0.29))):
@@ -1415,9 +1569,10 @@ def card(name, w, h, mat):
     return o
 
 
-def banana_plant(loc, rot=0.0, H=2.5, clear=None, gap=28.0):
-    """a young banana: a pseudostem and nine arching leaves. `clear`: a point (x, y) no leaf may
-    arch over — a leaf aimed within `gap` degrees of it is turned aside, the rest left as they grow"""
+def banana_plant(loc, rot=0.0, H=2.5, clear=(), gap=20.0):
+    """a young banana: a pseudostem and nine arching leaves. `clear`: points (x, y) no leaf may
+    arch over — a leaf aimed within `gap` degrees of one is cut away, as a gardener prunes the side
+    of a plant that leans over a working corner; the rest grow as they did"""
     parts = []
     stem = lathe("stem", [(0.0, 0), (0.12, 0), (0.1, 0.4), (0.075, H * 0.55), (0.055, H * 0.62), (0.0, H * 0.63)], M_STEM, segs=20)
     leaf_m = cutout("foliage:banana", os.path.join(HT, "banana_leaf_cut.png"), translucency=0.35, rough=0.45)
@@ -1441,14 +1596,14 @@ def banana_plant(loc, rot=0.0, H=2.5, clear=None, gap=28.0):
                 v = lf.data.vertices[lf.data.loops[li].vertex_index].co
                 uvl[li].uv = (v.x / (L * 0.36 * (1 - 0.15 * (v.y / L))) + 0.5, v.y / L)
         lf.data.materials.append(leaf_m)
-        if clear:
-            # the leaf grows along its local +y: its heading in the world is a + rot + 90°
-            want = math.atan2(clear[1] - loc[1], clear[0] - loc[0])
-            off = math.remainder(a + rot + math.pi / 2 - want, 2 * math.pi)
-            if abs(off) < math.radians(gap):
-                a += math.copysign(math.radians(gap), off if off else 1.0) - off
         lf.rotation_euler = (math.radians(random.uniform(-8, 12)), 0, a)
         lf.location = (0, 0, H * random.uniform(0.5, 0.62))
+        # the leaf grows along its local +y: its heading in the world is a + rot + 90°
+        heading = a + rot + math.pi / 2
+        if any(abs(math.remainder(heading - math.atan2(y - loc[1], x - loc[0]), 2 * math.pi)) < math.radians(gap)
+               for x, y in clear):
+            bpy.data.objects.remove(lf, do_unlink=True)      # pruned (its random draws are spent, so the others stay as they were)
+            continue
         parts.append(lf)
     o = join("Foliage_banana", parts + [stem])
     o.location = loc
@@ -1497,7 +1652,11 @@ def canopy(name, x0, x1, y0, y1, z0, z1, count):
     return join(f"Foliage_{name}", parts)
 
 
-banana_plant((0.82, 5.05, 0), 2.2, H=3.1, clear=(EASEL["x"], EASEL["y"]))
+# pruned where it would lean over her corner: her canvas, end to end, and her
+_ce = Vector(INFO["anchors"]["easel"]); _th = math.radians(EASEL["face"])
+_rt = Vector((math.cos(_th), math.sin(_th), 0)) * EASEL["cw"] / 2
+banana_plant((0.82, 5.05, 0), 2.2, H=3.1, gap=20.0,
+             clear=[tuple(_ce - _rt)[:2], tuple(_ce)[:2], tuple(_ce + _rt)[:2], tuple(INFO["anchors"]["dolly"])[:2]])
 bougainvillea("bougainvilleaN", ((2.2, AY1 + T / 2), (AX1 + T / 2, AY1 + T / 2)), 520, 0.22, H_AANGAN + 0.0, H_AANGAN + 0.55, (0, -1))
 bougainvillea("bougainvilleaE", ((AX1 + T / 2, 2.0), (AX1 + T / 2, AY1 + T / 2)), 380, 0.22, H_AANGAN + 0.0, H_AANGAN + 0.5, (-1, 0))
 canopy("peepal", QX0 - T - 3.2, QX0 - T - 0.5, ARCH["cy"] - 3.2, ARCH["cy"] + 3.2, 2.6, 6.2, 200)
@@ -1760,7 +1919,9 @@ VIEWS = {
     "canopy":    ((4.9, 3.85, 1.6), (4.9, AY0, 1.62)),
     # her easel in the corner by the banana, the poem beside it; from the canopy, a turn through the west
     "easelvia":  ((4.6, 2.9, 1.6), (1.4, 4.4, 1.3)),
-    "easel":     ((4.5, 2.5, 1.6), (1.7, 4.85, 0.92)),
+    # behind her right shoulder, as her photograph was taken: her, her canvas, her things
+    "easel":     (tuple(C_easel), tuple(Vector((0, 0, 1.18)) + Vector(((C_centre.x * 0.55 + T_tip.x * 0.45),
+                                                                       (C_centre.y * 0.55 + T_tip.y * 0.45), 0)))),
     # from the easel, on to the arch: close enough that the easel is behind the frame's edge
     "threshold": ((3.9, 3.1, 1.6), (AX0, 3.4, 1.42)),
     "bodhi":     ((-1.45, 3.4, 1.6), (QX0, 3.4, 1.62)),
@@ -1774,15 +1935,9 @@ VIEWS = {
     # three-quarters on the east wall, Bandh Darwaze on the north wall to the left
     "redwall":   ((-5.35, -4.2, 1.55), (-1.1, -1.75, 1.45)),
     # through the Red Room's east doorway into the gallery hall: down its length to the palms first,
-    # then along it, a bay to a stop: Gone Are The Days on the south wall, Faith either side of
-    # the palm window, the portraits back along the north wall
+    # then close to each group in turn (HALL): along the south wall, the east, and back along the north
     "galleryvia": ((-1.3, -2.55, 1.62), (6.0, -2.9, 1.66)),
     "gallery":   ((1.3, -2.85, 1.64), (9.5, -5.0, 1.85)),
-    "rupaya":    ((5.2, -1.65, 1.62), (5.2, GY0, 1.7)),
-    "panels":    ((13.9, -2.45, 1.62), (13.9, GY0, 1.6)),
-    "palms":     ((11.2, PALM["cy"], 1.62), (GX1, PALM["cy"], 1.75)),
-    "portraits": ((15.15, -5.65, 1.62), (15.15, GY1, 1.62)),
-    "doodhwala": ((8.1, -6.65, 1.62), (8.1, GY1, 1.62)),
     # then up, out of the hall's roof
     "featured":  ((9.3, PALM["cy"], 3.62), (10.8, PALM["cy"], 0.0)),
     # the house whole, high in the frame: the exhibitions and her words sit below it, to the left
@@ -1804,7 +1959,8 @@ NARROW = {
     "floral":    ((4.55, 3.0, 1.55), (AX1, 3.0, 1.22)),
     "canopy":    ((5.75, 3.25, 1.55), (5.75, AY0, 1.45)),
     "easelvia":  ((4.5, 2.9, 1.55), (1.4, 4.4, 1.2)),
-    "easel":     ((5.0, 2.45, 1.5), (2.45, 5.0, 0.62)),
+    "easel":     (tuple(C_centre + n_e * 3.3 + rt_e * 0.1 + Vector((0, 0, 1.5 - C_centre.z))),
+                  tuple(Vector((C_centre.x, C_centre.y, 0.62)) - rt_e * 0.2)),
     "threshold": ((3.7, 3.2, 1.55), (AX0, 3.4, 1.35)),
     "bodhi":     ((-1.85, 3.4, 1.55), (QX0, 3.4, 0.98)),
     # a portrait screen holds one wall: Threads of Faith, frontal; the Blue Buddha comes round on the turn
@@ -1815,15 +1971,23 @@ NARROW = {
     "redwall":   ((-3.55, -3.9, 1.55), (RX1, -3.9, 1.3)),
     "galleryvia": ((-1.2, -2.55, 1.58), (6.0, -2.75, 1.5)),
     "gallery":   ((1.3, -2.75, 1.55), (9.5, -4.3, 1.75)),
-    "rupaya":    ((5.07, -5.2, 1.55), (5.07, GY0, 1.35)),
-    "panels":    ((13.89, -5.25, 1.55), (13.89, GY0, 1.4)),
-    "palms":     ((14.0, -3.3, 1.55), (GX1, -3.3, 1.6)),             # "Gayatri" and the palms beside it
-    "portraits": ((15.15, -4.05, 1.55), (15.15, GY1, 1.4)),
-    "doodhwala": ((8.1, -4.15, 1.55), (8.1, GY1, 1.45)),
     "featured":  ((9.3, PALM["cy"], 3.62), (10.8, PALM["cy"], 0.0)),
     "plan":      ((8.0, -19.4, 60.0), (8.0, -19.4, 0.0)),
     "mess":      ((10.5, -10.5, 11.5), (0.4, 0.4, 0.4)),
 }
+# the hall's stops, from where its groups hang: square to each group, near it
+_OUT = {"S": Vector((0, 1, 0)), "N": Vector((0, -1, 0)), "E": Vector((-1, 0, 0))}
+for _k, (_side, _along, _d) in HALL.items():
+    _face = Vector((_along, GFACE[_side], 0)) if _side in "NS" else Vector((GFACE[_side], _along, 0))
+    _along_dir = Vector((1, 0, 0)) if _side in "NS" else Vector((0, 1, 0))
+    _sh = _along_dir * HALL_SHIFT.get(_k, 0.0) * (1 if _side == "N" else -1)
+    VIEWS[_k] = (tuple(_face + _sh + _OUT[_side] * _d + Vector((0, 0, 1.62))), tuple(_face + _sh + Vector((0, 0, GZ))))
+    # a portrait screen holds one work of the group, high in the frame, the words below it
+    _a = INFO["art"][HALL_PHONE[_k]]
+    _c = Vector(_a["centre"])
+    _dp = max(1.5, max(_a["w"], _a["h"]) / 0.555 / 0.74)
+    NARROW[_k] = (tuple(Vector((_c.x, _c.y, 0)) + _OUT[_side] * _dp + Vector((0, 0, 1.52))),
+                  tuple(Vector((_c.x, _c.y, _c.z - 0.34))))
 FOV = 40.0
 
 

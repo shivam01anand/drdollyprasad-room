@@ -10,18 +10,23 @@ it are hers: a gallery inside a Delhi home, built and lit in Blender.
 
 1. **The welcome** — warm paper, lamplight from above, and her greeting word by word: नमस्ते,
    then "Welcome to my studio" (Cormorant Garamond italic), her name, a hairline that fills as the
-   house loads. Then the invitation, **Step inside** — the gesture that lets the music begin (a
-   tanpura synthesised in the browser, `lib/music.ts`; on unless the visitor turns it off, and a
-   control in the header). Her name rises into the header, *Woman with Poppies* is shown clean at
+   house loads, and it goes straight in. The music begins with the visitor's first touch, click or
+   key (a browser allows sound only then): a warm piece in D major synthesised in the browser,
+   `lib/music.ts` — a canon's progression under a soft string pad, a felt piano rolling the chords
+   and singing short phrases in the major pentatonic (Bhupali's notes), never the same twice; on
+   unless the visitor turns it off, with a control in the header. Her name rises into the header, *Woman with Poppies* is shown clean at
    the exact rectangle the 3D painting occupies (`Room.heroRect()`), and the panel lifts with the
    courtyard around it. A second visit in a session is welcomed back and goes straight in.
 2. **The house is shown, then the camera moves in.** Her things fall into place as the panel
    lifts (`bounce.out` from two metres, as the original drops its furniture).
-3. **A sixteen-step walk**, one section each, one source (`lib/chapters.ts`) for copy and camera:
+3. **A nineteen-step walk**, one section each, one source (`lib/chapters.ts`) for copy and camera:
    - **the Aangan**, a courtyard garden open to the sky: "Woman with Poppies", the floral works,
-     "Under Canopy of Greens" under two green-enamel studio lamps; her easel in the corner by the
-     banana, a canvas primed and not yet begun, her palette and brushes beside it, and her
-     statement-poem with it; then the walk turns to the arch
+     "Under Canopy of Greens" under two green-enamel studio lamps; then **her, at her easel** in the
+     corner by the banana, painting: the canvas she is working on now and she herself, both from
+     her own photograph (`scripts/figure`: Apple's subject lifting for her, her pencil grid to
+     square the canvas; she is a card set square to the stop's camera, placed so her brush meets
+     the canvas where it did, her chair's back hiding where the photograph ends), her palette and
+     brushes beside her, and her statement-poem with her; then the walk turns to the arch
      — the tall brass lamp of her openings beside it in a ring of marigolds — and goes straight
      through into the Quiet Room without stopping (a chapter's `via`: the rig runs power2.in to
      the passing pose and power2.out from it);
@@ -35,16 +40,21 @@ it are hers: a gallery inside a Delhi home, built and lit in Blender.
      India Habitat Centre, where she has shown — red-brown brick with grey concrete bands, the
      work on white panels between brick piers, the roof open under a space frame hung with folded
      teal and cream sunshades (the afternoon falls through it on the floor, never on a painting),
-     and at the far end a window onto a court of palms. The rest of her work hangs as an
-     exhibition hangs, one line at eye level, a series to a wall: Gone Are The Days (south, two
-     stops), Faith either side of the palm window, the portraits back along the north wall (two
-     stops); its cards sit centred under the works; its photographs load after the house has
-     opened (`late`);
+     and at the far end a window onto a court of palms. The rest of her work hangs in close
+     groups, each its own stop, seen near (`HALL` in `build.py`): along the south wall Gone Are
+     The Days — three, a pair, the six small panels in two rows; Faith a pair either side of the
+     palm window; back along the north wall the portraits in two rows, a pair, and three. Its
+     cards sit centred under the works (above them for a group's top row) and say only the title
+     and whether it is free; its photographs load after the house has opened (`late`);
    - every canvas hangs in a float frame (a dark lip round a shadow gap, nothing of the canvas
      covered) and carries a printed wall label, typed in once the camera lands (`WallLabels`);
    - **the afternoon goes as you go in**: each chapter has a `dusk`, and the light moves toward
      the evening bake along the walk, the lamps coming up behind it; dark mode is all of it;
    - then up out of the house for **Featured** and **the plan** (exhibitions, her own words).
+
+   On a computer the wheel, a trackpad or the keys move the walk freely, and when they come to
+   rest it settles on a stop, as a phone's swipe does: a nudge settles back, a real scroll goes
+   on to the next stop (a walk left between stops shows no labels and frames no wall).
 
    Every room change passes through a doorway, through passing poses where a turn is long
    (`scripts/house/pathcheck.py` proves it for the landscape and the portrait walk). The camera

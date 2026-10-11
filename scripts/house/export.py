@@ -256,6 +256,11 @@ for o in targets:
     for slot in o.material_slots:
         if slot.material:
             slot.material = stand_in(slot.material.name)
+# her figure: the site draws her from her own photograph (public/art/figure), at its full size
+for o in [o for o in bpy.data.objects if o.name.startswith("Figure_")]:
+    for slot in o.material_slots:
+        if slot.material:
+            slot.material = stand_in(slot.material.name)
 # props and foliage: their textures, shrunk
 for im in bpy.data.images:
     if im.name in ("Lightmap",) or im.source != "FILE":

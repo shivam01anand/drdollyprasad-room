@@ -143,6 +143,8 @@ export default function Studio({ dims }: { dims: Dims }) {
     let vh = innerHeight;
     let lastActive = -1;
     let lastScroll = 0;
+    let settleTimer = 0;
+    let anchor = 0;                                  // the stop the walk last came to rest at
 
     const camT = (s: number) => {
       const n = centers.length;
@@ -204,7 +206,7 @@ export default function Studio({ dims }: { dims: Dims }) {
       apply(lastScroll, true);
     };
 
-    lenis.on("scroll", (l: Lenis) => apply(l.scroll));
+    lenis.on("scroll", (l: Lenis) => { apply(l.scroll); settleSoon(); });
 
     /* On a phone the walk is in the hand. A finger on the house moves it:
        drag up and the walk follows the finger toward the next wall (never
@@ -225,6 +227,7 @@ export default function Studio({ dims }: { dims: Dims }) {
     };
     const glideTo = (y: number, i: number, dur = 2.4) => {
       heading = i;
+      if (i < centers.length) anchor = i;
       const quick = reducedMotion();
       html.dataset.gliding = "1";
       lenis.scrollTo(y, {
@@ -304,6 +307,32 @@ export default function Studio({ dims }: { dims: Dims }) {
       if (next >= n) glideTo(worksTop, n);
       else glideTo(centers[next], next, go ? 2.4 : 0.9);
     };
+    /* A wheel, a trackpad or the keys move the walk freely; when they come to rest, the walk
+       settles on a stop, as a phone's swipe does: a nudge settles back to the stop it left, a
+       real scroll goes on to the next one, a long one to the stop nearest where it came to rest.
+       (A walk left between stops shows no wall labels, and frames no wall as it was hung.) */
+    const settle = () => {
+      const n = centers.length;
+      if (!n || heading >= 0 || html.dataset.gliding === "1" || locks.current.size || swipe.on) return;
+      const s = lastScroll;
+      if (s > centers[n - 1] + 2 || s < centers[0] - 2) return;      // the collage and the page are free
+      const near = nearestStop(s);
+      if (Math.abs(s - centers[near]) < 2) { anchor = near; return; }
+      const from = Math.min(n - 1, Math.max(0, anchor));
+      const gap = Math.abs(centers[Math.min(n - 1, from + 1)] - centers[Math.max(0, from - 1)]) / 2 || innerHeight;
+      const d = s - centers[from];
+      let next = near;
+      // a scroll past an eighth of the way is meant: it goes on, never back
+      if (next === from && Math.abs(d) > gap * 0.12) next = Math.max(0, Math.min(n - 1, from + Math.sign(d)));
+      anchor = next;
+      glideTo(centers[next], next, Math.min(2.4, 0.7 + Math.abs(centers[next] - s) / Math.max(1, gap) * 1.6));
+    };
+    const settleSoon = () => {
+      clearTimeout(settleTimer);
+      if (html.dataset.gliding === "1" || heading >= 0) return;
+      settleTimer = window.setTimeout(settle, 260);
+    };
+
     // the edge arrows (and the keyboard's): one wall on, or one back
     stepRef.current = (d: 1 | -1) => {
       if (!centers.length || locks.current.size) return;
@@ -454,6 +483,7 @@ export default function Studio({ dims }: { dims: Dims }) {
     return () => {
       killed = true;
       clearTimeout(timeout);
+      clearTimeout(settleTimer);
       gsap.ticker.remove(frame);
       canvas.removeEventListener("webglcontextlost", onContextLost);
       history.scrollRestoration = prevRestoration;

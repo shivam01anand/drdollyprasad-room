@@ -254,7 +254,10 @@ html[data-rearrange="1"] .copy{opacity:0;transition:opacity .4s ease}
 /* the wall labels: a printed card beside each canvas, as a gallery hangs it */
 .wall-labels{position:fixed;inset:0;z-index:2;pointer-events:none;overflow:hidden}
 /* a hang in one line (the gallery's walls): narrower cards, centred under their canvases */
-.wall-labels[data-dense="1"] .wall-label{max-width:170px;padding:8px 10px 9px}
+.wall-labels[data-dense="1"] .wall-label{max-width:170px;padding:7px 10px 8px}
+/* a close group's cards say what each work is and whether it is free; the rest is a tap away */
+.wall-labels[data-dense="1"] .cap-details{display:none}
+.wall-labels[data-dense="1"] .cap-status{margin-top:2px}
 .wall-label{position:absolute;left:0;top:0;display:flex;flex-direction:column;gap:1px;max-width:214px;
   padding:9px 12px 10px;margin:0;border:0;border-radius:1px;background:#F3EEE5;text-align:left;font:inherit;
   box-shadow:0 1px 1px rgba(48,32,22,.14),0 8px 16px -10px rgba(48,32,22,.45);

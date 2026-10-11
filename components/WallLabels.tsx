@@ -33,7 +33,7 @@ const overlaps = (a: Rect, b: Rect, m = 8) => a.x0 < b.x1 + m && a.x1 > b.x0 - m
 function spot(side: Side, f: Rect, w: number, h: number, centred = false) {
   if (side === "right") return { x: f.x1 + GAP, y: f.y1 - h };
   if (side === "left") return { x: f.x0 - GAP - w, y: f.y1 - h };
-  if (side === "above") return { x: f.x0, y: f.y0 - GAP * 0.75 - h };
+  if (side === "above") return { x: centred ? (f.x0 + f.x1) / 2 - w / 2 : f.x0, y: f.y0 - GAP * 0.75 - h };
   return { x: centred ? (f.x0 + f.x1) / 2 - w / 2 : f.x0, y: f.y1 + GAP * 0.75 };
 }
 
@@ -78,7 +78,7 @@ export default function WallLabels({ room, active, live, onOpen }: {
       const vw = innerWidth, vh = innerHeight;
       const gut = Math.max(16, Math.min(30, vw * 0.022));
       const avoid: Rect[] = [];
-      document.querySelectorAll<HTMLElement>(".copy-panel[data-on='1'], .brand, .hud-meta, .hud-mail, .diya-btn, .hud-bottom")
+      document.querySelectorAll<HTMLElement>(".copy-panel[data-on='1'], .brand, .hud-meta, .hud-mail, .diya-btn, .hud-bottom > *")
         .forEach((n) => { const b = n.getBoundingClientRect(); if (b.width && b.height) avoid.push({ x0: b.left, y0: b.top, x1: b.right, y1: b.bottom }); });
       const frames = [...rects.values(), ...others];
       const out = new Map<string, Side>();
@@ -88,16 +88,23 @@ export default function WallLabels({ room, active, live, onOpen }: {
         const n = nodes.get(id)!;
         const w = n.offsetWidth, h = n.offsetHeight;
         const first = CHAPTERS[active]?.labelSide;
+        // a work with another hung close beneath it (the top row of a group in two rows) takes its card above
+        const under = frames.some((o) => o.x0 < f.x1 && o.x1 > f.x0 && o.y0 >= f.y1 && o.y0 - f.y1 < h + GAP * 2);
+        const pref: Side | undefined = first === "below" && under ? "above" : first;
         const sides: Side[] = ["right", "left", "below", "above"];
-        for (const side of first ? [first, ...sides.filter((x) => x !== first)] : sides) {
+        const why: string[] = [];
+        for (const side of pref ? [pref, ...sides.filter((x) => x !== pref)] : sides) {
           const p = spot(side, f, w, h, centred);
           const r = { x0: p.x, y0: p.y, x1: p.x + w, y1: p.y + h };
-          if (r.x0 < gut || r.x1 > vw - gut || r.y0 < gut || r.y1 > vh - gut) continue;
-          if (frames.some((o) => overlaps(r, o)) || taken.some((o) => overlaps(r, o)) || avoid.some((o) => overlaps(r, o, 6))) continue;
+          if (r.x0 < gut || r.x1 > vw - gut || r.y0 < gut || r.y1 > vh - gut) { why.push(`${side}: off screen`); continue; }
+          if (frames.some((o) => overlaps(r, o))) { why.push(`${side}: a painting`); continue; }
+          if (taken.some((o) => overlaps(r, o))) { why.push(`${side}: a card`); continue; }
+          if (avoid.some((o) => overlaps(r, o, 6))) { why.push(`${side}: the header or words`); continue; }
           out.set(id, side);
           taken.push(r);
           break;
         }
+        if (!out.has(id) && process.env.NODE_ENV !== "production") console.debug("[labels] no room for", id, why.join("; "));
       }
       return out;
     };
@@ -115,12 +122,15 @@ export default function WallLabels({ room, active, live, onOpen }: {
       }
       // the works' labels first, their sides chosen once, as the camera lands
       const things = asides.map((a) => R.anchorRect(a.anchor, a.size[0], a.size[1])).filter((x): x is Rect => !!x);
+      // her, at her easel (house.json's "dolly"): no card may cover her
+      const her = R.anchorRect("dolly", 0.73, 0.64);
+      if (her) things.push(her);
       const first = !placed;
       if (!placed) placed = place(rects, [...R.artRects(), ...things]);
       // the works' labels, where they stand this frame, and the chapter's words and the
       // header: an aside must crowd none of them
       const labelRects: Rect[] = [];
-      document.querySelectorAll<HTMLElement>(".copy-panel[data-on='1'], .brand, .hud-meta, .hud-mail, .diya-btn, .hud-bottom, .dock")
+      document.querySelectorAll<HTMLElement>(".copy-panel[data-on='1'], .brand, .hud-meta, .hud-mail, .diya-btn, .hud-bottom > *, .dock")
         .forEach((x) => { const b = x.getBoundingClientRect(); if (b.width && b.height) labelRects.push({ x0: b.left, y0: b.top, x1: b.right, y1: b.bottom }); });
       for (const [id, side] of placed) {
         const f = rects.get(id), n = nodes.get(id)!;

@@ -105,6 +105,8 @@ const DEEPA_WICK = 0.14;
 const FRAME = 0.025;
 /** each wall's outward normal on the floor plane, three's (x, z) */
 const SIDE_OUT: Record<string, [number, number]> = { N: [0, 1], S: [0, -1], E: [-1, 0], W: [1, 0] };
+/** her photograph's tint in the afternoon courtyard's shade, and in the evening */
+const FIG_DAY = [0.86, 0.84, 0.8], FIG_NIGHT = [0.36, 0.3, 0.24];
 
 export class Room {
   rig!: Rig;
@@ -157,6 +159,7 @@ export class Room {
   private drag = { active: false, id: -1, x0: 0, y0: 0, sx: 0, sy: 0, tx: 0, ty: 0, rx: 0, ry: 0 };
 
   private art: THREE.Mesh[] = [];
+  private figureMats: THREE.MeshBasicMaterial[] = [];
   private narrow = false;
   private lastFlame = -Infinity;
 
@@ -264,9 +267,11 @@ export class Room {
     ground.needsUpdate = true;
     this.owned.push(ground);
     for (const [id, mesh] of this.parts.art) {
+      // a study (the canvas on her easel) is painted like the rest, but it is not a work to open
+      const pickable = !this.info.art[id]?.study;
       if (this.info.art[id]?.late) {
         mesh.material = paintMaterial(ground, this.baked, galleryLight(this.info.art[id]), flat);
-        this.art.push(mesh);
+        if (pickable) this.art.push(mesh);
         continue;
       }
       const tex = textures.get(id);
@@ -278,7 +283,24 @@ export class Room {
       // paint, not a print: the varnish under its gallery light now, the brushwork's
       // relief read once the room is open (reliefs())
       mesh.material = paintMaterial(tex, this.baked, galleryLight(this.info.art[id]), flat);
-      this.art.push(mesh);
+      if (pickable) this.art.push(mesh);
+    }
+    // her, at her easel: her own photograph, drawn as it is, in the light of the hour (applyEve)
+    for (const [name, mesh] of this.parts.figures) {
+      // unseen until her photograph is in: never a blank card
+      const mat = new THREE.MeshBasicMaterial({ color: 0xffffff, transparent: true, alphaTest: 0.03, depthWrite: true, visible: false });
+      mesh.material = mat;
+      this.figureMats.push(mat);
+      this.loadTexture(`/art/figure/${name}.webp`).then((t) => {
+        t.colorSpace = THREE.SRGBColorSpace;
+        t.flipY = false;                               // the card's UVs are glTF's
+        t.anisotropy = anisotropy;
+        mat.map = t;
+        mat.visible = true;
+        mat.needsUpdate = true;
+        this.owned.push(t);
+        this.invalidate();
+      }).catch(() => { mesh.visible = false; });
     }
     // development: ?bake=0 shows the live light for comparison
     if (process.env.NODE_ENV !== "production" && new URLSearchParams(location.search).get("bake") === "0") this.baked.bake.value = 0;
@@ -498,6 +520,8 @@ export class Room {
     this.diya.intensity = NIGHT.diya * this.lampK;
     (this.glow.material as THREE.SpriteMaterial).opacity = L(0.3, 0.95, this.lampK);
     if (this.deepa) this.deepa.light.intensity = NIGHT.deepa * this.lampK;
+    // her photograph has its own light: dim it and warm it as the evening comes
+    for (const m of this.figureMats) m.color.setRGB(L(FIG_DAY[0], FIG_NIGHT[0], e), L(FIG_DAY[1], FIG_NIGHT[1], e), L(FIG_DAY[2], FIG_NIGHT[2], e));
     this.envMats ??= this.envMaterials();
     for (const mat of this.envMats) mat.envMapIntensity = mat.userData.envFactor * L(V.env, NIGHT.env, e);
     const u = (this.sky.material as THREE.ShaderMaterial).uniforms;
@@ -1182,7 +1206,11 @@ export class Room {
   /** every canvas on screen, framed, in CSS pixels (a label must cover none of them) */
   artRects() {
     const out: { x0: number; y0: number; x1: number; y1: number }[] = [];
-    for (const id of Object.keys(this.info?.art ?? {})) { const r = this.artRect(id); if (r) out.push(r); }
+    for (const id of Object.keys(this.info?.art ?? {})) {
+      if (this.info?.art[id]?.study) continue;
+      const r = this.artRect(id);
+      if (r) out.push(r);
+    }
     return out;
   }
 
