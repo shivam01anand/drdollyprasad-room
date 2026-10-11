@@ -66,6 +66,8 @@ def kind(o):
     n = o.name
     if n.startswith("Art_"):
         return "art"
+    if n.startswith("Figure_"):
+        return "figure"
     if n.startswith(("Wall_", "Floor_", "Ceil_")) or n.startswith("Deco_laneDoor"):
         return "static"
     if n.startswith("Foliage_"):
@@ -101,29 +103,87 @@ for o in arts:
     o.select_set(True)
     bpy.context.view_layer.objects.active = o
     bpy.ops.object.transform_apply(location=True, rotation=True, scale=True)
-targets = merged + arts
-log(f"{len(merged)} static surfaces, {len(arts)} canvases")
+# her, at her easel: baked with the house, so she sits in its light (her own textures kept)
+figures = [o for o in bpy.data.objects if o.type == "MESH" and kind(o) == "figure"]
+for o in figures:
+    bpy.ops.object.select_all(action="DESELECT")
+    o.select_set(True)
+    bpy.context.view_layer.objects.active = o
+    bpy.ops.object.transform_apply(location=True, rotation=True, scale=True)
+targets = merged + arts + figures
+log(f"{len(merged)} static surfaces, {len(arts)} canvases, {len(figures)} parts of her")
 
 # ------------------------------------------------------------------ 2. lightmap UVs
+# her parts that come with their own light layout keep it (scripts/figure/model.py: each in a few
+# large pieces; cut into small ones, her light would change from piece to piece across her)
+premade = {o.name for o in figures if "LM" in o.data.uv_layers}
 for o in targets:
     if "LM" not in o.data.uv_layers:
         o.data.uv_layers.new(name="LM")
-bpy.ops.object.select_all(action="DESELECT")
-for o in targets:
-    o.select_set(True)
-    o.data.uv_layers.active = o.data.uv_layers["LM"]
-bpy.context.view_layer.objects.active = targets[0]
-bpy.ops.object.mode_set(mode="EDIT")
-bpy.ops.mesh.select_all(action="SELECT")
-bpy.ops.uv.select_all(action="SELECT")
+
+
+def edit_uvs(objs):
+    bpy.ops.object.select_all(action="DESELECT")
+    for o in objs:
+        o.select_set(True)
+        o.data.uv_layers.active = o.data.uv_layers["LM"]
+    bpy.context.view_layer.objects.active = objs[0]
+    bpy.ops.object.mode_set(mode="EDIT")
+    bpy.ops.mesh.select_all(action="SELECT")
+    bpy.ops.uv.select_all(action="SELECT")
+
+
+edit_uvs([o for o in targets if o.name not in premade])
 bpy.ops.uv.smart_project(angle_limit=math.radians(55), island_margin=0.0, area_weight=0.0, correct_aspect=True, scale_to_bounds=False)
+bpy.ops.object.mode_set(mode="OBJECT")
+edit_uvs(targets)
 bpy.ops.uv.average_islands_scale()
 bpy.ops.object.mode_set(mode="OBJECT")
+
+
+def lm_areas(o):
+    """its light layout's area, and its own (in square metres)"""
+    me = o.data
+    me.calc_loop_triangles()
+    nt = len(me.loop_triangles)
+    vi = np.zeros(nt * 3, np.int32)
+    li = np.zeros(nt * 3, np.int32)
+    me.loop_triangles.foreach_get("vertices", vi)
+    me.loop_triangles.foreach_get("loops", li)
+    co = np.zeros(len(me.vertices) * 3, np.float32)
+    me.vertices.foreach_get("co", co)
+    co = co.reshape(-1, 3) @ np.array(o.matrix_world.to_3x3()).T
+    uv = np.zeros(len(me.loops) * 2, np.float32)
+    me.uv_layers["LM"].data.foreach_get("uv", uv)
+    uv = uv.reshape(-1, 2)
+    p = co[vi].reshape(-1, 3, 3)
+    q = uv[li].reshape(-1, 3, 2)
+    a3 = np.linalg.norm(np.cross(p[:, 1] - p[:, 0], p[:, 2] - p[:, 0]), axis=1).sum() / 2
+    e1, e2 = q[:, 1] - q[:, 0], q[:, 2] - q[:, 0]
+    auv = np.abs(e1[:, 0] * e2[:, 1] - e1[:, 1] * e2[:, 0]).sum() / 2
+    return float(auv), float(a3)
+
+
+# her own layouts come at their own scale (averaging evens islands within what was laid out together):
+# brought to the room's density first, so the texels per metre below mean the same for her as for it
+ref = [lm_areas(o) for o in merged]
+room_k = sum(a for a, _ in ref) / max(1e-9, sum(b for _, b in ref))
+for o in figures:
+    if o.name not in premade:
+        continue
+    auv, a3 = lm_areas(o)
+    f = math.sqrt(room_k / max(1e-12, auv / max(1e-9, a3)))
+    uv = np.zeros(len(o.data.loops) * 2, np.float32)
+    o.data.uv_layers["LM"].data.foreach_get("uv", uv)
+    o.data.uv_layers["LM"].data.foreach_set("uv", uv * f)
+log(f"her own light layouts kept, at the room's density: {sorted(premade)}")
 for o in targets:
     k = float(o.get("lm", 1.0))
-    # a canvas is looked at closely: twice the room's density
+    # a canvas is looked at closely: twice the room's density; she, closer still
     if o in arts:
         k = 2.0
+    if o in figures:
+        k = 6.0
     if k != 1:
         uv = np.zeros(len(o.data.loops) * 2, np.float32)
         o.data.uv_layers["LM"].data.foreach_get("uv", uv)
@@ -184,6 +244,26 @@ def lamp(name, pos, energy, radius=0.04, color=(1.0, 0.62, 0.3)):
     return o
 
 
+ART_LIGHT = {}
+
+
+def art_light(tag, px):
+    """the light on each canvas's face (the median of its texels' luminance), for the site to
+    keep every painting in the light of a well-lit gallery wall, never washed out"""
+    lum = px @ np.array([0.2126, 0.7152, 0.0722], np.float32)
+    for o in arts:
+        uv = o.data.uv_layers["LM"].data
+        vals = []
+        for p in o.data.polygons:
+            if p.material_index != 0:
+                continue
+            for li in p.loop_indices:
+                u, v = uv[li].uv
+                vals.append(lum[min(RES - 1, max(0, int((1 - v) * RES))), min(RES - 1, max(0, int(u * RES)))])
+        if vals:
+            ART_LIGHT.setdefault(o.name[4:], {})[tag] = float(np.median(vals))
+
+
 def bake(tag):
     log(f"baking {tag}: {RES}² at {SPP} spp")
     bpy.ops.object.select_all(action="DESELECT")
@@ -193,7 +273,9 @@ def bake(tag):
     bpy.ops.object.bake(type="DIFFUSE", pass_filter={"DIRECT", "INDIRECT"}, use_clear=True, margin=8)
     px = np.empty(RES * RES * 4, np.float32)
     LM.pixels.foreach_get(px)
-    np.save(os.path.join(OUT, f"lm-{tag}.npy"), px.reshape(RES, RES, 4)[::-1, :, :3].copy())
+    img = px.reshape(RES, RES, 4)[::-1, :, :3].copy()
+    np.save(os.path.join(OUT, f"lm-{tag}.npy"), img)
+    art_light(tag, img)
     log(f"{tag} baked")
 
 
@@ -227,7 +309,7 @@ if ONLY in (None, "night"):
         o.data.energy = day_energy[n]
     bg.inputs["Strength"].default_value = day_sky
 
-json.dump({"res": RES, "spp": SPP}, open(os.path.join(OUT, "lm.json"), "w"))
+json.dump({"res": RES, "spp": SPP, "art": ART_LIGHT}, open(os.path.join(OUT, "lm.json"), "w"))
 
 # ------------------------------------------------------------------ 4. export
 # static surfaces: the site builds their materials and lays their texture UVs itself;
@@ -252,15 +334,18 @@ def stand_in(name):
     return m
 
 
-for o in targets:
+for o in merged + arts:
     for slot in o.material_slots:
         if slot.material:
             slot.material = stand_in(slot.material.name)
-# her figure: the site draws her from her own photograph (public/art/figure), at its full size
-for o in [o for o in bpy.data.objects if o.name.startswith("Figure_")]:
+# she keeps her own materials and textures (her skin, her clothes, her hair), the bake's image node gone
+for o in figures:
     for slot in o.material_slots:
-        if slot.material:
-            slot.material = stand_in(slot.material.name)
+        m = slot.material
+        if m and m.use_nodes and m.node_tree.nodes.get("LM_TARGET"):
+            m.node_tree.nodes.remove(m.node_tree.nodes["LM_TARGET"])
+    names = [l.name for l in o.data.uv_layers]
+    assert names[0] == "UVMap" and "LM" in names, (o.name, names)
 # props and foliage: their textures, shrunk
 for im in bpy.data.images:
     if im.name in ("Lightmap",) or im.source != "FILE":
@@ -269,7 +354,7 @@ for im in bpy.data.images:
     if used_by_site:
         continue
     w, h = im.size
-    cap = 1024 if any(k in im.name for k in ("banana", "bougainvillea", "peepal", "jute")) else 512
+    cap = 1024 if any(k in im.name for k in ("banana", "bougainvillea", "peepal", "jute", "skin", "top", "hair", "trousers")) else 512
     if max(w, h) > cap:
         s = cap / max(w, h)
         im.scale(max(1, int(w * s)), max(1, int(h * s)))

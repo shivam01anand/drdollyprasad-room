@@ -22,11 +22,11 @@ it are hers: a gallery inside a Delhi home, built and lit in Blender.
 3. **A nineteen-step walk**, one section each, one source (`lib/chapters.ts`) for copy and camera:
    - **the Aangan**, a courtyard garden open to the sky: "Woman with Poppies", the floral works,
      "Under Canopy of Greens" under two green-enamel studio lamps; then **her, at her easel** in the
-     corner by the banana, painting: the canvas she is working on now and she herself, both from
-     her own photograph (`scripts/figure`: Apple's subject lifting for her, her pencil grid to
-     square the canvas; she is a card set square to the stop's camera, placed so her brush meets
-     the canvas where it did, her chair's back hiding where the photograph ends), her palette and
-     brushes beside her, and her statement-poem with her; then the walk turns to the arch
+     corner by the banana, painting: the canvas she is working on now, from her own photograph
+     (`scripts/figure/make.py`: her pencil grid squares it), and she herself in 3D, seated on her
+     teak chair, her brush meeting the canvas where it did in the photograph (`scripts/figure`,
+     below), baked into the house's light with it; her palette and brushes beside her, and her
+     statement-poem with her; then the walk turns to the arch
      — the tall brass lamp of her openings beside it in a ring of marigolds — and goes straight
      through into the Quiet Room without stopping (a chapter's `via`: the rig runs power2.in to
      the passing pose and power2.out from it);
@@ -54,7 +54,12 @@ it are hers: a gallery inside a Delhi home, built and lit in Blender.
 
    On a computer the wheel, a trackpad or the keys move the walk freely, and when they come to
    rest it settles on a stop, as a phone's swipe does: a nudge settles back, a real scroll goes
-   on to the next stop (a walk left between stops shows no labels and frames no wall).
+   on to the next stop (a walk left between stops shows no labels and frames no wall). A window
+   made larger or smaller keeps the visitor where they stood (every stop moves with the window's
+   height; the walk is carried over in stops, not pixels), and the wall labels are placed again
+   for the new size. The header's lettering is light where the room behind it is dark and dark
+   where it is light, read from the frame as drawn (`Room.readLumaBehind`): the same wall sits
+   behind it on one screen and not on another.
 
    Every room change passes through a doorway, through passing poses where a turn is long
    (`scripts/house/pathcheck.py` proves it for the landscape and the portrait walk). The camera
@@ -96,7 +101,7 @@ Designed for the thumb, not shrunk from the desktop:
   past the last stop the page scrolls freely through the works and the contact;
 - phones render sharp: twice their pixels, 4× MSAA, the full lightmaps (only a weak machine
   gets the light set);
-- **the dock** — one bar where the desktop has four pills: where you are (`04/16 · The
+- **the dock** — one bar where the desktop has four pills: where you are (`04/19 · At her
   easel`) and a menu; the menu is a sheet from the bottom edge (`Stops`) with every stop,
   all her works, Shake the room, contact, mail and Instagram;
 - every copy label sits clear of its painting (the portrait cameras frame each painting high,
@@ -110,7 +115,8 @@ Designed for the thumb, not shrunk from the desktop:
 | | |
 |---|---|
 | The house | `scripts/house/build.py` builds it in Blender 5 from code: lime-washed walls with deep reveals and softened edges, an arch, panelled studded teak doors, timber ceilings, CC0 props (Poly Haven, `assets/polyhaven`), modelled charpais, a brass lamp, milk cans and a cart wheel, and leaf-card foliage (bougainvillea, banana, peepal). |
-| Light | `scripts/house/export.py` path-traces the diffuse light twice in Cycles into one lightmap atlas: the afternoon (sun from the west-south-west, sky, gallery lights) and the evening (sky down, gallery lights and lamps up). OpenImageDenoise cleans both. |
+| Light | `scripts/house/export.py` path-traces the diffuse light twice in Cycles into one lightmap atlas: the afternoon (sun from the west-south-west, sky, gallery lights) and the evening (sky down, gallery lights and lamps up). OpenImageDenoise cleans both. It measures the light on each canvas, and `publish.py` evens it (`lk` per work in `house.json`): a painting under a strong spot is brought down so it is never washed out, one in a dim corner lifted a little. |
+| Her | `scripts/figure/model.py` makes her with MPFB (MakeHuman for Blender, its CC0 assets in `assets/mpfb`, not in git): her build and years, her colours (`textures.py`), seated with her right arm raised to the canvas by IK, her left hand in her lap, her head turned up to the brush; her hair is her own (a close shell over MakeHuman's scalp region, its strands running back to a low bun, the scalp under it darkened on her skin for a soft hairline), her sunglasses pushed up on it, laid against its surface; her skin is kept a hand's breadth in from every opening of her clothes and gone where the pose pushes it through them. The pose is applied and the rig removed; `assets/figure/dolly-3d.blend` is self-contained (its textures packed), and `build.py` sets it on her chair. |
 | Into the site | `scripts/house/publish.py` writes `public/house/`: the GLB (textures ≤1024 WebP, Draco), the two lightmaps (and 2k copies for phones) and `house.json` (cameras, canvases, colliders, anchors) in three's coordinates. |
 | Materials | the architecture keeps the photographed PBR sets in `public/tex` (`lib/room/materials.ts`), laid in metres from world position at load; one shader patch (`lib/room/house.ts`) puts the baked light in place of live diffuse (`uBake`) and moves afternoon → evening (`uNight`). Live light remains for the things that move, the brass's glint, and Shake the room. |
 | Rendering | one `gsap.ticker` loop drives Lenis and `Room.renderFrame(now)`. Render-on-demand; shadow maps re-render only while things move; half-res GTAO, MSAA 2, DPR ≤ 1.5 (phones 1.25, no MSAA, no AO). |
@@ -128,6 +134,14 @@ python3 scripts/house/publish.py scripts/house/work/vN/final scripts/house/work/
 
 The final bake takes about an hour on an M1; run it with `nohup`. Camera-only changes need no
 rebake: rebuild with `--save=0` and copy the cams into `public/house/house.json`.
+
+Her figure, when it changes (MPFB 2.0 installed in Blender, `assets/mpfb/pack` linked into its data):
+
+```sh
+python3 scripts/figure/textures.py                                  # her colours
+blender -b -P scripts/figure/model.py -- scripts/house/work/fig      # then copy dolly-3d.blend to assets/figure
+blender -b scripts/house/work/fig/dolly-3d.blend -P scripts/figure/look.py -- scripts/house/work/fig/look dolly
+```
 
 ## Layout
 

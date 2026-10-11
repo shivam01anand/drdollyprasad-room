@@ -92,7 +92,8 @@ export function galleryLight(a: { side: string; centre: [number, number, number]
 }
 
 /** the canvas: her painting, the bake on it, its relief and its varnish */
-export function paintMaterial(tex: THREE.Texture, baked: BakedLight, light: THREE.Vector3, relief: THREE.Texture) {
+export function paintMaterial(tex: THREE.Texture, baked: BakedLight, light: THREE.Vector3, relief: THREE.Texture,
+  lk: [number, number] = [1, 1]) {
   const m = new THREE.MeshStandardMaterial({ map: tex, roughness: 0.86, metalness: 0, envMapIntensity: 0.5 });
   m.normalMap = relief;
   m.normalScale.set(0.22, 0.22);
@@ -118,5 +119,5 @@ export function paintMaterial(tex: THREE.Texture, baked: BakedLight, light: THRE
   };
   m.customProgramCacheKey = () => "paint";
   m.userData.sheen = sheen;
-  return baked.apply(m);
+  return baked.apply(m, lk);
 }

@@ -105,8 +105,7 @@ const DEEPA_WICK = 0.14;
 const FRAME = 0.025;
 /** each wall's outward normal on the floor plane, three's (x, z) */
 const SIDE_OUT: Record<string, [number, number]> = { N: [0, 1], S: [0, -1], E: [-1, 0], W: [1, 0] };
-/** her photograph's tint in the afternoon courtyard's shade, and in the evening */
-const FIG_DAY = [0.86, 0.84, 0.8], FIG_NIGHT = [0.36, 0.3, 0.24];
+
 
 export class Room {
   rig!: Rig;
@@ -159,7 +158,6 @@ export class Room {
   private drag = { active: false, id: -1, x0: 0, y0: 0, sx: 0, sy: 0, tx: 0, ty: 0, rx: 0, ry: 0 };
 
   private art: THREE.Mesh[] = [];
-  private figureMats: THREE.MeshBasicMaterial[] = [];
   private narrow = false;
   private lastFlame = -Infinity;
 
@@ -171,6 +169,8 @@ export class Room {
   private visible = true;
   private last = 0;
   private wake = 0;
+  /** readings asked of the next frame drawn, each under its own name: how light it is behind a part of the screen */
+  private lumaAsks = new Map<string, { rect: { x0: number; y0: number; x1: number; y1: number }; cb: (luma: number) => void }>();
   private aliveUntil = 0;
   private shadowsUntil = 0;
   private mode: "light" | "dark" = "light";
@@ -270,7 +270,7 @@ export class Room {
       // a study (the canvas on her easel) is painted like the rest, but it is not a work to open
       const pickable = !this.info.art[id]?.study;
       if (this.info.art[id]?.late) {
-        mesh.material = paintMaterial(ground, this.baked, galleryLight(this.info.art[id]), flat);
+        mesh.material = paintMaterial(ground, this.baked, galleryLight(this.info.art[id]), flat, this.info.art[id]?.lk);
         if (pickable) this.art.push(mesh);
         continue;
       }
@@ -282,26 +282,10 @@ export class Room {
       tex.needsUpdate = true;
       // paint, not a print: the varnish under its gallery light now, the brushwork's
       // relief read once the room is open (reliefs())
-      mesh.material = paintMaterial(tex, this.baked, galleryLight(this.info.art[id]), flat);
+      mesh.material = paintMaterial(tex, this.baked, galleryLight(this.info.art[id]), flat, this.info.art[id]?.lk);
       if (pickable) this.art.push(mesh);
     }
-    // her, at her easel: her own photograph, drawn as it is, in the light of the hour (applyEve)
-    for (const [name, mesh] of this.parts.figures) {
-      // unseen until her photograph is in: never a blank card
-      const mat = new THREE.MeshBasicMaterial({ color: 0xffffff, transparent: true, alphaTest: 0.03, depthWrite: true, visible: false });
-      mesh.material = mat;
-      this.figureMats.push(mat);
-      this.loadTexture(`/art/figure/${name}.webp`).then((t) => {
-        t.colorSpace = THREE.SRGBColorSpace;
-        t.flipY = false;                               // the card's UVs are glTF's
-        t.anisotropy = anisotropy;
-        mat.map = t;
-        mat.visible = true;
-        mat.needsUpdate = true;
-        this.owned.push(t);
-        this.invalidate();
-      }).catch(() => { mesh.visible = false; });
-    }
+
     // development: ?bake=0 shows the live light for comparison
     if (process.env.NODE_ENV !== "production" && new URLSearchParams(location.search).get("bake") === "0") this.baked.bake.value = 0;
 
@@ -520,8 +504,6 @@ export class Room {
     this.diya.intensity = NIGHT.diya * this.lampK;
     (this.glow.material as THREE.SpriteMaterial).opacity = L(0.3, 0.95, this.lampK);
     if (this.deepa) this.deepa.light.intensity = NIGHT.deepa * this.lampK;
-    // her photograph has its own light: dim it and warm it as the evening comes
-    for (const m of this.figureMats) m.color.setRGB(L(FIG_DAY[0], FIG_NIGHT[0], e), L(FIG_DAY[1], FIG_NIGHT[1], e), L(FIG_DAY[2], FIG_NIGHT[2], e));
     this.envMats ??= this.envMaterials();
     for (const mat of this.envMats) mat.envMapIntensity = mat.userData.envFactor * L(V.env, NIGHT.env, e);
     const u = (this.sky.material as THREE.ShaderMaterial).uniforms;
@@ -1194,6 +1176,41 @@ export class Room {
       this.renderer.shadowMap.needsUpdate = true;   // the roof casts too
     }
     this.composer.render(dt / 1000);
+    if (this.lumaAsks.size) {
+      const asks = [...this.lumaAsks.values()];
+      this.lumaAsks.clear();
+      for (const ask of asks) {
+        const l = this.readLuma(ask.rect);
+        if (l !== null) ask.cb(l);
+      }
+    }
+  }
+
+  /**
+   * How light the room is, as drawn, behind a part of the screen (CSS pixels): its mean luminance,
+   * 0 to 1, read from the next frame drawn (`now`: draw one for it). The header chooses its ink by
+   * it — the same wall sits behind the header on one screen and not on another.
+   */
+  readLumaBehind(name: string, rect: { x0: number; y0: number; x1: number; y1: number }, cb: (luma: number) => void, now = false) {
+    this.lumaAsks.set(name, { rect, cb });
+    if (now) this.wake = Math.max(this.wake, 1);
+  }
+
+  private readLuma(r: { x0: number; y0: number; x1: number; y1: number }) {
+    const gl = this.renderer!.getContext();
+    const W = gl.drawingBufferWidth, H = gl.drawingBufferHeight;
+    const c = this.canvas.getBoundingClientRect();
+    if (!c.width || !c.height) return null;
+    const x0 = Math.max(0, Math.floor((r.x0 - c.left) / c.width * W)), x1 = Math.min(W, Math.ceil((r.x1 - c.left) / c.width * W));
+    const y0 = Math.max(0, Math.floor((r.y0 - c.top) / c.height * H)), y1 = Math.min(H, Math.ceil((r.y1 - c.top) / c.height * H));
+    if (x1 - x0 < 2 || y1 - y0 < 2) return null;
+    const w = x1 - x0, h = y1 - y0;
+    const px = new Uint8Array(w * h * 4);
+    gl.bindFramebuffer(gl.FRAMEBUFFER, null);
+    gl.readPixels(x0, H - y1, w, h, gl.RGBA, gl.UNSIGNED_BYTE, px);   // (GL counts its rows from the foot)
+    let sum = 0, n = 0;
+    for (let i = 0; i < px.length; i += 16) { sum += 0.2126 * px[i] + 0.7152 * px[i + 1] + 0.0722 * px[i + 2]; n++; }
+    return n ? sum / n / 255 : null;
   }
 
   get introDone() { return this.rig?.isEnabled ?? false; }

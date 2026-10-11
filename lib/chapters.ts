@@ -24,7 +24,8 @@ export type Chapter = {
   verse?: string;
   /** the section is content of its own (the featured slider) */
   slot?: "featured";
-  /** the header sits on dark material in this framing: set it in light ink */
+  /** the header sits on dark material in this framing: light ink. Only until the room is drawn (or
+   *  if it fails): then the header reads its ink from the frame itself (Studio, Room.readLumaBehind) */
   ink?: "light";
   /** the Blender view this chapter frames (house.json cams) */
   view: string;

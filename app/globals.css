@@ -99,6 +99,8 @@ html[data-rearrange="1"] .stage canvas:active{cursor:grabbing}
 .hud .brand,.hud .hud-meta,.hud .hud-mail,.hud .hud-hint{transition:color .5s ease}
 html[data-hud="light"]:not([data-rearrange="1"]) .hud .brand,
 html[data-hud="light"]:not([data-rearrange="1"]) .hud .brand-target .pre-big{color:#F2ECE2}
+html[data-hud="dark"]:not([data-rearrange="1"]) .hud .brand,
+html[data-hud="dark"]:not([data-rearrange="1"]) .hud .brand-target .pre-big{color:#211B17}
 /* shaking the room clears the stage of everything but the room */
 html[data-rearrange="1"] .sec-featured,
 html[data-rearrange="1"] .chapter-text{visibility:hidden;pointer-events:none}

@@ -10,8 +10,8 @@ Out:
   public/art/room/in-progress.jpg   the canvas, squared up: her pencil grid shows the squares are
                                     near enough square to straighten it along its top and left edges;
                                     where she, her brush and a phone clamp hide it, bare primed canvas
-  public/art/figure/dolly.webp      her, lifted out, with the brush redrawn along the line she holds it
-  assets/figure/dolly.png           the same, for the bake (her shadow)
+  assets/figure/dolly.png           her, lifted out, with the brush redrawn along the line she holds it
+                                    (a reference: she is modelled in 3D by model.py, not shown from it)
   assets/figure/dolly.json          where things are in it: the brush tip, the cut at the bottom,
                                     and the canvas point the brush touches
 Both are white-balanced from the bare canvas, so she and her painting are in the same light.
@@ -85,7 +85,6 @@ ys, xs = np.where(a > 0.02)
 fx0, fx1, fy0, fy1 = int(xs.min()), int(xs.max()) + 1, int(ys.min()), int(ys.max()) + 1
 fig = np.dstack([rgb.astype(np.uint8), (a * 255).astype(np.uint8)])[fy0:fy1, fx0:fx1]
 cv2.imwrite(os.path.join(FIG, "dolly.png"), fig)
-cv2.imwrite(os.path.join(ROOT, "public", "art", "figure", "dolly.webp"), fig, [cv2.IMWRITE_WEBP_QUALITY, 90])
 
 # where the brush tip touches her canvas, in the canvas texture's own coordinates (0..1, from top left)
 p = A @ np.array([tip[0], tip[1], 1.0])

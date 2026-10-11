@@ -16,7 +16,8 @@ import type { Room } from "@/lib/room/Room";
  * Placement is a gallery's: to the right of the frame, its foot on the
  * frame's foot; failing that, to the left; failing that, below. A card never
  * covers a painting, her photograph on its easel, another card, the copy or
- * the header, and a canvas that is not wholly on screen gets none.
+ * the header, and a canvas that is not wholly on screen gets none. When the
+ * window changes size the cards are placed again, as they would have been.
  */
 
 const IDS = [...new Set(CHAPTERS.flatMap((c) => c.labels ?? []))];
@@ -61,6 +62,19 @@ export default function WallLabels({ room, active, live, onOpen }: {
     const asideAt = new Map<string, { x: number; y: number }>();
     let reveal: gsap.core.Timeline | null = null;
     let fade: gsap.core.Tween | null = null;
+    /** the window has changed size (a moment ago): the cards are placed again */
+    let resized = false;
+    let resizeTimer = 0;
+    const onResize = () => { clearTimeout(resizeTimer); resizeTimer = window.setTimeout(() => { resized = true; }, 140); };
+    addEventListener("resize", onResize);
+    const show = (n: HTMLElement) => {
+      n.dataset.on = "1";
+      gsap.fromTo(n, { autoAlpha: 0 }, { autoAlpha: 1, duration: quick ? 0 : 0.3, ease: "power2.out", overwrite: true });
+    };
+    const drop = (n: HTMLElement) => {
+      n.dataset.on = "0";
+      gsap.to(n, { autoAlpha: 0, duration: quick ? 0 : 0.2, ease: "power1.in", overwrite: true });
+    };
 
     const hide = (instant = false) => {
       reveal?.kill(); reveal = null;
@@ -123,10 +137,26 @@ export default function WallLabels({ room, active, live, onOpen }: {
       // the works' labels first, their sides chosen once, as the camera lands
       const things = asides.map((a) => R.anchorRect(a.anchor, a.size[0], a.size[1])).filter((x): x is Rect => !!x);
       // her, at her easel (house.json's "dolly"): no card may cover her
-      const her = R.anchorRect("dolly", 0.73, 0.64);
+      const her = R.anchorRect("dolly", 0.7, 1.35);         // she, seated, her brush raised
       if (her) things.push(her);
       const first = !placed;
+      const redo = !!placed && resized;
+      resized = false;
       if (!placed) placed = place(rects, [...R.artRects(), ...things]);
+      else if (redo) {
+        // placed again for the new size: a card that no longer fits goes, one that now fits comes
+        reveal?.progress(1);
+        const next = place(rects, [...R.artRects(), ...things]);
+        for (const id of ids) {
+          const n = nodes.get(id)!;
+          if (placed.has(id) && !next.has(id)) drop(n);
+          if (!placed.has(id) && next.has(id)) show(n);
+          if (next.has(id)) n.dataset.side = next.get(id)!;
+        }
+        for (const a of asides) if (placed.has(a.key)) next.set(a.key, "right");
+        placed = next;
+        asideAt.clear();
+      }
       // the works' labels, where they stand this frame, and the chapter's words and the
       // header: an aside must crowd none of them
       const labelRects: Rect[] = [];
@@ -153,6 +183,13 @@ export default function WallLabels({ room, active, live, onOpen }: {
         };
         const q = tries.find(fits);
         if (q) asideAt.set(a.key, q);
+      }
+      if (redo) {
+        for (const a of asides) {
+          const n = nodes.get(a.key)!;
+          if (asideAt.has(a.key) && !placed.has(a.key)) { placed.set(a.key, "right"); show(n); }
+          if (!asideAt.has(a.key) && placed.has(a.key)) { placed.delete(a.key); drop(n); }
+        }
       }
       if (first) {
         for (const k of asideAt.keys()) placed.set(k, "right");
@@ -184,6 +221,8 @@ export default function WallLabels({ room, active, live, onOpen }: {
     gsap.ticker.add(tick);
     return () => {
       gsap.ticker.remove(tick);
+      removeEventListener("resize", onResize);
+      clearTimeout(resizeTimer);
       hide(true);
       nodes.forEach((n) => n.querySelectorAll<HTMLElement>("[data-cap]").forEach((t) => { t.textContent = t.dataset.cap ?? ""; }));
     };

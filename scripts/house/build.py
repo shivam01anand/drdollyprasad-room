@@ -110,7 +110,7 @@ SITE = {
     # concrete bands, gallery-white panels for the work, a grey-green Kota stone floor
     "brick": ("brick", (1.05, 0.72, 0.68), 2.0),
     "concrete": ("plaster", (1.07, 1.02, 0.92), 2.4),
-    "panel": ("plaster", (2.05, 2.02, 1.95), 2.0),
+    "panel": ("plaster", (1.8, 1.77, 1.72), 2.0),
     "kota": ("floor", lin(0xB4BAB0), 2.4),
     # the primed face of the canvas on her easel: baked like the walls, so it reads white in the shade
     # (the bake keeps light, not colour: the site draws it a flat warm white, lib/room/materials.ts)
@@ -1464,12 +1464,15 @@ def paint_tube(name, loc, rot, hx):
 # her corner of the courtyard, clear of the opening shots' sightline to "Woman with Poppies"
 # (they look north from x 3.6) and of the turn to the arch; in the establishing shot it stands to
 # the left of her painting. On the easel, the canvas she is working on now, from her photograph
-# (scripts/figure/make.py); in front of it, her, painting it: her photograph, lifted out, on a card
-# set square to the stop's camera and placed so her brush meets the canvas where it did
+# (scripts/figure/make.py); in front of it, she, painting it: in 3D (scripts/figure/model.py),
+# seated on her chair, her brush on the canvas where it was in the photograph
 FIGMETA = json.load(open(os.path.join(ROOT, "assets", "figure", "dolly.json")))
-FIG_K = 0.00124                                  # metres per pixel of her photograph, at her (her head, crown to chin)
 EASEL = dict(x=1.95, y=4.75, face=50.0, cw=1.28)
 EASEL["ch"] = EASEL["cw"] / FIGMETA["canvas"]["aspect"]
+LEDGE = 0.86                                     # the tray: the brush's touch then at 1.257 m, her raised hand's height
+# where she sits, from where her brush touches the canvas: 0.12 m to its left, 0.52 m out from it
+# (the same numbers as model.py's --touch, in her own frame)
+HER_TOUCH = (0.12, 0.52)
 
 
 def her_corner(ledge):
@@ -1486,49 +1489,27 @@ def her_corner(ledge):
     return n, rt, art, P, centre, C
 
 
-# the tray's height: her crown should sit at a seated woman's 1.22 m
-for _ledge in [0.6 + 0.01 * k for k in range(60)]:
-    th = math.radians(EASEL["face"])
-    _n = Vector((math.sin(th), -math.cos(th), 0))
-    lean = math.atan2(0.17, 1.98)
-    _M = (Matrix.Translation((EASEL["x"], EASEL["y"], 0)) @ Matrix.Rotation(th, 4, "Z")
-          @ Matrix.Translation((0, 0.17 * _ledge / 1.98 - 0.05, _ledge)) @ Matrix.Rotation(-lean, 4, "X"))
-    _u, _v = FIGMETA["canvas"]["touch"]
-    _P = _M @ Vector(((_u - 0.5) * EASEL["cw"], 0, (1 - _v) * EASEL["ch"]))
-    _ctr = _M @ Vector((0, 0, EASEL["ch"] / 2))
-    _C = _ctr + _n * 2.55 + Vector((math.cos(th), math.sin(th), 0)) * 0.45
-    _C.z = 1.6
-    _s = 0.6 / (_C - _P).dot(_n)
-    _T = _P + (_C - _P) * _s
-    _crown = _T.z + (FIGMETA["figure"]["tip"][1] - FIGMETA["figure"]["crown"]) * FIG_K
-    if _crown >= 1.22:
-        break
-LEDGE = _ledge
 n_e, rt_e, _art, P_touch, C_centre, C_easel = her_corner(LEDGE)
 INFO["art"]["in-progress"]["light"] = list(C_centre + n_e * 1.6 + Vector((0, 0, 2.2)))
 INFO["anchors"]["easel"] = list(C_centre)
-# her card: square to the stop's camera, 0.6 m in front of the canvas, the brush's tip on the line
-# from the camera to where it touches
-_s = 0.6 / (C_easel - P_touch).dot(n_e)
-T_tip = P_touch + (C_easel - P_touch) * _s
-_view = (T_tip - C_easel); _view.z = 0; _view.normalize()
-rc = Vector((_view.y, -_view.x, 0))                                   # the camera's right
-fw, fh = FIGMETA["figure"]["w"] * FIG_K, FIGMETA["figure"]["h"] * FIG_K
-TLc = T_tip - rc * FIGMETA["figure"]["tip"][0] * FIG_K + Vector((0, 0, FIGMETA["figure"]["tip"][1] * FIG_K))
-bpy.ops.mesh.primitive_plane_add(size=1)
-fig = bpy.context.active_object
-fig.name = "Figure_dolly"
-fig.scale = (fw, fh, 1)
-fig.rotation_euler = (math.pi / 2, 0, 0)                              # standing, its face toward -y
-bpy.ops.object.transform_apply(scale=True, rotation=True)
-fig.data.materials.append(cutout("figure:dolly", os.path.join(HT, "..", "figure", "dolly.png"), translucency=0.0, rough=0.85))
-fig.location = TLc + rc * (fw / 2) - Vector((0, 0, fh / 2))
-fig.rotation_euler = (0, 0, math.atan2(-_view.x, _view.y))           # its face (-y) to the camera
-INFO["anchors"]["dolly"] = list(fig.location)
-# her chair, under her: its seat a little in front of her back, toward the canvas; its back to us
-_spine = TLc + rc * FIGMETA["figure"]["spine"] * FIG_K
-_chair = Vector((_spine.x, _spine.y, 0)) - n_e * 0.13
-teak_chair("dollyChair", _chair, math.radians(EASEL["face"]) + math.pi)
+# her chair, and she on it, facing her canvas
+_chair = Vector((P_touch.x, P_touch.y, 0)) - rt_e * HER_TOUCH[0] + n_e * HER_TOUCH[1]
+_chair.z = 0
+_rot = math.radians(EASEL["face"]) + math.pi
+teak_chair("dollyChair", _chair, _rot)
+with bpy.data.libraries.load(os.path.join(ROOT, "assets", "figure", "dolly-3d.blend"), link=False) as (src, dst):
+    dst.objects = [n for n in src.objects if n.startswith("Figure_")]
+_her = Matrix.Translation(_chair) @ Matrix.Rotation(_rot, 4, "Z")
+_lo, _hi = Vector((1e9,) * 3), Vector((-1e9,) * 3)
+for o in dst.objects:
+    link(o)
+    o.matrix_world = _her @ o.matrix_basis          # (its world matrix is not there until the scene is evaluated)
+    for c in o.bound_box:
+        w = o.matrix_world @ Vector(c)
+        _lo = Vector(map(min, _lo, w)); _hi = Vector(map(max, _hi, w))
+INFO["anchors"]["dolly"] = list((_lo + _hi) / 2)
+INFO["figure"] = {"size": [max(_hi.x - _lo.x, _hi.y - _lo.y), _hi.z - _lo.z]}
+T_tip = P_touch
 # the side table, at her right hand: a stool, her palette on it with the brushes and three tubes
 _stool = tuple(_chair + rt_e * 0.6 + n_e * 0.1)[:2]
 import_ph("wooden_stool_01", (*_stool, 0), 0.4, 1.0, prop=False)
@@ -1536,9 +1517,9 @@ palette("palette", (_stool[0] + 0.02, _stool[1] - 0.06, 0.442), math.radians(30)
 brush_tumbler("brushes", (_stool[0] - 0.12, _stool[1] + 0.12, 0.437))
 for k, (dx, dy, rot, hx) in enumerate(((0.11, 0.16, 0.5, 0xBB2B17), (0.15, 0.1, 0.8, 0x2F6A6E), (-0.15, -0.14, 2.3, 0xE8B82A))):
     paint_tube(f"tube{k}", (_stool[0] + dx, _stool[1] + dy, 0.437 + 0.0085), rot, hx)
-print("her corner: tray %.2f, brush tip at %s, card %s, chair %s, camera %s" % (
-    LEDGE, tuple(round(c, 2) for c in T_tip), tuple(round(c, 2) for c in fig.location),
-    tuple(round(c, 2) for c in _chair), tuple(round(c, 2) for c in C_easel)), flush=True)
+print("her corner: tray %.2f, brush touch at %s, chair %s, her %s..%s, camera %s" % (
+    LEDGE, tuple(round(c, 2) for c in P_touch), tuple(round(c, 2) for c in _chair),
+    tuple(round(c, 2) for c in _lo), tuple(round(c, 2) for c in _hi), tuple(round(c, 2) for c in C_easel)), flush=True)
 # canvases waiting against the west wall, faces to it and backs to the room: the larger with its
 # top on the wall, the smaller leaning on the larger
 for k, (y, w, h, ang, foot) in enumerate(((4.8, 0.762, 1.016, 9.0, None), (4.72, 0.61, 0.61, 14.0, 0.29))):
@@ -1810,7 +1791,7 @@ def fill(name, x0, x1, y0, y1, power, z=None):
 
 fill("Fill_quiet", QX0, QX1, QY0, QY1, float(opt.get("--fillq", 45)))
 fill("Fill_red", RX0, RX1, RY0, RY1, float(opt.get("--fillr", 90)))
-fill("Fill_gallery", GX0, GX1, GY0, GY1, float(opt.get("--fillg", 300)), z=4.4)
+fill("Fill_gallery", GX0, GX1, GY0, GY1, float(opt.get("--fillg", 150)), z=4.4)
 
 for k in ("monk-and-green-buddha", "monks-and-blue-buddha", "temple-bells",
           "bulls-and-wheel", "shree-420-and-milk-cans", "three-veiled-women", "terracotta-pots"):
@@ -1820,8 +1801,9 @@ for k in BANDH:
 # the gallery: a spot for each work, by its size, on a track under the space frame
 for k, a in list(INFO["art"].items()):
     if a.get("late"):
-        gallery_light(k, power=float(opt.get("--gallery", 135)) * 2.5 * min(1.0, 0.35 + 0.55 * max(a["w"], a["h"])),
-                      z=4.45, out=1.75, spot=56, color=(1.0, 0.94, 0.86))      # a gallery's warm white, not lamplight
+        # each spot narrow enough that a close group's lights do not pile up on one canvas
+        gallery_light(k, power=float(opt.get("--gallery", 135)) * 1.5 * min(1.0, 0.35 + 0.55 * max(a["w"], a["h"])),
+                      z=4.45, out=1.75, spot=44, color=(1.0, 0.94, 0.86))      # a gallery's warm white, not lamplight
 # the palm court at night: lights in the bed, turned up into the palms
 for k, (x, y) in enumerate(((22.0, -5.3), (23.4, -3.0), (21.6, -2.4))):
     d = bpy.data.lights.new(f"N_palm{k}", "SPOT")
@@ -1920,8 +1902,8 @@ VIEWS = {
     # her easel in the corner by the banana, the poem beside it; from the canopy, a turn through the west
     "easelvia":  ((4.6, 2.9, 1.6), (1.4, 4.4, 1.3)),
     # behind her right shoulder, as her photograph was taken: her, her canvas, her things
-    "easel":     (tuple(C_easel), tuple(Vector((0, 0, 1.18)) + Vector(((C_centre.x * 0.55 + T_tip.x * 0.45),
-                                                                       (C_centre.y * 0.55 + T_tip.y * 0.45), 0)))),
+    "easel":     (tuple(C_easel), (C_centre.x * 0.5 + INFO["anchors"]["dolly"][0] * 0.5,
+                                   C_centre.y * 0.5 + INFO["anchors"]["dolly"][1] * 0.5, 1.15)),
     # from the easel, on to the arch: close enough that the easel is behind the frame's edge
     "threshold": ((3.9, 3.1, 1.6), (AX0, 3.4, 1.42)),
     "bodhi":     ((-1.45, 3.4, 1.6), (QX0, 3.4, 1.62)),

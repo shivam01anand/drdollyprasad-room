@@ -63,9 +63,35 @@ def t(p):
     return [p[0], p[2], -p[1]]
 
 
+# each canvas's light, as the bake measured it on its face (export.py): a painting is shown as its
+# photograph is, under a gallery's light — the bright held down to a well-lit wall's, the darkest
+# brought up a little; a canvas in its room's shade stays in it
+LM = json.load(open(os.path.join(src, "lm.json"))).get("art", {})
+TARGET = {"day": 0.82, "night": 0.72}
+
+
+def lk(k):
+    m = LM.get(k)
+    if not m:
+        return None
+    out_k = []
+    for tag in ("day", "night"):
+        v = m.get(tag)
+        if not v or v <= 1e-4:
+            out_k.append(1.0)
+        elif v > TARGET[tag]:
+            out_k.append(round(TARGET[tag] / v, 3))
+        elif v < 0.45:
+            out_k.append(round(min(1.45, (0.45 / v) ** 0.5), 3))
+        else:
+            out_k.append(1.0)
+    return out_k if any(abs(x - 1) > 0.01 for x in out_k) else None
+
+
 out = {
     "lightmap": scales,
     "art": {k: {"w": v["w"], "h": v["h"], "side": v["side"], "centre": t(v["centre"]), **({"late": True} if v.get("late") else {}),
+                **({"lk": lk(k)} if lk(k) else {}),
                 **({"study": True} if v.get("study") else {}),
                 **({"light": t(v["light"])} if v.get("light") else
                    {"light": t(info["lights"][f"L_{k}"]["pos"])} if f"L_{k}" in info["lights"] else {})}

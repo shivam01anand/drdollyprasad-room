@@ -175,8 +175,9 @@ export default function Studio({ dims }: { dims: Dims }) {
       if (idx !== lastActive) {
         lastActive = idx;
         setActive(idx);
-        // the header's ink follows what it sits on
-        document.documentElement.dataset.hud = CHAPTERS[idx]?.ink ?? "";
+        // the header's ink follows what it sits on: read from the room as drawn (ink, below); until
+        // the room is there, or if it fails, the chapter's own word for it
+        if (!room?.introDone || dead) document.documentElement.dataset.hud = CHAPTERS[idx]?.ink ?? "";
       }
 
       // past the plan, the live room shrinks into a held card …
@@ -197,13 +198,34 @@ export default function Studio({ dims }: { dims: Dims }) {
     };
 
     const measure = () => {
+      // where the walk is, in stops, before the layout moves under it: a window made smaller or
+      // larger moves every stop, and the visitor must stay where they stood, not be carried on
+      const n0 = centers.length;
+      const inWalk = n0 > 1 && lastScroll >= centers[0] - 2 && lastScroll <= centers[n0 - 1] + 2;
+      const t = inWalk ? camT(lastScroll) : 0;
+      const intoWorks = lastScroll - worksTop;
       vh = innerHeight;
       const secs = [...(mainRef.current?.querySelectorAll<HTMLElement>(".sec") ?? [])];
       centers = secs.map((el) => el.offsetTop + el.offsetHeight / 2 - vh / 2);
       worksTop = document.getElementById("works")?.offsetTop ?? Infinity;
       const feat = mainRef.current?.querySelector<HTMLElement>(".sec-featured");
       if (feat) { featTop = feat.offsetTop; featBottom = feat.offsetTop + feat.offsetHeight; }
-      apply(lastScroll, true);
+      const n = centers.length;
+      let y = lastScroll;
+      if (n0 && n && heading >= 0) {
+        // a glide on its way arrives, at once, where its stop now is
+        y = heading < n ? centers[heading] : worksTop;
+        anchor = Math.min(heading, n - 1);
+        heading = -1;
+        delete html.dataset.gliding;
+      } else if (inWalk && n > 1 && !swipe.on) {
+        const f = t * (n - 1), k = Math.min(n - 2, Math.floor(f));
+        y = centers[k] + (f - k) * (centers[k + 1] - centers[k]);
+      } else if (n0 && intoWorks > 0 && Number.isFinite(worksTop) && !swipe.on) {
+        y = worksTop + intoWorks;
+      }
+      if (Number.isFinite(y) && Math.abs(y - lastScroll) > 0.5) lenis.scrollTo(Math.max(0, y), { immediate: true, force: true });
+      apply(Number.isFinite(y) ? Math.max(0, y) : lastScroll, true);
     };
 
     lenis.on("scroll", (l: Lenis) => { apply(l.scroll); settleSoon(); });
@@ -368,6 +390,7 @@ export default function Studio({ dims }: { dims: Dims }) {
       if (roomRef.current === room) roomRef.current = null;
       room = null;
       document.documentElement.dataset.room = "off";
+      document.documentElement.dataset.hud = "";            // (the page under it now: its own ink)
       setFailed(true);
       setRearrange(false);
       // the room's own reasons end; an open lightbox keeps its hold
@@ -449,6 +472,32 @@ export default function Studio({ dims }: { dims: Dims }) {
     const onContextLost = (e: Event) => { e.preventDefault(); fail(new Error("WebGL context lost")); };
     canvas.addEventListener("webglcontextlost", onContextLost);
 
+    /* The header's ink: light lettering where the room behind it is dark, dark where it is light,
+       read from the frame as drawn every little while as the walk goes (no chapter can know it: the
+       same wall sits behind the header on one screen and not on another), and once more on arriving. */
+    let inkAt = 0, wasLanded = false, inkLight: boolean | null = null, inkStop = -1;
+    const ink = () => {
+      const r = room;
+      if (!r || dead || !r.introDone || lastScroll > (centers[centers.length - 1] ?? Infinity) + 2) return;
+      const now = performance.now();
+      const landed = r.landed, arrived = landed && !wasLanded;
+      wasLanded = landed;
+      if (!arrived && now - inkAt < 400) return;
+      inkAt = now;
+      const b = document.querySelector<HTMLElement>(".hud .brand")?.getBoundingClientRect();
+      if (!b || !b.width) return;
+      const at = lastActive;
+      // (a frame is drawn for it on arriving, and whenever the walk is at a stop it has not read)
+      r.readLumaBehind("ink", { x0: b.left, y0: b.top, x1: b.right, y1: b.bottom }, (l) => {
+        inkStop = at;
+        // (a band between the two, so a wall of middling light never sets it flickering)
+        const light = inkLight === null ? l < 0.5 : inkLight ? l < 0.56 : l < 0.44;
+        if (light !== inkLight) { inkLight = light; html.dataset.hud = light ? "light" : "dark"; }
+        if (process.env.NODE_ENV !== "production") (window as unknown as { __ink?: object }).__ink = { l, light, at, t: performance.now() };
+      }, arrived || at !== inkStop);
+    };
+    gsap.ticker.add(ink);
+
     const ro = new ResizeObserver(() => measure());
     ro.observe(document.body);
     addEventListener("resize", measure);
@@ -485,6 +534,7 @@ export default function Studio({ dims }: { dims: Dims }) {
       clearTimeout(timeout);
       clearTimeout(settleTimer);
       gsap.ticker.remove(frame);
+      gsap.ticker.remove(ink);
       canvas.removeEventListener("webglcontextlost", onContextLost);
       history.scrollRestoration = prevRestoration;
       for (const k of ["room", "hud", "rearrange"] as const) {

@@ -16,8 +16,9 @@ import { worldUV, type Library, type Role } from "./materials";
  *    the room is shaken; foliage is alpha-tested cards.
  *  - Roof_*: the gallery hall's space frame and sunshades, with their own
  *    materials, lifted with the ceilings when the camera rises for the plan.
- *  - Figure_<name>: her, at her easel: a card the site draws from her own
- *    photograph (/art/figure/<name>.webp), unlit, in the light of the hour.
+ *  - Figure_*: she, at her easel, in 3D (scripts/figure/model.py): her own
+ *    textures (skin, clothes, hair) with her own UVs, and her lightmap UVs —
+ *    baked with the house, so she sits in its light, afternoon and evening.
  *
  * The light is baked twice into one atlas layout: the afternoon (lm-day) and
  * the evening with the diya lit (lm-night). A shader patch puts the baked
@@ -31,7 +32,8 @@ export type HouseInfo = {
   lightmap: { day: number; night?: number };
   /** `late`: far from the door (the gallery); its photograph loads after the house has opened.
    *  `light`: where its gallery light hangs, when it has one */
-  art: Record<string, { w: number; h: number; side: string; centre: V3; late?: boolean; light?: V3; study?: boolean }>;
+  /** `lk`: the canvas's light scale, afternoon and evening: a painting is shown in a gallery's light, never washed out */
+  art: Record<string, { w: number; h: number; side: string; centre: V3; late?: boolean; light?: V3; study?: boolean; lk?: [number, number] }>;
   cams: Record<string, { eye: V3; target: V3; fov: number }>;
   anchors: Record<string, V3>;
   sun: { toSun: V3 };
@@ -98,12 +100,13 @@ export class BakedLight {
     this.nightK = { value: (house.info.lightmap.night ?? house.info.lightmap.day) * Math.PI };
   }
 
-  /** lay the bake on a material (once) */
-  apply(mat: THREE.MeshStandardMaterial) {
+  /** lay the bake on a material (once); `k` scales its afternoon and evening light (a canvas's lk) */
+  apply(mat: THREE.MeshStandardMaterial, k: [number, number] = [1, 1]) {
     if (mat.userData.baked) return mat;
     mat.userData.baked = true;
     mat.lightMap = this.house.lmDay;
-    mat.lightMapIntensity = this.dayK;
+    mat.lightMapIntensity = this.dayK * k[0];
+    const nightK = k[1] === 1 ? this.nightK : { value: this.nightK.value * k[1] };
     const before = mat.onBeforeCompile.bind(mat);
     const key = mat.customProgramCacheKey.bind(mat);
     const u = this;
@@ -112,7 +115,7 @@ export class BakedLight {
       shader.uniforms.uBake = u.bake;
       shader.uniforms.uNight = u.night;
       shader.uniforms.uLmNight = u.nightMap;
-      shader.uniforms.uLmNightK = u.nightK;
+      shader.uniforms.uLmNightK = nightK;
       shader.fragmentShader = shader.fragmentShader
         .replace("#include <common>", `#include <common>
           uniform float uBake; uniform float uNight; uniform sampler2D uLmNight; uniform float uLmNightK;`)
@@ -140,8 +143,8 @@ export type HouseParts = {
   ceilings: THREE.Mesh[];
   /** the hall's roof structure: decoration that lifts with the ceilings */
   roofs: THREE.Object3D[];
-  /** her figure cards, by name */
-  figures: Map<string, THREE.Mesh>;
+  /** she, at her easel: her parts, baked with the house */
+  figures: THREE.Mesh[];
   /** the canvas fronts, by id */
   art: Map<string, THREE.Mesh>;
   edges: THREE.Mesh[];
@@ -154,7 +157,7 @@ export type HouseParts = {
  * materials. `lib` holds the room's photographed materials by role.
  */
 export function assemble(house: House, lib: Library, baked: BakedLight, edgeMat: THREE.MeshStandardMaterial): HouseParts {
-  const parts: HouseParts = { statics: [], ceilings: [], roofs: [], figures: new Map(), art: new Map(), edges: [], props: [], foliage: [] };
+  const parts: HouseParts = { statics: [], ceilings: [], roofs: [], figures: [], art: new Map(), edges: [], props: [], foliage: [] };
   const root = house.scene;
   root.updateMatrixWorld(true);
   // the GLB's nodes: what they are is in their names (and their extras)
@@ -196,13 +199,16 @@ export function assemble(house: House, lib: Library, baked: BakedLight, edgeMat:
         m.castShadow = true;
       });
     } else if (n.startsWith("Figure_")) {
-      // the bake holds her shadow; she casts none live
+      // her own textures under the house's baked light; the bake holds her shadow, she casts none live
       node.traverse((o) => {
         const m = o as THREE.Mesh;
         if (!m.isMesh) return;
+        const mat = m.material as THREE.MeshStandardMaterial;
+        mat.envMapIntensity = 0.35;
+        m.material = baked.apply(mat);
         m.castShadow = false;
         m.receiveShadow = false;
-        parts.figures.set(n.slice(7), m);
+        parts.figures.push(m);
       });
     } else if (n.startsWith("Roof_")) {
       // high and thin: the bake already holds its shadow, so it casts none live

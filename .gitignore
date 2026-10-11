@@ -11,3 +11,7 @@ scripts/bake/work/
 assets/polyhaven/
 scripts/house/work/
 scripts/intro/work/
+assets/mpfb/
+
+# her colours, made from the MakeHuman pack by scripts/figure/textures.py (packed into dolly-3d.blend)
+assets/figure/tex/
