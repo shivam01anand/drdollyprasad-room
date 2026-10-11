@@ -74,9 +74,12 @@ export const CHAPTERS: Chapter[] = [
     labelSide: "left",
     // her own words for the painting
     quote: "A young boy stands quietly beneath the shelter of large banana leaves. The bananas on his head look like a natural crown from the earth." },
-  // from the canopy the walk turns to the arch and goes straight through it into the Quiet Room
-  { id: "bodhi", eyebrow: "Artist’s statement", stop: "Artist’s statement", room: "The Quiet Room", verse: POEM, view: "bodhi",
-    via: "threshold", dusk: 0.22, labels: ["monk-and-green-buddha"] },
+  // her easel in the corner by the banana, a canvas primed and not yet begun: her statement beside it
+  { id: "easel", eyebrow: "Artist’s statement", stop: "The easel", room: "The courtyard", verse: POEM, view: "easel",
+    via: "easelvia", dusk: 0.12 },
+  // from the easel the walk turns to the arch and goes straight through it into the Quiet Room
+  { id: "bodhi", eyebrow: "“Buddha Under the Bodhi Tree” · c. 2005–2015", stop: "Buddha Under the Bodhi Tree", room: "The Quiet Room",
+    view: "bodhi", via: "threshold", dusk: 0.22, labels: ["monk-and-green-buddha"] },
   {
     id: "faith",
     eyebrow: "“Threads of Faith” · 2026",

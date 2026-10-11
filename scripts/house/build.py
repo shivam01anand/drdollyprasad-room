@@ -112,6 +112,9 @@ SITE = {
     "concrete": ("plaster", (1.07, 1.02, 0.92), 2.4),
     "panel": ("plaster", (2.05, 2.02, 1.95), 2.0),
     "kota": ("floor", lin(0xB4BAB0), 2.4),
+    # the primed face of the canvas on her easel: baked like the walls, so it reads white in the shade
+    # (the bake keeps light, not colour: the site draws it a flat warm white, lib/room/materials.ts)
+    "gesso": ("plaster", (2.25, 2.18, 2.0), 3.0),
 }
 
 
@@ -1167,6 +1170,228 @@ def press_easel(name, loc, face_deg, photo):
 press_easel("press", (-2.16, -4.28, 0), 180 + 28, os.path.join(HT, "press-interview.jpg"))
 INFO["anchors"]["press"] = [-2.16, -4.24, 0.86]       # the print's middle, for its caption
 
+
+# ====================================================================== her easel
+# "Welcome to my studio": the corner of the courtyard where she paints, in the shade of the west
+# wall by the banana — a studio easel with a canvas primed and not yet begun, her palette with the
+# paint fresh on it, brushes in a brass tumbler, tubes, and canvases leaning backs out. Nothing
+# painted on any of it: the only paintings in the house are hers.
+LINEN = os.path.join(PH, "tex", "rough_linen", "rough_linen_{}_1k.jpg")
+
+
+def linen_mat(name, colour, rough=0.9, normal=0.35):
+    """linen at its real weave (27 cm a tile, Poly Haven "Rough Linen"): its relief only, the
+    photograph being of a blue cloth; the colour is the flax, raw or primed"""
+    if name in bpy.data.materials:
+        return bpy.data.materials[name]
+    m = bpy.data.materials.new(name)
+    m.use_nodes = True
+    nt = m.node_tree
+    b = nt.nodes["Principled BSDF"]
+    b.inputs["Base Color"].default_value = (*colour, 1)
+    tc = nt.nodes.new("ShaderNodeTexCoord")
+    mp = nt.nodes.new("ShaderNodeMapping")
+    mp.inputs["Scale"].default_value = (1 / 0.27,) * 3
+    nt.links.new(tc.outputs["Object"], mp.inputs["Vector"])
+    nor = nt.nodes.new("ShaderNodeTexImage")
+    nor.image = img(LINEN.format("nor_gl"), False)
+    nor.projection = "BOX"
+    nt.links.new(mp.outputs["Vector"], nor.inputs["Vector"])
+    nm = nt.nodes.new("ShaderNodeNormalMap")
+    nm.inputs["Strength"].default_value = normal
+    nt.links.new(nor.outputs["Color"], nm.inputs["Color"])
+    nt.links.new(nm.outputs["Normal"], b.inputs["Normal"])
+    b.inputs["Roughness"].default_value = rough
+    return m
+
+
+M_GESSO = linen_mat("gesso", (0.78, 0.745, 0.67), rough=0.82, normal=0.2)      # primed: a warm white, the weave through it
+M_RAW_LINEN = linen_mat("rawLinen", (0.42, 0.33, 0.21))                       # the flax, unprimed, at the back
+M_PINE = flat("stretcherPine", lin(0xC4A27A), 0.75)
+
+
+def blank_canvas(name, w, h, d=0.038, primed=True, brace=False, baked_face=None):
+    """a stretched canvas, built facing -y, its foot at z=0, centred on x: linen over pine
+    stretchers, primed at the front and round the edges, raw at the back. `baked_face`: the
+    front is made apart, a static surface of that name (role "gesso"), so the bake lights it;
+    returned as (canvas, face)"""
+    t, bar = 0.004, 0.045
+    face = M_GESSO if primed else M_RAW_LINEN
+    front = box(baked_face or f"{name}_face", -w / 2, w / 2, -d, -d + t, 0, h,
+                role_mat("gesso") if baked_face else face, bevel=0.002)
+    parts = [] if baked_face else [front]
+    parts += [
+             # the linen turned round the stretcher's edges
+             box(f"{name}_wrapL", -w / 2, -w / 2 + t, -d, 0, 0, h, face, bevel=0),
+             box(f"{name}_wrapR", w / 2 - t, w / 2, -d, 0, 0, h, face, bevel=0),
+             box(f"{name}_wrapT", -w / 2, w / 2, -d, 0, h - t, h, face, bevel=0),
+             box(f"{name}_wrapB", -w / 2, w / 2, -d, 0, 0, t, face, bevel=0),
+             # the back of the linen, seen between the bars
+             box(f"{name}_back", -w / 2 + t, w / 2 - t, -d + t, -d + 2 * t, t, h - t, M_RAW_LINEN, bevel=0)]
+    for k, (x0, x1, z0, z1) in enumerate(((-w / 2 + t, -w / 2 + t + bar, t, h - t), (w / 2 - t - bar, w / 2 - t, t, h - t),
+                                          (-w / 2 + t, w / 2 - t, h - t - bar, h - t), (-w / 2 + t, w / 2 - t, t, t + bar))):
+        parts.append(box(f"{name}_bar{k}", x0, x1, -d + 2 * t, -0.002, z0, z1, M_PINE, bevel=0.002))
+    if brace:
+        parts.append(box(f"{name}_brace", -0.025, 0.025, -d + 2 * t, -0.004, t + bar, h - t - bar, M_PINE, bevel=0.002))
+    canvas = join(name, apply_mods(parts))
+    return (canvas, front) if baked_face else canvas
+
+
+def studio_easel(name, loc, face_deg, cw, ch):
+    """a teak studio easel, its canvas on the tray: two front legs and a back leg, a mast that
+    carries the top clamp, a tray with a lip at 62 cm. Built facing -y, turned to the room."""
+    tk = role_mat("teak")
+    H, lean = 1.98, 0.17
+    ledge = 0.62
+    yz = lambda z: lean * z / H                     # how far back the front plane is at height z
+    # the front legs meet the mast just under the canvas's top; only the mast and its clamp rise above
+    leg_top = ledge + ch - 0.06
+    parts = [rod(f"{name}_legL", (-0.36, 0, 0), (-0.035, yz(leg_top) + 0.02, leg_top), 0.018, tk),
+             rod(f"{name}_legR", (0.36, 0, 0), (0.035, yz(leg_top) + 0.02, leg_top), 0.018, tk),
+             rod(f"{name}_legB", (0, 0.82, 0), (0, yz(leg_top) + 0.05, leg_top), 0.016, tk),
+             rod(f"{name}_mast", (0, yz(0.5) + 0.03, 0.5), (0, yz(H + 0.08) + 0.03, H + 0.08), 0.017, tk),
+             rod(f"{name}_brace", (-0.31, yz(0.3) + 0.01, 0.3), (0.31, yz(0.3) + 0.01, 0.3), 0.012, tk)]
+    yl = yz(ledge)
+    parts.append(box(f"{name}_tray", -0.42, 0.42, yl - 0.1, yl + 0.012, ledge - 0.03, ledge, tk, bevel=0.004))
+    parts.append(box(f"{name}_lip", -0.42, 0.42, yl - 0.1, yl - 0.088, ledge, ledge + 0.025, tk, bevel=0.003))
+    top = ledge + ch
+    parts.append(box(f"{name}_clamp", -0.07, 0.07, yz(top) - 0.06, yz(top) + 0.035, top - 0.004, top + 0.05, tk, bevel=0.006))
+    easel = join(f"Deco_{name}", apply_mods(parts))
+    canvas, face = blank_canvas(f"Deco_{name}Canvas", cw, ch, brace=False, baked_face=f"Wall_{name}CanvasFace")
+    for o in (canvas, face):
+        o.rotation_euler = (-math.atan2(lean, H), 0, 0)
+        o.location = (0, yl - 0.05, ledge)
+    group = link(bpy.data.objects.new(f"Deco_{name}Group", None))
+    for o in (easel, canvas, face):
+        o.parent = group
+    group.location = Vector(loc)
+    group.rotation_euler = (0, 0, math.radians(face_deg))
+    # the face leaves the group for the architecture, where it stands
+    bpy.context.view_layer.update()
+    mw = face.matrix_world.copy()
+    face.parent = None
+    face.matrix_world = mw
+    face["lm"] = 1.5                                     # looked at closely: a finer light than the walls
+    return group
+
+
+def palette(name, loc, rot):
+    """her palette: a teak kidney with a thumb hole, the paint fresh on it in the colours of her
+    canvases, a little of it mixed across the middle"""
+    bm = bmesh.new()
+    n = 56
+    pts = []
+    for k in range(n):
+        a = 2 * math.pi * k / n
+        r = 1.0 - 0.18 * max(0.0, math.cos(a - 3.6)) ** 6         # the notch for the thumb, near the hole
+        pts.append((0.21 * r * math.cos(a), 0.15 * r * math.sin(a)))
+    outer = [bm.verts.new((x, y, 0)) for x, y in pts]
+    bm.faces.new(outer)
+    bmesh.ops.solidify(bm, geom=bm.faces[:], thickness=0.006)
+    me = bpy.data.meshes.new(f"{name}_board")
+    bm.to_mesh(me)
+    bm.free()
+    board = link(bpy.data.objects.new(f"{name}_board", me))
+    board.data.materials.append(role_mat("teak"))
+    hole = rod(f"{name}_holeCut", (-0.125, -0.06, -0.02), (-0.125, -0.06, 0.03), 0.021, M_PINE, segs=24)
+    hole.name = "cutter"
+    hole.hide_render = True
+    hole.hide_set(True)
+    m = board.modifiers.new("hole", "BOOLEAN")
+    m.object = hole
+    m.operation = "DIFFERENCE"
+    m.solver = "EXACT"
+    parts = [board]
+    paints = [(0xF2EFE8, 0.024), (0xE8B82A, 0.019), (0xC98A2E, 0.02), (0xDD8430, 0.017), (0xBB2B17, 0.022),
+              (0x8E1B2A, 0.018), (0x4F6B2A, 0.019), (0x2F6A6E, 0.02), (0x2A3A8C, 0.017), (0x4A2E22, 0.02)]
+    rnd = random.Random(9)
+    for k, (hx, r) in enumerate(paints):
+        a = math.radians(-35 + k * 23)
+        x, y = 0.165 * math.cos(a), 0.115 * math.sin(a)
+        bpy.ops.mesh.primitive_uv_sphere_add(segments=16, ring_count=8, radius=r, location=(x, y, 0.006))
+        bl = bpy.context.active_object
+        bl.scale = (1.0 + rnd.random() * 0.4, 0.9 + rnd.random() * 0.3, 0.32)
+        bl.rotation_euler = (0, 0, rnd.random() * math.pi)
+        bl.data.materials.append(flat(f"paint{hx:06X}", lin(hx), 0.28))
+        parts.append(bl)
+    # where she has mixed: soft smears across the middle
+    for k, (hx, x, y, l) in enumerate(((0xE7A8A0, -0.02, 0.03, 0.07), (0xD9B27A, 0.04, -0.02, 0.06), (0x6E8E86, -0.05, -0.035, 0.05))):
+        bpy.ops.mesh.primitive_uv_sphere_add(segments=16, ring_count=8, radius=0.02, location=(x, y, 0.006))
+        sm = bpy.context.active_object
+        sm.scale = (l / 0.02, 0.9, 0.18)
+        sm.rotation_euler = (0, 0, rnd.uniform(-0.6, 0.6))
+        sm.data.materials.append(flat(f"paint{hx:06X}", lin(hx), 0.32))
+        parts.append(sm)
+    o = join(f"Deco_{name}", apply_mods(parts))
+    o.location = Vector(loc)
+    o.rotation_euler = (0, 0, rot)
+    for p in o.data.polygons:
+        p.use_smooth = True
+    return o
+
+
+def brush_tumbler(name, loc):
+    """a brass tumbler of brushes, bristles up, leaning out from the rim"""
+    rnd = random.Random(17)
+    parts = [lathe(f"{name}_tumbler", [(0.0, 0.0), (0.038, 0.0), (0.041, 0.004), (0.046, 0.12), (0.048, 0.13), (0.044, 0.13),
+                                         (0.04, 0.012), (0.0, 0.012)], flat("tumblerBrass", lin(0xB08A4E), 0.38, 1.0), segs=40)]
+    handles = [lin(0xC8A574), lin(0x1E1A18), lin(0x8E2A1E), lin(0xC8A574), lin(0x1E1A18)]
+    for k in range(9):
+        a = 2 * math.pi * k / 9 + rnd.uniform(-0.2, 0.2)
+        tilt = rnd.uniform(0.08, 0.2)
+        L = rnd.uniform(0.25, 0.33)
+        r = rnd.uniform(0.0038, 0.0058)
+        base = Vector((0.018 * math.cos(a), 0.018 * math.sin(a), 0.015))
+        d = Vector((math.sin(tilt) * math.cos(a), math.sin(tilt) * math.sin(a), math.cos(tilt)))
+        p1 = base + d * L
+        parts.append(rod(f"{name}_h{k}", base, p1, r, flat(f"brushHandle{k % 5}", handles[k % 5], 0.35), segs=8))
+        p2 = p1 + d * 0.028
+        parts.append(rod(f"{name}_f{k}", p1, p2, r * 1.15, flat("ferrule", lin(0xB9B4AA), 0.3, 1.0), segs=8))
+        bpy.ops.mesh.primitive_cone_add(vertices=8, radius1=r * 1.25, radius2=r * 0.25, depth=rnd.uniform(0.022, 0.04),
+                                        location=p2 + d * 0.016)
+        cone = bpy.context.active_object
+        cone.rotation_euler = d.to_track_quat("Z", "Y").to_euler()
+        cone.data.materials.append(flat("bristle", lin(0x9C7C56), 0.85))
+        parts.append(cone)
+    o = join(f"Deco_{name}", apply_mods(parts))
+    o.location = Vector(loc)
+    return o
+
+
+def paint_tube(name, loc, rot, hx):
+    """a paint tube, half used: aluminium, a band of its colour, a black cap"""
+    parts = [rod(f"{name}_body", (-0.05, 0, 0), (0.045, 0, 0), 0.012, flat("tubeAlu", lin(0xC9C6BE), 0.35, 1.0), segs=12),
+             box(f"{name}_crimp", -0.068, -0.05, -0.013, 0.013, -0.0025, 0.0025, flat("tubeAlu", lin(0xC9C6BE), 0.35, 1.0), bevel=0.001),
+             rod(f"{name}_band", (0.005, 0, 0), (0.03, 0, 0), 0.0123, flat(f"paint{hx:06X}", lin(hx), 0.28), segs=12),
+             rod(f"{name}_cap", (0.045, 0, 0), (0.062, 0, 0), 0.0085, flat("tubeCap", lin(0x1C1A18), 0.5), segs=12)]
+    o = join(f"Deco_{name}", apply_mods(parts))
+    for p in o.data.polygons:
+        p.use_smooth = True
+    o.scale = (1, 1, 0.7)                            # squeezed a little
+    o.rotation_euler = (0, 0, rot)
+    o.location = Vector(loc)
+    return o
+
+
+# clear of the sightline to "Woman with Poppies" from the courtyard (the opening shots look north
+# from x 3.6), and of the turn to the arch; in the establishing shot it stands left of her painting
+EASEL = dict(x=2.2, y=4.75, face=45.0)
+studio_easel("easel", (EASEL["x"], EASEL["y"], 0), EASEL["face"], 0.762, 1.016)          # 30 × 40 in, her size
+INFO["anchors"]["easel"] = [EASEL["x"], EASEL["y"], 1.15]
+# the side table: a stool, her palette on it with the tumbler of brushes and three tubes
+_stool = (2.82, 4.42)
+import_ph("wooden_stool_01", (*_stool, 0), 0.4, 1.0, prop=False)
+palette("palette", (_stool[0] + 0.02, _stool[1] - 0.06, 0.442), math.radians(30))
+brush_tumbler("brushes", (_stool[0] - 0.12, _stool[1] + 0.12, 0.437))
+for k, (dx, dy, rot, hx) in enumerate(((0.11, 0.16, 0.5, 0xBB2B17), (0.15, 0.1, 0.8, 0x2F6A6E), (-0.15, -0.14, 2.3, 0xE8B82A))):
+    paint_tube(f"tube{k}", (_stool[0] + dx, _stool[1] + dy, 0.437 + 0.0085), rot, hx)
+# canvases waiting against the west wall, faces to it and backs to the room: the larger with its
+# top on the wall, the smaller leaning on the larger
+for k, (y, w, h, ang, foot) in enumerate(((4.8, 0.762, 1.016, 9.0, None), (4.72, 0.61, 0.61, 14.0, 0.29))):
+    c = blank_canvas(f"Deco_waiting{k}", w, h, primed=True, brace=(h > 0.9))
+    c.rotation_euler = (math.radians(ang), 0, math.radians(-90))
+    c.location = (foot if foot else AX0 + h * math.sin(math.radians(ang)) + 0.04, y, 0.0)
+
 # the lane door: one leaf ajar into the room, turquoise flaking over old wood
 lane, lane_iron = door_leaf("Deco_laneDoor", 1.06, 2.26, 0.055, "door", panels=(2, 3), hardware="iron", hinge_left=True)
 # shut in its frame, a few centimetres back from the room's face: hinged on the north jamb,
@@ -1190,8 +1415,9 @@ def card(name, w, h, mat):
     return o
 
 
-def banana_plant(loc, rot=0.0, H=2.5):
-    """a young banana: a pseudostem and nine arching leaves"""
+def banana_plant(loc, rot=0.0, H=2.5, clear=None, gap=28.0):
+    """a young banana: a pseudostem and nine arching leaves. `clear`: a point (x, y) no leaf may
+    arch over — a leaf aimed within `gap` degrees of it is turned aside, the rest left as they grow"""
     parts = []
     stem = lathe("stem", [(0.0, 0), (0.12, 0), (0.1, 0.4), (0.075, H * 0.55), (0.055, H * 0.62), (0.0, H * 0.63)], M_STEM, segs=20)
     leaf_m = cutout("foliage:banana", os.path.join(HT, "banana_leaf_cut.png"), translucency=0.35, rough=0.45)
@@ -1215,6 +1441,12 @@ def banana_plant(loc, rot=0.0, H=2.5):
                 v = lf.data.vertices[lf.data.loops[li].vertex_index].co
                 uvl[li].uv = (v.x / (L * 0.36 * (1 - 0.15 * (v.y / L))) + 0.5, v.y / L)
         lf.data.materials.append(leaf_m)
+        if clear:
+            # the leaf grows along its local +y: its heading in the world is a + rot + 90°
+            want = math.atan2(clear[1] - loc[1], clear[0] - loc[0])
+            off = math.remainder(a + rot + math.pi / 2 - want, 2 * math.pi)
+            if abs(off) < math.radians(gap):
+                a += math.copysign(math.radians(gap), off if off else 1.0) - off
         lf.rotation_euler = (math.radians(random.uniform(-8, 12)), 0, a)
         lf.location = (0, 0, H * random.uniform(0.5, 0.62))
         parts.append(lf)
@@ -1265,7 +1497,7 @@ def canopy(name, x0, x1, y0, y1, z0, z1, count):
     return join(f"Foliage_{name}", parts)
 
 
-banana_plant((0.82, 5.05, 0), 2.2, H=3.1)
+banana_plant((0.82, 5.05, 0), 2.2, H=3.1, clear=(EASEL["x"], EASEL["y"]))
 bougainvillea("bougainvilleaN", ((2.2, AY1 + T / 2), (AX1 + T / 2, AY1 + T / 2)), 520, 0.22, H_AANGAN + 0.0, H_AANGAN + 0.55, (0, -1))
 bougainvillea("bougainvilleaE", ((AX1 + T / 2, 2.0), (AX1 + T / 2, AY1 + T / 2)), 380, 0.22, H_AANGAN + 0.0, H_AANGAN + 0.5, (-1, 0))
 canopy("peepal", QX0 - T - 3.2, QX0 - T - 0.5, ARCH["cy"] - 3.2, ARCH["cy"] + 3.2, 2.6, 6.2, 200)
@@ -1526,7 +1758,11 @@ VIEWS = {
     "presence":  ((3.6, 2.05, 1.62), (3.6, AY1, 1.86)),
     "floral":    ((3.25, 3.0, 1.6), (AX1, 2.85, 1.6)),
     "canopy":    ((4.9, 3.85, 1.6), (4.9, AY0, 1.62)),
-    "threshold": ((4.8, 3.4, 1.6), (AX0, 3.4, 1.42)),
+    # her easel in the corner by the banana, the poem beside it; from the canopy, a turn through the west
+    "easelvia":  ((4.6, 2.9, 1.6), (1.4, 4.4, 1.3)),
+    "easel":     ((4.5, 2.5, 1.6), (1.7, 4.85, 0.92)),
+    # from the easel, on to the arch: close enough that the easel is behind the frame's edge
+    "threshold": ((3.9, 3.1, 1.6), (AX0, 3.4, 1.42)),
     "bodhi":     ((-1.45, 3.4, 1.6), (QX0, 3.4, 1.62)),
     # the Quiet Room's south-east corner, two walls, a painting on each
     "faith":     ((-3.28, 3.63, 1.6), (-0.95, 1.3, 1.55)),
@@ -1555,7 +1791,7 @@ VIEWS = {
 }
 # a step closer to the work on a wide screen: the paintings at about 1.3× where a wall has one,
 # less where a view must hold several (the eye slides toward the target, along the line of sight)
-CLOSER = {"presence": 0.76, "canopy": 0.86, "bodhi": 0.8,
+CLOSER = {"presence": 0.7, "canopy": 0.86, "bodhi": 0.8,
           "street": 0.86}
 for k, f in CLOSER.items():
     e, t = Vector(VIEWS[k][0]), Vector(VIEWS[k][1])
@@ -1567,7 +1803,9 @@ NARROW = {
     "presence":  ((3.6, 2.55, 1.55), (3.6, AY1, 1.3)),
     "floral":    ((4.55, 3.0, 1.55), (AX1, 3.0, 1.22)),
     "canopy":    ((5.75, 3.25, 1.55), (5.75, AY0, 1.45)),
-    "threshold": ((4.4, 3.4, 1.55), (AX0, 3.4, 1.35)),
+    "easelvia":  ((4.5, 2.9, 1.55), (1.4, 4.4, 1.2)),
+    "easel":     ((5.0, 2.45, 1.5), (2.45, 5.0, 0.62)),
+    "threshold": ((3.7, 3.2, 1.55), (AX0, 3.4, 1.35)),
     "bodhi":     ((-1.85, 3.4, 1.55), (QX0, 3.4, 0.98)),
     # a portrait screen holds one wall: Threads of Faith, frontal; the Blue Buddha comes round on the turn
     "faith":     ((-3.05, 1.98, 1.55), (QX1, 1.98, 1.3)),

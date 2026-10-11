@@ -17,13 +17,15 @@ it are hers: a gallery inside a Delhi home, built and lit in Blender.
    courtyard around it. A second visit in a session is welcomed back and goes straight in.
 2. **The house is shown, then the camera moves in.** Her things fall into place as the panel
    lifts (`bounce.out` from two metres, as the original drops its furniture).
-3. **A fifteen-step walk**, one section each, one source (`lib/chapters.ts`) for copy and camera:
+3. **A sixteen-step walk**, one section each, one source (`lib/chapters.ts`) for copy and camera:
    - **the Aangan**, a courtyard garden open to the sky: "Woman with Poppies", the floral works,
-     "Under Canopy of Greens" under two green-enamel studio lamps; then the walk turns to the arch
+     "Under Canopy of Greens" under two green-enamel studio lamps; her easel in the corner by the
+     banana, a canvas primed and not yet begun, her palette and brushes beside it, and her
+     statement-poem with it; then the walk turns to the arch
      — the tall brass lamp of her openings beside it in a ring of marigolds — and goes straight
      through into the Quiet Room without stopping (a chapter's `via`: the rig runs power2.in to
      the passing pose and power2.out from it);
-   - **the Quiet Room**: the Bodhi Buddha under one light with her poem, then its south-east
+   - **the Quiet Room**: the Bodhi Buddha under one light, then its south-east
      corner — "The Blue Buddha" on the wall with the door, "Threads of Faith" on the wall beside
      it, one painting to a wall;
    - **the Red Room** by the lane: "The Bullocks" and "Terracotta" on the red wall, with her
@@ -84,8 +86,8 @@ Designed for the thumb, not shrunk from the desktop:
   past the last stop the page scrolls freely through the works and the contact;
 - phones render sharp: twice their pixels, 4× MSAA, the full lightmaps (only a weak machine
   gets the light set);
-- **the dock** — one bar where the desktop has four pills: where you are (`04/15 · Artist's
-  statement`) and a menu; the menu is a sheet from the bottom edge (`Stops`) with every stop,
+- **the dock** — one bar where the desktop has four pills: where you are (`04/16 · The
+  easel`) and a menu; the menu is a sheet from the bottom edge (`Stops`) with every stop,
   all her works, Shake the room, contact, mail and Instagram;
 - every copy label sits clear of its painting (the portrait cameras frame each painting high,
   and on a short phone the poem sets in its two stanzas side by side);
