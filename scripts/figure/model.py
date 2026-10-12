@@ -1,14 +1,17 @@
 """
-Her, in 3D, at her easel: a woman of her build and years made with MPFB (MakeHuman for Blender,
-CC0 assets in assets/mpfb), in her colours (scripts/figure/textures.py) — a soft pink top,
-charcoal trousers, her dark hair drawn back into a low bun, her sunglasses pushed up on her head —
-seated, her right arm raised to the canvas with a brush, her left hand in her lap.
+Her, in 3D, at her easel, as her photographs show her painting (assets/figure/at-the-easel.jpg and
+IMG_1199, October 2026): a woman of her build and years made with MPFB (MakeHuman for Blender, CC0
+assets in assets/mpfb), in her colours (scripts/figure/textures.py) — her dusty-pink fleece hoodie
+with its hood down on her back, charcoal trousers, her dark hair drawn back into a low bun with loose
+hairs over it, her sunglasses pushed up on her head — seated on a round stool close to her canvas,
+leaning in, her elbow down and her forearm rising, the brush held as a pen is held and rising to
+the canvas, her left hand in her lap.
 
     blender -b -P scripts/figure/model.py -- <out dir> [--touch=x,y,z]
 
-Her own frame: she sits on a chair whose seat centre is at the origin's floor point, facing -y
+Her own frame: she sits on a stool whose seat centre is at the origin's floor point, facing -y
 (the canvas is in front of her, at -y). `--touch` is where the brush meets the canvas, in this
-frame (scripts/house/build.py places the chair so that it is so). Writes <out>/dolly-3d.blend with
+frame (scripts/house/build.py places the stool so that it is so). Writes <out>/dolly-3d.blend with
 the posed meshes, every one named Figure_dolly*, the rig applied and gone.
 """
 import math
@@ -28,11 +31,11 @@ from bl_ext.user_default.mpfb.services.targetservice import TargetService
 argv = sys.argv[sys.argv.index("--") + 1:]
 OUT = argv[0]
 opt = dict(a.split("=", 1) for a in argv[1:] if "=" in a)
-TOUCH = Vector(tuple(float(v) for v in opt.get("--touch", "-0.12,-0.52,1.257").split(",")))   # (her right is -x)
+TOUCH = Vector(tuple(float(v) for v in opt.get("--touch", "-0.2,-0.44,1.139").split(",")))   # (her right is -x)
 ROOT = os.path.abspath(os.path.join(os.path.dirname(__file__), "..", ".."))
 PACK = os.path.join(ROOT, "assets", "mpfb", "pack")
 TEX = os.path.join(ROOT, "assets", "figure", "tex")
-SEAT = 0.45                                  # the chair's seat
+SEAT = 0.437                                 # her stool's seat (Poly Haven wooden_stool_01)
 os.makedirs(OUT, exist_ok=True)
 
 bpy.ops.wm.read_factory_settings(use_empty=True)
@@ -40,7 +43,7 @@ sc = bpy.context.scene
 
 # ------------------------------------------------------------------ her
 macro = TargetService.get_default_macro_info_dict()
-macro.update({"gender": 0.0, "age": 0.79, "muscle": 0.42, "weight": 0.64, "height": 0.46, "proportions": 0.55,
+macro.update({"gender": 0.0, "age": 0.79, "muscle": 0.42, "weight": 0.55, "height": 0.46, "proportions": 0.55,
               "cupsize": 0.55, "firmness": 0.35})
 macro["race"] = {"asian": 0.55, "african": 0.25, "caucasian": 0.2}
 body = HumanService.create_human(macro_detail_dict=macro, scale=0.1)
@@ -48,7 +51,7 @@ rig = HumanService.add_builtin_rig(body, "default")          # first, so all she
 HumanService.set_character_skin(os.path.join(PACK, "skins/old_asian_female/old_asian_female.mhmat"), body, skin_type="GAMEENGINE")
 worn = {}
 for kind, rel in (("Eyebrows", "eyebrows/eyebrow010/eyebrow010.mhclo"),
-                  ("Clothes", "clothes/female_elegantsuit01/female_elegantsuit01.mhclo"),
+                  ("Clothes", "clothes/female_elegantsuit01/female_elegantsuit01.mhclo"),  # (its blouse, in her fleece: her hoodie)
                   ("Clothes", "clothes/female_casualsuit01/female_casualsuit01.mhclo")):
     worn[rel.split("/")[1]] = HumanService.add_mhclo_asset(os.path.join(PACK, rel), body, asset_type=kind, subdiv_levels=0,
                                                          material_type="GAMEENGINE")
@@ -87,6 +90,7 @@ def keep_part(o, pick):
 
 
 keep_part(worn["female_elegantsuit01"], lambda ps: max(ps, key=len))                     # the blouse, not the skirt
+
 keep_part(worn["female_casualsuit01"], lambda ps: min(ps, key=lambda p: min(v.co.z for v in p)))   # the jeans, not the t-shirt
 
 
@@ -164,19 +168,6 @@ for side, hip in (("L", hipL), ("R", hipR)):
     t = rig.pose.bones[f"foot.{side}"].constraints.new("DAMPED_TRACK")
     t.target = toe
 
-# her right arm to the canvas, the brush in her hand; her left hand in her lap
-shoulderR = W("upperarm01.R")
-reach = TOUCH - shoulderR
-wrist_goal = TOUCH - reach.normalized() * 0.24 + Vector((0, 0, -0.03))
-wR = empty("wrist.R.goal", wrist_goal)
-eR = empty("elbow.R.pole", shoulderR + Vector((-0.35, 0.18, -0.35)))
-ik("lowerarm02.R", wR, eR, 4, pole_angle=-math.pi / 2)
-wL = empty("wrist.L.goal", (hipL.x - 0.02, hipL.y - 0.24, SEAT + 0.2))
-eL = empty("elbow.L.pole", W("upperarm01.L") + Vector((0.4, 0.25, -0.3)))
-ik("lowerarm02.L", wL, eL, 4, pole_angle=-math.pi / 2)
-bpy.context.view_layer.update()
-
-
 def rot_world(name, axis, angle):
     """turn a pose bone about a world axis through its own head, on top of its pose"""
     pb = rig.pose.bones[name]
@@ -187,26 +178,105 @@ def rot_world(name, axis, angle):
     bpy.context.view_layer.update()
 
 
-# a painter's lean toward her canvas, and her head up to the brush's tip
-rot_world("spine03", (1, 0, 0), math.radians(7))          # (about +x, a positive turn brings her forward, to -y)
-rot_world("spine01", (1, 0, 0), math.radians(4))
-head = W("head")
+def P(name, end="head"):
+    """a bone's head (or tail) as posed, in the world"""
+    b = rig.pose.bones[name]
+    return rig.matrix_world @ (b.head if end == "head" else b.tail)
+
+
+# her left hand in her lap
+wL = empty("wrist.L.goal", (hipL.x - 0.02, hipL.y - 0.24, SEAT + 0.2))
+eL = empty("elbow.L.pole", W("upperarm01.L") + Vector((0.4, 0.25, -0.3)))
+ik("lowerarm02.L", wL, eL, 4, pole_angle=-math.pi / 2)
+# her right arm up to the canvas as a painter's is: the elbow down at her side, the forearm rising
+shoulderR = W("upperarm01.R")
+BRUSH_FRONT = 0.12                                           # (the brush beyond her fingertips, to its tip)
+aim = Vector((0.30, -1.0, 0.80)).normalized()                # (the brush's line, as in her photograph: on and up, toward her left)
+wrist_goal = TOUCH - aim * (BRUSH_FRONT + 0.09)
+wR = empty("wrist.R.goal", wrist_goal)
+eR = empty("elbow.R.pole", shoulderR + Vector((-0.15, -0.05, -0.6)))
+ik("lowerarm02.R", wR, eR, 4, pole_angle=-math.pi / 2)
+bpy.context.view_layer.update()
+
+# a painter's lean toward her canvas, her shoulders a little rounded
+rot_world("spine03", (1, 0, 0), math.radians(10))         # (about +x, a positive turn brings her forward, to -y)
+rot_world("spine01", (1, 0, 0), math.radians(5))
+rot_world("neck01", (1, 0, 0), math.radians(6))
+
+
+def curl(sd, f, degs):
+    """a finger bent into the palm joint by joint, about the axis its own length and the palm's facing give"""
+    across = (P(f"finger5-1.{sd}") - P(f"finger2-1.{sd}")).normalized()
+    along = (P(f"finger3-1.{sd}") - P(f"wrist.{sd}")).normalized()
+    palm = along.cross(across).normalized() * (1 if sd == "R" else -1)      # (the way her palm faces)
+    for j, deg in zip((1, 2, 3), degs):
+        y = (P(f"{f}-{j}.{sd}", "tail") - P(f"{f}-{j}.{sd}")).normalized()
+        rot_world(f"{f}-{j}.{sd}", y.cross(palm).normalized(), math.radians(deg))
+
+
+# her right hand holds the brush as a pen is held: index over it, the middle finger under it, the
+# thumb against it, the ring and little fingers folded in
+for f, degs in (("finger2", (28, 38, 22)), ("finger3", (42, 52, 30)), ("finger4", (62, 72, 38)), ("finger5", (68, 74, 38))):
+    curl("R", f, degs)
+# the thumb turned in across her palm to meet the index finger's last joint
+base_, tip_ = P("finger1-1.R"), P("finger1-3.R", "tail")
+goal_ = P("finger2-3.R")
+ax_ = (tip_ - base_).cross(goal_ - base_)
+if ax_.length > 1e-6:
+    rot_world("finger1-1.R", ax_.normalized(), (tip_ - base_).angle(goal_ - base_) * 0.75)
+curl_thumb = ((P("finger2-1.R") - P("wrist.R")).cross(P("finger5-1.R") - P("finger2-1.R"))).normalized()
+for j, deg in ((2, 18), (3, 14)):
+    y = (P(f"finger1-{j}.R", "tail") - P(f"finger1-{j}.R")).normalized()
+    rot_world(f"finger1-{j}.R", y.cross(curl_thumb).normalized(), math.radians(deg))
+for f in ("finger2", "finger3", "finger4", "finger5"):           # (her left hand lies open, a little curled)
+    curl("L", f, (14, 18, 10))
+
+
+def grip():
+    """the brush's line in her hand: from the web between thumb and index, through where they meet"""
+    web = (P("finger2-1.R") + P("finger1-2.R")) / 2
+    pinch = (P("finger1-3.R", "tail") + P("finger2-3.R", "tail")) / 2
+    return web, pinch, (pinch - web).normalized()
+
+
+# her hand turned in the world so the brush lies along that line, and her arm moved until its tip is
+# where she paints (her hand then a little below her eyes, the brush rising from it)
+def hand_to(Rw):
+    """her right hand turned to Rw, in the world (its head stays at her wrist; its scale as it was)"""
+    pb = rig.pose.bones["wrist.R"]
+    loc, _r, scl = (rig.matrix_world @ pb.matrix).decompose()
+    new = Matrix.Translation(loc) @ Rw.to_4x4() @ Matrix.Diagonal((scl.x, scl.y, scl.z, 1.0))
+    pb.matrix = rig.matrix_world.inverted() @ new
+    bpy.context.view_layer.update()
+
+
+web, pinch, d0 = grip()
+R0 = (rig.matrix_world @ rig.pose.bones["wrist.R"].matrix).decompose()[1].to_matrix()
+Rw = d0.rotation_difference(aim).to_matrix() @ R0
+target = TOUCH - aim * BRUSH_FRONT
+for it in range(10):
+    hand_to(Rw)
+    web, pinch, d_ = grip()
+    wR.location = wR.location + (target - pinch)
+    bpy.context.view_layer.update()
+hand_to(Rw)
+web, pinch, d_ = grip()
+BRUSH = (web, pinch, (TOUCH - web).normalized())
+print("grip: the brush's tip misses the canvas point by %.1f mm; its line %.0f deg off the one asked" % (
+    ((pinch + d_ * BRUSH_FRONT) - TOUCH).length * 1000, math.degrees(d_.angle(aim))), flush=True)
+
+# where her neck and back are, as posed (her hood is laid on her back by them, after the pose is set)
+NECK, CHEST, MID = P("neck01"), P("spine01"), P("spine03")
+SH_L, SH_R = P("shoulder01.L"), P("shoulder01.R")
+
+# her head up to the brush's tip
+head = P("head")
 look = (TOUCH - head)
 yaw = math.atan2(-look.x, -look.y)                     # toward her right, where the brush is
 pitch = math.atan2(look.z, math.hypot(look.x, look.y))
 rot_world("neck01", (0, 0, 1), -yaw * 0.35)
 rot_world("head", (0, 0, 1), -yaw * 0.35)
-rot_world("head", (1, 0, 0), -pitch * 0.55)               # (a negative turn about +x lifts her face)
-
-# her right hand closes round the brush; her left lies open in her lap
-for f in ("finger2", "finger3", "finger4", "finger5"):
-    for j, deg in ((1, 38), (2, 55), (3, 40)):
-        pb = rig.pose.bones[f"{f}-{j}.R"]
-        pb.rotation_mode = "XYZ"
-        pb.rotation_euler.x = math.radians(deg)
-        pb = rig.pose.bones[f"{f}-{j}.L"]
-        pb.rotation_mode = "XYZ"
-        pb.rotation_euler.x = math.radians(deg * 0.35)
+rot_world("head", (1, 0, 0), -pitch * 0.45)               # (a negative turn about +x lifts her face)
 bpy.context.view_layer.update()
 
 # ------------------------------------------------------------------ her head, as posed
@@ -363,10 +433,13 @@ while todo:
                 far[w] = dd
                 nxt.append(w)
     todo = nxt
-# thick as drawn-back hair is: a few millimetres at her hairline, a finger's width over her crown
+# as full as her hair is, drawn back: a few millimetres at her hairline, over her crown and at her
+# sides a good deal more, a soft unevenness in it (it is wavy, and not pulled tight)
 for v in bm.verts:
-    k = min(1.0, far[v] / 0.02)
-    v.co = v.co + v.normal * (0.0016 + 0.0068 * k * k * (3 - 2 * k))
+    k = min(1.0, far[v] / 0.025)
+    q = v.co - C
+    wave = 1 + 0.18 * math.sin(q.x * 61 + q.z * 23) * math.sin(q.y * 47 - q.z * 31)
+    v.co = v.co + v.normal * (0.0018 + 0.0125 * k * k * (3 - 2 * k) * wave)
 # (what came with her skin goes: its UVs, its weights)
 for lay in list(bm.loops.layers.uv.values()):
     bm.loops.layers.uv.remove(lay)
@@ -401,6 +474,11 @@ bpy.ops.object.select_all(action="DESELECT")
 hair.select_set(True)
 bpy.context.view_layer.objects.active = hair
 bpy.ops.mesh.customdata_custom_splitnormals_clear()               # (her skin's own normals came with it)
+# the loose hairs over it: a second layer a little above, mostly air, strands along the same flow
+frizz = bpy.data.objects.new("Figure_dollyFrizz", me.copy())
+sc.collection.objects.link(frizz)
+for v in frizz.data.vertices:
+    v.co = v.co + v.normal * 0.006
 print("skull: centre", tuple(round(c, 3) for c in C), "radius %.3f;" % R, "scalp", len(scalp), "points; hair", len(me.polygons), "faces", flush=True)
 
 # her scalp under her hair darkened on her skin, softly: a hairline, not an edge
@@ -529,6 +607,8 @@ def material(name, rgb=None, rough=0.5, metal=0.0, image=None):
         t = m.node_tree.nodes.new("ShaderNodeTexImage")
         t.image = bpy.data.images.load(os.path.join(TEX, image), check_existing=True)
         m.node_tree.links.new(t.outputs["Color"], b.inputs["Base Color"])
+        if t.image.depth == 32 and "frizz" in image:                  # (an image with holes in it: its alpha too)
+            m.node_tree.links.new(t.outputs["Alpha"], b.inputs["Alpha"])
     else:
         b.inputs["Base Color"].default_value = (*rgb, 1)
     b.inputs["Roughness"].default_value = rough
@@ -543,7 +623,7 @@ ax = (BUN + N_b).normalized()
 e1 = (up - ax * up.dot(ax)).normalized()
 e2 = ax.cross(e1)
 base = P_b - ax * 0.011
-RB, HB, PITCH, GROOVE = 0.036, 0.031, 0.0105, 0.0016
+RB, HB, PITCH, GROOVE = 0.041, 0.035, 0.0115, 0.0016
 NR, NP = 22, 120
 
 
@@ -592,8 +672,9 @@ bm.normal_update()
 me = bpy.data.meshes.new("Figure_dollyBun")
 bm.to_mesh(me)
 bm.free()
-mat_hair = material("figure:hair", rough=0.55, image="hair.png")
+mat_hair = material("figure:hair", rough=0.68, image="hair.png")
 hair.data.materials.append(mat_hair)
+frizz.data.materials.append(material("figure:frizz", rough=0.6, image="frizz.png"))
 me.materials.append(mat_hair)
 for poly in me.polygons:
     poly.use_smooth = True
@@ -665,12 +746,103 @@ glasses.name = "Figure_dollyGlasses"
 print("bun at", tuple(round(c, 3) for c in base), "%.0f deg below her head's level;" % math.degrees(math.asin(-ax.dot(up))),
       "glasses at", tuple(round(c, 3) for c in P0), flush=True)
 
-# ------------------------------------------------------------------ the brush: from her palm to the canvas
-vs = [body.matrix_world @ v.co for v in body.data.vertices]
-# her right hand: the vertices nearest the wrist goal and beyond it toward the canvas
-d = (TOUCH - wrist_goal).normalized()
-hand = [v for v in vs if (v - wrist_goal).length < 0.14 and (v - wrist_goal).dot(d) > 0.0]
-palm = sum(hand, Vector()) / max(1, len(hand)) if hand else wrist_goal + d * 0.07
+# ------------------------------------------------------------------ her hood, down on her back
+# her fleece hoodie's hood, lying down: a U of doubled fleece from the back of her neckline down her
+# shoulder blades, bunched thickest where it folds at her neck, a seam down its middle, its edge a
+# lip of cloth on her back. Laid over the sweatshirt by rays, in her back's own frame.
+side_b = (SH_L - SH_R).normalized()
+down_b = (MID - NECK).normalized()
+back_b = side_b.cross(down_b).normalized()                       # (out of her back)
+side_b = down_b.cross(back_b).normalized()
+cloth_t = BVHTree.FromPolygons(*world_mesh([top_o]))
+skin_t = BVHTree.FromPolygons(*world_mesh([top_o, body]))
+bm_ = bmesh.new()
+bm_.from_mesh(top_o.data)
+bm_.transform(top_o.matrix_world)
+neckline = [v.co.copy() for v in bm_.verts if v.is_boundary and (v.co - NECK).length < 0.14]
+bm_.free()
+nc = sum(neckline, Vector()) / len(neckline)
+O = max(neckline, key=lambda q: (q - nc).dot(back_b))            # the back of her neckline
+DH, HW = 0.25, 0.155
+
+
+def hood_w(v):
+    """its half-width down her back (v: 0 at her neckline, 1 at its point; above 0, round her neck)"""
+    if v < 0.05:
+        return HW * (0.62 + 0.38 * min(1.0, max(0.0, (v + 0.14) / 0.19)))
+    return HW * max(0.0, 1 - ((v - 0.05) / 0.95) ** 2.4) ** 0.5
+
+
+def hood_t(u, v):
+    """how far it stands off her back: a roll at her neck, flatter as it goes down, its middle seam"""
+    sm = min(1.0, max(0.0, (v - 0.12) / 0.78))
+    T = 0.013 + 0.03 * (1 - sm * sm * (3 - 2 * sm))
+    seam = 0.0035 * math.exp(-((u * hood_w(v)) / 0.011) ** 2)
+    return T * max(0.0, 1 - u * u) ** 0.5 + 0.009 - seam
+
+
+NU, NV = 24, 22
+VS = [-0.14 + (1.0 + 0.14) * k / NV for k in range(NV + 1)]
+bmh = bmesh.new()
+uvh = bmh.loops.layers.uv.new("UVMap")
+lmh = bmh.loops.layers.uv.new("LM")
+top_, low_, sd_ = [], [], []
+for v in VS:
+    row_t, row_l, row_s = [], [], []
+    w_ = max(hood_w(v), 0.004)
+    for i in range(NU + 1):
+        u = -1 + 2 * i / NU
+        sx, dd = u * w_, v * DH
+        q = O + side_b * sx + down_b * dd
+        hit = (cloth_t if v >= 0 else skin_t).ray_cast(q + back_b * 0.3, -back_b, 0.6)
+        if hit[0] is None:
+            hit = skin_t.ray_cast(q + back_b * 0.3, -back_b, 0.6)
+        b_ = hit[0] if hit[0] is not None else q
+        nrm = hit[1] if hit[1] is not None else back_b
+        if nrm.dot(back_b) < 0:
+            nrm = -nrm
+        n_ = (nrm + back_b).normalized()
+        row_t.append(bmh.verts.new(b_ + n_ * hood_t(u, v)))
+        row_l.append(bmh.verts.new(b_ + n_ * 0.0012))
+        row_s.append((sx, dd))
+    top_.append(row_t); low_.append(row_l); sd_.append(row_s)
+
+
+def face4(vs4, sd4):
+    f = bmh.faces.new(vs4)
+    for lp, (a_, b2) in zip(f.loops, sd4):
+        lp[uvh].uv = (a_ / 0.08, b2 / 0.08)
+        lp[lmh].uv = (a_, b2)
+    return f
+
+
+for k in range(NV):
+    for i in range(NU):
+        face4((top_[k][i], top_[k][i + 1], top_[k + 1][i + 1], top_[k + 1][i]),
+              (sd_[k][i], sd_[k][i + 1], sd_[k + 1][i + 1], sd_[k + 1][i]))
+# its edge: a wall of cloth down to her back, all round
+ring = [(0, i) for i in range(NU + 1)] + [(k, NU) for k in range(1, NV + 1)] + \
+       [(NV, i) for i in range(NU - 1, -1, -1)] + [(k, 0) for k in range(NV - 1, 0, -1)]
+for (k0, i0), (k1, i1) in zip(ring, ring[1:] + ring[:1]):
+    a0, a1 = sd_[k0][i0], sd_[k1][i1]
+    face4((top_[k0][i0], low_[k0][i0], low_[k1][i1], top_[k1][i1]), (a0, (a0[0], a0[1] + 0.01), (a1[0], a1[1] + 0.01), a1))
+bmesh.ops.remove_doubles(bmh, verts=bmh.verts[:], dist=1e-5)
+for _ in range(2):
+    bmesh.ops.smooth_vert(bmh, verts=[v for v in bmh.verts if not v.is_boundary], factor=0.4,
+                          use_axis_x=True, use_axis_y=True, use_axis_z=True)
+bmh.normal_update()
+meh = bpy.data.meshes.new("Figure_dollyHood")
+bmh.to_mesh(meh)
+bmh.free()
+for poly in meh.polygons:
+    poly.use_smooth = True
+hood = bpy.data.objects.new("Figure_dollyHood", meh)
+sc.collection.objects.link(hood)
+meh.materials.append(material("figure:hood", rough=0.95, image="fleece.png"))
+print("hood: from", tuple(round(c, 3) for c in O), "down", tuple(round(c, 2) for c in down_b), flush=True)
+
+# ------------------------------------------------------------------ the brush: in her grip, to the canvas
+web, pinch, d = BRUSH
 mat_wood = bpy.data.materials.new("figure:brushWood")
 mat_wood.use_nodes = True
 mat_wood.node_tree.nodes["Principled BSDF"].inputs["Base Color"].default_value = (0.42, 0.2, 0.07, 1)
@@ -695,7 +867,7 @@ def rod(p0, p1, r0, r1, mat):
     return o
 
 
-start = palm - d * 0.06
+start = web - d * 0.075                                       # (its end, past the web of her hand)
 tip = TOUCH
 L = (tip - start).length
 b_parts = [rod(start, start + d * (L - 0.035), 0.0042, 0.0034, mat_wood),
@@ -730,7 +902,7 @@ def alpha_mode(o, clip):
 
 for o in sc.objects:
     if o.type == "MESH":
-        alpha_mode(o, clip=o is worn["eyebrow010"])
+        alpha_mode(o, clip=o in (worn["eyebrow010"], frizz))
 
 # ------------------------------------------------------------------ names, and out
 names = {body.name: "Figure_dollyBody", worn["eyebrow010"].name: "Figure_dollyBrows",
@@ -781,7 +953,7 @@ for o in sc.objects:
         o.data.calc_loop_triangles()
         tris += len(o.data.loop_triangles)
         print("part", o.name, len(o.data.loop_triangles), "tris", flush=True)
-print("total", tris, "tris; brush tip", tuple(round(c, 3) for c in tip), "palm", tuple(round(c, 3) for c in palm), flush=True)
+print("total", tris, "tris; brush tip", tuple(round(c, 3) for c in tip), "in her grip at", tuple(round(c, 3) for c in pinch), flush=True)
 # self-contained: every part's place folded into its vertices (an appended object's world matrix is
 # not there until the scene is evaluated, its own transform is), every image in the file at the size
 # the web is given (the copy in assets/figure must not lean on paths beside the one it was made in)

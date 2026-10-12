@@ -9,7 +9,8 @@ canvas she is working on, and her, for the corner of the courtyard where she pai
 Out:
   public/art/room/in-progress.jpg   the canvas, squared up: her pencil grid shows the squares are
                                     near enough square to straighten it along its top and left edges;
-                                    where she, her brush and a phone clamp hide it, bare primed canvas
+                                    where she, her brush and a phone clamp hide it, bare primed canvas;
+                                    her upside-down underdrawing on its left taken off (unsketch)
   assets/figure/dolly.png           her, lifted out, with the brush redrawn along the line she holds it
                                     (a reference: she is modelled in 3D by model.py, not shown from it)
   assets/figure/dolly.json          where things are in it: the brush tip, the cut at the bottom,
@@ -58,6 +59,32 @@ local = cv2.GaussianBlur(bal * keep[..., None], (0, 0), 45) / np.maximum(cv2.Gau
 patch = bal[40:110, 760:960]
 grain = cv2.resize(patch - patch.reshape(-1, 3).mean(0), (CW, CH), interpolation=cv2.INTER_LINEAR) * 0.55
 canvas = np.clip(bal * (1 - m[..., None]) + (local + grain) * m[..., None], 0, 255).astype(np.uint8)
+
+
+def unsketch(img, dense_too):
+    """her ochre underdrawing of an upside-down figure, on the canvas's left (a figure turned over so
+    she draws its shapes, not what it is), taken off down to the bare ground: a stroke is warmer, more
+    saturated and darker than the ground around it; her grey pencil grid is not, and stays"""
+    hsv_ = cv2.cvtColor(img, cv2.COLOR_BGR2HSV)
+    S_, V_, H_ = hsv_[:, :, 1].astype(np.int16), hsv_[:, :, 2].astype(np.int16), hsv_[:, :, 0]
+    bgV = cv2.medianBlur(hsv_[:, :, 2], 41).astype(np.int16)
+    bgS = cv2.medianBlur(hsv_[:, :, 1], 41).astype(np.int16)
+    warm = (H_ >= 5) & (H_ <= 34)
+    yy, xx = np.mgrid[0:img.shape[0], 0:img.shape[1]]
+    # (the left of the canvas, clear of the woman she has painted, her hands and her hair)
+    region = (xx < 343) | ((xx < 448) & (yy < 292)) | ((xx < 500) & (yy < 185))
+    if dense_too:
+        line = warm & ((((S_ - bgS) > 14) & ((bgV - V_) > 8)) | ((S_ - bgS) > 26))
+        face = ((xx - 190) / 105.0) ** 2 + ((yy - 610) / 140.0) ** 2 < 1      # its face: oval, eyes, nose, mouth
+        hands = (xx > 300) & (xx < 505) & (yy < 150)                           # its hands, along the top
+        line |= (face | hands) & warm & (((S_ - bgS) > 6) | ((bgV - V_) > 6))
+    else:
+        line = warm & ((S_ - bgS) > 8) & ((bgV - V_) > 4)                      # what is left of it, fainter
+    mask_ = cv2.dilate((line & region).astype(np.uint8), np.ones((5, 5), np.uint8))
+    return cv2.inpaint(img, mask_, 5, cv2.INPAINT_TELEA)
+
+
+canvas = unsketch(unsketch(canvas, True), False)
 cv2.imwrite(os.path.join(ROOT, "public", "art", "room", "in-progress.jpg"), canvas, [cv2.IMWRITE_JPEG_QUALITY, 88])
 
 # ---------------------------------------------------------------- her

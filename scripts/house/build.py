@@ -1346,23 +1346,6 @@ def easel_painting(art_id, path, cw, ch, M, depth=0.03):
     return o
 
 
-def teak_chair(name, loc, rot):
-    """her chair: a plain teak chair, a solid back to it; built facing -y (its back at +y)"""
-    tk, tr = role_mat("teak"), role_mat("teakRail")
-    sw, sd, sh = 0.44, 0.42, 0.45
-    parts = [box(f"{name}_seat", -sw / 2, sw / 2, -sd / 2, sd / 2, sh - 0.035, sh, tr, bevel=0.008, segs=3)]
-    for x in (-sw / 2 + 0.03, sw / 2 - 0.03):
-        parts.append(box(f"{name}_legF", x - 0.022, x + 0.022, -sd / 2 + 0.01, -sd / 2 + 0.054, 0, sh - 0.035, tk, bevel=0.004))
-        # the back legs rise into the stiles of the back
-        parts.append(box(f"{name}_stile", x - 0.022, x + 0.022, sd / 2 - 0.054, sd / 2 - 0.01, 0, 0.9, tk, bevel=0.005))
-    parts.append(box(f"{name}_back", -sw / 2 + 0.03, sw / 2 - 0.03, sd / 2 - 0.045, sd / 2 - 0.02, 0.56, 0.86, tr, bevel=0.008, segs=3))
-    parts.append(box(f"{name}_rung", -sw / 2 + 0.03, sw / 2 - 0.03, -0.02, 0.02, 0.14, 0.17, tk, bevel=0.004))
-    o = join(f"Deco_{name}", apply_mods(parts))
-    o.location = Vector(loc)
-    o.rotation_euler = (0, 0, rot)
-    return o
-
-
 def palette(name, loc, rot):
     """her palette: a teak kidney with a thumb hole, the paint fresh on it in the colours of her
     canvases, a little of it mixed across the middle"""
@@ -1465,14 +1448,15 @@ def paint_tube(name, loc, rot, hx):
 # (they look north from x 3.6) and of the turn to the arch; in the establishing shot it stands to
 # the left of her painting. On the easel, the canvas she is working on now, from her photograph
 # (scripts/figure/make.py); in front of it, she, painting it: in 3D (scripts/figure/model.py),
-# seated on her chair, her brush on the canvas where it was in the photograph
+# seated on her stool, her brush on the canvas where it was in the photograph
 FIGMETA = json.load(open(os.path.join(ROOT, "assets", "figure", "dolly.json")))
 EASEL = dict(x=1.95, y=4.75, face=50.0, cw=1.28)
 EASEL["ch"] = EASEL["cw"] / FIGMETA["canvas"]["aspect"]
-LEDGE = 0.86                                     # the tray: the brush's touch then at 1.257 m, her raised hand's height
-# where she sits, from where her brush touches the canvas: 0.12 m to its left, 0.52 m out from it
-# (the same numbers as model.py's --touch, in her own frame)
-HER_TOUCH = (0.12, 0.52)
+LEDGE = 0.74                                     # the tray: the brush's touch then at 1.139 m, at her eyes as she sits
+# where she sits, from where her brush touches the canvas: 0.2 m to its left, 0.44 m out from it
+# (close, as she sits to paint, her elbow down, her hand out to her right of her head; the same
+# numbers as model.py's --touch, in her own frame)
+HER_TOUCH = (0.2, 0.44)
 
 
 def her_corner(ledge):
@@ -1496,7 +1480,8 @@ INFO["anchors"]["easel"] = list(C_centre)
 _chair = Vector((P_touch.x, P_touch.y, 0)) - rt_e * HER_TOUCH[0] + n_e * HER_TOUCH[1]
 _chair.z = 0
 _rot = math.radians(EASEL["face"]) + math.pi
-teak_chair("dollyChair", _chair, _rot)
+# her stool: the round wooden one, its seat 0.437 m (model.py's SEAT)
+import_ph("wooden_stool_01", tuple(_chair), _rot, 1.0, prop=False)
 with bpy.data.libraries.load(os.path.join(ROOT, "assets", "figure", "dolly-3d.blend"), link=False) as (src, dst):
     dst.objects = [n for n in src.objects if n.startswith("Figure_")]
 _her = Matrix.Translation(_chair) @ Matrix.Rotation(_rot, 4, "Z")
@@ -1511,12 +1496,12 @@ INFO["anchors"]["dolly"] = list((_lo + _hi) / 2)
 INFO["figure"] = {"size": [max(_hi.x - _lo.x, _hi.y - _lo.y), _hi.z - _lo.z]}
 T_tip = P_touch
 # the side table, at her right hand: a stool, her palette on it with the brushes and three tubes
-_stool = tuple(_chair + rt_e * 0.6 + n_e * 0.1)[:2]
-import_ph("wooden_stool_01", (*_stool, 0), 0.4, 1.0, prop=False)
-palette("palette", (_stool[0] + 0.02, _stool[1] - 0.06, 0.442), math.radians(30))
-brush_tumbler("brushes", (_stool[0] - 0.12, _stool[1] + 0.12, 0.437))
+_stool = tuple(_chair + rt_e * 0.78 - n_e * 0.02)[:2]          # (beside the easel, out of the painting's way)
+import_ph("painted_wooden_stool", (*_stool, 0), 0.4, 1.0, prop=False)            # (its top at 0.579 m)
+palette("palette", (_stool[0] + 0.02, _stool[1] - 0.06, 0.584), math.radians(30))
+brush_tumbler("brushes", (_stool[0] - 0.1, _stool[1] + 0.1, 0.579))
 for k, (dx, dy, rot, hx) in enumerate(((0.11, 0.16, 0.5, 0xBB2B17), (0.15, 0.1, 0.8, 0x2F6A6E), (-0.15, -0.14, 2.3, 0xE8B82A))):
-    paint_tube(f"tube{k}", (_stool[0] + dx, _stool[1] + dy, 0.437 + 0.0085), rot, hx)
+    paint_tube(f"tube{k}", (_stool[0] + dx * 0.85, _stool[1] + dy * 0.85, 0.579 + 0.0085), rot, hx)
 print("her corner: tray %.2f, brush touch at %s, chair %s, her %s..%s, camera %s" % (
     LEDGE, tuple(round(c, 2) for c in P_touch), tuple(round(c, 2) for c in _chair),
     tuple(round(c, 2) for c in _lo), tuple(round(c, 2) for c in _hi), tuple(round(c, 2) for c in C_easel)), flush=True)
