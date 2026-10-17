@@ -34,10 +34,8 @@ export default function RootLayout({ children }: { children: React.ReactNode }) 
   return (
     <html lang="en" data-mode="light">
       <head>
-        {WELCOME_FONTS.map((href) => <link key={href} rel="preload" as="font" type="font/woff2" href={href} crossOrigin="anonymous" />)}
-        <link rel="preload" as="image" href="/art/large/woman-with-poppies.jpg" />
-        <link rel="preload" as="fetch" href="/house/house.json" crossOrigin="anonymous" />
-        <link rel="preload" as="fetch" href="/house/house.glb" crossOrigin="anonymous" fetchPriority="low" />
+        {WELCOME_FONTS.filter((href) => href.includes("instrument-sans") || href.includes("ibm-plex-mono"))
+          .map((href) => <link key={href} rel="preload" as="font" type="font/woff2" href={href} crossOrigin="anonymous" />)}
       </head>
       <body>{children}</body>
     </html>

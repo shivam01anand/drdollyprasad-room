@@ -3,6 +3,7 @@ import path from "node:path";
 import Studio from "@/components/Studio";
 import Works, { Contact } from "@/components/Works";
 import { EMAIL, INSTAGRAM, SITE } from "@/lib/works";
+import WELCOME_FONTS from "@/lib/welcome-fonts.json";
 
 type Dims = Record<string, { w: number; h: number }>;
 
@@ -30,6 +31,11 @@ export default function Page() {
   const dims = readDims();
   return (
     <>
+      {WELCOME_FONTS.filter((href) => href.includes("cormorant") || href.includes("devanagari"))
+        .map((href) => <link key={href} rel="preload" as="font" type="font/woff2" href={href} crossOrigin="anonymous" />)}
+      <link rel="preload" as="image" href="/art/large/woman-with-poppies.jpg" />
+      <link rel="preload" as="fetch" href="/house/house.json" crossOrigin="anonymous" />
+      <link rel="preload" as="fetch" href="/house/house.glb" crossOrigin="anonymous" fetchPriority="low" />
       <Studio dims={dims} />
       <Works dims={dims} />
       <Contact />
