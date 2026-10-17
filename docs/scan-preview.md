@@ -1,44 +1,54 @@
-# Artist scan preview
+# Artist in her studio
 
-The normal studio uses the modelled figure in `public/house/house.glb`. The
-Gaussian-splat integration is preserved as an experiment and disabled by default.
-It does not establish that the supplied scans are suitable for the site.
+Her isolated take 124 is the normal studio figure. `lib/room/dolly.ts` loads it
+after the welcome and places it beside the easel. The approximate MPFB figure and
+its small round stool disappear only after the scan has loaded successfully.
+A failed download retains the fallback model and stool.
 
-The two older Scaniverse takes supplied on 13 October show a cross-legged pose on a bed,
-in a floral jacket. The face and painting hand are motion-softened, and the lap is
-incomplete where the bedding obscured it. On 14 October, review rejected these
-takes: the figure looked ghost-like in the studio and did not match the easel pose.
-Replacing the existing figure with this asset should not be enabled for a release.
+The 11–14 October Claude discussion asked for a real likeness in the house,
+correct scale, day/night light and removal of the mannequin. The older takes
+121/122 were rejected for smeared face/hands and a pose mismatch. Take 124 has the
+clearer face and more coherent hands. Its bed and room are now removed from the
+actual 3D data. The website loads `public/art/figure/dolly-124.splat`
+(268,201 Gaussians; 8,582,432 bytes), not the rejected take 122 draft.
 
-## Preserved implementation
+## Placement and runtime
 
-- `scripts/figure/splat.py` crops take 122 into an SH-0 `.splat`: 96,761 splats,
-  3,096,352 bytes. The raw PLY files stay local in ignored `assets/figure/scan/`.
-- `scripts/figure/splat_review.py` makes local CPU previews with NumPy and Pillow.
-- `lib/room/dolly.ts` loads the scan after the welcome, uses a CPU sorting worker
-  without shared memory, and shares the room's depth and day/night lighting.
-- Sorting completion requests a frame from the room's render-on-demand loop.
-- The modelled figure stays visible until the optional scan loads successfully.
-  A load failure retains the model. The scan hides in plan/rearrange views and
-  disposes its renderer when the room is destroyed.
+`lib/room/dolly-placement.json` is shared by the web placement and local bake tools.
+Her source coordinates are preserved, with -Y up, then rotated and scaled 1.15×
+into the house. The seat reference is [1.93, .46, -4.12] in three.js coordinates.
+The 74° yaw presents her face to the existing chapter camera. A broad, low wooden
+seat with a linen cushion supports the captured pose; no painting hand or feet
+are generated. Her body bounds are [1.574, .409, -4.468] to [2.294, 1.361, -3.759].
 
-To examine the experiment locally:
+The renderer uses a CPU sort worker without shared memory. Sorting completion
+wakes the room's demand renderer, and a world-space copy of the rig camera keeps
+the sort correct during turns. It shares the room's depth buffer and day/night
+colour. Her scan and new seat hide in plan/rearrange views and dispose with the
+room. `NEXT_PUBLIC_DOLLY_SCAN=false` is a build-time fallback switch; leave it
+unset for the normal experience.
+
+The local corner bake uses the published GLB's exact UVs, source house lights,
+and a shadow-only hull of the scan. The mannequin and its old stool do not cast
+shadows into that bake. The hull is never exported as her visible body. The
+covered floor/wall/canvas texels are rebaked for day and night; other rooms retain
+their existing light. Reproduce with:
 
 ```sh
-NEXT_PUBLIC_DOLLY_SCAN=true npm run dev -- -p 3841
+blender -b scripts/house/work/v17/house.blend \
+  -P scripts/figure/rebake_scan_corner.py -- \
+  --scan "$HOME/Desktop/DrDollyPrasad_Isolated_Sector124.ply" \
+  --out review/scan-corner --samples 96
+blender -b -P scripts/bake/denoise.py -- review/scan-corner lm-day
+blender -b -P scripts/bake/denoise.py -- review/scan-corner lm-night
+python3 scripts/figure/publish_corner_light.py review/scan-corner
 ```
 
-The environment variable is a build-time option. Leave it unset for normal builds.
-The repository includes cropped drafts, not the original scans, review
-recordings, credentials, dependencies, or bake intermediates.
+A local CPU perspective composition (`review_placement.py`) checks scale and
+seating against the chapter's Blender camera. It does not replace browser QA.
+Raw scans, review files and bake intermediates stay local and ignored.
 
-## New take 124: isolated person
-
-On 18 October, takes 123 and 124 were compared from matching camera angles. Take
-124 has the clearer face and more coherent hands. Its bed and room have now been
-removed from the actual 3D data. The new asset is
-`public/art/figure/dolly-124.splat` (268,201 Gaussians; 8,582,432 bytes).
-It is separate from the older room experiment and has not replaced that asset.
+## Isolating take 124
 
 Two reviewed frontal person silhouettes select the original Gaussians in 3D.
 An opacity/scale filter, a local red-bedding exclusion below the waist, and the
@@ -76,16 +86,4 @@ The preview was checked in Chrome with rotation and reset, with no console error
 
 The seated pose, face, hands and clothing come from the scan. Lower clothing edges
 and the underside of the legs remain soft/incomplete in the source, and no missing
-feet or body detail has been invented. Placement in the studio still needs a
-separate review; the production website and its modelled figure are unchanged.
-
-## Next step
-
-A replacement scan needs a still painting pose, bright even light, visible feet
-and legs, and clear face/hand detail. Crop and inspect it before changing placement.
-Then check desktop and phone views, day/night colour, house occlusion, camera turns,
-sorting, missing-asset fallback, and plan/rearrange transitions. A final release
-also needs a new house bake without the old model's baked shadow.
-
-GitHub publication preserves the development work. It does not deploy these
-unreleased changes to drdollyprasad.com.
+feet or body detail has been invented. Her studio is arranged around that pose.

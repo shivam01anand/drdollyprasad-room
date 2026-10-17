@@ -339,14 +339,17 @@ export class Room {
       if (this.disposed) { dolly.dispose(); return; }
       this.world.add(dolly.object);
       this.parts.figures.forEach(figure => { figure.visible = false; });
-      this.info.anchors.dolly = [1.77, .78, -4.26];
+      this.parts.figureSeats.forEach(seat => { seat.visible = false; });
+      this.info.anchors.dolly = dolly.anchor.toArray();
       this.ao?.refreshExclusions();
+      this.renderer!.shadowMap.needsUpdate = true;
       this.invalidate();
     } catch {
       this.dolly?.dispose();
       this.dolly = undefined;
       this.parts.figures.forEach(figure => { figure.visible = true; });
-      // A failed experimental scan leaves the existing figure in place.
+      this.parts.figureSeats.forEach(seat => { seat.visible = true; });
+      // A failed scan leaves the existing figure and its stool in place.
     }
   }
 
@@ -830,9 +833,8 @@ export class Room {
     }
     this.rig.playIntro(startPose(this.info, this.narrow), () => {
       this.opts.onIntroFinished();
-      // The supplied scans were rejected during review. Keep the renderer ready
-      // for a replacement scan without changing the normal studio experience.
-      if (process.env.NEXT_PUBLIC_DOLLY_SCAN === "true") void this.lateFigure();
+      // Load her isolated scan after the welcome, keeping the model as a fallback.
+      if (process.env.NEXT_PUBLIC_DOLLY_SCAN !== "false") void this.lateFigure();
     }, reduce ? 0 : 1.15);
   }
 

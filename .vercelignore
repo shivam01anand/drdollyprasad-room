@@ -2,6 +2,7 @@
 .next
 .next-*
 node_modules
+__pycache__
 review
 tsconfig.tsbuildinfo
 run-variants.sh

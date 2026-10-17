@@ -1,0 +1,8 @@
+{
+  "scale": 1.15,
+  "yaw_degrees": 74,
+  "source_seat": [0, 0.54, -0.15],
+  "studio_seat": [1.93, 0.46, -4.12],
+  "seat_width": 0.86,
+  "seat_depth": 0.72
+}
