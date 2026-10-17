@@ -1,0 +1,51 @@
+<!doctype html>
+<html lang="en">
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<title>Dr Dolly Prasad — isolated 3D scan</title>
+<style>
+  * { box-sizing: border-box }
+  body { margin: 0; background: #242522; color: #f3efe6; font: 15px/1.5 system-ui, sans-serif }
+  #viewer { position: absolute; inset: 0 }
+  header { position: absolute; z-index: 2; top: 24px; left: 28px; pointer-events: none }
+  h1 { margin: 0 0 5px; font-size: 22px; font-weight: 500 }
+  p { margin: 0; color: #c3c2b9 }
+  footer { position: absolute; z-index: 2; bottom: 24px; left: 28px; display: flex; gap: 12px }
+  button, a { color: inherit; background: #ffffff12; border: 1px solid #ffffff38; border-radius: 8px; padding: 9px 15px; text-decoration: none; font: inherit; cursor: pointer }
+  button:hover, a:hover { background: #ffffff24 }
+  #status { position: absolute; bottom: 80px; left: 28px; z-index: 2 }
+</style>
+<div id="viewer"></div>
+<header><h1>Dr Dolly Prasad</h1><p>Isolated 3D scan · Drag to rotate · Scroll to zoom</p></header>
+<p id="status" role="status">Loading the cleaned scan…</p>
+<footer><button id="reset">Reset view</button><a href="/dolly.ply" download="DrDollyPrasad_Isolated_Sector124.ply">Download clean PLY</a></footer>
+<script type="importmap">{"imports":{"three":"/vendor/three.module.js"}}</script>
+<script type="module">
+  import * as THREE from 'three';
+  import { Viewer, SceneRevealMode } from '/vendor/gaussian-splats-3d.module.js';
+  const scene = new THREE.Scene();
+  scene.background = new THREE.Color('#242522');
+  const start = [-.9, -.24, -1.65];
+  const target = [0, .15, -.1];
+  const viewer = new Viewer({
+    rootElement: document.getElementById('viewer'),
+    cameraUp: [0, -1, 0],
+    initialCameraPosition: start,
+    initialCameraLookAt: target,
+    threeScene: scene,
+    gpuAcceleratedSort: false,
+    sharedMemoryForWorkers: false,
+    integerBasedSort: false,
+    sphericalHarmonicsDegree: 0,
+    sceneRevealMode: SceneRevealMode.Instant,
+  });
+  document.getElementById('reset').addEventListener('click', () => {
+    viewer.camera.position.fromArray(start);
+    viewer.controls.target.fromArray(target);
+    viewer.controls.update();
+  });
+  viewer.addSplatScene('/dolly.splat', { splatAlphaRemovalThreshold: 45, showLoadingUI: true })
+    .then(() => { viewer.start(); document.getElementById('status').hidden = true; })
+    .catch(error => { document.getElementById('status').textContent = 'Could not load the scan. Check the local server.'; console.error(error); });
+</script>
+</html>
