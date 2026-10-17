@@ -17,6 +17,7 @@ the posed meshes, every one named Figure_dolly*, the rig applied and gone.
 import math
 import os
 import sys
+import json
 
 import bpy
 import bmesh
@@ -391,6 +392,11 @@ A = np.array([[2 * v.x, 2 * v.y, 2 * v.z, 1.0] for v in sv])
 sol = np.linalg.lstsq(A, np.array([v.length_squared for v in sv]), rcond=None)[0]
 C = Vector(sol[:3])                                               # the middle of her skull: a sphere through her scalp
 R = math.sqrt(sol[3] + C.length_squared)
+with open(os.path.join(OUT, "dolly-pose.json"), "w") as pose_file:
+    json.dump({"head_origin": list(H), "skull_center": list(C), "skull_radius": R,
+               "face": list(face), "up": list(up), "side": list(side),
+               "neck": list(NECK), "brush_contact": list(TOUCH),
+               "brush_grip": list(pinch), "brush_direction": list(d_)}, pose_file, indent=2)
 BUN = (-face * math.cos(math.radians(24)) - up * math.sin(math.radians(24))).normalized()   # (low at the back)
 f1 = (up - BUN * up.dot(BUN)).normalized()
 f2 = BUN.cross(f1)

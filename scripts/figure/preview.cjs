@@ -5,7 +5,7 @@ const path = require('node:path');
 const root = path.resolve(__dirname, '../..');
 const files = new Map([
   ['/', [path.join(__dirname, 'preview.html'), 'text/html; charset=utf-8']],
-  ['/dolly.splat', [path.join(root, 'public/art/figure/dolly-124.splat'), 'application/octet-stream']],
+  ['/dolly.splat', [path.join(root, 'assets/figure/scan/dolly-124.splat'), 'application/octet-stream']],
   ['/vendor/three.module.js', [path.join(root, 'node_modules/three/build/three.module.js'), 'text/javascript']],
   ['/vendor/gaussian-splats-3d.module.js', [path.join(root, 'node_modules/@mkkellogg/gaussian-splats-3d/build/gaussian-splats-3d.module.js'), 'text/javascript']],
 ]);

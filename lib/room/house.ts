@@ -16,8 +16,8 @@ import { worldUV, type Library, type Role } from "./materials";
  *    the room is shaken; foliage is alpha-tested cards.
  *  - Roof_*: the gallery hall's space frame and sunshades, with their own
  *    materials, lifted with the ceilings when the camera rises for the plan.
- *  - Figure_*: the fallback modelled figure. The artist's scan replaces it
- *    only once the scan has loaded successfully.
+ *  - Figure_*: her painting figure, with a scan-derived head fitted to the
+ *    original body, hands and brush pose.
  *
  * The light is baked twice into one atlas layout: the afternoon (lm-day) and
  * the evening with the diya lit (lm-night). A shader patch puts the baked
@@ -142,9 +142,10 @@ export type HouseParts = {
   ceilings: THREE.Mesh[];
   /** the hall's roof structure: decoration that lifts with the ceilings */
   roofs: THREE.Object3D[];
-  /** the modelled figure: retained until her scan is ready */
+  /** her adapted painting figure */
   figures: THREE.Mesh[];
-  figureSeats: THREE.Object3D[];
+  /** Only the generic head/hair hides when the captured head is ready. */
+  figureHeads: THREE.Mesh[];
   /** the canvas fronts, by id */
   art: Map<string, THREE.Mesh>;
   edges: THREE.Mesh[];
@@ -157,14 +158,13 @@ export type HouseParts = {
  * materials. `lib` holds the room's photographed materials by role.
  */
 export function assemble(house: House, lib: Library, baked: BakedLight, edgeMat: THREE.MeshStandardMaterial): HouseParts {
-  const parts: HouseParts = { statics: [], ceilings: [], roofs: [], figures: [], figureSeats: [], art: new Map(), edges: [], props: [], foliage: [] };
+  const parts: HouseParts = { statics: [], ceilings: [], roofs: [], figures: [], figureHeads: [], art: new Map(), edges: [], props: [], foliage: [] };
   const root = house.scene;
   root.updateMatrixWorld(true);
   // the GLB's nodes: what they are is in their names (and their extras)
   const top = [...root.children];
   for (const node of top) {
     const n = node.name;
-    if (n.startsWith("Deco_wooden_stool_01_")) parts.figureSeats.push(node);
     if (n.startsWith("Static_") || n.startsWith("Ceil_")) {
       node.traverse((o) => {
         const m = o as THREE.Mesh;
@@ -209,6 +209,7 @@ export function assemble(house: House, lib: Library, baked: BakedLight, edgeMat:
         m.castShadow = false;
         m.receiveShadow = false;
         parts.figures.push(m);
+        if (node.userData.headFallback) parts.figureHeads.push(m);
       });
     } else if (n.startsWith("Roof_")) {
       // high and thin: the bake already holds its shadow, so it casts none live

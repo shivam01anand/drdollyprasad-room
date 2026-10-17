@@ -24,8 +24,9 @@ it are hers: a gallery inside a Delhi home, built and lit in Blender.
      "Under Canopy of Greens" under two green-enamel studio lamps; then **her, at her easel** in the
      corner by the banana: the canvas she is working on now, from her own photograph
      (`scripts/figure/make.py`: her pencil grid squares it; her upside-down underdrawing on its
-     left taken off), and her actual 3D scan on a low cushioned seat (`scripts/figure`,
-     below), facing the visitor in her captured hands-in-lap pose; her palette, paints and brushes on a painted
+     left taken off), and a painting figure adapted to her facial proportions and
+     captured skin detail (`scripts/figure`, below), looking toward the canvas with
+     the brush in her hand; her palette, paints and brushes on a painted
      stool beside the easel, and her statement-poem with her; then the walk turns to the arch
      — the tall brass lamp of her openings beside it in a ring of marigolds — and goes straight
      through into the Quiet Room without stopping (a chapter's `via`: the rig runs power2.in to
@@ -116,7 +117,7 @@ Designed for the thumb, not shrunk from the desktop:
 |---|---|
 | The house | `scripts/house/build.py` builds it in Blender 5 from code: lime-washed walls with deep reveals and softened edges, an arch, panelled studded teak doors, timber ceilings, CC0 props (Poly Haven, `assets/polyhaven`), modelled charpais, a brass lamp, milk cans and a cart wheel, and leaf-card foliage (bougainvillea, banana, peepal). |
 | Light | `scripts/house/export.py` path-traces the diffuse light twice in Cycles into one lightmap atlas: the afternoon (sun from the west-south-west, sky, gallery lights) and the evening (sky down, gallery lights and lamps up). OpenImageDenoise cleans both. It measures the light on each canvas, and `publish.py` evens it (`lk` per work in `house.json`): a painting under a strong spot is brought down so it is never washed out, one in a dim corner lifted a little. |
-| Her | Her isolated take 124 is the default (`lib/room/dolly.ts`, GaussianSplats3D 0.4.7). It loads after the welcome, uses the house's depth and day/night colour, and replaces the MPFB figure and its stool only after loading succeeds. A low cushioned seat supports her real captured pose. The old model remains a load-failure fallback. See [scan notes](docs/scan-preview.md). |
+| Her | The original painting body, hands, brush and stool remain. Only her head from take 124 is aligned to the painter's neck, looking at the brush contact. Its actual 3D features replace the generic head after loading; the original head is retained as a download-failure fallback. See [figure notes](docs/scan-preview.md). |
 | Into the site | `scripts/house/publish.py` writes `public/house/`: the GLB (textures ≤1024 WebP, Draco), the two lightmaps (and 2k copies for phones) and `house.json` (cameras, canvases, colliders, anchors) in three's coordinates. |
 | Materials | the architecture keeps the photographed PBR sets in `public/tex` (`lib/room/materials.ts`), laid in metres from world position at load; one shader patch (`lib/room/house.ts`) puts the baked light in place of live diffuse (`uBake`) and moves afternoon → evening (`uNight`). Live light remains for the things that move, the brass's glint, and Shake the room. |
 | Rendering | one `gsap.ticker` loop drives Lenis and `Room.renderFrame(now)`. Render-on-demand; shadow maps re-render only while things move; half-res GTAO, MSAA 2, DPR ≤ 1.5 (phones 1.25, no MSAA, no AO). |
@@ -135,20 +136,9 @@ python3 scripts/house/publish.py scripts/house/work/vN/final scripts/house/work/
 The final bake takes about an hour on an M1; run it with `nohup`. Camera-only changes need no
 rebake: rebuild with `--save=0` and copy the cams into `public/house/house.json`.
 
-Her take 124 is cropped locally (NumPy and Pillow):
-
-```sh
-python3 scripts/figure/isolate_scan.py --input "$HOME/Downloads/Sector 124.ply" \
-  --output public/art/figure/dolly-124.splat \
-  --ply-output "$HOME/Desktop/DrDollyPrasad_Isolated_Sector124.ply"
-npm run dev -- -p 3841
-```
-
-The raw scans stay local. Only the isolated artist is served on the website.
-The renderer is enabled by default; `NEXT_PUBLIC_DOLLY_SCAN=false` is a build-time
-fallback switch. The scan is 268,201 Gaussians / 8.58 MB, with her face, clothes,
-hands and original pose preserved. It adds no invented feet or brush grip.
-[Scan notes](docs/scan-preview.md) describe placement, lighting and reproduction.
+The source scans and full seated scan previews stay local. The website serves the
+painting body with only her isolated 3D head, aligned to look at the canvas.
+[Figure notes](docs/scan-preview.md) describe the identity fit and visual checks.
 
 ## Layout
 

@@ -329,7 +329,7 @@ export class Room {
     if (process.env.NODE_ENV !== "production") (window as unknown as { __room?: Room }).__room = this;
   }
 
-  /** she arrives after the welcome, without holding the door open */
+  /** Fit her real head after loading; the painting body and brush stay visible. */
   private async lateFigure() {
     try {
       const { Dolly } = await import("./dolly");
@@ -338,18 +338,14 @@ export class Room {
       await dolly.load();
       if (this.disposed) { dolly.dispose(); return; }
       this.world.add(dolly.object);
-      this.parts.figures.forEach(figure => { figure.visible = false; });
-      this.parts.figureSeats.forEach(seat => { seat.visible = false; });
-      this.info.anchors.dolly = dolly.anchor.toArray();
+      this.parts.figureHeads.forEach(head => { head.visible = false; });
+      dolly.show(true);
       this.ao?.refreshExclusions();
-      this.renderer!.shadowMap.needsUpdate = true;
       this.invalidate();
     } catch {
       this.dolly?.dispose();
       this.dolly = undefined;
-      this.parts.figures.forEach(figure => { figure.visible = true; });
-      this.parts.figureSeats.forEach(seat => { seat.visible = true; });
-      // A failed scan leaves the existing figure and its stool in place.
+      this.parts.figureHeads.forEach(head => { head.visible = true; });
     }
   }
 
@@ -833,8 +829,7 @@ export class Room {
     }
     this.rig.playIntro(startPose(this.info, this.narrow), () => {
       this.opts.onIntroFinished();
-      // Load her isolated scan after the welcome, keeping the model as a fallback.
-      if (process.env.NEXT_PUBLIC_DOLLY_SCAN !== "false") void this.lateFigure();
+      void this.lateFigure();
     }, reduce ? 0 : 1.15);
   }
 
@@ -1206,7 +1201,6 @@ export class Room {
       this.ceiling.visible = ceilingOn;
       this.renderer.shadowMap.needsUpdate = true;   // the roof casts too
     }
-    this.dolly?.show(ceilingOn && !this.rearranged);
     this.composer.render(dt / 1000);
     if (this.lumaAsks.size) {
       const asks = [...this.lumaAsks.values()];
@@ -1307,8 +1301,8 @@ export class Room {
     this.disposed = true;
     this.useMotion(false);
     this.ready = false;
-    this.abort.abort();
     this.dolly?.dispose();
+    this.abort.abort();
     this.modeTl?.kill();
     this.dropTl?.kill();
     this.resetTl?.kill();

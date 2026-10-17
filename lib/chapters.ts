@@ -75,7 +75,7 @@ export const CHAPTERS: Chapter[] = [
     labelSide: "left",
     // her own words for the painting
     quote: "A young boy stands quietly beneath the shelter of large banana leaves. The bananas on his head look like a natural crown from the earth." },
-  // her corner by the banana: her real scan rests beside the easel, her statement beside her
+  // her corner by the banana: she paints at her easel, her statement beside her
   { id: "easel", eyebrow: "Artist’s statement", stop: "At her easel", room: "The courtyard", verse: POEM, view: "easel",
     via: "easelvia", dusk: 0.12,
     // the canvas she is working on, from her own photograph (scripts/figure/make.py)
