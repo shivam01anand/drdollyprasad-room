@@ -8,6 +8,7 @@ import type * as CANNON from "cannon-es";
 
 import { buildLibrary, textureList, type Library } from "./materials";
 import { Rig } from "./rig";
+import type { Dolly } from "./dolly";
 import { loadHouse, assemble, BakedLight, ROOF, type HouseInfo, type HouseParts } from "./house";
 import { paintMaterial, reliefMap, flatRelief, galleryLight } from "./paint";
 import { activeVariant, NIGHT } from "./variants";
@@ -62,6 +63,7 @@ class RoomAO extends GTAOPass {
   setSize(w: number, h: number) {
     super.setSize(Math.max(1, Math.floor(w / 2)), Math.max(1, Math.floor(h / 2)));
   }
+  refreshExclusions() { this.excluded = undefined; }
   overrideVisibility() {
     if (!this.excluded) {
       this.excluded = [];
@@ -136,6 +138,7 @@ export class Room {
   private ceiling = new THREE.Group();
   private info!: HouseInfo;
   private parts!: HouseParts;
+  private dolly?: Dolly;
 
   private sun!: THREE.DirectionalLight;
   private hemi!: THREE.HemisphereLight;
@@ -324,6 +327,27 @@ export class Room {
     this.reliefs();
     this.lateArt(anisotropy);
     if (process.env.NODE_ENV !== "production") (window as unknown as { __room?: Room }).__room = this;
+  }
+
+  /** she arrives after the welcome, without holding the door open */
+  private async lateFigure() {
+    try {
+      const { Dolly } = await import("./dolly");
+      if (this.disposed) return;
+      const dolly = this.dolly = new Dolly(this.baked!.night, this.tier.dpr, () => this.invalidate());
+      await dolly.load();
+      if (this.disposed) { dolly.dispose(); return; }
+      this.world.add(dolly.object);
+      this.parts.figures.forEach(figure => { figure.visible = false; });
+      this.info.anchors.dolly = [1.77, .78, -4.26];
+      this.ao?.refreshExclusions();
+      this.invalidate();
+    } catch {
+      this.dolly?.dispose();
+      this.dolly = undefined;
+      this.parts.figures.forEach(figure => { figure.visible = true; });
+      // A failed experimental scan leaves the existing figure in place.
+    }
   }
 
   /** the gallery's photographs, a few at a time once the house is open; each takes its relief as it lands */
@@ -804,7 +828,12 @@ export class Room {
       const ms = tl.duration() * 1000 + 120;
       this.keepAlive(ms, true);
     }
-    this.rig.playIntro(startPose(this.info, this.narrow), () => this.opts.onIntroFinished(), reduce ? 0 : 1.15);
+    this.rig.playIntro(startPose(this.info, this.narrow), () => {
+      this.opts.onIntroFinished();
+      // The supplied scans were rejected during review. Keep the renderer ready
+      // for a replacement scan without changing the normal studio experience.
+      if (process.env.NEXT_PUBLIC_DOLLY_SCAN === "true") void this.lateFigure();
+    }, reduce ? 0 : 1.15);
   }
 
   /** where Twenty Paise is on screen before the camera moves — the
@@ -1175,6 +1204,7 @@ export class Room {
       this.ceiling.visible = ceilingOn;
       this.renderer.shadowMap.needsUpdate = true;   // the roof casts too
     }
+    this.dolly?.show(ceilingOn && !this.rearranged);
     this.composer.render(dt / 1000);
     if (this.lumaAsks.size) {
       const asks = [...this.lumaAsks.values()];
@@ -1276,6 +1306,7 @@ export class Room {
     this.useMotion(false);
     this.ready = false;
     this.abort.abort();
+    this.dolly?.dispose();
     this.modeTl?.kill();
     this.dropTl?.kill();
     this.resetTl?.kill();

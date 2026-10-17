@@ -16,9 +16,8 @@ import { worldUV, type Library, type Role } from "./materials";
  *    the room is shaken; foliage is alpha-tested cards.
  *  - Roof_*: the gallery hall's space frame and sunshades, with their own
  *    materials, lifted with the ceilings when the camera rises for the plan.
- *  - Figure_*: she, at her easel, in 3D (scripts/figure/model.py): her own
- *    textures (skin, clothes, hair) with her own UVs, and her lightmap UVs —
- *    baked with the house, so she sits in its light, afternoon and evening.
+ *  - Figure_*: the modelled figure, baked with the house. The optional scan
+ *    preview replaces it only once the scan has loaded successfully.
  *
  * The light is baked twice into one atlas layout: the afternoon (lm-day) and
  * the evening with the diya lit (lm-night). A shader patch puts the baked
@@ -143,7 +142,7 @@ export type HouseParts = {
   ceilings: THREE.Mesh[];
   /** the hall's roof structure: decoration that lifts with the ceilings */
   roofs: THREE.Object3D[];
-  /** she, at her easel: her parts, baked with the house */
+  /** the modelled figure: retained until an optional scan is ready */
   figures: THREE.Mesh[];
   /** the canvas fronts, by id */
   art: Map<string, THREE.Mesh>;
@@ -199,7 +198,6 @@ export function assemble(house: House, lib: Library, baked: BakedLight, edgeMat:
         m.castShadow = true;
       });
     } else if (n.startsWith("Figure_")) {
-      // her own textures under the house's baked light; the bake holds her shadow, she casts none live
       node.traverse((o) => {
         const m = o as THREE.Mesh;
         if (!m.isMesh) return;
@@ -247,4 +245,3 @@ export function assemble(house: House, lib: Library, baked: BakedLight, edgeMat:
   }
   return parts;
 }
-

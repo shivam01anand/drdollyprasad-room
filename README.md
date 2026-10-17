@@ -24,9 +24,8 @@ it are hers: a gallery inside a Delhi home, built and lit in Blender.
      "Under Canopy of Greens" under two green-enamel studio lamps; then **her, at her easel** in the
      corner by the banana, painting: the canvas she is working on now, from her own photograph
      (`scripts/figure/make.py`: her pencil grid squares it; her upside-down underdrawing on its
-     left taken off), and she herself in 3D, on a round stool in her pink fleece hoodie, the brush
-     held as a pen and rising to the canvas where it was in the photograph (`scripts/figure`,
-     below), baked into the house's light with it; her palette, paints and brushes on a painted
+     left taken off), and her modelled figure on the round stool in her pink hoodie (`scripts/figure`,
+     below), baked into the house's afternoon and evening light; her palette, paints and brushes on a painted
      stool beside the easel, and her statement-poem with her; then the walk turns to the arch
      — the tall brass lamp of her openings beside it in a ring of marigolds — and goes straight
      through into the Quiet Room without stopping (a chapter's `via`: the rig runs power2.in to
@@ -117,7 +116,7 @@ Designed for the thumb, not shrunk from the desktop:
 |---|---|
 | The house | `scripts/house/build.py` builds it in Blender 5 from code: lime-washed walls with deep reveals and softened edges, an arch, panelled studded teak doors, timber ceilings, CC0 props (Poly Haven, `assets/polyhaven`), modelled charpais, a brass lamp, milk cans and a cart wheel, and leaf-card foliage (bougainvillea, banana, peepal). |
 | Light | `scripts/house/export.py` path-traces the diffuse light twice in Cycles into one lightmap atlas: the afternoon (sun from the west-south-west, sky, gallery lights) and the evening (sky down, gallery lights and lamps up). OpenImageDenoise cleans both. It measures the light on each canvas, and `publish.py` evens it (`lk` per work in `house.json`): a painting under a strong spot is brought down so it is never washed out, one in a dim corner lifted a little. |
-| Her | `scripts/figure/model.py` makes her with MPFB (MakeHuman for Blender, its CC0 assets in `assets/mpfb`, not in git), matched against her photographs: her build and years, her colours (`textures.py`: her skin, hair and fleece, white-balanced from the bare canvas beside her), her hoodie (a blouse in her fleece, its hood laid down her back by rays), seated close to the canvas, the brush held as a pen (her fingers bent about axes her palm gives, her hand turned so the brush rises along the line it does in her photograph, her arm moved by IK until its tip is on the canvas), her left hand in her lap; her hair is her own (a full, uneven shell over MakeHuman's scalp region, its strands running back to a low bun, loose hairs over it, the scalp under it darkened on her skin for a soft hairline), her sunglasses pushed up on it; her skin is kept a hand's breadth in from every opening of her clothes and gone where the pose pushes it through them. The pose is applied and the rig removed; `assets/figure/dolly-3d.blend` is self-contained (its textures packed), and `build.py` sets it on her stool. |
+| Her | The default figure is built with MPFB by `scripts/figure/model.py` and baked into the house. An opt-in scan renderer (`lib/room/dolly.ts`, GaussianSplats3D 0.4.7) loads after the welcome and uses the house's depth and day/night light. It replaces the model only after loading succeeds. The supplied scan is a rejected draft; see [scan preview notes](docs/scan-preview.md). |
 | Into the site | `scripts/house/publish.py` writes `public/house/`: the GLB (textures ≤1024 WebP, Draco), the two lightmaps (and 2k copies for phones) and `house.json` (cameras, canvases, colliders, anchors) in three's coordinates. |
 | Materials | the architecture keeps the photographed PBR sets in `public/tex` (`lib/room/materials.ts`), laid in metres from world position at load; one shader patch (`lib/room/house.ts`) puts the baked light in place of live diffuse (`uBake`) and moves afternoon → evening (`uNight`). Live light remains for the things that move, the brass's glint, and Shake the room. |
 | Rendering | one `gsap.ticker` loop drives Lenis and `Room.renderFrame(now)`. Render-on-demand; shadow maps re-render only while things move; half-res GTAO, MSAA 2, DPR ≤ 1.5 (phones 1.25, no MSAA, no AO). |
@@ -136,13 +135,19 @@ python3 scripts/house/publish.py scripts/house/work/vN/final scripts/house/work/
 The final bake takes about an hour on an M1; run it with `nohup`. Camera-only changes need no
 rebake: rebuild with `--save=0` and copy the cams into `public/house/house.json`.
 
-Her figure, when it changes (MPFB 2.0 installed in Blender, `assets/mpfb/pack` linked into its data):
+The experimental scan is converted locally (numpy; Pillow for the optional CPU previews):
 
 ```sh
-python3 scripts/figure/textures.py                                  # her colours
-blender -b -P scripts/figure/model.py -- scripts/house/work/fig      # then copy dolly-3d.blend to assets/figure
-blender -b scripts/house/work/fig/dolly-3d.blend -P scripts/figure/look.py -- scripts/house/work/fig/look dolly
+python3 scripts/figure/splat.py
+python3 scripts/figure/splat_review.py
+NEXT_PUBLIC_DOLLY_SCAN=true npm run dev -- -p 3841
 ```
+
+The raw takes stay in the ignored `assets/figure/scan/` directory. Only the cropped
+`public/art/figure/dolly.splat` is included as a draft asset. The scan is disabled by
+default: the supplied takes have a pose mismatch and insufficient face/hand detail.
+[Scan preview notes](docs/scan-preview.md) record the limitations and next steps.
+The original MPFB figure remains the default, including when a scan fails to load.
 
 ## Layout
 

@@ -136,8 +136,8 @@ export default function WallLabels({ room, active, live, onOpen }: {
       }
       // the works' labels first, their sides chosen once, as the camera lands
       const things = asides.map((a) => R.anchorRect(a.anchor, a.size[0], a.size[1])).filter((x): x is Rect => !!x);
-      // her, at her easel (house.json's "dolly"): no card may cover her
-      const her = R.anchorRect("dolly", 0.7, 1.35);         // she, seated, her brush raised
+      // her, at her easel (the room's "dolly" anchor): no card may cover her
+      const her = R.anchorRect("dolly", 0.85, 1.35);        // allow room for either figure's silhouette
       if (her) things.push(her);
       const first = !placed;
       const redo = !!placed && resized;

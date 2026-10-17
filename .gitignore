@@ -15,3 +15,6 @@ assets/mpfb/
 
 # her colours, made from the MakeHuman pack by scripts/figure/textures.py (packed into dolly-3d.blend)
 assets/figure/tex/
+
+# her scans (Gaussian splats, Scaniverse, 13 Oct 2026): the raw takes stay off the web and out of git
+assets/figure/scan/
