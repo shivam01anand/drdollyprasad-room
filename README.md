@@ -151,6 +151,11 @@ painting body with only her isolated 3D head, aligned to look at the canvas.
     components/            Studio (page + HUD + copy), Preloader, Featured, Lightbox, Works, Cursor
     scripts/house/         build, export, publish, pathcheck (Blender + tools)
 
+## Performance
+
+See [the performance audit](docs/performance.md) for the loading/rendering changes,
+asset sizes and validation limits.
+
 ## Checking it
 
 The Chrome extension's tab is usually hidden, and hidden tabs get no animation frames, so

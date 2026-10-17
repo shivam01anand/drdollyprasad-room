@@ -17,7 +17,8 @@ metadata. No arm, hand, brush, clothing or stool vertices move. Both texture UVs
 and the original day/night lightmap UVs are preserved. The original painting-pose
 lightmaps are restored; the abandoned full-scan bench bake is not used.
 
-After the welcome, `lib/room/dolly.ts` loads only `dolly-head.splat` (about 1 MB).
+While the welcome still covers the ready room, `lib/room/dolly.ts` loads only
+`dolly-head.splat` (about 1 MB).
 Once it succeeds, `Room.ts` hides only the generic head meshes. The body, hands,
 brush and stool remain visible. A failed head download keeps the original head
 in place. The head shares scene depth, camera sorting and the day/night blend.

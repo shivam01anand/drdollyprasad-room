@@ -52,21 +52,28 @@ export type House = {
   lmNight: THREE.Texture | null;
 };
 
+export function loadHouseInfo(signal: AbortSignal, tick: () => void): Promise<HouseInfo> {
+  return fetch(`${HOUSE_DIR}/house.json`, { signal }).then((r) => {
+    if (!r.ok) throw new Error(`house.json ${r.status}`);
+    return r.json() as Promise<HouseInfo>;
+  }).then((info) => { tick(); return info; });
+}
+
 export async function loadHouse(
   small: boolean,
   signal: AbortSignal,
   loadTexture: (url: string) => Promise<THREE.Texture>,
   tick: () => void,
+  infoPromise = loadHouseInfo(signal, tick),
 ): Promise<House> {
   const draco = new DRACOLoader().setDecoderPath("/draco/");
   draco.setDecoderConfig({ type: "wasm" });
+  // Fetch the decoder while the model is in flight, instead of after it arrives.
+  draco.preload();
   const loader = new GLTFLoader().setDRACOLoader(draco);
   const suffix = small ? "-2k" : "";
   const [info, gltf, lmDay, lmNight] = await Promise.all([
-    fetch(`${HOUSE_DIR}/house.json`, { signal }).then((r) => {
-      if (!r.ok) throw new Error(`house.json ${r.status}`);
-      return r.json() as Promise<HouseInfo>;
-    }).then((x) => { tick(); return x; }),
+    infoPromise,
     loader.loadAsync(`${HOUSE_DIR}/house.glb`).then((x) => { tick(); return x; }),
     loadTexture(`${HOUSE_DIR}/lm-day${suffix}.webp`).then((x) => { tick(); return x; }),
     loadTexture(`${HOUSE_DIR}/lm-night${suffix}.webp`).then((x) => { tick(); return x; }).catch(() => null),

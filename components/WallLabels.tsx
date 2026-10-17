@@ -64,6 +64,7 @@ export default function WallLabels({ room, active, live, onOpen }: {
     let fade: gsap.core.Tween | null = null;
     /** the window has changed size (a moment ago): the cards are placed again */
     let resized = false;
+    let lastView = -1;
     let resizeTimer = 0;
     const onResize = () => { clearTimeout(resizeTimer); resizeTimer = window.setTimeout(() => { resized = true; }, 140); };
     addEventListener("resize", onResize);
@@ -127,7 +128,9 @@ export default function WallLabels({ room, active, live, onOpen }: {
       const R = room.current;
       if (!R) return;
       const here = R.landed && Math.abs(R.at * (CHAPTERS.length - 1) - active) < 0.04;
-      if (!here) { if (placed) hide(); return; }
+      if (!here) { if (placed) hide(); lastView = -1; return; }
+      if (placed && !resized && lastView === R.viewVersion && !reveal?.isActive()) return;
+      lastView = R.viewVersion;
       const rects = new Map<string, Rect>();
       for (const id of ids) {
         const f = R.artRect(id);

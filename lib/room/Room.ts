@@ -9,10 +9,11 @@ import type * as CANNON from "cannon-es";
 import { buildLibrary, textureList, type Library } from "./materials";
 import { Rig } from "./rig";
 import type { Dolly } from "./dolly";
-import { loadHouse, assemble, BakedLight, ROOF, type HouseInfo, type HouseParts } from "./house";
-import { paintMaterial, reliefMap, flatRelief, galleryLight } from "./paint";
+import { loadHouse, loadHouseInfo, assemble, BakedLight, ROOF, type HouseInfo, type HouseParts } from "./house";
+import { paintMaterial, flatRelief, galleryLight } from "./paint";
+import { ReliefBuilder } from "./relief-builder";
 import { activeVariant, NIGHT } from "./variants";
-import { resolveWalk, isNarrow, startPose, messPose, duskAt, HERO_ID } from "../chapters";
+import { CHAPTERS, resolveWalk, isNarrow, startPose, messPose, duskAt, HERO_ID } from "../chapters";
 
 export type RoomOpts = {
   manifestUrl: string;
@@ -107,6 +108,8 @@ const DEEPA_WICK = 0.14;
 const FRAME = 0.025;
 /** each wall's outward normal on the floor plane, three's (x, z) */
 const SIDE_OUT: Record<string, [number, number]> = { N: [0, 1], S: [0, -1], E: [-1, 0], W: [1, 0] };
+// Reuse the welcome's full-resolution photo instead of downloading it twice.
+const artworkTextureURL = (id: string) => id === HERO_ID ? `/art/large/${id}.jpg` : `/art/room/${id}.jpg`;
 
 
 export class Room {
@@ -161,6 +164,12 @@ export class Room {
   private drag = { active: false, id: -1, x0: 0, y0: 0, sx: 0, sy: 0, tx: 0, ty: 0, rx: 0, ry: 0 };
 
   private art: THREE.Mesh[] = [];
+  private artQueue: THREE.Mesh[] = [];
+  private artLoads = 0;
+  private artPriority = -1;
+  private reliefBuilder = new ReliefBuilder();
+  private viewRevision = 0;
+  private viewport = { left: 0, top: 0, width: 0, height: 0 };
   private narrow = false;
   private lastFlame = -Infinity;
 
@@ -174,6 +183,8 @@ export class Room {
   private wake = 0;
   /** readings asked of the next frame drawn, each under its own name: how light it is behind a part of the screen */
   private lumaAsks = new Map<string, { rect: { x0: number; y0: number; x1: number; y1: number }; cb: (luma: number) => void }>();
+  private readbackPending = false;
+  private readbackPixels = new Uint8Array(0);
   private aliveUntil = 0;
   private shadowsUntil = 0;
   private mode: "light" | "dark" = "light";
@@ -220,14 +231,17 @@ export class Room {
 
     const texP = Promise.all(texList.map((t) =>
       this.loadTexture(t.url).then((tex) => { tick(); return [`${t.set}:${t.kind}`, tex] as const; })));
-    const houseP = loadHouse(this.tier.small, this.abort.signal, (u) => this.loadTexture(u), tick);
-    const house = await houseP;
+    const infoP = loadHouseInfo(this.abort.signal, tick);
+    const houseP = loadHouse(this.tier.small, this.abort.signal, (u) => this.loadTexture(u), tick, infoP);
     // the works near the door load with the house; the gallery's after it has opened (lateArt)
-    const ids = Object.keys(house.info.art).filter((id) => !house.info.art[id].late);
-    total = 4 + texList.length + ids.length;
-    const artP = Promise.all(ids.map((id) =>
-      this.loadTexture(`/art/room/${id}.jpg`).then((tex) => { tick(); return [id, tex] as const; })));
-    const [texPairs, artPairs] = await Promise.all([texP, artP]);
+    const artP = infoP.then((info) => {
+      const ids = Object.keys(info.art).filter((id) => !info.art[id].late);
+      total = 4 + texList.length + ids.length;
+      return Promise.all(ids.map((id) =>
+        this.loadTexture(artworkTextureURL(id)).then((tex) => { tick(); return [id, tex] as const; })));
+    });
+    // Photos, surfaces and geometry download together; none waits for GLB decode.
+    const [house, texPairs, artPairs] = await Promise.all([houseP, texP, artP]);
     if (this.disposed) {
       texPairs.forEach(([, t]) => t.dispose());
       artPairs.forEach(([, t]) => t.dispose());
@@ -325,7 +339,10 @@ export class Room {
     this.ready = true;
     this.wake = 2;
     this.reliefs();
-    this.lateArt(anisotropy);
+    this.lateArt();
+    // Prepare her head while the welcome still covers the room, so its first
+    // decode, sort and shader upload do not land on the visitor's first scroll.
+    void this.lateFigure();
     if (process.env.NODE_ENV !== "production") (window as unknown as { __room?: Room }).__room = this;
   }
 
@@ -349,29 +366,57 @@ export class Room {
     }
   }
 
-  /** the gallery's photographs, a few at a time once the house is open; each takes its relief as it lands */
-  private lateArt(anisotropy: number) {
-    const queue = this.art.filter((m) => this.info.art[m.userData.artId]?.late);
-    const next = () => {
-      if (this.disposed) return;
-      const batch = queue.splice(0, 3);
-      if (!batch.length) return;
-      Promise.all(batch.map((mesh) => this.loadTexture(`/art/room/${mesh.userData.artId}.jpg`).then((tex) => {
+  /** Keep three requests in flight, replacing each as it finishes. */
+  private lateArt() {
+    this.artQueue = this.art.filter((m) => this.info.art[m.userData.artId]?.late);
+    this.pumpArt();
+  }
+
+  private pumpArt() {
+    if (this.disposed) return;
+    while (this.artLoads < 3 && this.artQueue.length) {
+      const mesh = this.artQueue.shift()!;
+      this.artLoads++;
+      void this.loadTexture(artworkTextureURL(mesh.userData.artId)).then((tex) => {
         if (this.disposed) { tex.dispose(); return; }
         tex.colorSpace = THREE.SRGBColorSpace;
-        tex.anisotropy = anisotropy;
+        tex.anisotropy = Math.min(8, this.renderer!.capabilities.getMaxAnisotropy());
         tex.flipY = false;
         tex.needsUpdate = true;
         this.owned.push(tex);
-        const mat = mesh.material as THREE.MeshStandardMaterial;
-        mat.map = tex;
-        const relief = reliefMap(tex.image as HTMLImageElement, 384);
-        this.owned.push(relief);
-        mat.normalMap = relief;
+        (mesh.material as THREE.MeshStandardMaterial).map = tex;
         this.invalidate();
-      }).catch(() => { /* the warm ground stays */ }))).then(() => setTimeout(next, 120));
+        void this.addRelief(mesh, 384);
+      }).catch(() => { /* the warm ground stays */ }).finally(() => {
+        this.artLoads--;
+        this.pumpArt();
+      });
+    }
+  }
+
+  /** Menu jumps prioritize that wall and its neighbors before the camera arrives. */
+  prepareChapter(index: number) {
+    if (index === this.artPriority) return;
+    this.artPriority = index;
+    const wanted = [index, index + 1, index - 1, index + 2].flatMap((i) => CHAPTERS[i]?.labels ?? []);
+    const rank = (mesh: THREE.Mesh) => {
+      const at = wanted.indexOf(mesh.userData.artId);
+      return at < 0 ? wanted.length : at;
     };
-    setTimeout(next, 600);
+    this.artQueue.sort((a, b) => rank(a) - rank(b));
+  }
+
+  private async addRelief(mesh: THREE.Mesh, longest: number) {
+    const material = mesh.material as THREE.MeshStandardMaterial;
+    const image = material.map?.image as HTMLImageElement | undefined;
+    if (!image?.width || this.disposed) return;
+    try {
+      const relief = await this.reliefBuilder.build(image, longest);
+      if (this.disposed) { relief.dispose(); return; }
+      this.owned.push(relief);
+      material.normalMap = relief;
+      this.invalidate();
+    } catch { /* a flat normal retains the painting if background work is cancelled */ }
   }
 
   /** each canvas's relief, read from its photograph one at a time in idle moments, off the load path */
@@ -383,15 +428,7 @@ export class Room {
       if (this.disposed) return;
       const mesh = queue.shift();
       if (!mesh) return;
-      const mat = mesh.material as THREE.MeshStandardMaterial;
-      const img = mat.map?.image as HTMLImageElement | undefined;
-      if (img?.width) {
-        const relief = reliefMap(img, this.tier.small ? 512 : 768);
-        this.owned.push(relief);
-        mat.normalMap = relief;
-        this.invalidate();
-      }
-      idle(next);
+      void this.addRelief(mesh, this.tier.small ? 512 : 768).then(() => idle(next));
     };
     idle(next);
   }
@@ -829,7 +866,6 @@ export class Room {
     }
     this.rig.playIntro(startPose(this.info, this.narrow), () => {
       this.opts.onIntroFinished();
-      void this.lateFigure();
     }, reduce ? 0 : 1.15);
   }
 
@@ -852,8 +888,8 @@ export class Room {
     return { left: x0, top: y0, width: x1 - x0, height: y1 - y0 };
   }
 
-  scroll(p: number) { this.rig?.scroll(p); }
-  syncScroll(p: number) { this.rig?.syncScroll(p); this.wake = 2; }
+  scroll(p: number) { this.prepareChapter(Math.round(p * (CHAPTERS.length - 1))); this.rig?.scroll(p); }
+  syncScroll(p: number) { this.prepareChapter(Math.round(p * (CHAPTERS.length - 1))); this.rig?.syncScroll(p); this.wake = 2; }
 
   /** stop drawing while an opaque section covers the room */
   setVisible(v: boolean) {
@@ -1132,6 +1168,9 @@ export class Room {
     if (!this.renderer || !this.composer) return;
     const w = this.canvas.clientWidth || innerWidth;
     const h = this.canvas.clientHeight || innerHeight;
+    const rect = this.canvas.getBoundingClientRect();
+    this.viewport = { left: rect.left, top: rect.top, width: rect.width, height: rect.height };
+    this.viewRevision++;
     this.renderer.setSize(w, h, false);
     this.composer.setSize(w, h);
     const aspect = w / Math.max(1, h);
@@ -1154,6 +1193,13 @@ export class Room {
     this.last = now;
 
     let draw = this.rig.update(dt);
+    if (draw) {
+      this.viewRevision++;
+      // One layout read per changed view, shared by all projected labels.
+      // This also catches the held-card scale when returning from the collage.
+      const rect = this.canvas.getBoundingClientRect();
+      this.viewport = { left: rect.left, top: rect.top, width: rect.width, height: rect.height };
+    }
     const walk = duskAt(this.rig.progress);
     if (Math.abs(walk - this.eve.walk) > 1e-4) {
       this.eve.walk = walk;
@@ -1206,8 +1252,9 @@ export class Room {
       const asks = [...this.lumaAsks.values()];
       this.lumaAsks.clear();
       for (const ask of asks) {
-        const l = this.readLuma(ask.rect);
-        if (l !== null) ask.cb(l);
+        void this.readLuma(ask.rect).then((l) => {
+          if (!this.disposed && l !== null) ask.cb(l);
+        }).catch(() => { /* keep the current ink if a context is being lost */ });
       }
     }
   }
@@ -1222,27 +1269,65 @@ export class Room {
     if (now) this.wake = Math.max(this.wake, 1);
   }
 
-  private readLuma(r: { x0: number; y0: number; x1: number; y1: number }) {
+  private async readLuma(r: { x0: number; y0: number; x1: number; y1: number }) {
+    if (this.readbackPending || this.disposed) return null;
     const gl = this.renderer!.getContext();
+    if (!(gl instanceof WebGL2RenderingContext)) return null;
     const W = gl.drawingBufferWidth, H = gl.drawingBufferHeight;
-    const c = this.canvas.getBoundingClientRect();
+    const c = this.viewport;
     if (!c.width || !c.height) return null;
     const x0 = Math.max(0, Math.floor((r.x0 - c.left) / c.width * W)), x1 = Math.min(W, Math.ceil((r.x1 - c.left) / c.width * W));
     const y0 = Math.max(0, Math.floor((r.y0 - c.top) / c.height * H)), y1 = Math.min(H, Math.ceil((r.y1 - c.top) / c.height * H));
     if (x1 - x0 < 2 || y1 - y0 < 2) return null;
     const w = x1 - x0, h = y1 - y0;
-    const px = new Uint8Array(w * h * 4);
-    gl.bindFramebuffer(gl.FRAMEBUFFER, null);
-    gl.readPixels(x0, H - y1, w, h, gl.RGBA, gl.UNSIGNED_BYTE, px);   // (GL counts its rows from the foot)
-    let sum = 0, n = 0;
-    for (let i = 0; i < px.length; i += 16) { sum += 0.2126 * px[i] + 0.7152 * px[i + 1] + 0.0722 * px[i + 2]; n++; }
-    return n ? sum / n / 255 : null;
+    const bytes = w * h * 4;
+    if (this.readbackPixels.length < bytes) this.readbackPixels = new Uint8Array(bytes);
+    const px = this.readbackPixels.subarray(0, bytes);
+    const buffer = gl.createBuffer();
+    if (!buffer) return null;
+    let sync: WebGLSync | null = null;
+    this.readbackPending = true;
+    try {
+      // The same displayed pixels, read through a WebGL 2 pixel buffer. A fence
+      // lets the GPU finish them without stopping the animation/main thread.
+      gl.bindFramebuffer(gl.FRAMEBUFFER, null);
+      gl.bindBuffer(gl.PIXEL_PACK_BUFFER, buffer);
+      gl.bufferData(gl.PIXEL_PACK_BUFFER, bytes, gl.STREAM_READ);
+      gl.readPixels(x0, H - y1, w, h, gl.RGBA, gl.UNSIGNED_BYTE, 0);
+      gl.bindBuffer(gl.PIXEL_PACK_BUFFER, null);
+      sync = gl.fenceSync(gl.SYNC_GPU_COMMANDS_COMPLETE, 0);
+      gl.flush();
+      if (!sync) return null;
+      const fence = sync, deadline = performance.now() + 1000;
+      const complete = await new Promise<boolean>((resolve) => {
+        const poll = () => {
+          if (this.disposed || gl.isContextLost() || performance.now() > deadline) { resolve(false); return; }
+          const status = gl.clientWaitSync(fence, 0, 0);
+          if (status === gl.TIMEOUT_EXPIRED) { setTimeout(poll, 4); return; }
+          resolve(status === gl.ALREADY_SIGNALED || status === gl.CONDITION_SATISFIED);
+        };
+        setTimeout(poll, 0);
+      });
+      if (!complete) return null;
+      gl.bindBuffer(gl.PIXEL_PACK_BUFFER, buffer);
+      gl.getBufferSubData(gl.PIXEL_PACK_BUFFER, 0, px);
+      let sum = 0, n = 0;
+      for (let i = 0; i < px.length; i += 16) { sum += 0.2126 * px[i] + 0.7152 * px[i + 1] + 0.0722 * px[i + 2]; n++; }
+      return n ? sum / n / 255 : null;
+    } finally {
+      gl.bindBuffer(gl.PIXEL_PACK_BUFFER, null);
+      gl.deleteBuffer(buffer);
+      if (sync) gl.deleteSync(sync);
+      this.readbackPending = false;
+    }
   }
 
   get introDone() { return this.rig?.isEnabled ?? false; }
 
   /** the camera's place on the walk, 0 at the first chapter, 1 at the last */
   get at() { return this.rig?.progress ?? 0; }
+  /** Labels only need new projected positions when the camera or viewport changes. */
+  get viewVersion() { return this.viewRevision; }
   /** the camera has arrived where the scroll put it, and the house is at rest */
   get landed() { return this.ready && !!this.rig && this.rig.isEnabled && this.rig.travel < 0.0015 && !this.rearranged; }
 
@@ -1264,7 +1349,7 @@ export class Room {
     const cam = this.rig.camera;
     const right = tmpR.setFromMatrixColumn(cam.matrixWorld, 0).multiplyScalar(w / 2);
     const up = tmpU.setFromMatrixColumn(cam.matrixWorld, 1).multiplyScalar(h / 2);
-    const r = this.canvas.getBoundingClientRect();
+    const r = this.viewport;
     let x0 = Infinity, y0 = Infinity, x1 = -Infinity, y1 = -Infinity;
     for (const [i, j] of [[-1, -1], [1, -1], [1, 1], [-1, 1]]) {
       tmpV.set(a[0], a[1], a[2]).addScaledVector(right, i).addScaledVector(up, j).project(cam);
@@ -1281,7 +1366,7 @@ export class Room {
     if (!a || !this.rig || !this.canvas) return null;
     const [nx, nz] = SIDE_OUT[a.side] ?? [0, 1];
     const hw = a.w / 2 + FRAME, hh = a.h / 2 + FRAME;
-    const r = this.canvas.getBoundingClientRect();
+    const r = this.viewport;
     let x0 = Infinity, y0 = Infinity, x1 = -Infinity, y1 = -Infinity;
     for (const sx of [-1, 1])
       for (const sy of [-1, 1]) {
@@ -1301,6 +1386,7 @@ export class Room {
     this.disposed = true;
     this.useMotion(false);
     this.ready = false;
+    this.reliefBuilder.dispose();
     this.dolly?.dispose();
     this.abort.abort();
     this.modeTl?.kill();

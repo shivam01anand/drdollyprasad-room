@@ -692,7 +692,10 @@ export default function Studio({ dims }: { dims: Dims }) {
     setTimeout(() => go("#works"), 60);
   };
   // the sheet holds the page still while it is open: move once it has let go
-  const goStop = (i: number) => setTimeout(() => go(`[data-chapter='${CHAPTERS[i].id}']`, true), 120);
+  const goStop = (i: number) => {
+    roomRef.current?.prepareChapter(i);
+    setTimeout(() => go(`[data-chapter='${CHAPTERS[i].id}']`, true), 120);
+  };
   // the chapter in view, for the header's "you are here"
   const here = ready ? CHAPTERS[active]?.id : undefined;
 

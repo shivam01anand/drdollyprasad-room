@@ -10,6 +10,13 @@ export default {
   outputFileTracingRoot: path.dirname(fileURLToPath(import.meta.url)),
   // each variant builds into its own directory so several dev servers can run
   distDir: process.env.DIST_DIR || ".next",
+  async headers() {
+    return [{
+      // Font filenames contain their content hash, so repeat visits reuse them.
+      source: "/fonts/:path*",
+      headers: [{ key: "Cache-Control", value: "public, max-age=31536000, immutable" }],
+    }];
+  },
   // one address: www sends people to the bare domain
   async redirects() {
     return [{

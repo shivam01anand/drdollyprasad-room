@@ -1,4 +1,6 @@
 import type { Metadata, Viewport } from "next";
+import WELCOME_FONTS from "@/lib/welcome-fonts.json";
+import "./fonts.css";
 import "./globals.css";
 
 const DESCRIPTION =
@@ -32,13 +34,10 @@ export default function RootLayout({ children }: { children: React.ReactNode }) 
   return (
     <html lang="en" data-mode="light">
       <head>
-        <link rel="preconnect" href="https://fonts.googleapis.com" />
-        <link rel="preconnect" href="https://fonts.gstatic.com" crossOrigin="" />
-        <link
-          href="https://fonts.googleapis.com/css2?family=Instrument+Sans:ital,wght@0,400;0,500;0,600;1,400&family=IBM+Plex+Mono:wght@400;500&family=IBM+Plex+Sans+Devanagari:wght@500&family=Cormorant+Garamond:ital,wght@1,500&display=swap"
-          rel="stylesheet"
-        />
+        {WELCOME_FONTS.map((href) => <link key={href} rel="preload" as="font" type="font/woff2" href={href} crossOrigin="anonymous" />)}
         <link rel="preload" as="image" href="/art/large/woman-with-poppies.jpg" />
+        <link rel="preload" as="fetch" href="/house/house.json" crossOrigin="anonymous" />
+        <link rel="preload" as="fetch" href="/house/house.glb" crossOrigin="anonymous" fetchPriority="low" />
       </head>
       <body>{children}</body>
     </html>
