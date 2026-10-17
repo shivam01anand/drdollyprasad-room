@@ -8,18 +8,17 @@ import { EMAIL, INSTAGRAM } from "@/lib/works";
 /**
  * The phone's menu: a sheet from the bottom edge, in reach of the thumb.
  * It holds the walk as a list of its stops — where you are, and any other
- * to go to — then the rest of the house: shaking it, the contact, her mail
+ * to go to — then the rest of the house: the contact, her mail
  * and her Instagram. A tap on the veil, a drag down on the sheet, or Escape
  * puts it away.
  */
 import type { WorksFilter } from "./Works";
 
-export default function Stops({ open, active, onClose, onGo, onShake, onContact, onWorks }: {
+export default function Stops({ open, active, onClose, onGo, onContact, onWorks }: {
   open: boolean;
   active: number;
   onClose(): void;
   onGo(i: number): void;
-  onShake(): void;
   onContact(): void;
   onWorks(f: WorksFilter): void;
 }) {
@@ -109,7 +108,6 @@ export default function Stops({ open, active, onClose, onGo, onShake, onContact,
           <button type="button" className="pill" onClick={() => { onClose(); onWorks("sold"); }}>Sold</button>
         </div>
         <div className="sheet-actions">
-          <button type="button" className="pill" onClick={() => { onClose(); onShake(); }}>Shake the room ⁂</button>
           <button type="button" className="pill" onClick={() => { onClose(); onContact(); }}>Contact</button>
           <a className="pill" href={`mailto:${EMAIL}`}>Write to me</a>
           <a className="pill" href={INSTAGRAM.url} target="_blank" rel="noreferrer">Instagram ↗</a>

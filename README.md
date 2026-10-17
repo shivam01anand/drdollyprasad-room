@@ -87,8 +87,7 @@ The canvases are paint, not prints (`lib/room/paint.ts`): a relief normal map re
 photograph's fine detail, and a soft varnish sheen from its gallery light that slides as the camera
 moves.
 
-Also: **Shake the room** (the dollhouse view; drag tilts the house, her things tumble; Reset
-hops them home) and **the diya** (dark mode: evening falls, the gallery lights and the brass
+Also: **the diya** (dark mode: evening falls, the gallery lights and the brass
 lamp come on — a second bake, not a filter).
 
 ## On a phone
@@ -102,14 +101,13 @@ Designed for the thumb, not shrunk from the desktop:
   past the last stop the page scrolls freely through the works and the contact;
 - phones render sharp: twice their pixels, 4× MSAA, the full lightmaps (only a weak machine
   gets the light set);
-- **the dock** — one bar where the desktop has four pills: where you are (`04/19 · At her
+- **the dock** — one bar where the desktop has three pills: where you are (`04/19 · At her
   easel`) and a menu; the menu is a sheet from the bottom edge (`Stops`) with every stop,
-  all her works, Shake the room, contact, mail and Instagram;
+  all her works, contact, mail and Instagram;
 - every copy label sits clear of its painting (the portrait cameras frame each painting high,
   and on a short phone the poem sets in its two stanzas side by side);
 - Featured is a carousel with its plate number (`03 / 12`); a painting opens on a tap, closes
   from a round chip in the corner or with a pull down;
-- **Shake the room** uses the phone: tilt it and the house tilts, shake it and her things fly.
 
 ## How it is built
 
@@ -119,7 +117,7 @@ Designed for the thumb, not shrunk from the desktop:
 | Light | `scripts/house/export.py` path-traces the diffuse light twice in Cycles into one lightmap atlas: the afternoon (sun from the west-south-west, sky, gallery lights) and the evening (sky down, gallery lights and lamps up). OpenImageDenoise cleans both. It measures the light on each canvas, and `publish.py` evens it (`lk` per work in `house.json`): a painting under a strong spot is brought down so it is never washed out, one in a dim corner lifted a little. |
 | Her | The original painting body, hands, brush and stool remain. Only her head from take 124 is aligned to the painter's neck, looking at the brush contact. Its actual 3D features replace the generic head after loading; the original head is retained as a download-failure fallback. See [figure notes](docs/scan-preview.md). |
 | Into the site | `scripts/house/publish.py` writes `public/house/`: the GLB (textures ≤1024 WebP, Draco), the two lightmaps (and 2k copies for phones) and `house.json` (cameras, canvases, colliders, anchors) in three's coordinates. |
-| Materials | the architecture keeps the photographed PBR sets in `public/tex` (`lib/room/materials.ts`), laid in metres from world position at load; one shader patch (`lib/room/house.ts`) puts the baked light in place of live diffuse (`uBake`) and moves afternoon → evening (`uNight`). Live light remains for the things that move, the brass's glint, and Shake the room. |
+| Materials | the architecture keeps the photographed PBR sets in `public/tex` (`lib/room/materials.ts`), laid in metres from world position at load; one shader patch (`lib/room/house.ts`) puts the baked light in place of live diffuse (`uBake`) and moves afternoon → evening (`uNight`). Live light remains for moving things and the brass's glint. |
 | Rendering | one `gsap.ticker` loop drives Lenis and `Room.renderFrame(now)`. Render-on-demand; shadow maps re-render only while things move; half-res GTAO, MSAA 2, DPR ≤ 1.5 (phones 1.25, no MSAA, no AO). |
 | Robustness | one terminal failure path (asset error, timeout, WebGL context loss, render exception) disposes the room and turns the page into the paintings; `prefers-reduced-motion` cuts between chapters; scroll locks have one owner. |
 
@@ -148,7 +146,7 @@ painting body with only her isolated 3D head, aligned to look at the canvas.
     lib/room/Room.ts       engine: load, light, post, physics, input, public API
     lib/room/house.ts      the house: GLB, lightmaps, the baked-light patch, assembly
     lib/room/materials.ts  PBR roles, metric UVs, shader patches
-    lib/room/rig.ts        camera rig, intro, scroll timeline, rearrange blend
+    lib/room/rig.ts        camera rig, intro, scroll timeline
     lib/closelook.ts       the lightbox's close look; lib/rooms.ts its rooms at scale
     components/            Studio (page + HUD + copy), Preloader, Featured, Lightbox, Works, Cursor
     scripts/house/         build, export, publish, pathcheck (Blender + tools)
@@ -160,7 +158,7 @@ WebGL screenshots time out there. In development:
 
 - `?fast` skips the preloader, `?shot=<chapter id>` lands on a beat, `?mode=dark` lights the diya,
   `?bake=0` shows the live light without the bake;
-- `window.__studio.go(id)`, `.top(y)`, `.mode(m)`, `.rearrange(on)`;
+- `window.__studio.go(id)`, `.top(y)`, `.mode(m)`;
 - `window.__advance(ms)` steps the animation clock by hand in a hidden tab.
 
 Headless Chrome via `puppeteer-core` against the installed Chrome renders everything

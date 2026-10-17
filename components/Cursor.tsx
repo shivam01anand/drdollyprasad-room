@@ -8,7 +8,7 @@ import { motion, gsap, scrambleTo } from "@/lib/motion";
  * drawn in difference, so it is dark over plaster and light over the dark
  * room. Over a link or a control it closes to a dot; over something that
  * says what it does — the Featured row, a painting in the collage or on the
- * wall, the room in rearrange — it opens and the word decodes inside it.
+ * wall — it opens and the word decodes inside it.
  * The system cursor is never hidden. Desktop only, as in the original.
  *
  * Labels come from `data-cursor` on any element, or from the room through
@@ -42,8 +42,7 @@ export default function Cursor({ live }: { live: boolean }) {
     let tw: { kill(): void } | null = null;
 
     const settle = () => {
-      const rearrange = document.documentElement.dataset.rearrange === "1";
-      const label = fromDom ?? (overCanvas ? (rearrange ? "Drag to tilt" : fromRoom) : null);
+      const label = fromDom ?? (overCanvas ? fromRoom : null);
       d.classList.toggle("is-label", !!label);
       d.classList.toggle("is-control", !label && overControl);
       if ((label ?? "") === shown) return;
@@ -79,10 +78,6 @@ export default function Cursor({ live }: { live: boolean }) {
     };
     const onOut = (e: PointerEvent) => { if (!e.relatedTarget) w.dataset.in = "0"; };
     const onRoom = (e: Event) => { fromRoom = (e as CustomEvent<string | null>).detail; settle(); };
-    // rearrange flips the room's word without a pointer move
-    const mo = new MutationObserver(settle);
-    mo.observe(document.documentElement, { attributes: true, attributeFilter: ["data-rearrange"] });
-
     addEventListener("pointermove", onMove, { passive: true });
     document.addEventListener("pointerover", onOver, { passive: true });
     document.addEventListener("pointerout", onOut, { passive: true });
@@ -94,7 +89,6 @@ export default function Cursor({ live }: { live: boolean }) {
       document.removeEventListener("pointerover", onOver);
       document.removeEventListener("pointerout", onOut);
       removeEventListener("cursor:label", onRoom);
-      mo.disconnect();
       tw?.kill();
     };
   }, []);

@@ -32,8 +32,8 @@ export default function Studio({ dims }: { dims: Dims }) {
   const lbRef = useRef<LightboxHandle>(null);
   const roomRef = useRef<Room | null>(null);
   const lenisRef = useRef<Lenis | null>(null);
-  // every reason scrolling is held, in one place: the intro, the lightbox,
-  // rearrange. Scroll runs only when none is left.
+  // Every reason scrolling is held, in one place: the intro, lightbox and menu.
+  // Scroll runs only when none is left.
   const locks = useRef(new Set<string>(["intro"]));
   const lock = useCallback((reason: string, on: boolean) => {
     if (on) locks.current.add(reason); else locks.current.delete(reason);
@@ -47,7 +47,6 @@ export default function Studio({ dims }: { dims: Dims }) {
   const [failed, setFailed] = useState(false);
   const [ready, setReady] = useState(false);
   const [mode, setMode] = useState<"light" | "dark">(activeVariant().startDark ? "dark" : "light");
-  const [rearrange, setRearrange] = useState(false);
   /** one wall on or back (set by the scroll effect, which knows the stops) */
   const stepRef = useRef<(d: 1 | -1) => void>(() => {});
   /** the first visit's hint, on a phone: how to walk */
@@ -72,8 +71,6 @@ export default function Studio({ dims }: { dims: Dims }) {
     }
     return off;
   }, [ready]);
-  /** the room is shaken by the phone itself, not by a finger */
-  const [moving, setMoving] = useState(false);
   const [active, setActive] = useState(0);
   const [loadEpoch, setLoadEpoch] = useState(0);
   const ranOnce = useRef(false);
@@ -113,15 +110,13 @@ export default function Studio({ dims }: { dims: Dims }) {
       setReady(false);
       setFailed(false);
       setPct(0);
-      setRearrange(false);
       setLoadEpoch((n) => n + 1);
       hudLive.current = false;
-      locks.current.delete("rearrange");
     }
     ranOnce.current = true;
     const prevRestoration = history.scrollRestoration;
     const html = document.documentElement;
-    const prevData = { room: html.dataset.room, hud: html.dataset.hud, rearrange: html.dataset.rearrange };
+    const prevData = { room: html.dataset.room, hud: html.dataset.hud };
     if ("scrollRestoration" in history) history.scrollRestoration = "manual";
     scrollTo(0, 0);
     const reduce = reducedMotion();
@@ -392,10 +387,8 @@ export default function Studio({ dims }: { dims: Dims }) {
       document.documentElement.dataset.room = "off";
       document.documentElement.dataset.hud = "";            // (the page under it now: its own ink)
       setFailed(true);
-      setRearrange(false);
       // the room's own reasons end; an open lightbox keeps its hold
       locks.current.delete("intro");
-      locks.current.delete("rearrange");
       if (locks.current.size) lenis.stop(); else lenis.start();
       requestAnimationFrame(measure);
     };
@@ -418,11 +411,6 @@ export default function Studio({ dims }: { dims: Dims }) {
         },
         onArtwork: (id) => lbRef.current?.open(id, null, WALK_ORDER),
         onHoverArt: (id) => roomCursorLabel(id ? "View" : null),
-        onRearrangeError: (error) => {
-          if (killed || dead) return;
-          console.error("[room physics]", error);
-          setRearrange(false);
-        },
       }).then(() => {
         if (killed || dead) return;
         clearTimeout(timeout);
@@ -448,7 +436,6 @@ export default function Studio({ dims }: { dims: Dims }) {
         },
         top(y: number) { lenis.scrollTo(y, { immediate: true, force: true }); apply(y, true); },
         mode: (m: "light" | "dark") => setMode(m),
-        rearrange: (on: boolean) => setRearrange(on),
         music,
       };
       if (q.get("mode") === "dark") setMode("dark");
@@ -537,7 +524,7 @@ export default function Studio({ dims }: { dims: Dims }) {
       gsap.ticker.remove(ink);
       canvas.removeEventListener("webglcontextlost", onContextLost);
       history.scrollRestoration = prevRestoration;
-      for (const k of ["room", "hud", "rearrange"] as const) {
+      for (const k of ["room", "hud"] as const) {
         if (prevData[k] === undefined) delete html.dataset[k]; else html.dataset[k] = prevData[k];
       }
       ro.disconnect();
@@ -652,12 +639,6 @@ export default function Studio({ dims }: { dims: Dims }) {
     if (loaded && !failed) roomRef.current?.setMode(mode);
   }, [mode, loaded, failed]);
 
-  useEffect(() => {
-    roomRef.current?.setState(rearrange ? "rearrange" : "presentation");
-    document.documentElement.dataset.rearrange = rearrange ? "1" : "0";
-    lock("rearrange", rearrange);
-  }, [rearrange, lock]);
-
   const go = (sel: string, center = false) => {
     const el = document.querySelector<HTMLElement>(sel);
     const l = lenisRef.current;
@@ -703,22 +684,6 @@ export default function Studio({ dims }: { dims: Dims }) {
     return () => removeEventListener("keydown", onKey);
   }, [ready]);
 
-  /** shake the room; on a phone, ask (inside the tap, as iOS insists) to feel the phone move */
-  const shake = () => {
-    type Askable = { requestPermission?: () => Promise<"granted" | "denied"> };
-    const DOE = (window as unknown as { DeviceOrientationEvent?: Askable }).DeviceOrientationEvent;
-    const DME = (window as unknown as { DeviceMotionEvent?: Askable }).DeviceMotionEvent;
-    const coarse = matchMedia("(pointer: coarse)").matches;
-    if (coarse && DOE?.requestPermission) {
-      Promise.all([DOE.requestPermission(), DME?.requestPermission?.() ?? Promise.resolve("granted")])
-        .then(([a]) => setMoving(a === "granted")).catch(() => setMoving(false));
-    } else setMoving(coarse && "DeviceOrientationEvent" in window);
-    setRearrange(true);
-  };
-  useEffect(() => {
-    roomRef.current?.useMotion(rearrange && moving);
-    if (!rearrange && moving) setMoving(false);
-  }, [rearrange, moving]);
   useEffect(() => { lock("sheet", stops); }, [stops, lock]);
   /** a stop of the walk, by its index: its section, centred */
   /** the works, filtered, in the collage below the house */
@@ -801,11 +766,9 @@ export default function Studio({ dims }: { dims: Dims }) {
           </button>
         </div>
         <div className="hud-bottom">
-          <span className="lab hud-hint" key={rearrange ? "tilt" : "scroll"}>
-            {rearrange ? (moving ? "Tilt your phone · give it a shake" : "Drag to tilt the room") : "Scroll ↓"}
-          </span>
+          <span className="lab hud-hint">Scroll ↓</span>
           {/* the phone's dock: where you are in the house, the works, and the rest in a sheet */}
-          {ready && !failed && !rearrange && (
+          {ready && !failed && (
             <div className="dock">
               <button type="button" className="dock-where" disabled={!ready} onClick={() => setStops(true)}
                       aria-label={`Stop ${active + 1} of ${CHAPTERS.length}: ${CHAPTERS[active]?.stop}. All stops`}>
@@ -819,27 +782,13 @@ export default function Studio({ dims }: { dims: Dims }) {
             </div>
           )}
           <nav className="hud-pills" aria-label="Site">
-            {failed ? (
-              <>
-                <span className="mask"><button type="button" className="pill hud-pill" onClick={() => go("#works")}>Works<span className="arr"> →</span></button></span>
-                <span className="mask"><button type="button" className="pill hud-pill" onClick={() => go("#contact")}>Contact<span className="arr"> →</span></button></span>
-              </>
-            ) : !rearrange ? (
-              <>
-                <span className="mask"><button type="button" className="pill hud-pill" disabled={!ready}
-                      onClick={shake}>Shake<span className="long"> the room</span> <span aria-hidden="true">⁂</span></button></span>
-                <span className="mask"><button type="button" className="pill hud-pill" aria-current={here === "featured" || undefined}
-                      onClick={() => go("[data-chapter='featured']")}>Works<span className="arr"> →</span></button></span>
-                <span className="mask"><button type="button" className="pill hud-pill" aria-current={here === "plan" || undefined}
-                      onClick={() => go("[data-chapter='plan']", true)}>Exhibitions<span className="arr"> →</span></button></span>
-                <span className="mask"><button type="button" className="pill hud-pill" onClick={() => go("#contact")}>Contact<span className="arr"> →</span></button></span>
-              </>
-            ) : (
-              <>
-                <span className="mask"><button type="button" className="pill" onClick={() => roomRef.current?.reset()}>Reset ↺</button></span>
-                <span className="mask"><button type="button" className="pill pill-solid" onClick={() => setRearrange(false)}>Back to the room</button></span>
-              </>
+            <span className="mask"><button type="button" className="pill hud-pill" aria-current={here === "featured" || undefined}
+                  onClick={() => go(failed ? "#works" : "[data-chapter='featured']")}>Works<span className="arr"> →</span></button></span>
+            {!failed && (
+              <span className="mask"><button type="button" className="pill hud-pill" aria-current={here === "plan" || undefined}
+                    onClick={() => go("[data-chapter='plan']", true)}>Exhibitions<span className="arr"> →</span></button></span>
             )}
+            <span className="mask"><button type="button" className="pill hud-pill" onClick={() => go("#contact")}>Contact<span className="arr"> →</span></button></span>
           </nav>
         </div>
       </header>
@@ -864,7 +813,7 @@ export default function Studio({ dims }: { dims: Dims }) {
         ) : null)}
       </div>
 
-      <WallLabels room={roomRef} active={active} live={ready && !failed && !rearrange}
+      <WallLabels room={roomRef} active={active} live={ready && !failed}
                   onOpen={(id) => lbRef.current?.open(id, null, WALK_ORDER)} />
 
       {failed && (
@@ -896,7 +845,7 @@ export default function Studio({ dims }: { dims: Dims }) {
       </main>
 
       {/* a phone's way to walk without knowing the gesture: an arrow at each edge */}
-      {ready && !failed && !rearrange && (
+      {ready && !failed && (
         <div className="edge-nav" aria-hidden="false">
           <button type="button" className="edge-btn is-prev" aria-label="The last wall" disabled={active === 0}
                   onClick={() => stepRef.current(-1)}><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M14.5 5.5 8 12l6.5 6.5" /></svg></button>
@@ -913,11 +862,11 @@ export default function Studio({ dims }: { dims: Dims }) {
       )}
 
       {!failed && (
-        <QuickIndex active={active} live={ready && !rearrange} onStop={goStop} onWorks={showWorks}
+        <QuickIndex active={active} live={ready} onStop={goStop} onWorks={showWorks}
                     onPlan={() => go("[data-chapter='plan']", true)} onContact={() => go("#contact")} />
       )}
       <Stops open={stops} active={active} onClose={closeStops} onGo={goStop}
-             onShake={shake} onContact={() => go("#contact")} onWorks={showWorks} />
+             onContact={() => go("#contact")} onWorks={showWorks} />
       <Lightbox ref={lbRef} dims={dims} onOpenChange={onLightbox} />
       <Cursor live={ready || failed} />
     </>

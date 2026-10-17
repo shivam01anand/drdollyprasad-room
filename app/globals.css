@@ -77,8 +77,6 @@ button{font:inherit;color:inherit}
 /* ---------------------------------------------------------------- stage */
 .stage{position:fixed;inset:0;z-index:0;transform-origin:50% 40%;will-change:transform;overflow:hidden}
 .stage canvas{width:100%;height:100%;touch-action:pan-y}
-html[data-rearrange="1"] .stage canvas{touch-action:none;cursor:grab}
-html[data-rearrange="1"] .stage canvas:active{cursor:grabbing}
 
 /* -------------------------------------------------------------- chapters */
 .chapters{position:relative;z-index:1;pointer-events:none}
@@ -97,13 +95,10 @@ html[data-rearrange="1"] .stage canvas:active{cursor:grabbing}
 /* before hydration the header is held back, so nothing flashes over the counter */
 .hud[data-state="pre"] :is(.hud-meta,.hud-mail,.hud-hint,.hud-pills,.diya-btn){visibility:hidden}
 .hud .brand,.hud .hud-meta,.hud .hud-mail,.hud .hud-hint{transition:color .5s ease}
-html[data-hud="light"]:not([data-rearrange="1"]) .hud .brand,
-html[data-hud="light"]:not([data-rearrange="1"]) .hud .brand-target .pre-big{color:#F2ECE2}
-html[data-hud="dark"]:not([data-rearrange="1"]) .hud .brand,
-html[data-hud="dark"]:not([data-rearrange="1"]) .hud .brand-target .pre-big{color:#211B17}
-/* shaking the room clears the stage of everything but the room */
-html[data-rearrange="1"] .sec-featured,
-html[data-rearrange="1"] .chapter-text{visibility:hidden;pointer-events:none}
+html[data-hud="light"] .hud .brand,
+html[data-hud="light"] .hud .brand-target .pre-big{color:#F2ECE2}
+html[data-hud="dark"] .hud .brand,
+html[data-hud="dark"] .hud .brand-target .pre-big{color:#211B17}
 .hud-top{display:grid;grid-template-columns:1fr auto auto auto auto;align-items:start;gap:clamp(10px,1.2vw,16px)}
 /* every fact and control sits on the same quiet chip; the name alone is free type */
 .hud-meta,.hud-mail{align-self:center;background:var(--chip);border:1px solid var(--line);border-radius:999px;
@@ -160,7 +155,6 @@ html[data-rearrange="1"] .chapter-text{visibility:hidden;pointer-events:none}
 .qi-stops button{padding:8px 0;font-size:16px}
 .qi-stops .lab{flex:none;width:2em}
 .qi-more{display:flex;flex-wrap:wrap;gap:8px;margin-top:22px}
-html[data-rearrange="1"] .qi{display:none}
 @media (max-width:900px) and (pointer:coarse){ .qi{display:none} }
 .sheet-h{margin:6px 0 8px}
 .sheet-works{display:flex;flex-wrap:wrap;gap:8px;margin-bottom:12px}
@@ -251,7 +245,6 @@ html[data-gliding="1"]{scroll-snap-type:none}
 .quote{margin:16px 0 0;padding-top:14px;border-top:1px solid var(--rule);font-size:clamp(15px,1.1vw,17px);line-height:1.55;font-style:italic;color:var(--ink);max-width:34em}
 .poem{margin:0;font-size:clamp(18px,1.45vw,21px);line-height:1.4;letter-spacing:-.008em}
 .poem-line{display:block;min-height:1.42em}
-html[data-rearrange="1"] .copy{opacity:0;transition:opacity .4s ease}
 
 /* the wall labels: a printed card beside each canvas, as a gallery hangs it */
 .wall-labels{position:fixed;inset:0;z-index:2;pointer-events:none;overflow:hidden}
@@ -270,7 +263,7 @@ html[data-rearrange="1"] .copy{opacity:0;transition:opacity .4s ease}
 .wall-label:focus-visible{outline:2px solid var(--oxide);outline-offset:3px}
 .wall-label.is-aside{cursor:default;pointer-events:none;background:rgba(243,238,229,.92)}
 html[data-mode="dark"] .wall-label{background:#DDD4C6;box-shadow:0 1px 1px rgba(0,0,0,.3),0 8px 18px -10px rgba(0,0,0,.6)}
-html[data-rearrange="1"] .wall-labels,html[data-room="off"] .wall-labels{display:none}
+html[data-room="off"] .wall-labels{display:none}
 
 .room-off{position:relative;z-index:2;margin:0;padding:calc(var(--hud-top) + 24px) var(--gut) 0;color:var(--ink)}
 html[data-room="off"] .stage,
@@ -508,10 +501,6 @@ html[data-mode="dark"] .lb-veil{background:rgba(0,0,0,.5)}
   .pill,.feat-arrow,.lb-close{min-height:44px}
   .feat-arrow,.lb-close{min-width:44px}
 }
-@media (max-width:1100px){
-  /* the four controls must share one row; the long words go first */
-  .hud-pills .long{display:none}
-}
 @media (max-width:900px){
   :root{--hud-top:84px;--hud-bottom:72px}
   /* a soft band behind the name, so it reads over beams and over paintings */
@@ -524,8 +513,8 @@ html[data-mode="dark"] .lb-veil{background:rgba(0,0,0,.5)}
   .brand-target .pre-big{font-size:26px}
   .hud-bottom{flex-direction:column;align-items:stretch;gap:8px}
   .hud-hint{width:max-content;padding:5px 10px 4px;font-size:10px}
-  /* the dock stands in for the hint and the pills; the shaking room keeps its own two */
-  html:not([data-rearrange="1"]) .hud-pills,html:not([data-rearrange="1"]) .hud-hint{display:none}
+  /* the dock stands in for the desktop hint and navigation */
+  .hud-pills,.hud-hint{display:none}
   .hud-pills{justify-content:flex-start;flex-wrap:nowrap;gap:6px}
   .hud-pills .arr{display:none}
   .dock{display:flex;align-items:center;gap:8px;width:100%;animation:dock-rise .7s var(--ease) .15s both}
