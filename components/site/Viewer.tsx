@@ -12,7 +12,6 @@ export default function Viewer({ w, src, thumb, dims, small }: {
   const [view, setView] = useState(rooms.length ? rooms[0].room.id : "work");
   const v = rooms.find((r) => r.room.id === view);
   const name = `${w.title}, ${w.medium.toLowerCase()}, by Dr Dolly Prasad`;
-  const lower = (s: string) => s.replace(/^An? /, (a) => a.toLowerCase());
 
   return (
     <>
@@ -21,7 +20,7 @@ export default function Viewer({ w, src, thumb, dims, small }: {
           <div className="room">
             {/* eslint-disable-next-line @next/next/no-img-element */}
             <img src={v.room.src} width={v.room.w} height={v.room.h} fetchPriority="high"
-                 alt={v.room.inPhoto ? `${name}, hanging in ${lower(v.room.label)}` : `${lower(v.room.label)}`} />
+                 alt={v.room.inPhoto ? `${name}, shown in an illustrative room setting` : "An illustrative room setting"} />
             {!v.room.inPhoto && (
               <span className="room-art" style={{
                 left: `${v.at.left}%`, top: `${v.at.top}%`, width: `${v.at.width}%`, height: `${v.at.height}%`,
@@ -34,7 +33,7 @@ export default function Viewer({ w, src, thumb, dims, small }: {
               </span>
             )}
             {v.trueSize && w.size && <span className="scale">Shown to scale · {w.size}</span>}
-            <span className="room-cap">{v.room.label}</span>
+            <span className="room-cap">Illustrative room setting</span>
           </div>
         ) : (
           <div className="paper">
@@ -47,7 +46,7 @@ export default function Viewer({ w, src, thumb, dims, small }: {
         <div className="thumbs" role="group" aria-label="Views of the painting">
           {rooms.map((r) => (
             <button key={r.room.id} type="button" aria-pressed={view === r.room.id} onClick={() => setView(r.room.id)}
-                    aria-label={`In ${lower(r.room.label)}`} title={r.room.label}>
+                    aria-label="In a room setting" title="In a room setting">
               {/* eslint-disable-next-line @next/next/no-img-element */}
               <img src={r.room.thumb} alt="" />
             </button>

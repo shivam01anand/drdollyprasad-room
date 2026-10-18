@@ -26,7 +26,7 @@ export default function WorksPage() {
           <b>The stories behind each painting are on Instagram</b>
           <span className="link" style={{ display: "inline-flex", gap: 8, alignItems: "center" }}><InstagramIcon />{INSTAGRAM.handle} →</span>
         </a>
-        <p className="meta" style={{ marginTop: 18 }}>Looking for something particular? <Link href="/enquire">Ask about a painting or a commission</Link>.</p>
+        <p className="meta" style={{ marginTop: 18 }}>Looking for something in particular? <Link href="/enquire">Ask about a painting</Link>.</p>
       </section>
     </div>
   );

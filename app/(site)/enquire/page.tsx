@@ -12,7 +12,7 @@ export default function Enquire() {
     <div className="wrap">
       <section className="sec-tight" style={{ paddingBottom: 0 }}>
         <h1 className="page-title">Enquire</h1>
-        <p className="lede">Ask about a painting, a commission, an exhibition or the press. Prices are on request.</p>
+        <p className="lede">A painting you would like to know more about, an exhibition, the press, or a commission. Prices are on request.</p>
       </section>
       <EnquireForm />
     </div>

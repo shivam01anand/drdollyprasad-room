@@ -645,3 +645,15 @@ html[data-mode="dark"] .lb-veil{background:rgba(0,0,0,.5)}
   .wp-text{padding:30px 0 6px}
   .wp-actions .pill{flex:1 1 auto}
 }
+
+/* the way out of the studio, always on screen above the house and its preloader */
+.studio-exit{position:fixed;z-index:10000;left:50%;top:20px;transform:translateX(-50%);
+  display:inline-flex;align-items:center;gap:10px;padding:14px 26px 14px 20px;border-radius:999px;
+  background:#211B17;color:#F2ECE2;text-decoration:none;font:600 16px/1 var(--sans, "Instrument Sans", Arial, sans-serif);
+  letter-spacing:.04em;box-shadow:0 10px 30px rgba(0,0,0,.28);border:1px solid rgba(242,236,226,.25);
+  transition:transform .2s ease, background-color .2s ease}
+.studio-exit:hover{background:#A84B2A;transform:translateX(-50%) translateY(-2px)}
+.studio-exit:focus-visible{outline:3px solid #A84B2A;outline-offset:3px}
+.studio-exit svg{width:20px;height:20px;fill:none;stroke:currentColor;stroke-width:2.2;stroke-linecap:round}
+@media (max-width:760px){ .studio-exit{top:auto;left:auto;right:14px;bottom:96px;transform:none;padding:12px 18px 12px 14px;font-size:14.5px}
+  .studio-exit:hover{transform:none} }

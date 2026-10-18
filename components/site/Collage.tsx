@@ -17,19 +17,19 @@ const X = (src: string, eyebrow: string, title: string, sub: string, alt: string
  *  Instagram manner, and her exhibitions. Each column holds its list twice, so it loops. */
 const COLUMNS: Item[][] = [
   [P("bulls-and-wheel"), C("temple-bells"), P("red-turban-portrait"),
-    X("/site/ex/ihc-room-01.jpg", "Solo exhibition", "India Habitat Centre", "New Delhi", "Her paintings around the room at India Habitat Centre"),
+    X("/site/ex/ihc-01.jpg", "Exhibition · November 2010", "India Habitat Centre", "Open Palm Court, New Delhi", "Her paintings around the room at India Habitat Centre"),
     P("weathered-door-ring"), P("boy-and-kettle")],
   [P("woman-with-poppies"), P("mother-india-and-kettles"), { k: "s" }, P("offering-of-light"), C("coins-and-clay-bank"), P("milkman-on-bicycle")],
-  [X("/site/ex/iccr-03.jpg", "Indian Council for Cultural Relations", "A Lifetime to Paint", "Azad Bhavan Art Gallery · June 2010", "The ICCR sign for A Lifetime to Paint"),
+  [X("/site/ex/iccr-sign.jpg", "Indian Council for Cultural Relations", "A Lifetime to Paint", "Azad Bhavan Art Gallery · June 2010", "The ICCR sign for A Lifetime to Paint"),
     P("boy-with-bananas"), P("red-and-teal-door-lock"), P("rickshaw-puller-and-coin"), P("patterned-turban-portrait"), C("woman-with-bird")],
   [P("three-veiled-women"), C("bulls-and-wheel"), P("monks-and-blue-buddha"),
-    X("/site/ex/paper-01.jpg", "Exhibition · 2007", "Recent paintings", "Triveni Kala Sangam · with Sangeeta Sharma", "The invitation to the 2007 Triveni Kala Sangam exhibition"),
+    X("/site/ex/kala-dolly.jpg", "Art fair · February 2018", "First International Kala Mela", "IGNCA, New Delhi", "Dr Dolly Prasad beside her painting at the First International Kala Mela"),
     P("terracotta-pots"), P("man-among-metal-pans")],
   [P("child-among-flowers"), P("postbox-and-stamps"),
-    X("/site/ex/ihc-evening-01.jpg", "Opening night", "Lighting the lamp", "India Habitat Centre", "Dr Dolly Prasad lights the lamp at her exhibition"),
+    X("/site/ex/ihc-03.jpg", "Opening night · 2010", "Lighting the lamp", "India Habitat Centre", "Dr Dolly Prasad lights the lamp at her exhibition"),
     P("yellow-turban-portrait"), C("boy-with-bananas"), P("prayer-and-scripture")],
   [P("shree-420-and-milk-cans"), P("teal-door-bolt"), C("woman-with-red-flower"), P("monk-and-green-buddha"),
-    X("/site/ex/ihc-press-01.jpg", "In the press", "Beside The Bullocks", "India Habitat Centre", "Dr Dolly Prasad speaking to the press beside The Bullocks"),
+    X("/site/ex/ihc-press-b.jpg", "In front of the cameras", "Beside The Bullocks", "India Habitat Centre · 2010", "Dr Dolly Prasad interviewed beside The Bullocks"),
     P("cycle-rickshaw")],
 ];
 
@@ -37,7 +37,7 @@ function Tile({ it }: { it: Item }) {
   if (it.k === "s") {
     return (
       <Link className="tile scard" href="/exhibitions" tabIndex={-1}>
-        <b>18</b><em>Solo exhibitions</em><small>2005–2018 · New Delhi and Bombay</small>
+        <b>18</b><em>Exhibitions and art fairs</em><small>2005–2018 · Delhi, Jaipur, Bombay</small>
       </Link>
     );
   }

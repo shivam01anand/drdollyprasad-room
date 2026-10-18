@@ -1,7 +1,7 @@
 import type { Metadata, Viewport } from "next";
 
 const DESCRIPTION =
-  "Paintings by Dr Dolly Prasad — the everyday, held sacred. Oil on canvas, New Delhi. Eighteen solo exhibitions; work in private collections in India, the USA, New York and London.";
+  "Paintings by Dr Dolly Prasad — the everyday, held sacred. Oil on canvas, New Delhi. Eighteen exhibitions and art fairs, 2005–2018; work in private collections in India, the USA and London.";
 
 export const metadata: Metadata = {
   metadataBase: new URL("https://drdollyprasad.com"),

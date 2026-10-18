@@ -3,7 +3,7 @@
 import Link from "next/link";
 import { usePathname } from "next/navigation";
 import { useEffect, useRef } from "react";
-import { INSTAGRAM, NAV, PORTRAIT, STUDIO_PATH, whatsappHref } from "@/lib/site";
+import { INSTAGRAM, NAV, PORTRAIT, STUDIO_PATH, WHATSAPP, whatsappHref } from "@/lib/site";
 import { ChatIcon, InstagramIcon, MenuIcon } from "./Icons";
 
 /** her portrait and name top-left, the rooms of the site, and the two ways to ask */
@@ -27,7 +27,7 @@ export default function Header() {
         <Link href="/" className="brand" aria-label="Dr Dolly Prasad — home">
           {/* eslint-disable-next-line @next/next/no-img-element */}
           <img src={PORTRAIT} alt="" width={52} height={52} />
-          <span>Dr Dolly Prasad</span>
+          <span className="brand-t"><b>Dr Dolly Prasad</b><i>The everyday, held sacred.</i></span>
         </Link>
         <nav className="nav" aria-label="Main">
           {links}
@@ -36,7 +36,7 @@ export default function Header() {
           </a>
         </nav>
         <div className="hdr-cta">
-          <a className="btn btn-wa" href={whatsappHref()}><ChatIcon />WhatsApp</a>
+          {WHATSAPP && <a className="btn btn-wa" href={whatsappHref()}><ChatIcon />WhatsApp</a>}
           <Link className="btn btn-solid" href="/enquire">Enquire</Link>
         </div>
         <details className="menu" ref={menu}>

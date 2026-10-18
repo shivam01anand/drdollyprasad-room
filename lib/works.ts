@@ -2,8 +2,11 @@
  * The catalogue, once.
  *
  * Titles are hers where she has given them and working titles otherwise.
- * Sizes appear ONLY where she has stated them; everything else is unknown
- * and renders as unknown. Status is the "Available" / "Sold" sorting from
+ * Sizes appear ONLY where they are confirmed; everything else is unknown
+ * and renders as unknown. Sizes are height × width. (18 Oct 2026: doors are
+ * 12 × 12 in; Elder Woman and Red Turban 30 × 30 in; Vakratunda and Gayatri
+ * 48 × 30 in; Cart-Man, Mother India, Shree 420 and Mother and Son on request
+ * until their height and width are confirmed.) Status is the "Available" / "Sold" sorting from
  * her own site, plus what she has offered since (Sacred Fragments, Oct 2026);
  * a recent work with no known status reads "Enquire".
  */
@@ -33,36 +36,36 @@ export const WORKS: Work[] = [
   W("rickshaw-puller-and-coin", "Twenty Paise", "Gone Are The Days", "Available", { year: "c. 2016–2018" }),
   W("carriage-and-autorickshaw", "Gone Are The Days [A]", "Gone Are The Days", "Available", { year: "c. 2016–2018" }),
   W("bullock-cart-and-truck", "Gone Are The Days [B]", "Gone Are The Days", "Available", { year: "c. 2016–2018", size: "24 × 24 in", inches: 24 }),
-  W("rickshaw-rest-framed", "The Cart-Man and the Rupaya", "Gone Are The Days", "Available", { year: "c. 2016–2018", size: "36 × 48 in", inches: 48 }),
+  W("rickshaw-rest-framed", "The Cart-Man and the Rupaya", "Gone Are The Days", "Available", { year: "c. 2016–2018" }),
   W("coins-and-clay-bank", "The Matka and the Coins", "Gone Are The Days", "Available", { year: "c. 2016–2018" }),
   W("postbox-and-stamps", "Patra Petika", "Gone Are The Days", "Available", { year: "c. 2016–2018" }),
-  W("mother-india-and-kettles", "Mother India", "Gone Are The Days", "Available", { year: "c. 2016–2018", size: "30 × 40 in", inches: 40 }),
-  W("shree-420-and-milk-cans", "Shree 420", "Gone Are The Days", "Available", { year: "c. 2016–2018", size: "30 × 40 in", inches: 40 }),
+  W("mother-india-and-kettles", "Mother India", "Gone Are The Days", "Available", { year: "c. 2016–2018" }),
+  W("shree-420-and-milk-cans", "Shree 420", "Gone Are The Days", "Available", { year: "c. 2016–2018" }),
   W("bulls-and-wheel", "The Bullocks", "Gone Are The Days", "Available", { year: "c. 2016–2018", size: "48 × 48 in", inches: 48 }),
   W("cycle-rickshaw", "The Cycle Rickshaw-wala", "Gone Are The Days", "Available", { year: "c. 2016–2018" }),
   W("rickshaw-rest", "The Rickshaw-wala Resting", "Gone Are The Days", "Sold", { year: "c. 2016–2018" }),
-  W("horse-cart-and-autorickshaw", "Small Panel I", "Gone Are The Days", "Available", { year: "c. 2016–2018", size: "18 × 18 in", inches: 18 }),
-  W("rickshaw-and-autorickshaw", "Small Panel II", "Gone Are The Days", "Available", { year: "c. 2016–2018", size: "18 × 18 in", inches: 18 }),
+  W("horse-cart-and-autorickshaw", "Small Panel I", "Gone Are The Days", "Available", { year: "c. 2016–2018" }),
+  W("rickshaw-and-autorickshaw", "Small Panel II", "Gone Are The Days", "Available", { year: "c. 2016–2018" }),
   W("terracotta-pots", "Terracotta", "Gone Are The Days", "Available", { year: "2015", size: "36 × 36 in", inches: 36 }),
   // Bandh Darwaze — 2018, one foot square
-  W("weathered-door-ring", "Bandh Darwaze I", "Bandh Darwaze", "Available", { year: "2018", size: "18 × 18 in", inches: 18 }),
-  W("red-and-teal-door-lock", "Bandh Darwaze II", "Bandh Darwaze", "Available", { year: "2018", size: "18 × 18 in", inches: 18 }),
-  W("teal-door-bolt", "Bandh Darwaze III", "Bandh Darwaze", "Available", { year: "2018", size: "18 × 18 in", inches: 18 }),
-  W("carved-door-knocker", "Bandh Darwaze IV", "Bandh Darwaze", "Available", { year: "2018", size: "18 × 18 in", inches: 18 }),
+  W("weathered-door-ring", "Bandh Darwaze I", "Bandh Darwaze", "Available", { year: "2018", size: "12 × 12 in", inches: 12 }),
+  W("red-and-teal-door-lock", "Bandh Darwaze II", "Bandh Darwaze", "Available", { year: "2018", size: "12 × 12 in", inches: 12 }),
+  W("teal-door-bolt", "Bandh Darwaze III", "Bandh Darwaze", "Available", { year: "2018", size: "12 × 12 in", inches: 12 }),
+  W("carved-door-knocker", "Bandh Darwaze IV", "Bandh Darwaze", "Available", { year: "2018", size: "12 × 12 in", inches: 12 }),
   // Faith — c. 2005–2015
   W("monks-and-blue-buddha", "The Blue Buddha", "Faith", "Available", { year: "c. 2005–2015" }),
   W("monk-and-green-buddha", "Buddha Under the Bodhi Tree", "Faith", "Available", { year: "c. 2005–2015" }),
-  W("offering-of-light", "Vakratunda", "Faith", "Sold", { year: "c. 2005–2015" }),
-  W("prayer-and-scripture", "Gayatri", "Faith", "Sold", { year: "c. 2005–2015" }),
+  W("offering-of-light", "Vakratunda", "Faith", "Sold", { year: "c. 2005–2015", size: "48 × 30 in", inches: 48 }),
+  W("prayer-and-scripture", "Gayatri", "Faith", "Sold", { year: "c. 2005–2015", size: "48 × 30 in", inches: 48 }),
   W("priest-with-flame", "The Aarti", "Faith", "Sold", { year: "c. 2005–2015" }),
   W("sacred-tree", "The Peepal Shrine", "Faith", "Sold", { year: "c. 2005–2015" }),
   W("newspaper-reader", "The Newspaper Reader", "Faith", "Sold", { year: "c. 2005–2015" }),
   // Portraits — c. 2005–2015
-  W("elder-woman-portrait", "Portrait I — The Elder Woman", "Portraits", "Available", { year: "c. 2005–2015", size: "30 in", inches: 30 }),
-  W("red-turban-portrait", "Portrait II — The Red Turban", "Portraits", "Available", { year: "c. 2005–2015", size: "24 × 24 in", inches: 24 }),
+  W("elder-woman-portrait", "The Elder Woman", "Portraits", "Available", { year: "c. 2005–2015", size: "30 × 30 in", inches: 30 }),
+  W("red-turban-portrait", "The Red Turban", "Portraits", "Available", { year: "c. 2005–2015", size: "30 × 30 in", inches: 30 }),
   W("yellow-turban-portrait", "The Yellow Turban", "Portraits", "Available", { year: "c. 2005–2015" }),
   W("patterned-turban-portrait", "The Lattice Turban", "Portraits", "Available", { year: "c. 2005–2015" }),
-  W("mother-and-child", "Mother and Son", "Portraits", "Available", { year: "c. 2005–2015", size: "36 × 48 in", inches: 48 }),
+  W("mother-and-child", "Mother and Son", "Portraits", "Available", { year: "c. 2005–2015" }),
   W("boy-and-kettle", "The Chai Boy", "Portraits", "Sold", { year: "c. 2005–2015" }),
   W("man-among-metal-pans", "The Kadhai Seller", "Portraits", "Sold", { year: "c. 2005–2015" }),
   W("three-veiled-women", "Three Women in Red", "Portraits", "Sold", { year: "c. 2005–2015" }),
@@ -83,7 +86,7 @@ export const BY_ID = new Map(WORKS.map((w) => [w.id, w]));
 
 export const SERIES: { label: string; note: string }[] = [
   { label: "Gone Are The Days", note: "c. 2016–2018 · oil on canvas" },
-  { label: "Bandh Darwaze", note: "Closed Doors · 2018 · 18 × 18 in each" },
+  { label: "Bandh Darwaze", note: "Closed Doors · 2018 · 12 × 12 in each" },
   { label: "Faith", note: "c. 2005–2015" },
   { label: "Portraits", note: "c. 2005–2015" },
   { label: "Recent work", note: "2024– · her own titles" },
@@ -118,9 +121,15 @@ export const SITE = "https://drdollyprasad.com";
 export const workPath = (id: string) => `/work/${id}`;
 
 /** her stated size as width and height in inches, when she gives both */
-export const inchDims = (w: Work) => {
+/** the two stated numbers, in the order given, plus width and height read
+ *  against the photograph's own shape (the longer side gets the larger number) */
+export const inchDims = (w: Work, photo?: { w: number; h: number }) => {
   const m = w.size?.match(/^(\d+(?:\.\d+)?)\s*×\s*(\d+(?:\.\d+)?)\s*in$/);
-  return m ? { width: +m[1], height: +m[2] } : null;
+  if (!m) return null;
+  const a = +m[1], b = +m[2];
+  const big = Math.max(a, b), small = Math.min(a, b);
+  const landscape = photo ? photo.w >= photo.h : a <= b;
+  return { a, b, width: landscape ? big : small, height: landscape ? small : big };
 };
 
 export const EMAIL = "drdollyprasad@gmail.com";

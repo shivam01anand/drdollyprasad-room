@@ -2,7 +2,7 @@ import type { Metadata } from "next";
 import Link from "next/link";
 import { notFound } from "next/navigation";
 import Card from "@/components/site/Card";
-import { SERIES_BY_SLUG, SERIES_PAGES, enquireHref, whatsappHref, worksIn, type Chapter } from "@/lib/site";
+import { SERIES_BY_SLUG, SERIES_PAGES, WHATSAPP, enquireHref, whatsappHref, worksIn, type Chapter } from "@/lib/site";
 import { TAILORED } from "@/lib/rooms";
 import { BY_ID, LARGE, workPath, type Work } from "@/lib/works";
 import { ChatIcon } from "@/components/site/Icons";
@@ -25,12 +25,10 @@ export async function generateMetadata({ params }: Props): Promise<Metadata> {
 
 /** a photograph of the series out in the world, from her exhibitions */
 const PHOTO: Record<string, { src: string; alt: string; cap: string }> = {
-  "gone-are-the-days": { src: "/site/ex/ihc-press-01.jpg", alt: "Dr Dolly Prasad speaking to the press beside The Bullocks",
-    cap: "Beside The Bullocks, speaking to the press at her exhibition at India Habitat Centre, New Delhi." },
+  "gone-are-the-days": { src: "/site/ex/ihc-press-b.jpg", alt: "Dr Dolly Prasad interviewed beside The Bullocks",
+    cap: "Beside The Bullocks, in front of the cameras at Open Palm Court, India Habitat Centre, New Delhi, November 2010." },
   faith: { src: "/site/ex/iccr-02.jpg", alt: "Dr Dolly Prasad beside The Blue Buddha at ICCR",
-    cap: "Beside The Blue Buddha at A Lifetime to Paint, ICCR, New Delhi, 2010." },
-  portraits: { src: "/site/ex/ihc-room-04.jpg", alt: "Two paintings of working figures above a brass lamp on a red-brick wall",
-    cap: "Working lives on the wall at India Habitat Centre, New Delhi." },
+    cap: "Beside The Blue Buddha at A Lifetime to Paint, ICCR, New Delhi, June 2010." },
 };
 
 const img = (id: string) => (LARGE.has(id) ? `/art/large/${id}.jpg` : `/art/works/${id}.jpg`);
@@ -142,10 +140,10 @@ export default async function SeriesStory({ params }: Props) {
         <div className="next-series">
           <div className="ask">
             <b>Interested in a work from {s.label}?</b>
-            <p className="meta">Prices on request. Ask about any painting, or about a commission.</p>
+            <p className="meta">Prices on request. Ask about any painting in the series.</p>
             <div style={{ display: "flex", gap: 10, flexWrap: "wrap" }}>
-              <a className="btn btn-wa" href={whatsappHref()}><ChatIcon />Ask on WhatsApp</a>
-              <Link className="btn" href={enquireHref()}>Send an enquiry</Link>
+              {WHATSAPP && <a className="btn btn-wa" href={whatsappHref()}><ChatIcon />Ask on WhatsApp</a>}
+              <Link className={WHATSAPP ? "btn" : "btn btn-solid"} href={enquireHref()}>Send an enquiry</Link>
             </div>
           </div>
           <Link className="go" href={`/series/${next.slug}`}>

@@ -45,13 +45,57 @@ export const WORDS: Record<string, string> = {
     "A young boy stands quietly beneath the shelter of large banana leaves. The bananas on his head look like a natural crown from the earth. Surrounded by deep green, he becomes part of the landscape itself. The painting speaks about nature, childhood, and the quiet beauty of everyday.",
 };
 
-/** short pulls from her words, for cards */
+/** short pulls from her words, for cards — each a whole sentence of hers */
 export const PULL: Record<string, string> = {
   "temple-bells": "Every thread representing a hope, desire, promise, or prayer.",
   "woman-with-bird": "Sometimes, I paint not to show, but to pause.",
   "woman-with-red-flower": "A pause, a breath, a space where the mind softens and listens.",
   "boy-with-bananas": "The bananas on his head look like a natural crown from the earth.",
-  "child-among-flowers": "Beauty can be found even amidst the thorn of life’s challenges.",
+  "child-among-flowers": "The vibrant bougainvillea serves as a reminder that beauty can be found even amidst the thorn of life’s challenges.",
+};
+
+/**
+ * One line per painting, in the observer's voice (third person, never hers):
+ * what is on the canvas, and a thought to leave with. Nothing about the
+ * sitters' lives that the painting itself does not show.
+ */
+export const LOOK: Record<string, string> = {
+  "rickshaw-puller-and-coin": "Broad shoulders in front, a twenty-paise coin behind. What is earned and what is carried, on one canvas.",
+  "carriage-and-autorickshaw": "A tonga and an autorickshaw on the same road. One is arriving; the other has almost gone.",
+  "bullock-cart-and-truck": "A bullock cart beside a truck. Two speeds, one street.",
+  "rickshaw-rest-framed": "A working man at rest against a giant rupee. For a moment, the money waits for him.",
+  "coins-and-clay-bank": "A clay gullak, and the coins it was made to hold: 20 paise, 5 naye paise, 4 annas. Now the coins are gone, and the gullak waits.",
+  "postbox-and-stamps": "Patra petika: the red letterbox, set against a field of stamps. Letters went in; the world came back.",
+  "mother-india-and-kettles": "Steel kettles in front of a Mother India poster: the street’s tea, and the street’s cinema.",
+  "shree-420-and-milk-cans": "Milk cans beneath a peeling Shree 420 poster. The morning round passes an old film still on the wall.",
+  "bulls-and-wheel": "Before engines, there were these two, shoulder to shoulder under one yoke. The wheel still stands. The road has moved on.",
+  "cycle-rickshaw": "A rickshaw-wala and his cycle, large against a red field of smaller vehicles.",
+  "rickshaw-rest": "Between fares, an arm across the wheel. The rest is part of the work.",
+  "horse-cart-and-autorickshaw": "A small panel from Gone Are The Days: older and newer ways of travelling, side by side.",
+  "rickshaw-and-autorickshaw": "A second small panel: the cycle and the motor, sharing one road.",
+  "terracotta-pots": "Clay pots, mouth after mouth, in the colour of the earth they were made from.",
+  "weathered-door-ring": "A ring on a weathered door, the paint worn down to its layers.",
+  "red-and-teal-door-lock": "Red wood, teal wood, and a lock holding them shut.",
+  "teal-door-bolt": "A bolt drawn across teal paint. Whatever is inside stays inside.",
+  "carved-door-knocker": "A carved knocker on a turquoise door, waiting for a visitor.",
+  "monks-and-blue-buddha": "Small figures in saffron before a vast blue face. Stillness, at two scales.",
+  "monk-and-green-buddha": "A monk beneath the Bodhi tree, held in green and gold.",
+  "offering-of-light": "A lamp raised to a wall of scripture. What do you bring to a prayer?",
+  "prayer-and-scripture": "A devotee sits before the written word. And what do you hope to leave behind?",
+  "priest-with-flame": "The aarti flame, lifted: a gesture of seconds, held on canvas.",
+  "sacred-tree": "A peepal trunk wound in red thread, a thread for every wish.",
+  "newspaper-reader": "The morning paper, opened like a ritual.",
+  "elder-woman-portrait": "An elder’s face, painted close.",
+  "red-turban-portrait": "A red turban, a gold earring, a smile. The rest of his story stays his own.",
+  "yellow-turban-portrait": "The yellow catches you first. Then the eyes, which ask for longer.",
+  "patterned-turban-portrait": "A lattice of cloth tied above the face, and the lines of a life beneath it.",
+  "mother-and-child": "A mother and her son, close, and the small space between them.",
+  "boy-and-kettle": "The chai boy between orders, chin in hand, in a world of blue.",
+  "man-among-metal-pans": "The kadhai seller among his pans, circle upon circle.",
+  "three-veiled-women": "Three women in red, their veils drawn close together.",
+  "milkman-on-bicycle": "The doodhwala on his round, the cans swinging from his bicycle.",
+  "riverside-figures": "Boatmen at the water’s edge.",
+  "woman-with-poppies": "A face turned to one side, and the poppies in full voice around her.",
 };
 
 /** approved editorial lines (third person), for cards and chapters */
@@ -60,10 +104,27 @@ export const LINES: Record<string, string> = {
   "coins-and-clay-bank": "Now the coins are gone, and the gullak waits.",
 };
 
+/** her poem, verbatim */
 export const STATEMENT = [
   "They are not things,", "They are everything", "They come to me", "They hold my hand",
   "They give me a brush", "Then sit quietly", "In front of me", "I put them on canvas",
   "I don’t paint", "Am not a painter",
+];
+
+/**
+ * The artist's statement, in the observer's voice (third person): what the
+ * work is about, from the brand thesis — attention, memory, devotion and the
+ * pause. Written for the site; hers to change.
+ */
+export const ABOUT_THE_WORK = [
+  "Dr Dolly Prasad paints what daily life passes by.",
+  "A clay gullak and the coins it was made to hold. A door nobody opens any more. A lamp raised to a wall of scripture. A boy beneath banana leaves, a crown of fruit on his head.",
+  "She gives these ordinary things the scale, the colour and the stillness we usually keep for the sacred. A matka is looked at as closely as a Buddha. A rickshaw-wala at rest is given the whole canvas.",
+];
+export const THREADS = [
+  { t: "Memory", d: "The tonga, the twenty-paise coin, the hand-painted film poster — kept on canvas as they leave the street." },
+  { t: "Devotion", d: "Not as spectacle but as habit: a thread, a bell, a flame, the morning paper." },
+  { t: "The pause", d: "Faces, flowers and birds, held long enough to be felt." },
 ];
 
 export const ON_THE_WORK =
@@ -71,8 +132,6 @@ export const ON_THE_WORK =
 
 export const ON_EXHIBITIONS =
   "Each of these paintings reminds me I have yet to pick up many more hues to fill up some empty lines, some yet to be filled up nooks. I hope it would be a life-long unraveling with these tinges, an affair to last a lifetime…";
-
-export type Motif = "days" | "doors" | "faith" | "faces" | "recent" | "home";
 
 export type Chapter = {
   title: string;
@@ -91,7 +150,6 @@ export type SeriesPage = {
   slug: string;
   label: string;
   period: string;
-  motif: Motif;
   /** one line for the overview and the home tiles */
   line: string;
   /** the work that opens the series */
@@ -104,13 +162,13 @@ export type SeriesPage = {
 
 export const SERIES_PAGES: SeriesPage[] = [
   {
-    slug: "gone-are-the-days", label: "Gone Are The Days", period: "c. 2016–2018", motif: "days",
-    line: "Rickshaws, coins, clay and cinema posters from an India slipping out of view.",
+    slug: "gone-are-the-days", label: "Gone Are The Days", period: "c. 2016–2018",
+    line: "The India that is quietly leaving: the tonga, the gullak, the twenty-paise coin.",
     hero: "bulls-and-wheel",
     quote: "The shades that touched me, the live frames that seemed to tell a story larger than the attention they seemed to draw.",
     intro: [
-      "Fourteen canvases gather the things daily life is letting go of: the tonga and the bullock cart, the twenty-paise coin, the clay gullak, the red letterbox, the hand-painted cinema poster.",
-      "Again and again an old thing shares the canvas with what replaced it — a bullock cart beside a truck, a tonga beside an autorickshaw. Each painting holds two times at once.",
+      "Fourteen canvases of the things daily life is letting go of. The bullock cart and the tonga. The clay gullak and the coins it was made to hold. The red letterbox. The hand-painted film poster.",
+      "Often an old thing shares the canvas with what replaced it: a cart beside a truck, a tonga beside an autorickshaw. Two times, one painting.",
     ],
     chapters: [
       { title: "Coins and clay", works: ["rickshaw-puller-and-coin", "coins-and-clay-bank", "terracotta-pots"],
@@ -121,33 +179,34 @@ export const SERIES_PAGES: SeriesPage[] = [
         big: "The wheel still stands. The road has moved on." },
       { title: "Then and now", works: ["carriage-and-autorickshaw", "bullock-cart-and-truck", "cycle-rickshaw", "rickshaw-rest"],
         big: "A tonga beside an autorickshaw. A bullock cart beside a truck.",
-        small: "Two ways of moving through the same street, painted on one canvas." },
+        small: "Two ways of moving through the same street, on one canvas." },
       { title: "Letters and cinema", works: ["postbox-and-stamps", "mother-india-and-kettles", "shree-420-and-milk-cans"],
-        big: "A red letterbox, and the posters of films a whole country knew by heart." },
+        big: "A red letterbox. Steel kettles. Milk cans under a film poster.",
+        small: "The street’s post, its tea and its cinema." },
     ],
   },
   {
-    slug: "bandh-darwaze", label: "Bandh Darwaze", period: "2018", motif: "doors",
-    line: "Closed doors: a ring, a lock, a bolt and a carved knocker, painted close.",
+    slug: "bandh-darwaze", label: "Bandh Darwaze", period: "2018",
+    line: "Four closed doors: a ring, a lock, a bolt, a knocker.",
     hero: "red-and-teal-door-lock",
     intro: [
-      "Bandh darwaze — closed doors. Four square canvases look closely at the hardware of old doors: a weathered ring, a red and teal lock, a teal bolt, a carved knocker.",
-      "There are no people in this series, only the things hands reach for at a threshold, painted on worn, colour-washed wood.",
+      "Bandh darwaze: closed doors. Four small square canvases, each a close look at the hardware of an old door, painted over worn, colour-washed wood.",
+      "No people, no rooms. Only what a hand reaches for at a threshold.",
     ],
     chapters: [
       { title: "The ring and the lock", works: ["weathered-door-ring", "red-and-teal-door-lock"],
-        big: "A ring to knock with. A lock that keeps the rest out of view." },
+        big: "A ring to knock with. A lock to keep the rest unseen." },
       { title: "The bolt and the knocker", works: ["teal-door-bolt", "carved-door-knocker"],
-        small: "Four canvases, one wall: the series is made to be seen together." },
+        small: "A foot square each, the four are made to be seen together, on one wall." },
     ],
   },
   {
-    slug: "faith", label: "Faith", period: "c. 2005–2015", motif: "faith",
-    line: "Lamps, threads, scripture and stillness: devotion as daily practice.",
+    slug: "faith", label: "Faith", period: "c. 2005–2015",
+    line: "Devotion as daily practice: a lamp, a thread, a page of scripture.",
     hero: "offering-of-light",
     intro: [
-      "Devotion here is not spectacle. A monk raises a lamp to a wall of scripture, a devotee sits before it, a priest lifts a flame, a trunk is wound with red thread.",
-      "Faith, in these paintings, lives in habit — even in a man reading his morning paper.",
+      "Not spectacle, but habit. A lamp is raised to a wall of scripture. A devotee sits before it. A priest lifts the aarti flame. A peepal is wound in red thread.",
+      "And a man opens his morning paper. In these paintings, that too is a kind of faith.",
     ],
     chapters: [
       { title: "Light and scripture", works: ["offering-of-light", "prayer-and-scripture"],
@@ -159,15 +218,16 @@ export const SERIES_PAGES: SeriesPage[] = [
     ],
   },
   {
-    slug: "portraits", label: "Portraits", period: "c. 2005–2015", motif: "faces",
-    line: "Faces and working lives: turbans, a chai boy, a kadhai seller, a milkman on his round.",
+    slug: "portraits", label: "Portraits", period: "c. 2005–2015",
+    line: "Faces, and the things of their day: a turban, a kettle, a stack of kadhais.",
     hero: "three-veiled-women",
     intro: [
-      "The play of emotions on a face has always held her. These portraits stay with people and the work of their hands: elders in turbans, a boy between orders of chai, a seller among his pans, a milkman on his round.",
+      "The play of emotion on a face has always held her. These portraits stay close: elders in turbans, a chai boy between orders, a kadhai seller among his pans, a doodhwala on his round.",
+      "Each figure is painted with the things of their work beside them. The face is where you meet them. The rest is left to them.",
     ],
     chapters: [
       { title: "Turbans", works: ["red-turban-portrait", "yellow-turban-portrait", "patterned-turban-portrait"],
-        big: "Three turbans, three ways of meeting the world." },
+        big: "Red, yellow, a lattice of cloth.", small: "The colour draws you in. The faces keep you there." },
       { title: "Working lives", works: ["boy-and-kettle", "man-among-metal-pans", "milkman-on-bicycle"],
         small: "A kettle, a stack of kadhais, milk cans on a bicycle: each figure is painted with the things of their day." },
       { title: "Together", works: ["three-veiled-women", "mother-and-child"], room: true, dark: true,
@@ -175,11 +235,12 @@ export const SERIES_PAGES: SeriesPage[] = [
     ],
   },
   {
-    slug: "recent-work", label: "Recent work", period: "2024–", motif: "recent",
-    line: "Flowers, birds and stillness — most of them described in her own words.",
+    slug: "recent-work", label: "Recent work", period: "2024–",
+    line: "Flowers, leaves, a bird, a pause — in her own words.",
     hero: "boy-with-bananas",
     intro: [
-      "Her recent paintings turn inward: women and children with flowers, birds and leaves, pauses and breath. Five of the six come with her own words, and here they are given in full.",
+      "Her recent work turns inward. A child beneath banana leaves. A woman beside a bird. Bells hung with red thread.",
+      "Five of the six paintings come with her own words. They are given here in full.",
     ],
     chapters: [
       { title: "Under Canopy of Greens", works: ["boy-with-bananas"], room: true, hers: true, big: WORDS["boy-with-bananas"] },
@@ -187,7 +248,7 @@ export const SERIES_PAGES: SeriesPage[] = [
       { title: "Whispers of Stillness", works: ["woman-with-bird"], room: true, dark: true, hers: true, big: WORDS["woman-with-bird"] },
       { title: "Petals of Thought", works: ["woman-with-red-flower"], hers: true, big: WORDS["woman-with-red-flower"] },
       { title: "Blooming Innocence", works: ["child-among-flowers"], room: true, hers: true, big: WORDS["child-among-flowers"] },
-      { title: "Woman with Poppies", works: ["woman-with-poppies"] },
+      { title: "Woman with Poppies", works: ["woman-with-poppies"], big: LOOK["woman-with-poppies"] },
     ],
   },
 ];
@@ -219,92 +280,154 @@ export const enquireHref = (w?: Work) => (w ? `/enquire?work=${w.id}` : "/enquir
 
 /* ---------------------------------------------------------------- exhibitions */
 
-export type Photo = { src: string; alt: string };
+/**
+ * From the exhibition archive (Project Memory/exhibitions-master.json and the
+ * exhibition post records, 18 Oct 2026). Her own record lists eighteen
+ * exhibitions and art fairs, 2005–2018; it does not say which were solo, so
+ * nothing here calls them all solo. Dates are given only as precisely as the
+ * record gives them.
+ */
 
-export type Exhibition = {
+export type Photo = { src: string; alt: string };
+export type Album = { title: string; line: string; photos: Photo[] };
+export type Clip = { src: string; poster: string; title: string; line: string };
+
+export type Show = {
   id: string;
   title: string;
   kind: string;
   venue: string;
   city: string;
-  /** when, as the record states it; empty when it does not */
   when: string;
-  year?: string;
-  /** a line from the record, never invented */
+  year: string;
+  /** editorial, from the record and the photographs */
+  lede: string;
+  /** her words, verbatim, where they belong to this show */
+  quote?: string;
   note?: string;
-  photos: Photo[];
-  /** works known to have been shown */
+  albums: Album[];
+  clips?: Clip[];
   works?: string[];
-  /** ends after this ISO day (the current show) */
-  until?: string;
 };
 
-const ex = (n: string, alt: string): Photo => ({ src: `/site/ex/${n}.jpg`, alt });
+const ph = (n: string, alt: string): Photo => ({ src: `/site/ex/${n}.jpg`, alt });
 
-export const EXHIBITIONS: Exhibition[] = [
+export const NOW = {
+  id: "sacred-fragments", title: "Sacred Fragments: A Journey Home", city: "New Delhi",
+  when: "18–21 October 2026", until: "2026-10-21",
+  line: "Showing Threads of Faith and Under Canopy of Greens.",
+  works: ["temple-bells", "boy-with-bananas"],
+};
+
+export const SHOWS: Show[] = [
   {
-    id: "sacred-fragments", title: "Sacred Fragments: A Journey Home", kind: "Now showing",
-    venue: "", city: "New Delhi", when: "18–21 October 2026", year: "2026", until: "2026-10-21",
-    note: "Showing Threads of Faith and Under Canopy of Greens.",
-    works: ["temple-bells", "boy-with-bananas"], photos: [],
-  },
-  {
-    id: "india-habitat-centre", title: "India Habitat Centre", kind: "Solo exhibition",
-    venue: "India Habitat Centre", city: "New Delhi", when: "",
-    note: "The opening lamp, conversations beside the canvases, and the press in front of The Bullocks.",
-    works: ["bulls-and-wheel", "rickshaw-rest-framed", "coins-and-clay-bank", "rickshaw-puller-and-coin", "monks-and-blue-buddha"],
-    photos: [
-      ex("ihc-room-01", "The exhibition room at India Habitat Centre, paintings around the walls and a brass lamp in the centre."),
-      ex("ihc-evening-01", "Dr Dolly Prasad lights the brass lamp at the opening, with guests beside her."),
-      ex("ihc-press-01", "Dr Dolly Prasad is interviewed beside The Bullocks, with cameras and microphones in front of her."),
-      ex("ihc-evening-06", "Dr Dolly Prasad in conversation with visitors in front of her paintings."),
-      ex("ihc-room-02", "Three framed paintings along the pale and red-brick gallery walls."),
-      ex("ihc-evening-12", "Dr Dolly Prasad beside The Blue Buddha, looking across the room."),
-      ex("ihc-room-04", "Two paintings of working figures above the brass lamp on a red-brick wall."),
-      ex("ihc-evening-10", "Photographers and visitors in front of a large painting of a rickshaw puller."),
-      ex("ihc-press-02", "Dr Dolly Prasad speaks to the press beside a large rickshaw painting."),
-      ex("ihc-room-03", "Paintings along a pale gallery partition and the adjoining wall."),
-      ex("ihc-evening-09", "Visitors looking along a wall of her paintings."),
-      ex("ihc-evening-04", "Dr Dolly Prasad with a visitor holding a bouquet."),
+    id: "india-habitat-centre-2010", title: "An evening at India Habitat Centre", kind: "Exhibition",
+    venue: "Open Palm Court, India Habitat Centre", city: "New Delhi", when: "November 2010", year: "2010",
+    lede: "A lamp lit at the opening. The Bullocks, the gullak and the rickshaw-walas on red-brick walls. Visitors stopping to talk, to look, to take a photograph — and the press, with questions, beside the paintings.",
+    works: ["bulls-and-wheel", "coins-and-clay-bank", "monks-and-blue-buddha"],
+    albums: [
+      { title: "The evening", line: "The lamp is lit, and the room fills.", photos: [
+        ph("ihc-02", "The opening at Open Palm Court, India Habitat Centre: visitors gathered around the lit brass lamp."),
+        ph("ihc-03", "Dr Dolly Prasad lights the brass lamp at the opening, with guests beside her."),
+        ph("ihc-04", "Dr Dolly Prasad in conversation with visitors in front of her paintings."),
+        ph("ihc-05", "Dr Dolly Prasad and visitors look along a wall of paintings of everyday objects and working lives."),
+        ph("ihc-06", "Photographers and visitors in front of a large painting of a rickshaw puller."),
+        ph("ihc-08", "Dr Dolly Prasad beside The Blue Buddha, looking across the room."),
+      ] },
+      { title: "In front of the cameras", line: "Interviews beside the work: a rickshaw-wala behind her in one, The Bullocks in the other.", photos: [
+        ph("ihc-press-a", "Dr Dolly Prasad smiles in conversation with a reporter beside her rickshaw painting."),
+        ph("ihc-press-b", "Dr Dolly Prasad listens during an interview beside The Bullocks."),
+      ] },
+      { title: "A walk through the room", line: "The wide views first, then the canvases up close.", photos: [
+        ph("ihc-01", "The empty exhibition room, paintings around the walls and a brass lamp at its centre."),
+        ph("ihc-07", "Three framed paintings along the pale and red-brick gallery walls."),
+        ph("ihc-room-a", "Paintings along a pale gallery partition and the adjoining wall."),
+        ph("ihc-room-b", "Two paintings of working figures above the brass lamp on a red-brick wall."),
+        ph("ihc-room-c", "The Bullocks in its black frame on the exhibition wall."),
+        ph("ihc-room-e", "The Matka and the Coins in its exhibition frame."),
+        ph("ihc-room-d", "A framed painting of a working figure against a large coin."),
+        ph("ihc-room-f", "A large framed painting of a rickshaw puller on a red-brick wall."),
+        ph("ihc-room-g", "A framed painting of a seated reader against a large coin."),
+      ] },
     ],
   },
   {
-    id: "a-lifetime-to-paint", title: "A Lifetime to Paint", kind: "Solo exhibition",
-    venue: "Indian Council for Cultural Relations, Azad Bhavan Art Gallery", city: "I.P. Estate, New Delhi",
-    when: "Opened 11 June 2010 · 12–16 June 2010", year: "2010",
-    note: "Presented by the Indian Council for Cultural Relations.",
+    id: "a-lifetime-to-paint", title: "A Lifetime to Paint", kind: "Exhibition, presented by the Indian Council for Cultural Relations",
+    venue: "Azad Bhavan Art Gallery, ICCR, I.P. Estate", city: "New Delhi", when: "Opened 11 June 2010 · on view 12–16 June", year: "2010",
+    lede: "She spoke at the opening beside a marigold-decked lamp, The Blue Buddha behind her. The title looks past the walls, to the paintings still to come.",
+    quote: "I hope it would be a life-long unraveling with these tinges, an affair to last a lifetime…",
     works: ["monks-and-blue-buddha"],
-    photos: [
-      ex("iccr-01", "Dr Dolly Prasad speaks at the opening of A Lifetime to Paint, beside a brass lamp, with The Blue Buddha behind her."),
-      ex("iccr-02", "Dr Dolly Prasad, holding flowers, beside The Blue Buddha at ICCR."),
-      ex("iccr-03", "The ICCR sign for A Lifetime to Paint, with the June 2010 dates and the Azad Bhavan Art Gallery."),
+    albums: [
+      { title: "The opening", line: "11 June 2010, Azad Bhavan Art Gallery.", photos: [
+        ph("iccr-speech", "Dr Dolly Prasad speaks at the opening of A Lifetime to Paint, beside a brass lamp, with The Blue Buddha behind her."),
+        ph("iccr-02", "Dr Dolly Prasad, holding flowers, beside The Blue Buddha at ICCR."),
+        ph("iccr-sign", "The ICCR sign for A Lifetime to Paint, a painting exhibition by Dr Dolly Prasad, 11–16 June 2010."),
+      ] },
     ],
   },
   {
-    id: "triveni-2007", title: "An exhibition of recent paintings", kind: "Two-artist exhibition, with Sangeeta Sharma",
+    id: "kala-mela-2018", title: "First International Kala Mela", kind: "Art fair, organised by Lalit Kala Akademi",
+    venue: "Indira Gandhi National Centre for the Arts", city: "New Delhi", when: "4–18 February 2018", year: "2018",
+    lede: "Artists from India and abroad, and the people who came to meet them. She stood beside a seated working figure painted against a rupee; nearby, a visitor raised her phone for a selfie with the paintings.",
+    albums: [
+      { title: "At the fair", line: "February 2018, IGNCA.", photos: [
+        ph("kala-dolly", "Dr Dolly Prasad in a red coat beside her framed painting at the Kala Mela."),
+        ph("kala-painting", "Her painting of a seated working figure against a rupee, in its black frame at the Kala Mela."),
+        ph("kala-selfie", "A visitor takes a selfie beside the paintings at the Kala Mela."),
+        ph("kala-booklet", "The booklet of the First International Kala Mela."),
+      ] },
+    ],
+  },
+  {
+    id: "triveni-2007", title: "Recent paintings, with Sangeeta Sharma", kind: "Two-artist exhibition",
     venue: "Triveni Kala Sangam, Mandi House", city: "New Delhi", when: "10–20 May 2007", year: "2007",
-    photos: [ex("paper-01", "The invitation to an exhibition of recent paintings by Dolly Prasad and Sangeeta Sharma, Triveni Kala Sangam, 10–20 May 2007 (recreated from the original).")],
-  },
-  {
-    id: "art-today-and-tomorrow", title: "Art Today And Tomorrow", kind: "Group exhibition",
-    venue: "Travancore Art Gallery", city: "New Delhi", when: "",
-    note: "Listed in Delhi Times, The Times of India.",
-    photos: [ex("paper-04", "The Delhi Times listing for Art Today And Tomorrow at Travancore Art Gallery.")],
-  },
-  {
-    id: "kala-mela", title: "First International Kala Mela", kind: "Art fair", venue: "", city: "", when: "",
-    photos: [
-      ex("kala-mela-01", "Dr Dolly Prasad beside her framed painting at the First International Kala Mela."),
-      ex("kala-mela-02", "The booklet of the First International Kala Mela."),
-      ex("kala-mela-04", "Her painting of a seated working man against a rupee, in its black frame at the Kala Mela."),
+    lede: "The invitation keeps what no photograph did: two names, ten days in May, and the paintings chosen to introduce them — among them Lajja, Intezar and Mannat.",
+    note: "The invitation pages are recreated from the originals for legibility; old contact details are left out.",
+    albums: [
+      { title: "The invitation", line: "From the paper archive.", photos: [
+        ph("triveni-1", "The invitation to an exhibition of recent paintings by Dolly Prasad and Sangeeta Sharma, Triveni Kala Sangam, 10–20 May 2007."),
+        ph("triveni-2", "The back of the invitation, with paintings and small portraits of Sangeeta Sharma and Dolly Prasad."),
+        ph("triveni-3", "The artist sheet: the invitation, her portrait and three paintings, Lajja, Intezar and Mannat."),
+      ] },
     ],
   },
 ];
 
-/** the venues of her solo exhibitions, as recorded */
-export const VENUES = [
-  "Triveni Kala Sangam", "India Habitat Centre", "ICCR", "Travancore Art Gallery", "Lalit Kala Akademi", "Nehru Art Gallery, Bombay",
+export const PRESS = {
+  clipping: ph("delhi-times", "A Delhi Times clipping, Must See Must Do, listing Art Today And Tomorrow, a group show at Travancore Art Gallery."),
+  clippingLine: "Delhi Times listed Art Today And Tomorrow, a group show of paintings at Travancore Art Gallery. The clipping is undated.",
+  clips: [
+    { src: "/site/video/tv-archive-2.mp4", poster: "/site/video/tv-archive-2.jpg", title: "On NCR television · June 2010",
+      line: "The recording carries a 12 June 2010 date. The camera turns from the paintings to her, speaking within the exhibition." },
+    { src: "/site/video/tv-archive-1.mp4", poster: "/site/video/tv-archive-1.jpg", title: "From the television archive",
+      line: "A gallery conversation, and the paintings on its walls. Date and venue not recorded." },
+  ] as Clip[],
+};
+
+/** her record, as she lists it (drdollyprasad.wordpress.com/about), newest first */
+export type RecordEntry = { year: string; month?: string; venue: string; city: string; show?: string };
+export const RECORD: RecordEntry[] = [
+  { year: "2018", month: "October", venue: "International Art Fair", city: "Jaipur" },
+  { year: "2018", month: "February", venue: "International Lalit Kala Art Fair (First International Kala Mela)", city: "Delhi", show: "kala-mela-2018" },
+  { year: "2016", month: "March", venue: "Cabinet Secretariat Gallery", city: "Delhi" },
+  { year: "2015", month: "May", venue: "CSOI Club", city: "Delhi" },
+  { year: "2011", venue: "ICCR", city: "Delhi" },
+  { year: "2010", month: "November", venue: "Open Palm Court, India Habitat Centre", city: "Delhi", show: "india-habitat-centre-2010" },
+  { year: "2010", month: "June", venue: "ICCR — A Lifetime to Paint", city: "Delhi", show: "a-lifetime-to-paint" },
+  { year: "2009", month: "March", venue: "Foyer, Convention Centre, India Habitat Centre", city: "Delhi" },
+  { year: "2008", month: "September", venue: "Epicenter", city: "Gurgaon" },
+  { year: "2008", month: "August", venue: "India Habitat Centre", city: "New Delhi" },
+  { year: "2007", month: "May", venue: "Triveni Kala Sangam", city: "New Delhi", show: "triveni-2007" },
+  { year: "2007", venue: "Travancore Art Gallery", city: "New Delhi" },
+  { year: "2007", venue: "Indraprastha Art Gallery", city: "New Delhi" },
+  { year: "2006", venue: "Nehru Art Gallery", city: "Bombay" },
+  { year: "2006", venue: "Travancore Art Gallery", city: "New Delhi" },
+  { year: "2006", venue: "All India Women Art Show", city: "" },
+  { year: "2005", venue: "Indraprastha Art Gallery", city: "New Delhi" },
+  { year: "2005", venue: "Sriram Centre", city: "New Delhi" },
 ];
+
+export const RECORD_LINE = "Eighteen exhibitions and art fairs, 2005–2018";
 
 export const PORTRAIT = "/site/dolly.jpg";
-export const PORTRAIT_LARGE = "/site/ex/kala-mela-01.jpg";
+export const PORTRAIT_LARGE = "/site/ex/kala-dolly.jpg";

@@ -5,7 +5,7 @@ import { InstagramIcon } from "@/components/site/Icons";
 import Until from "@/components/Until";
 import HashRedirect from "@/components/site/HashRedirect";
 import {
-  BIO_LINE, BIO_SUB, EMAIL, EXHIBITIONS, INSTAGRAM, PORTRAIT, SERIES_PAGES, SITE, STUDIO_PATH, worksIn,
+  BIO_LINE, BIO_SUB, EMAIL, INSTAGRAM, NOW, PORTRAIT, RECORD_LINE, SERIES_PAGES, SHOWS, SITE, STUDIO_PATH, worksIn,
 } from "@/lib/site";
 import { BY_ID } from "@/lib/works";
 
@@ -24,11 +24,11 @@ const PERSON = {
 
 const AVAILABLE = ["boy-with-bananas", "temple-bells", "bulls-and-wheel", "woman-with-poppies"];
 const IG = ["patterned-turban-portrait", "bulls-and-wheel", "red-turban-portrait", "coins-and-clay-bank", "yellow-turban-portrait", "terracotta-pots"];
-const now = EXHIBITIONS.find((e) => e.until)!;
-const SHOWS = [
-  { id: "india-habitat-centre", src: "/site/ex/ihc-room-01.jpg", eyebrow: "Solo exhibition", sub: "India Habitat Centre, New Delhi" },
-  { id: "a-lifetime-to-paint", src: "/site/ex/iccr-01.jpg", eyebrow: "Solo exhibition · 2010", sub: "ICCR, Azad Bhavan Art Gallery, New Delhi" },
-  { id: "triveni-2007", src: "/site/ex/paper-01.jpg", eyebrow: "Exhibition · 2007", sub: "With Sangeeta Sharma · Triveni Kala Sangam, New Delhi" },
+const now = NOW;
+const CARDS = [
+  { id: "india-habitat-centre-2010", src: "/site/ex/ihc-03.jpg", alt: "Dr Dolly Prasad lights the lamp at the opening at India Habitat Centre" },
+  { id: "a-lifetime-to-paint", src: "/site/ex/iccr-speech.jpg", alt: "Dr Dolly Prasad speaks at the opening of A Lifetime to Paint, ICCR" },
+  { id: "kala-mela-2018", src: "/site/ex/kala-dolly.jpg", alt: "Dr Dolly Prasad beside her painting at the First International Kala Mela" },
 ];
 
 export default function Home() {
@@ -53,7 +53,7 @@ export default function Home() {
         </div>
       </section>
 
-      <Until until={now.until!}>
+      <Until until={now.until}>
         <Link className="nowstrip" href="/exhibitions">
           <em>Now showing</em><b>{now.title}</b><span>{now.city} · {now.when}</span><u>Details →</u>
         </Link>
@@ -91,19 +91,22 @@ export default function Home() {
 
       <section className="sec wrap">
         <div className="sec-head">
-          <h2>On the walls</h2>
+          <div>
+            <h2>On the walls</h2>
+            <p className="meta" style={{ fontSize: 16, marginTop: 8 }}>{RECORD_LINE}.</p>
+          </div>
           <Link className="link" href="/exhibitions">All exhibitions →</Link>
         </div>
         <div className="shows">
-          {SHOWS.map((s) => {
-            const e = EXHIBITIONS.find((x) => x.id === s.id)!;
+          {CARDS.map((c) => {
+            const e = SHOWS.find((x) => x.id === c.id)!;
             return (
-              <Link key={s.id} href={`/exhibitions#${s.id}`}>
+              <Link key={c.id} href={`/exhibitions#${c.id}`}>
                 {/* eslint-disable-next-line @next/next/no-img-element */}
-                <img src={s.src} alt={e.photos[0]?.alt ?? e.title} loading="lazy" />
-                <span className="eyebrow rust">{s.eyebrow}</span>
+                <img src={c.src} alt={c.alt} loading="lazy" />
+                <span className="eyebrow rust">{e.when.replace(/^Opened 11 /, "").replace(/ · on view.*$/, "")}</span>
                 <b>{e.title}</b>
-                <span className="meta">{s.sub}</span>
+                <span className="meta">{e.venue}, {e.city}</span>
               </Link>
             );
           })}
@@ -113,11 +116,11 @@ export default function Home() {
       <section className="sec-tight wrap">
         <div className="about-row">
           {/* eslint-disable-next-line @next/next/no-img-element */}
-          <img className="round" src="/site/ex/kala-mela-01.jpg" alt="Dr Dolly Prasad beside one of her paintings" loading="lazy" />
+          <img className="round" src="/site/ex/kala-dolly.jpg" alt="Dr Dolly Prasad beside one of her paintings" loading="lazy" />
           <div className="txt">
             <p className="eyebrow">About the artist</p>
-            <p className="big">Dr. Dolly Prasad’s art is the everyday held sacred. Oil on canvas catching the hues of India in its waiting and wishing, its worship and whispers.</p>
-            <p className="meta" style={{ fontSize: 16 }}>Eighteen solo exhibitions, 2005–2018, at venues including Triveni Kala Sangam, India Habitat Centre, ICCR and Lalit Kala Akademi. Work in private collections in India, the USA and London.</p>
+            <p className="big">She paints what daily life passes by — a clay gullak, a closed door, a lamp raised to scripture — and gives it the stillness we keep for prayer.</p>
+            <p className="meta" style={{ fontSize: 16 }}>A doctor and a painter in New Delhi. Eighteen exhibitions and art fairs between 2005 and 2018, from Triveni Kala Sangam and India Habitat Centre to ICCR and the First International Kala Mela. Paintings in private collections in India, the USA and London.</p>
             <Link className="link" href="/about">Her story →</Link>
           </div>
         </div>
@@ -128,7 +131,7 @@ export default function Home() {
           <div className="txt">
             <p className="eyebrow">From the studio</p>
             <h2>Follow {INSTAGRAM.handle} on Instagram</h2>
-            <p className="meta" style={{ fontSize: 16 }}>New paintings, the stories behind them, and her exhibitions.</p>
+            <p className="meta" style={{ fontSize: 16 }}>The paintings, the stories behind them, and the shows they hung in.</p>
             <a className="btn btn-solid" href={INSTAGRAM.url} target="_blank" rel="noopener noreferrer"><InstagramIcon />Open Instagram</a>
           </div>
           <div className="ig-grid">
