@@ -5,7 +5,8 @@
     "dev": "next dev",
     "build": "next build",
     "start": "next start",
-    "check:motion": "node scripts/check-motion.cjs"
+    "check:motion": "node scripts/check-motion.cjs",
+    "check:analytics": "node scripts/check-analytics.cjs"
   },
   "dependencies": {
     "@fontsource/cormorant-garamond": "5.3.0",
@@ -15,6 +16,7 @@
     "gsap": "3.13.0",
     "lenis": "1.1.18",
     "next": "15.5.27",
+    "posthog-js": "1.438.12",
     "react": "19.1.9",
     "react-dom": "19.1.9",
     "three": "0.169.0"
@@ -23,6 +25,7 @@
     "@types/node": "22.10.2",
     "@types/react": "19.0.2",
     "@types/three": "0.169.0",
+    "jsdom": "29.1.1",
     "typescript": "5.7.2"
   }
 }

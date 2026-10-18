@@ -3,12 +3,21 @@
 Updated 18 October 2026. This records the work continued from the original
 Claude conversation and the current published website.
 
+Later work: Shubham's conventional website redesign is now on `main` (pulled
+through `f368bb5` for the analytics addition), with the 3D experience at
+`/studio`. Treat the older 3D commit references below as history and use the
+current files as the starting point. Visitor/painting/enquiry tracking and its
+PostHog setup are documented in [docs/analytics.md](docs/analytics.md), with
+[prepared analytics views](docs/analytics-views.md). The initial integration
+uses the existing PostHog project with Dolly-only production/test filters;
+saving a dashboard requires authenticated PostHog API access.
+
 ## Where the project stands
 
 - Website: <https://drdollyprasad.com>.
 - Repository: <https://github.com/shivam01anand/drdollyprasad-room>.
 - Production/default branch: `main`. The original `house` branch is retained.
-- Application implementation through: `f8c2befbbacf0a387309006638f365b626e7245f`.
+- Earlier 3D continuation implementation through: `f8c2befbbacf0a387309006638f365b626e7245f`.
 - Initial 18 October production promotion:
   `dpl_9e7XCkKrkyXzVWBcAdzVw18jkM1Z`. Later GitHub pushes can create newer
   deployments of the same application code.

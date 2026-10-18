@@ -1,8 +1,9 @@
 "use client";
 
-import { useEffect, useState } from "react";
+import { useEffect, useRef, useState } from "react";
 import { EMAIL, SITE, WHATSAPP, quoted, workPath } from "@/lib/site";
 import { BY_ID, WORKS } from "@/lib/works";
+import { paintingProperties, track } from "@/lib/analytics";
 
 /**
  * An enquiry, written once and sent the way the visitor prefers: WhatsApp
@@ -19,6 +20,7 @@ export default function EnquireForm() {
   const [msg, setMsg] = useState("");
   const [copied, setCopied] = useState(false);
   const [sent, setSent] = useState<"" | "wa" | "mail">("");
+  const started = useRef(false);
 
   useEffect(() => {
     const id = new URLSearchParams(location.search).get("work");
@@ -26,6 +28,12 @@ export default function EnquireForm() {
   }, []);
 
   const w = work ? BY_ID.get(work) : undefined;
+  const context = () => ({ ...(w ? paintingProperties(w) : {}), enquiry_type: w ? "A painting" : kind, source: "enquiry_form" });
+  const start = () => {
+    if (started.current) return;
+    started.current = true;
+    track("enquiry_started", context());
+  };
   const text = () => {
     const sign = [name, city].filter(Boolean).join(", ");
     return [
@@ -42,23 +50,25 @@ export default function EnquireForm() {
   const subject = w ? `Enquiry: ${w.title}` : `Enquiry: ${kind}`;
   const viaMail = (e?: React.FormEvent) => {
     e?.preventDefault();
+    track("enquiry_handoff", { ...context(), method: "email" });
     setSent("mail");
     location.href = `mailto:${EMAIL}?subject=${encodeURIComponent(subject)}&body=${encodeURIComponent(text())}`;
   };
   const viaWa = () => {
+    track("enquiry_handoff", { ...context(), method: "whatsapp" });
     setSent("wa");
     window.open(`https://wa.me/${WHATSAPP}?text=${encodeURIComponent(text())}`, "_blank", "noopener");
   };
   const copy = async () => {
-    try { await navigator.clipboard.writeText(EMAIL); setCopied(true); setTimeout(() => setCopied(false), 2000); } catch { /* refused */ }
+    try { await navigator.clipboard.writeText(EMAIL); track("contact_copied", { source: "enquiry_page" }); setCopied(true); setTimeout(() => setCopied(false), 2000); } catch { /* refused */ }
   };
   const copyMessage = async () => {
-    try { await navigator.clipboard.writeText(`${subject}\n\n${text()}`); setCopied(true); setTimeout(() => setCopied(false), 2000); } catch { /* refused */ }
+    try { await navigator.clipboard.writeText(`${subject}\n\n${text()}`); track("enquiry_message_copied", context()); setCopied(true); setTimeout(() => setCopied(false), 2000); } catch { /* refused */ }
   };
 
   return (
     <div className="enq">
-      <form onSubmit={WHATSAPP ? (e) => { e.preventDefault(); viaWa(); } : viaMail}>
+      <form onFocusCapture={start} onSubmit={WHATSAPP ? (e) => { e.preventDefault(); viaWa(); } : viaMail}>
         <div className="two">
           <div className="field">
             <label htmlFor="q-kind">I’m asking about</label>

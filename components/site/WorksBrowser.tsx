@@ -4,6 +4,7 @@ import { useEffect, useMemo, useState } from "react";
 import Card from "./Card";
 import { SERIES_PAGES } from "@/lib/site";
 import { WORKS, type Work } from "@/lib/works";
+import { track } from "@/lib/analytics";
 
 type Status = "all" | "available" | "sold";
 type Size = "all" | "small" | "medium" | "large";
@@ -56,6 +57,7 @@ export default function WorksBrowser() {
   const pages = Math.max(1, Math.ceil(shown.length / per));
   const slice = shown.slice((page - 1) * per, page * per);
   const go = (k: number) => {
+    track("works_page_changed", { page: k, per_page: per, collection_filter: series, status_filter: status, size_filter: size });
     setPage(k);
     document.getElementById("all")?.scrollIntoView({ behavior: "smooth", block: "start" });
   };
@@ -65,14 +67,14 @@ export default function WorksBrowser() {
       <div className="filters filters-line" role="group" aria-label="Filter the works">
         <label className="fsel">
           <span>Collection</span>
-          <select value={series} onChange={(e) => setSeries(e.target.value)}>
+          <select value={series} onChange={(e) => { track("works_filter_changed", { filter: "collection", value: e.target.value }); setSeries(e.target.value); }}>
             <option value="all">All</option>
             {SERIES_PAGES.map((s) => <option key={s.slug} value={s.slug}>{s.label} ({n((w) => w.series === s.label)})</option>)}
           </select>
         </label>
         <label className="fsel">
           <span>Status</span>
-          <select value={status} onChange={(e) => setStatus(e.target.value as Status)}>
+          <select value={status} onChange={(e) => { track("works_filter_changed", { filter: "status", value: e.target.value }); setStatus(e.target.value as Status); }}>
             <option value="all">All</option>
             <option value="available">Available</option>
             <option value="sold">In private collections</option>
@@ -80,7 +82,7 @@ export default function WorksBrowser() {
         </label>
         <label className="fsel">
           <span>Size</span>
-          <select value={size} onChange={(e) => setSize(e.target.value as Size)}>
+          <select value={size} onChange={(e) => { track("works_filter_changed", { filter: "size", value: e.target.value }); setSize(e.target.value as Size); }}>
             <option value="all">All</option>
             <option value="small">S · under 24 in</option>
             <option value="medium">M · 24–36 in</option>

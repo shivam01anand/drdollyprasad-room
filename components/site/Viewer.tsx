@@ -3,6 +3,7 @@
 import { useState } from "react";
 import { roomsFor, type RoomView } from "@/lib/rooms";
 import type { Work } from "@/lib/works";
+import { paintingProperties, track } from "@/lib/analytics";
 
 /** the painting as it would hang, to scale where she has stated a size, or on its own */
 export default function Viewer({ w, src, thumb, dims, small }: {
@@ -12,6 +13,11 @@ export default function Viewer({ w, src, thumb, dims, small }: {
   const [view, setView] = useState(rooms.length ? rooms[0].room.id : "work");
   const v = rooms.find((r) => r.room.id === view);
   const name = `${w.title}, ${w.medium.toLowerCase()}, by Dr Dolly Prasad`;
+  const choose = (id: string) => {
+    if (id === view) return;
+    track("painting_view_changed", { ...paintingProperties(w), view: id === "work" ? "painting" : "room", room_id: id === "work" ? null : id });
+    setView(id);
+  };
 
   return (
     <>
@@ -45,13 +51,13 @@ export default function Viewer({ w, src, thumb, dims, small }: {
       {rooms.length > 0 && (
         <div className="thumbs" role="group" aria-label="Views of the painting">
           {rooms.map((r) => (
-            <button key={r.room.id} type="button" aria-pressed={view === r.room.id} onClick={() => setView(r.room.id)}
+            <button key={r.room.id} type="button" aria-pressed={view === r.room.id} onClick={() => choose(r.room.id)}
                     aria-label="In a room setting" title="In a room setting">
               {/* eslint-disable-next-line @next/next/no-img-element */}
               <img src={r.room.thumb} alt="" />
             </button>
           ))}
-          <button type="button" className="t-paint" aria-pressed={view === "work"} onClick={() => setView("work")} aria-label="The painting on its own" title="The painting">
+          <button type="button" className="t-paint" aria-pressed={view === "work"} onClick={() => choose("work")} aria-label="The painting on its own" title="The painting">
             {/* eslint-disable-next-line @next/next/no-img-element */}
             <img src={thumb} alt="" />
           </button>
