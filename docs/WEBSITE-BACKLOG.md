@@ -360,7 +360,7 @@ They are a stand-in only and must not go live.
 
 | Path | Figure |
 |---|---|
-| `public/site/dividers/reading.png` | reading (home breaks 1 and 4 of the Collections story pages, Collections band 2) |
+| `public/site/dividers/reading.png` | reading (home break 1, Collections band 2, each collection story page) |
 | `public/site/dividers/praying.png` | praying (home break 2, Collections band 4) |
 | `public/site/dividers/seated.png` | seated (home break 3) |
 
