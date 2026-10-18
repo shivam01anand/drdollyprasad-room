@@ -2,7 +2,7 @@ import type { Metadata } from "next";
 import Link from "next/link";
 import Until from "@/components/Until";
 import Slideshow from "@/components/site/Slideshow";
-import { NOW, PRESS, RECORD, RECORD_LINE, SHOWS } from "@/lib/site";
+import { NOW, NOW_SHOWING_CONFIRMED, PRESS, RECORD, RECORD_LINE, SHOWS } from "@/lib/site";
 import { BY_ID, WORKS, workPath } from "@/lib/works";
 import { dims } from "@/lib/images";
 
@@ -22,7 +22,7 @@ export default function Exhibitions() {
         <p className="lede">Eighteen shows across galleries and art fairs, from Delhi to Bombay. Her paintings have hung at India Habitat Centre, the Indian Council for Cultural Relations, Triveni Kala Sangam, Travancore Art Gallery and Nehru Art Gallery in Bombay, and at the First International Kala Mela organised by Lalit Kala Akademi. Her shows have been covered on television and in the papers.</p>
       </section>
 
-      <Until until={NOW.until}>
+      {NOW_SHOWING_CONFIRMED && <Until until={NOW.until}>
         <section id={NOW.id} style={{ paddingBottom: 28 }}>
           <div className="now-box">
             <div className="txt">
@@ -42,7 +42,7 @@ export default function Exhibitions() {
             </div>
           </div>
         </section>
-      </Until>
+      </Until>}
 
       <section className="ex-head">
         <div className="ex-facts">

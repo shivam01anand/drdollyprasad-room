@@ -7,7 +7,7 @@ import Until from "@/components/Until";
 import HashRedirect from "@/components/site/HashRedirect";
 import Marquee from "@/components/site/Marquee";
 import {
-  BIO_LINE, BIO_SUB, EMAIL, INSTAGRAM, NOW, PORTRAIT, SERIES_PAGES, SHOWS, SITE, STUDIO_PATH, worksIn,
+  BIO_LINE, BIO_SUB, EMAIL, INSTAGRAM, NOW, NOW_SHOWING_CONFIRMED, PORTRAIT, SERIES_PAGES, SHOWS, SITE, STUDIO_PATH, worksIn,
 } from "@/lib/site";
 import { BY_ID } from "@/lib/works";
 import { dims } from "@/lib/images";
@@ -44,11 +44,11 @@ export default function Home() {
         <a className="btn" href={STUDIO_PATH}>Walk through the studio</a>
       </WallHero>
 
-      <Until until={now.until}>
+      {NOW_SHOWING_CONFIRMED && <Until until={now.until}>
         <Link className="nowstrip" href="/exhibitions">
           <span className="live"><i aria-hidden="true" />Live now</span><b><span className="nw-long">{now.title}</span><span className="nw-short">{now.title.split(":")[0]}</span></b><span className="nw-where">{now.venue}, {now.city} · {now.when}</span><span className="nw-short nw-when">IHC · 18 to 21 Oct</span><u>See the show →</u>
         </Link>
-      </Until>
+      </Until>}
 
       <section className="sec wrap">
         <div className="sec-head">

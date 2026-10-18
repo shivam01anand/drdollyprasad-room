@@ -45,6 +45,10 @@ export type Room = {
   shadow?: { x: number; y: number; blur: number; color: string };
   /** the painting is in the photograph (rendered there): the room is shown as it is, nothing hung over it */
   inPhoto?: boolean;
+  /** a virtual room study (generated scene): labelled as such, and never captioned "to scale" */
+  study?: boolean;
+  /** for a study: the furniture its relative size was judged against (an assumption, not a measurement) */
+  assumed?: string;
 };
 
 export type Tailored = Room & {
@@ -106,6 +110,23 @@ export const TAILORED: Tailored[] = [
     w: 1800, h: 1200, pxPerCm: 4.730, floor: 1056, cx: 900, sill: 102, cm: 91.4, inPhoto: true },
 ];
 
+/**
+ * Pilot (design round 004, room B, "calm hallway"): a virtual room study for two
+ * paintings only, 05 "The Matka and the Coins" and 40 "Petals of Thought". The
+ * painting is composited into the scene from its original image, frontal and
+ * uncropped; its size is judged against an assumed 120 cm console
+ * (ROOM_SCALE_NOTES.json: 4.25 px/cm on the 1536 px scene), so it is a relative
+ * size study and is labelled so, never "to scale".
+ */
+export const PILOT: Tailored[] = [
+  { id: "hallway-05", work: "coins-and-clay-bank", label: "A calm hallway", study: true, assumed: "120 cm console",
+    src: "/art/rooms/hallway-05.webp", thumb: "/art/rooms/hallway-05-thumb.webp",
+    w: 1536, h: 1024, pxPerCm: 4.25, floor: 790, cx: 768, sill: 0, cm: 91.4, inPhoto: true },
+  { id: "hallway-40", work: "woman-with-red-flower", label: "A calm hallway", study: true, assumed: "120 cm console",
+    src: "/art/rooms/hallway-40.webp", thumb: "/art/rooms/hallway-40-thumb.webp",
+    w: 1536, h: 1024, pxPerCm: 4.25, floor: 790, cx: 768, sill: 0, cm: 61, inPhoto: true },
+];
+
 /** the fallback rooms, for works with a stated size and no room of their own */
 export const GENERIC: Room[] = [
   // bench 42–45 cm against a 10 cm skirting: 3.4 px/cm; lower edge 22 cm above the bench
@@ -155,7 +176,10 @@ export function hang(room: Room, longestCm: number, aspect: number): Hang {
 export type RoomView = { room: Room; at: Hang; trueSize: boolean };
 
 /** the rooms a work can be seen in: its own, else the generic ones if she has stated its size */
-export function roomsFor(work: Work, aspect: number): RoomView[] {
+export function roomsFor(work: Work, aspect: number, opts: { pilot?: boolean } = {}): RoomView[] {
+  // the hallway pilot is shown on the website's painting pages only (not in the studio)
+  const pilot = opts.pilot ? PILOT.find((r) => r.work === work.id) : undefined;
+  if (pilot) return [{ room: pilot, at: hang(pilot, pilot.cm, aspect), trueSize: false }];
   const own = TAILORED.find((r) => r.work === work.id);
   const stated = work.inches ? work.inches * 2.54 : 0;
   if (own) return [{ room: own, at: hang(own, stated || own.cm, aspect), trueSize: !!stated }];

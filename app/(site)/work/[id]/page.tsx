@@ -2,10 +2,10 @@ import type { Metadata } from "next";
 import Link from "next/link";
 import { notFound } from "next/navigation";
 import { BY_ID, LARGE, SHOW, SITE, WORKS, inchDims, quoted, workPath, type Work } from "@/lib/works";
-import { INSTAGRAM, LOOK, PULL, SMALL_PHOTO, shownYear, STUDIO_PATH, WHATSAPP, WORDS, enquireHref, labelLine, seriesPath, whatsappHref, worksIn } from "@/lib/site";
+import { INSTAGRAM, LOOK, NOW_SHOWING_CONFIRMED, PULL, SMALL_PHOTO, shownYear, STUDIO_PATH, WHATSAPP, WORDS, enquireHref, labelLine, seriesPath, whatsappHref, worksIn } from "@/lib/site";
 import manifest from "@/public/art/manifest.json";
 import Card from "@/components/site/Card";
-import Viewer from "@/components/site/Viewer";
+import Viewer, { RoomStudy } from "@/components/site/Viewer";
 import Tabs from "@/components/site/Tabs";
 import Share from "@/components/Share";
 import Until from "@/components/Until";
@@ -95,28 +95,28 @@ export default async function WorkPage({ params }: Props) {
     { label: "Delivery and framing", body: (
       <>
         <p>For availability, framing and delivery, write with the painting’s title and your city, and the options will be shared with you.</p>
-        <p>The room views on this page are illustrations, made to show the painting at its size.</p>
+        <p>The room views on this page are illustrations or virtual room studies, not photographs of a real room.</p>
       </>) },
   ];
 
   return (
-    <div className="wrap">
+    <div className="wp">
+      {/* the first screen: the whole painting, its title, and a way to look closer */}
+      <Viewer w={w} src={src} dims={d ? { w: d.w, h: d.h } : undefined}
+              small={!!d && Math.max(d.w, d.h) < 600} sub={labelLine(w)} />
+
+      <div className="wrap">
       <nav className="crumb" aria-label="Breadcrumb">
         <Link href="/works">Works</Link> / <Link href={seriesPath(w.series)}>{w.series}</Link> / {w.title}
       </nav>
 
-      <header className="wp-top">
-        <div className="wp-head">
-          <h1>{w.title}</h1>
-          <p className="meta">{labelLine(w)} · <Link href={seriesPath(w.series)}>{w.series}</Link></p>
-        </div>
-        {lead && <p className="wp-lead">{words ? `“${lead}”` : lead}{words && <span>Dr Dolly Prasad</span>}</p>}
-      </header>
-
       <section className="wp-grid">
         <div className="wp-main">
-          <Viewer w={w} src={src} thumb={`/site/thumbs/${id}.jpg`} dims={d ? { w: d.w, h: d.h } : undefined}
-                  small={!!d && Math.max(d.w, d.h) < 600} />
+          <header className="wp-head">
+            <p className="meta">{labelLine(w)} · <Link href={seriesPath(w.series)}>{w.series}</Link></p>
+            {lead && <p className="wp-lead">{words ? `“${lead}”` : lead}{words && <span>Dr Dolly Prasad</span>}</p>}
+          </header>
+          <RoomStudy w={w} src={src} dims={d ? { w: d.w, h: d.h } : undefined} />
         </div>
 
         <div className="wp-side">
@@ -124,7 +124,7 @@ export default async function WorkPage({ params }: Props) {
             <span className={`status${sold ? " is-sold" : w.status === "Enquire" ? " is-enquire" : ""}`}>{statusWord(w)}</span>
             <b>{sold ? "In a private collection" : "Price on request"}</b>
           </div>
-          {SHOW.works.includes(id) && (
+          {NOW_SHOWING_CONFIRMED && SHOW.works.includes(id) && (
             <Until until={SHOW.until}><p className="show-note">{SHOW.line}</p></Until>
           )}
           {WHATSAPP && <a className="btn btn-wa" href={whatsappHref(w)}><ChatIcon />{sold ? "Ask about her work" : "Ask on WhatsApp"}</a>}
@@ -155,6 +155,14 @@ export default async function WorkPage({ params }: Props) {
         <Link href={workPath(prev.id)}><span>Previous</span><b>{prev.title}</b></Link>
         <Link href={workPath(next.id)} className="nx"><span>Next</span><b>{next.title}</b></Link>
       </nav>
+
+      </div>
+
+      {/* on a phone, the way to ask stays in reach under the thumb */}
+      <div className="wp-bar">
+        <span><b>{w.title}</b><small>{sold ? "In a private collection" : w.status === "Enquire" ? "Availability on enquiry" : "Available · Price on request"}</small></span>
+        <Link className="btn btn-solid" href={enquireHref(w)}>{sold ? "Ask" : "Enquire"}</Link>
+      </div>
 
       <script type="application/ld+json" dangerouslySetInnerHTML={{ __html: JSON.stringify(ld) }} />
     </div>
