@@ -179,8 +179,50 @@ nice). The merged list at the end is what this sprint builds.
 | S9 | Seven-step type scale, 13 px floor, half the small capitals | Brand 5, Tech 6 | P1 | Built |
 | S10 | Image weight | Tech 4 | P1 | Built |
 | S11 | 44 px tap targets on phones | Tech 5 | P1 | Built |
+| S12a | Exhibitions jump links one row on phones; small photos in a smaller box | Pass 2 | P1 | Built |
 | S12 | Borders | Brand 9 | P1 | Needs ChatGPT design |
 | S13 | Glass behind pictures | Brand 10 | P2 | Needs ChatGPT design |
+
+### Critique pass 2 (on the sprint build) and results
+
+Pass 2 found, and fixed: on a phone the painting's box was a fixed 70% of the
+screen, so a landscape painting floated in a tall blurred box (now the box fits
+the painting, which sits right under its title); small photographs filled a
+large box (now a smaller one); story-page paintings had no reserved size; the
+About theme numbers failed contrast (4.36:1); Share, filters, pager and
+buttons were 36 to 42 px on a phone (now 44 px); exhibition jump links wrapped
+to four rows on a phone (now one sideways row). Stopped after pass 2 (2-loop
+limit).
+
+| Measure (9 pages, 390 and 1440 px) | Live (`main`) | After sprint |
+|---|---|---|
+| Worst layout shift (CLS) | 0.754 (home) | 0.037 |
+| Phone transfer: home / About / Exhibitions | 4.2 / 0.9* / 4.3 MB | 3.5 / 1.8 / 1.7 MB |
+| Phone tap targets under 44 px | 148 | 1 |
+| Type sizes on the busiest page | 22 | 13 |
+| Text under 13 px (instances) | 123 | 0 |
+| Accessibility (axe) issues | 9 (1 critical) | 0 |
+| Pictures without a reserved size | 230 | 12 |
+| Enquiry sends itself | No | Yes, once `RESEND_API_KEY` is set (falls back to the mail app until then) |
+| Painting page, phone, painting top edge | below title, lead and crumb | 196 px from the top |
+
+\* Live About measured lighter because its rolls had not yet loaded the
+paintings PR #7 added; PR #7's About was 4.8 MB.
+
+### Left after this sprint
+
+- **Needs Mummy:** her own "From the artist" line; her hospital-to-easel story
+  in her words (About now says only "a doctor and a self-taught painter");
+  a name for Recent work ("Onset of Spring" is ours); Terracotta's year;
+  Sacred Fragments visit hours; Threads of Faith's orientation; "Delhi" vs
+  "New Delhi" in her record; the WhatsApp number.
+- **Needs ChatGPT design:** realistic rooms (brief 004); the new border (B1);
+  glass behind pictures (B4).
+- **Needs a decision:** the Resend key for the enquiry form (free account on
+  drdollyprasad@gmail.com, key into Vercel as `RESEND_API_KEY`; no DNS).
+- **Next technical pass:** home is still 3.5 MB on a phone (the moving wall
+  loads 41 painting thumbnails; serve 280 px copies to phones); collection
+  story pages are 8.8 phone screens (B9, density).
 
 ## Open items (round 3 review, PR #7)
 

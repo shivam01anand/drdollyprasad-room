@@ -919,3 +919,7 @@ section.wrap:has(+ .marq) .sec-head{margin-bottom:0}
 @media (pointer:coarse),(max-width:900px){ .side-small .share-btn{min-width:44px;justify-content:center} }
 /* the jump links stay in one sideways row on a phone, so the first show starts sooner */
 @media (max-width:640px){ .ex-jump{flex-wrap:nowrap;overflow-x:auto;scrollbar-width:none;margin-inline:calc(-1 * var(--gut));padding-inline:var(--gut)} .ex-jump a{flex:none} }
+@media (pointer:coarse),(max-width:900px){
+  .fsel select,.chip,.ftr-links .btn,.btn,.menu-panel .btn{min-height:44px}
+  .pager button{min-width:44px;height:44px}
+}
