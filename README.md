@@ -7,6 +7,8 @@ The step-by-step [contribution guide](CONTRIBUTING.md) covers Claude Code,
 preview branches, pull requests and publishing.
 Visitor tracking and the PostHog funnel views are covered in [analytics](docs/analytics.md).
 
+What is still to fix on the site lives in the [website backlog](docs/WEBSITE-BACKLOG.md): every team reads it, and solved items are removed.
+
 <!-- Production deployment trigger check: 2026-10-18. -->
 
 An adaptation of the davidlee.studio technique (teardown: `~/projects/davidlee-studio-teardown`)
