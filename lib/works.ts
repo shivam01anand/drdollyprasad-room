@@ -96,10 +96,12 @@ export const FEATURED = [
   "shree-420-and-milk-cans", "woman-with-red-flower", "monks-and-blue-buddha", "terracotta-pots",
 ];
 
-/** the works with an 1800 px file in /art/large — the lightbox upgrades to it */
+/** the works with a file larger than /art/works (up to 1800 px) in /art/large — the lightbox upgrades to it */
 export const LARGE = new Set([
   ...FEATURED, "rickshaw-puller-and-coin", "red-and-teal-door-lock", "boy-and-kettle", "man-among-metal-pans",
   "mother-india-and-kettles", "bullock-cart-and-truck", "weathered-door-ring", "teal-door-bolt", "carved-door-knocker",
+  "rickshaw-rest-framed", "coins-and-clay-bank", "cycle-rickshaw", "rickshaw-rest", "offering-of-light", "priest-with-flame",
+  "sacred-tree", "newspaper-reader", "red-turban-portrait", "yellow-turban-portrait", "patterned-turban-portrait",
 ]);
 
 /** her exhibition, while it is on: her words as the Threads of Faith chapter gives them, and the
