@@ -35,6 +35,10 @@ export default function Roll({ items, label, every = 3800, shape = "square" }: {
   return (
     <div className="roll" ref={root} role="region" aria-roledescription="carousel" aria-label={label}>
       <div className={`roll-stage is-${shape}`}>
+        {/* a blurred copy of the current painting behind it, so the stage reads as frosted glass in its colours */}
+        {items.map((x, k) => (
+          <span key={`bg-${x.src}`} className={`roll-bg${k === i ? " on" : ""}`} aria-hidden="true" style={{ backgroundImage: `url(${x.src})` }} />
+        ))}
         {items.map((x, k) => (
           // eslint-disable-next-line @next/next/no-img-element
           <img key={x.src} src={x.src} alt={k === i ? x.title : ""} aria-hidden={k !== i}

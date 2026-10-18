@@ -37,6 +37,7 @@ const alt = (w: Work) => `${w.title}, ${w.medium.toLowerCase()}, by Dr Dolly Pra
 function Words({ c }: { c: Chapter }) {
   return (
     <>
+      {c.setup && <p className="chap-small">{c.setup}</p>}
       {c.big && <p className={`chap-big${c.hers ? " hers" : ""}`}>{c.hers ? `“${c.big}”` : c.big}</p>}
       {c.hers && <p className="chap-sig">Dr Dolly Prasad</p>}
       {c.small && <p className="chap-small">{c.small}</p>}
@@ -139,8 +140,8 @@ export default async function SeriesStory({ params }: Props) {
       <section className="sec-tight wrap">
         <div className="next-series">
           <div className="ask">
-            <b>Interested in a work from {s.label}?</b>
-            <p className="meta">Prices on request. Ask about any painting in the collection.</p>
+            <b>Interested in one of these paintings?</b>
+            <p className="meta">Prices on request. Ask about any painting here, or about her work in general.</p>
             <div style={{ display: "flex", gap: 10, flexWrap: "wrap" }}>
               {WHATSAPP && <a className="btn btn-wa" href={whatsappHref()}><ChatIcon />Ask on WhatsApp</a>}
               <Link className={WHATSAPP ? "btn" : "btn btn-solid"} href={enquireHref()}>Send an enquiry</Link>

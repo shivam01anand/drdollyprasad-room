@@ -1,6 +1,7 @@
 import Link from "next/link";
 import { labelLine, statusText } from "@/lib/site";
 import { quoted, workPath, type Work } from "@/lib/works";
+import { dims } from "@/lib/images";
 
 export const thumb = (id: string) => `/site/thumbs/${id}.jpg`;
 
@@ -13,7 +14,7 @@ export default function Card({ w, label = true, eager = false }: { w: Work; labe
       <div className="mat">
         {/* eslint-disable-next-line @next/next/no-img-element */}
         <img className="framed thin" src={thumb(w.id)} alt={`${w.title}, ${w.medium.toLowerCase()}, by Dr Dolly Prasad`}
-             loading={eager ? "eager" : "lazy"} decoding="async" />
+             loading={eager ? "eager" : "lazy"} decoding="async" {...dims(thumb(w.id))} />
       </div>
       <span className="card-t">{w.title}</span>
       {label && <span className="meta">{labelLine(w)}</span>}

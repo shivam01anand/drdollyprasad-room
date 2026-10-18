@@ -79,13 +79,10 @@ export default async function WorkPage({ params }: Props) {
   };
 
   const cm = size ? ` · ${Math.round(size.a * 2.54)} × ${Math.round(size.b * 2.54)} cm` : "";
+  // the label (medium, size, year, collection) is shown once, under the title; this adds only what it does not say
   const rows: [string, React.ReactNode][] = [
-    ["Title", w.title],
-    ["Medium", w.medium],
-    ["Size", w.size ? `${w.size}${cm}` : "On request"],
-    ["Year", shownYear(w) ?? "On request"],
-    ["Collection", <Link key="s" href={seriesPath(w.series)}>{w.series}</Link>],
-    ["Status", statusWord(w)],
+    ["Size", w.size ? `${w.size}${cm} (height × width)` : "On request"],
+    ["Status", sold ? "In a private collection" : statusWord(w)],
   ];
 
   const tabs = [
@@ -108,25 +105,21 @@ export default async function WorkPage({ params }: Props) {
         <Link href="/works">Works</Link> / <Link href={seriesPath(w.series)}>{w.series}</Link> / {w.title}
       </nav>
 
+      <header className="wp-top">
+        <div className="wp-head">
+          <h1>{w.title}</h1>
+          <p className="meta">{labelLine(w)} · <Link href={seriesPath(w.series)}>{w.series}</Link></p>
+        </div>
+        {lead && <p className="wp-lead">{words ? `“${lead}”` : lead}{words && <span>Dr Dolly Prasad</span>}</p>}
+      </header>
+
       <section className="wp-grid">
         <div className="wp-main">
-          <div className="wp-head">
-            <h1>{w.title}</h1>
-            <p className="meta">{labelLine(w)} · From the collection <Link href={seriesPath(w.series)}>{w.series}</Link></p>
-            {lead && <p className={`wp-lead${words ? " hers" : ""}`}>{words ? `“${lead}”` : lead}{words && <span>Dr Dolly Prasad</span>}</p>}
-          </div>
           <Viewer w={w} src={src} thumb={`/site/thumbs/${id}.jpg`} dims={d ? { w: d.w, h: d.h } : undefined}
                   small={!!d && Math.max(d.w, d.h) < 600} />
         </div>
 
-        <aside className="wp-side">
-          <div className="side-facts">
-            <span className="eyebrow">{w.series}</span>
-            <span>{w.medium}</span>
-            {w.size && <span>{w.size}{cm}</span>}
-            {w.year && <span>{shownYear(w)}</span>}
-            <span>From the collection <Link href={seriesPath(w.series)}>{w.series} →</Link></span>
-          </div>
+        <div className="wp-side">
           <div className="side-status">
             <span className={`status${sold ? " is-sold" : w.status === "Enquire" ? " is-enquire" : ""}`}>{statusWord(w)}</span>
             <b>{sold ? "In a private collection" : "Price on request"}</b>
@@ -137,14 +130,14 @@ export default async function WorkPage({ params }: Props) {
           {WHATSAPP && <a className="btn btn-wa" href={whatsappHref(w)}><ChatIcon />{sold ? "Ask about her work" : "Ask on WhatsApp"}</a>}
           <Link className={WHATSAPP ? "btn" : "btn btn-solid"} href={enquireHref(w)}>{sold ? "Ask about her work" : "Enquire about this painting"}</Link>
           <div className="side-small">
-            <a href={INSTAGRAM.url} target="_blank" rel="noopener noreferrer"><InstagramIcon />Her paintings on Instagram {INSTAGRAM.handle}</a>
-            <a href={`${STUDIO_PATH}#work=${id}`}>See it on the wall in her studio →</a>
+            <a href={INSTAGRAM.url} target="_blank" rel="noopener noreferrer"><InstagramIcon />Instagram</a>
+            <a href={`${STUDIO_PATH}#work=${id}`}>In her studio →</a>
             <Share title={`${quoted(w.title)} · Dr Dolly Prasad`} path={workPath(id)} className="link share-btn" />
           </div>
-        </aside>
+        </div>
       </section>
 
-      <section style={{ paddingBottom: 40 }}>
+      <section className="wp-lower" style={{ paddingBottom: 28 }}>
         <Tabs tabs={tabs} />
       </section>
 
