@@ -108,7 +108,8 @@ const click = async (el) => act(async () => { el.dispatchEvent(new MouseEvent('c
   const view = createRoot(document.getElementById('root'));
   sessionStorage.removeItem('dolly-analytics-test');
   history.replaceState(null, '', '/works?analytics_test=1&utm_source=instagram');
-  await act(async () => { view.render(React.createElement(React.Fragment, null, React.createElement(Analytics), React.createElement(WorksBrowser))); });
+  // Match RootLayout: page content mounts before the global analytics component.
+  await act(async () => { view.render(React.createElement(React.Fragment, null, React.createElement(WorksBrowser), React.createElement(Analytics))); });
   assert.equal(byEvent('$pageview').length, 1);
   assert.equal(byEvent('$pageview')[0].properties.is_test, true, 'Catalogue URL updates must preserve the first-visit verification flag');
   assert.ok(byEvent('$pageview')[0].properties.$current_url.includes('utm_source=instagram'), 'Campaign attribution must survive initial catalogue URL setup');
@@ -120,14 +121,14 @@ const click = async (el) => act(async () => { el.dispatchEvent(new MouseEvent('c
 
   // A painting-to-enquiry journey must retain the painting, even after the route changes.
   history.replaceState(null, '', '/work/temple-bells'); pathname = '/work/temple-bells';
-  await act(async () => { view.render(React.createElement(React.Fragment, null, React.createElement(Analytics), React.createElement('a', { href: '/enquire?work=temple-bells' }, 'Enquire'))); });
+  await act(async () => { view.render(React.createElement(React.Fragment, null, React.createElement('a', { href: '/enquire?work=temple-bells' }, 'Enquire'), React.createElement(Analytics))); });
   assert.equal(byEvent('painting_viewed').at(-1).properties.painting_id, 'temple-bells');
   assert.equal(byEvent('page_engagement')[0].properties.$pathname, '/works');
   await click(document.querySelector('#root a'));
   assert.equal(byEvent('enquiry_clicked').at(-1).properties.painting_title, 'Threads of Faith');
 
   history.replaceState(null, '', '/enquire?work=temple-bells'); pathname = '/enquire';
-  await act(async () => { view.render(React.createElement(React.Fragment, null, React.createElement(Analytics), React.createElement(EnquireForm))); });
+  await act(async () => { view.render(React.createElement(React.Fragment, null, React.createElement(EnquireForm), React.createElement(Analytics))); });
   assert.equal(byEvent('enquiry_viewed').at(-1).properties.painting_id, 'temple-bells');
   await act(async () => document.getElementById('q-name').focus());
   await act(async () => document.getElementById('q-reply').focus());
@@ -169,7 +170,7 @@ const click = async (el) => act(async () => { el.dispatchEvent(new MouseEvent('c
   assert.equal(config.session_recording.recordBody, false);
   assert.equal(config.session_recording.captureCanvas.recordCanvas, false);
 
-  await act(async () => { view.render(React.createElement(React.Fragment, null, React.createElement(Analytics), React.createElement(Share, { title: 'Threads of Faith', path: '/work/temple-bells' }))); });
+  await act(async () => { view.render(React.createElement(React.Fragment, null, React.createElement(Share, { title: 'Threads of Faith', path: '/work/temple-bells' }), React.createElement(Analytics))); });
   await click(document.querySelector('#root button'));
   assert.equal(byEvent('painting_shared').at(-1).properties.painting_id, 'temple-bells');
   assert.equal(byEvent('painting_shared').at(-1).properties.method, 'copy_link');
