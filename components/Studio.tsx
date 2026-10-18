@@ -752,6 +752,7 @@ export default function Studio({ dims }: { dims: Dims }) {
             </div>
           )}
           <nav className="hud-pills" aria-label="Site">
+            <span className="mask"><a className="pill hud-pill" href="/">← The website</a></span>
             <span className="mask"><button type="button" className="pill hud-pill" aria-current={here === "featured" || undefined}
                   onClick={() => go(failed ? "#works" : "[data-chapter='featured']")}>Works<span className="arr"> →</span></button></span>
             {!failed && (

@@ -108,6 +108,7 @@ export default function Stops({ open, active, onClose, onGo, onContact, onWorks 
           <button type="button" className="pill" onClick={() => { onClose(); onWorks("sold"); }}>Sold</button>
         </div>
         <div className="sheet-actions">
+          <a className="pill pill-solid" href="/">← The website</a>
           <button type="button" className="pill" onClick={() => { onClose(); onContact(); }}>Contact</button>
           <a className="pill" href={`mailto:${EMAIL}`}>Write to me</a>
           <a className="pill" href={INSTAGRAM.url} target="_blank" rel="noreferrer">Instagram ↗</a>

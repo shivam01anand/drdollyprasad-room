@@ -1,14 +1,11 @@
 import type { Metadata, Viewport } from "next";
-import WELCOME_FONTS from "@/lib/welcome-fonts.json";
-import "./fonts.css";
-import "./globals.css";
 
 const DESCRIPTION =
-  "Paintings by Dr Dolly Prasad — a doctor who paints. Oil on canvas, New Delhi. Eighteen solo exhibitions; work in private collections in India, the USA, New York and London.";
+  "Paintings by Dr Dolly Prasad — the everyday, held sacred. Oil on canvas, New Delhi. Eighteen solo exhibitions; work in private collections in India, the USA, New York and London.";
 
 export const metadata: Metadata = {
   metadataBase: new URL("https://drdollyprasad.com"),
-  title: "Dr Dolly Prasad · Paintings, New Delhi",
+  title: { default: "Dr Dolly Prasad · Paintings, New Delhi", template: "%s · Dr Dolly Prasad" },
   description: DESCRIPTION,
   // the link preview when the site is shared (WhatsApp, Instagram, mail)
   openGraph: {
@@ -24,19 +21,16 @@ export const metadata: Metadata = {
 };
 
 export const viewport: Viewport = {
-  themeColor: "#EFE9DF",
+  themeColor: "#FBF9F5",
   width: "device-width",
   initialScale: 1,
   viewportFit: "cover",
 };
 
+/** the website (app/(site)) and the studio (app/studio) each bring their own fonts and styles */
 export default function RootLayout({ children }: { children: React.ReactNode }) {
   return (
     <html lang="en" data-mode="light">
-      <head>
-        {WELCOME_FONTS.filter((href) => href.includes("instrument-sans") || href.includes("ibm-plex-mono"))
-          .map((href) => <link key={href} rel="preload" as="font" type="font/woff2" href={href} crossOrigin="anonymous" />)}
-      </head>
       <body>{children}</body>
     </html>
   );
