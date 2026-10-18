@@ -18,6 +18,7 @@ import { CHAPTERS, WALK_ORDER, stopOf } from "@/lib/chapters";
 import { activeVariant } from "@/lib/room/variants";
 import { BY_ID, EMAIL, FEATURED } from "@/lib/works";
 import { rebaseWalkScroll, walkProgress } from "@/lib/walk-layout";
+import { paintingProperties, track } from "@/lib/analytics";
 
 type Dims = Record<string, { w: number; h: number }>;
 
@@ -74,6 +75,15 @@ export default function Studio({ dims }: { dims: Dims }) {
   }, [ready]);
   const [active, setActive] = useState(0);
   const [loadEpoch, setLoadEpoch] = useState(0);
+  useEffect(() => {
+    if (!ready || failed) return;
+    const chapter = CHAPTERS[active];
+    if (!chapter) return;
+    const timer = setTimeout(() => track("studio_chapter_viewed", {
+      chapter_id: chapter.id, chapter_name: chapter.stop, room: chapter.room, chapter_number: active + 1,
+    }), 700);
+    return () => clearTimeout(timer);
+  }, [active, ready, failed]);
   const ranOnce = useRef(false);
   // once the header is live, scroll owns its inertness; before, React does
   const hudLive = useRef(false);
@@ -340,8 +350,11 @@ export default function Studio({ dims }: { dims: Dims }) {
 
     /* One terminal failure path: the room is torn down, the chapters
        collapse, and the paintings below become the page. */
+    const loadStarted = performance.now();
+    track("studio_load_started");
     const fail = (why: unknown) => {
       if (killed || dead) return;
+      track("studio_load_failed", { reason: why instanceof Error && why.message === "timed out" ? "timeout" : "asset_or_render_error", duration_ms: Math.round(performance.now() - loadStarted) });
       dead = true;
       console.error("[room]", why);
       room?.dispose();
@@ -369,10 +382,15 @@ export default function Studio({ dims }: { dims: Dims }) {
         onProgress: (p) => { if (!killed && !dead) setPct(Math.round(p * 100)); },
         onIntroFinished: () => {
           if (killed || dead) return;
+          track("studio_ready", { duration_ms: Math.round(performance.now() - loadStarted) });
           setReady(true);
           lock("intro", false);
         },
-        onArtwork: (id) => lbRef.current?.open(id, null, WALK_ORDER),
+        onArtwork: (id) => {
+          const w = BY_ID.get(id);
+          if (w) track("painting_clicked", { ...paintingProperties(w), source: "studio_canvas" });
+          lbRef.current?.open(id, null, WALK_ORDER);
+        },
         onHoverArt: (id) => roomCursorLabel(id ? "View" : null),
       }).then(() => {
         if (killed || dead) return;

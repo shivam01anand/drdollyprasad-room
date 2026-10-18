@@ -1,5 +1,7 @@
 "use client";
 
+import { paintingProperties, track } from "@/lib/analytics";
+
 import { forwardRef, useEffect, useImperativeHandle, useRef } from "react";
 import { motion, gsap, Flip, scrambleTo, reducedMotion } from "@/lib/motion";
 import { BY_ID, LARGE, WORKS, enquiry, quoted, workPath, type Work } from "@/lib/works";
@@ -118,14 +120,17 @@ const Lightbox = forwardRef<LightboxHandle, { dims: Dims; onOpenChange(open: boo
       const order = ["work", ...rooms.current.map((r) => r.room.id)];
       if (order.length < 2) return;
       const k = order.indexOf(view.current);
-      show(order[(k + d + order.length) % order.length]);
+      show(order[(k + d + order.length) % order.length], false, true);
     };
 
     /** painting, or a room: a quiet crossfade inside the figure */
-    const show = (which: string, instant = false) => {
+    const show = (which: string, instant = false, manual = false) => {
       const w = st.current.id ? BY_ID.get(st.current.id) : null;
       const fr = frame.current!, rb = roomBox.current!;
       if (!w) return;
+      if (manual && which !== view.current) track("painting_view_changed", {
+        ...paintingProperties(w), surface: "studio_lightbox", view: which === "work" ? "painting" : "room", room_id: which === "work" ? null : which,
+      });
       view.current = which;
       views.current?.querySelectorAll<HTMLButtonElement>("button").forEach((b) =>
         b.setAttribute("aria-pressed", String(b.dataset.view === which)));
@@ -175,7 +180,7 @@ const Lightbox = forwardRef<LightboxHandle, { dims: Dims; onOpenChange(open: boo
         const b = document.createElement("button");
         b.type = "button"; b.className = "lb-view"; b.dataset.view = id;
         b.setAttribute("aria-pressed", String(id === "work")); b.setAttribute("aria-label", label); b.title = label;
-        b.addEventListener("click", (e) => { e.stopPropagation(); stopShow(); if (view.current !== id) show(id); });
+        b.addEventListener("click", (e) => { e.stopPropagation(); stopShow(); if (view.current !== id) show(id, false, true); });
         return b;
       };
       const self = btn("work", "The painting");
@@ -204,6 +209,8 @@ const Lightbox = forwardRef<LightboxHandle, { dims: Dims; onOpenChange(open: boo
       const w = BY_ID.get(id);
       const r = root.current, i = img.current;
       if (!w || !r || !i || (st.current.id && !swap)) return;
+      track("painting_viewed", { ...paintingProperties(w), surface: "studio_lightbox" });
+      r.dataset.paintingId = id;
       st.current.at = performance.now();
       motion();
       kill();
@@ -317,6 +324,8 @@ const Lightbox = forwardRef<LightboxHandle, { dims: Dims; onOpenChange(open: boo
       stopShow();
       const r = root.current, i = img.current;
       if (!r || !i || !st.current.id || st.current.busy) return;
+      const w = BY_ID.get(st.current.id);
+      if (w) track("painting_closed", { ...paintingProperties(w), surface: "studio_lightbox", duration_seconds: Math.round((performance.now() - st.current.at) / 1000) });
       st.current.busy = true;
       kill();
       look.current?.enable(false);
@@ -375,9 +384,11 @@ const Lightbox = forwardRef<LightboxHandle, { dims: Dims; onOpenChange(open: boo
       try {
         if (navigator.share && matchMedia("(pointer: coarse)").matches) {
           await navigator.share({ title: `${quoted(w.title)} · Dr Dolly Prasad`, url });
+          track("painting_shared", { ...paintingProperties(w), surface: "studio_lightbox", method: "native_share" });
           return;
         }
         await navigator.clipboard.writeText(url);
+        track("painting_shared", { ...paintingProperties(w), surface: "studio_lightbox", method: "copy_link" });
         if (shareBtn.current) shareBtn.current.textContent = "Link copied";
         clearTimeout(shareTimer.current);
         shareTimer.current = window.setTimeout(() => { if (shareBtn.current) shareBtn.current.textContent = "Share"; }, 2200);

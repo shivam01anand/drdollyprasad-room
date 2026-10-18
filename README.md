@@ -5,6 +5,7 @@ instructions, read [CONTINUATION.md](CONTINUATION.md). Pushes to `main` publish
 through Vercel; the original `house` branch is retained for development.
 The step-by-step [contribution guide](CONTRIBUTING.md) covers Claude Code,
 preview branches, pull requests and publishing.
+Visitor tracking and the PostHog funnel views are covered in [analytics](docs/analytics.md).
 
 <!-- Production deployment trigger check: 2026-10-18. -->
 
