@@ -7,7 +7,7 @@ Claude conversation and the current published website.
 
 - Website: <https://drdollyprasad.com>.
 - Repository: <https://github.com/shivam01anand/drdollyprasad-room>.
-- Working/default branch: `house`.
+- Production/default branch: `main`. The original `house` branch is retained.
 - Application implementation through: `f8c2befbbacf0a387309006638f365b626e7245f`.
 - Initial 18 October production promotion:
   `dpl_9e7XCkKrkyXzVWBcAdzVw18jkM1Z`. Later GitHub pushes can create newer
@@ -137,17 +137,19 @@ this project. Tracked environment files were absent from both the current tree
 and Git history; a targeted scan of the current text files found no common
 credential patterns. This is not an exhaustive security audit.
 
-GitHub user `shubhamanand0412` was invited as a collaborator with **write**
-permission. The invitation must be accepted before he can push. Ownership
-transfer is unnecessary. No Vercel team membership or paid seat was added.
+GitHub user `shubhamanand0412` accepted the collaborator invitation, and **write**
+permission was verified through GitHub's API. Ownership transfer is unnecessary.
+No Vercel team membership or paid seat was added.
 
 The repository is connected to the existing Vercel project `drdollyprasad`.
-The intended production branch is **`house`**, not `main`:
+The production branch is **`main`**. Its older October 7 history is fast-forwarded
+to the latest `house` continuation; the original branch and history are retained:
 
-- Push to `house`: Vercel builds and publishes to `drdollyprasad.com` after a
+- Push to `main`: Vercel builds and publishes to `drdollyprasad.com` after a
   successful deployment.
 - Push to a feature branch: use its Vercel preview to review the change.
-- Merge the feature branch into `house` when it should go live.
+- Merge the feature branch into `main` when it should go live.
+- `house` remains available for the original development history and previews.
 
 Keep this repository public for free Vercel collaboration. Making it private
 again changes that arrangement: Vercel requires private-repository commit
@@ -166,7 +168,7 @@ For a fresh local checkout:
 ```sh
 git clone https://github.com/shivam01anand/drdollyprasad-room.git
 cd drdollyprasad-room
-git switch house
+git switch main
 npm ci
 npm run dev
 ```

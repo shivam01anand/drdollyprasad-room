@@ -1,5 +1,9 @@
 # drdollyprasad.com — the house
 
+For the current release, Claude resume command and collaboration/publishing
+instructions, read [CONTINUATION.md](CONTINUATION.md). Pushes to `main` publish
+through Vercel; the original `house` branch is retained for development.
+
 An adaptation of the davidlee.studio technique (teardown: `~/projects/davidlee-studio-teardown`)
 for Dr Dolly Prasad. The mechanics are the original's; the house, its light and everything in
 it are hers: a gallery inside a Delhi home, built and lit in Blender.
