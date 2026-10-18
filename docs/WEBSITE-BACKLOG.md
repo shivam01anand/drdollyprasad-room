@@ -352,26 +352,13 @@ These are not new from this review but are still open.
 
 The divider is built and placed (`components/site/Divider.tsx`; home page at
 three breaks, Collections page before bands 2 and 4, each collection's story
-page before "The paintings in this collection"). It shows **temporary**
-crops of the rough (`005-Borders-Rough.jpg`), upscaled 5x from a 25 px figure.
-They are a stand-in only and must not go live.
+page before "The paintings in this collection"). **Final art is in** (005
+RETURN-2): the same reading figure in all three slots, as a computer file
+(`<name>.png`, 104 x 128, shown 52 x 64) and a phone file (`<name>-phone.png`,
+78 x 96, shown 39 x 48), transparent, ink-only. To give a slot its own figure,
+replace that pair at the same sizes; if the size changes, update `DIVIDER_PX`
+and the heights in `site.css`.
 
-**To drop in the final art, replace these three files, same names, nothing else:**
-
-| Path | Figure |
-|---|---|
-| `public/site/dividers/reading.png` | reading (home break 1, Collections band 2, each collection story page) |
-| `public/site/dividers/praying.png` | praying (home break 2, Collections band 4) |
-| `public/site/dividers/seated.png` | seated (home break 3) |
-
-Spec for each: transparent PNG, **170 x 192 px** (3x of the 64 px tall desktop
-size; the page shows it 58 px tall on a phone and 70 px on a computer, width
-automatic, so keep the same aspect, about 0.885), ink **#26211D** on transparent
-(no white halo, no paper tone), a single crisp line weight like the Instagram
-Faith border, figure centred and facing inward, 6 to 10 px of clear margin
-inside the canvas, under 25 KB each. If the final size differs, change
-`DIVIDER_PX` in `Divider.tsx` to match (it sets width/height so there is no
-layout shift). One file for all three is fine while only one figure exists.
 Rules held by the component: `alt=""`, always its own block between sections
 (at least 41 px from the nearest painting on a phone), never inside a section
 that has paintings.

@@ -1376,7 +1376,8 @@ section.wrap:has(+ .marq) .sec-head{margin-bottom:0}
 }
 
 /* ==== the single divider (brief 005, pick C): a reading figure between two hairlines at a section break ==== */
-.divider{display:flex;align-items:center;justify-content:center;gap:18px;padding:clamp(34px,5vw,56px) var(--gut);position:relative;z-index:1}
-.divider::before,.divider::after{content:"";height:1px;width:clamp(48px,18vw,150px);background:var(--ink);opacity:.4}
-.divider img{display:block;height:58px;width:auto;flex:none}
-@media (min-width:761px){ .divider img{height:70px} }
+.divider{display:flex;align-items:center;justify-content:center;gap:18px;padding:64px var(--gut);position:relative;z-index:1}
+.divider::before,.divider::after{content:"";height:1px;width:44px;background:var(--ink);opacity:.4}
+.divider picture{display:block;flex:none}
+.divider img{display:block;height:48px;width:auto;flex:none}
+@media (min-width:761px){ .divider{padding-block:88px} .divider::before,.divider::after{width:80px} .divider img{height:64px} }
