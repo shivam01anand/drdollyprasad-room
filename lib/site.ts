@@ -247,7 +247,7 @@ export const SMALL_PHOTO = new Set(["elder-woman-portrait", "horse-cart-and-auto
 
 /** the status line a card shows */
 export const statusText = (w: Work) =>
-  w.status === "Sold" ? "In a private collection" : w.status === "Enquire" ? "On enquiry" : "Available · Price on request";
+  w.status === "Sold" ? "In a private collection" : w.status === "Enquire" ? "On enquiry" : "Available";
 
 /** the label line: medium · size · year */
 export const labelLine = (w: Work) => [w.medium, w.size, shownYear(w)].filter(Boolean).join(" · ");

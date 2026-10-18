@@ -1,25 +1,38 @@
 "use client";
 
-import { useState } from "react";
+import { useCallback, useState } from "react";
 import { roomsFor, type RoomView } from "@/lib/rooms";
 import type { Work } from "@/lib/works";
+import Zoom from "./Zoom";
 
-/** the painting as it would hang, to scale where she has stated a size, or on its own */
-export default function Viewer({ w, src, thumb, dims, small }: {
-  w: Work; src: string; thumb: string; dims?: { w: number; h: number }; small: boolean;
+/**
+ * The painting as it would hang, to scale where she has stated a size, or on
+ * its own. Until a view is chosen, a computer shows the room and a phone shows
+ * the painting itself, as large as the screen allows. A tap opens it full screen.
+ */
+export default function Viewer({ w, src, thumb, dims, small, sub }: {
+  w: Work; src: string; thumb: string; dims?: { w: number; h: number }; small: boolean; sub?: string;
 }) {
   const rooms: RoomView[] = dims ? roomsFor(w, dims.w / dims.h) : [];
-  const [view, setView] = useState(rooms.length ? rooms[0].room.id : "work");
-  const v = rooms.find((r) => r.room.id === view);
+  // null: not yet chosen (CSS picks the room on a computer, the painting on a phone)
+  const [view, setView] = useState<string | null>(null);
+  const [zoom, setZoom] = useState(false);
+  const open = useCallback(() => setZoom(true), []);
+  const shut = useCallback(() => setZoom(false), []);
   const name = `${w.title}, ${w.medium.toLowerCase()}, by Dr Dolly Prasad`;
+  const roomId = view ?? rooms[0]?.room.id;
+  const v = rooms.find((r) => r.room.id === roomId);
+  const auto = view === null && !!v;
+  const showRoom = !!v && view !== "work";
+  const showPaper = !v || view === "work" || auto;
 
   return (
     <>
-      <div className="viewer">
-        {v ? (
-          <div className="room">
+      <div className={`viewer${auto ? " is-auto" : ""}`}>
+        {showRoom && v && (
+          <div className="room v-room">
             {/* eslint-disable-next-line @next/next/no-img-element */}
-            <img src={v.room.src} width={v.room.w} height={v.room.h} fetchPriority="high"
+            <img src={v.room.src} width={v.room.w} height={v.room.h} loading={auto ? "lazy" : undefined}
                  alt={v.room.inPhoto ? `${name}, shown in an illustrative room setting` : "An illustrative room setting"} />
             {!v.room.inPhoto && (
               <span className="room-art" style={{
@@ -35,28 +48,37 @@ export default function Viewer({ w, src, thumb, dims, small }: {
             {v.trueSize && w.size && <span className="scale">Shown to scale · {w.size}</span>}
             <span className="room-cap">Illustrative room setting</span>
           </div>
-        ) : (
-          <div className="paper">
+        )}
+        {showPaper && (
+          <button type="button" className="paper v-paper" onClick={open} aria-label={`Open ${w.title} full screen`}>
             {/* eslint-disable-next-line @next/next/no-img-element */}
             <img src={src} alt={name} width={dims?.w} height={dims?.h} fetchPriority="high" className={small ? "is-small" : undefined} />
-          </div>
+            <span className="paper-hint" aria-hidden="true">
+              <svg viewBox="0 0 24 24"><path d="M14 4h6v6M10 20H4v-6M20 4l-7 7M4 20l7-7" fill="none" stroke="currentColor" strokeWidth="1.6" /></svg>
+            </span>
+          </button>
         )}
       </div>
       {rooms.length > 0 && (
-        <div className="thumbs" role="group" aria-label="Views of the painting">
+        <div className={`thumbs${auto ? " is-auto" : ""}`} role="group" aria-label="Views of the painting">
           {rooms.map((r) => (
-            <button key={r.room.id} type="button" aria-pressed={view === r.room.id} onClick={() => setView(r.room.id)}
+            <button key={r.room.id} type="button" className="t-room" aria-pressed={view === r.room.id || undefined} onClick={() => setView(r.room.id)}
                     aria-label="In a room setting" title="In a room setting">
               {/* eslint-disable-next-line @next/next/no-img-element */}
               <img src={r.room.thumb} alt="" />
             </button>
           ))}
-          <button type="button" className="t-paint" aria-pressed={view === "work"} onClick={() => setView("work")} aria-label="The painting on its own" title="The painting">
+          <button type="button" className="t-paint" aria-pressed={view === "work" || undefined} onClick={() => setView("work")} aria-label="The painting on its own" title="The painting">
             {/* eslint-disable-next-line @next/next/no-img-element */}
             <img src={thumb} alt="" />
           </button>
+          <button type="button" className="t-zoom" onClick={open}>
+            <svg viewBox="0 0 24 24" aria-hidden="true"><circle cx="10.5" cy="10.5" r="6.5" fill="none" stroke="currentColor" strokeWidth="1.6" /><path d="M15.5 15.5L21 21M10.5 7.5v6M7.5 10.5h6" stroke="currentColor" strokeWidth="1.6" /></svg>
+            <span>Look closer</span>
+          </button>
         </div>
       )}
+      {zoom && <Zoom src={src} alt={name} title={w.title} sub={sub} onClose={shut} />}
     </>
   );
 }

@@ -679,3 +679,357 @@ p{margin:0}
   .themes-arrows button{width:32px;height:32px;font-size:19px}
 }
 @media (max-width:420px){ .themes-arrows{display:none} .themes-tabs [role="tab"]{font-size:15px;padding:6px 9px} }
+
+/* ==========================================================================
+   Round 9: finer, quieter, made for the phone first.
+   A lighter type scale, more air, softer shadows; motion that answers the
+   hand (cards lift, collection tiles turn over, sections rise into place);
+   and on a phone, paintings as large as the screen allows.
+   ========================================================================== */
+
+:root{
+  --ease:cubic-bezier(.2,.7,.2,1);
+  --ease-io:cubic-bezier(.65,0,.35,1);
+  --mat:#F2EDE5;
+  --hair:#E8E1D6;
+  --shadow-1:0 1px 2px rgba(38,33,29,.06),0 8px 18px -6px rgba(38,33,29,.18);
+  --shadow-2:0 2px 4px rgba(38,33,29,.06),0 22px 40px -12px rgba(38,33,29,.32);
+}
+@media (max-width:640px){ :root{ --gut:18px } }
+
+/* ---- type: lighter, calmer, more air ---- */
+body{font-size:16.5px;line-height:1.62;text-rendering:optimizeLegibility}
+h1,h2,h3{font-weight:500;letter-spacing:-.005em}
+.page-title,.story-head h1,.namecard h1,.ab-band h1{font-weight:500;letter-spacing:-.015em}
+.sec-head h2,.chap-h h2,.ex-txt h2,.ab-band h2{font-weight:500}
+.eyebrow{font-size:11.5px;letter-spacing:.22em}
+.meta{font-size:14px;line-height:1.5}
+.sec-line,.lede{color:var(--soft)}
+.sec-head{margin-bottom:28px;padding-bottom:14px;border-bottom:1px solid var(--hair)}
+.sec-head h2{font-size:clamp(32px,3.8vw,44px)}
+.sec{padding-block:clamp(48px,7vw,96px)}
+.sec-tight{padding-block:clamp(36px,5vw,64px)}
+::selection{background:#EBD3C5;color:var(--ink)}
+
+/* ---- buttons: a fill that sweeps in from the left ---- */
+.btn{min-height:46px;padding:0 24px;font-size:12.5px;letter-spacing:.16em;border-color:currentColor;
+  background-image:linear-gradient(var(--ink),var(--ink));background-repeat:no-repeat;background-size:0% 100%;background-position:left;
+  transition:background-size .45s var(--ease-io),color .3s ease,border-color .3s ease,transform .2s ease}
+.btn:hover{background-color:transparent;background-size:100% 100%;color:var(--bg);border-color:var(--ink)}
+.btn:active{transform:translateY(1px)}
+.btn-solid{background-color:var(--ink);color:var(--bg);border-color:var(--ink);background-image:linear-gradient(var(--rust),var(--rust))}
+.btn-solid:hover{background-color:var(--ink);color:var(--rust-ink);border-color:var(--rust)}
+.btn-light{background-image:linear-gradient(var(--dark-ink),var(--dark-ink))}
+.btn-light:hover{color:var(--dark)}
+.link{font-size:12px;letter-spacing:.18em;display:inline-flex;align-items:center;gap:6px;
+  background:linear-gradient(currentColor,currentColor) left bottom/0% 1px no-repeat;padding-bottom:3px;transition:background-size .4s var(--ease-io),color .25s ease}
+.link:hover{text-decoration:none;background-size:100% 1px}
+
+/* ---- header: full at the top, slim once the page moves ---- */
+.hdr{background:rgba(251,249,245,.9);-webkit-backdrop-filter:saturate(1.4) blur(12px);backdrop-filter:saturate(1.4) blur(12px);border-bottom-color:transparent;transition:border-color .3s ease,box-shadow .3s ease}
+.is-scrolled .hdr{border-bottom-color:var(--hair);box-shadow:0 6px 24px -18px rgba(38,33,29,.5)}
+.hdr-in{padding-block:14px;transition:padding .35s var(--ease)}
+.is-scrolled .hdr-in{padding-block:8px}
+.brand img{border-width:1px;transition:width .35s var(--ease),height .35s var(--ease)}
+.brand-t b{font-weight:600;font-size:30px;letter-spacing:-.01em;transition:font-size .35s var(--ease)}
+.brand-t i{font-size:15.5px}
+.is-scrolled .brand img{width:40px;height:40px}
+.is-scrolled .brand-t b{font-size:25px}
+.brand-t i{transition:opacity .3s ease,max-height .35s var(--ease);max-height:20px;overflow:hidden}
+.is-scrolled .brand-t i{opacity:0;max-height:0}
+.nav a{font-size:19px;font-weight:500}
+.nav a::after{height:1px;bottom:0}
+.hdr-cta .btn{min-height:40px;padding:0 18px}
+
+/* the phone menu: two lines that cross, and a full screen of pages */
+.burger{display:none}
+.sheet{display:none}
+@media (max-width:999px){
+  .menu{display:none !important}
+  .burger{display:flex;flex-direction:column;justify-content:center;gap:7px;width:44px;height:44px;margin-right:-8px;padding:0 9px;background:none;border:0;cursor:pointer;position:relative;z-index:2}
+  .burger span{display:block;height:1.5px;background:var(--ink);transition:transform .4s var(--ease-io)}
+  .is-open .burger span:first-child{transform:translateY(4.25px) rotate(45deg)}
+  .is-open .burger span:last-child{transform:translateY(-4.25px) rotate(-45deg)}
+  .sheet{display:flex;flex-direction:column;justify-content:space-between;position:fixed;inset:0;z-index:-1;background:var(--bg);
+    padding:calc(var(--band) + 96px) calc(var(--gut) + var(--rail)) calc(28px + env(safe-area-inset-bottom));
+    opacity:0;visibility:hidden;transition:opacity .35s ease,visibility 0s linear .35s}
+  .is-open .sheet{opacity:1;visibility:visible;transition:opacity .35s ease}
+  .sheet-nav{display:flex;flex-direction:column}
+  .sheet-nav a{font-family:var(--serif);font-size:clamp(38px,11vw,52px);font-weight:500;line-height:1.18;text-decoration:none;padding-block:4px;
+    opacity:0;transform:translateY(14px);transition:opacity .5s ease,transform .6s var(--ease);transition-delay:calc(var(--i,0) * 55ms + 80ms)}
+  .is-open .sheet-nav a{opacity:1;transform:none}
+  .sheet-nav a[aria-current="page"]{color:var(--rust)}
+  .sheet-nav a[aria-current="page"]::before{content:"";display:inline-block;width:18px;height:1px;background:var(--rust);vertical-align:middle;margin-right:12px}
+  .sheet-foot{display:flex;flex-direction:column;gap:16px;align-items:flex-start}
+  .sheet-foot .btn{width:100%}
+  .sheet-ig{display:inline-flex;align-items:center;gap:8px;text-decoration:none;color:var(--muted);font-size:15px}
+  .sheet-ig svg{width:20px;height:20px}
+}
+
+/* ---- the frame on a phone: no side ribbons (the screen is the frame), a slimmer frieze ---- */
+@media (max-width:640px){
+  :root{--rail:0px;--band:24px}
+  .rail{display:none}
+  .band-top{margin-top:4px}
+  .hdr-in{padding-block:10px}
+  .brand{gap:10px}
+  .brand img{width:36px;height:36px}
+  .brand-t{gap:3px}
+  .brand-t b{font-size:23px}
+  .brand-t i{font-size:13px}
+  .is-scrolled .brand img{width:32px;height:32px}
+  .is-scrolled .brand-t b{font-size:21px}
+}
+
+/* ---- paintings on cards: a light mat, a thin frame, a lift under the hand ---- */
+.mat{background:var(--mat);padding:9%}
+.mat img{max-height:calc(100cqw - 18cqw)}
+.framed{border-width:5px;box-shadow:var(--shadow-1)}
+.framed.thin{border-width:3px;box-shadow:var(--shadow-1)}
+.card{gap:4px}
+.card .mat{margin-bottom:10px;overflow:hidden;transition:background-color .5s ease}
+.card .mat img{transition:transform .7s var(--ease),box-shadow .7s var(--ease)}
+.card-t{font-size:21px;font-weight:500;line-height:1.15;
+  background:linear-gradient(currentColor,currentColor) left 100%/0% 1px no-repeat;transition:background-size .5s var(--ease-io),color .3s ease;
+  width:fit-content;max-width:100%}
+.card .status{font-size:12.5px;letter-spacing:.06em;display:inline-flex;align-items:center;gap:7px}
+.card .status::before{content:"";width:6px;height:6px;border-radius:50%;background:currentColor;flex:none}
+@media (hover:hover){
+  .card:hover .mat{background:#ECE5DA}
+  .card:hover .mat img{transform:translateY(-6px) scale(1.025);box-shadow:var(--shadow-2)}
+  .card:hover .card-t{color:var(--ink);background-size:100% 1px}
+}
+.grid{gap:40px 22px}
+
+/* the collection tiles turn over on a computer: the painting, then the collection in a line */
+.flip-in{position:relative;transform-style:preserve-3d;transition:transform .9s var(--ease-io);margin-bottom:10px}
+.flip-in .mat{margin-bottom:0}
+.flip-back{position:absolute;inset:0;display:flex;flex-direction:column;justify-content:center;gap:10px;padding:12%;
+  background:var(--ink);color:var(--bg);transform:rotateY(180deg);-webkit-backface-visibility:hidden;backface-visibility:hidden}
+.flip-front{-webkit-backface-visibility:hidden;backface-visibility:hidden}
+.flip-back em{font-style:normal;font-size:10.5px;letter-spacing:.2em;text-transform:uppercase;color:#E0A07E}
+.flip-back b{font-family:var(--serif);font-size:26px;font-weight:500;line-height:1.05}
+.flip-back span{font-size:14px;line-height:1.5;color:var(--dark-muted)}
+.flip-back u{text-decoration:none;font-size:11px;letter-spacing:.18em;text-transform:uppercase;margin-top:6px;border-bottom:1px solid currentColor;align-self:flex-start;padding-bottom:3px}
+@media (hover:hover){
+  .flip{perspective:1400px}
+  .flip:hover .flip-in,.flip:focus-visible .flip-in{transform:rotateY(180deg)}
+  .flip:hover .mat img{transform:none;box-shadow:var(--shadow-1)}
+  .series-tiles .flip-line{display:none}
+}
+@media (hover:none){ .flip-back{display:none} }
+
+/* ---- the moving wall: tiles answer the pointer ---- */
+.tile{transition:transform .5s var(--ease),filter .5s ease}
+@media (hover:hover){ .collage:hover .tile{filter:saturate(.85) brightness(.97)} .collage .tile:hover{transform:scale(1.035);filter:none;position:relative;z-index:1} }
+.framed,.xcard,.tcard,.ncard,.scard{box-shadow:var(--shadow-1)}
+.namecard{box-shadow:0 30px 80px -20px rgba(38,33,29,.45);padding-bottom:30px}
+.namecard h1{font-size:clamp(44px,5vw,64px)}
+.namecard .held{font-size:clamp(21px,2.1vw,26px)}
+.namecard .sub{font-size:15px;line-height:1.55}
+
+/* ---- the home page on a phone: the wall shows, the card sits low ---- */
+@media (max-width:640px){
+  .is-home .collage{height:calc(100svh - 120px);min-height:560px;max-height:760px}
+  .is-page .collage{height:auto;min-height:0;max-height:none}
+  .is-page .collage .cols{position:absolute;inset:0}
+  .is-page .collage{display:flex;align-items:flex-end;min-height:min(78svh,620px);padding:120px 0 16px}
+  .is-page .namecard{position:relative;left:auto;top:auto;transform:none;margin:0 auto;width:calc(100% - 28px)}
+  .namecard{width:calc(100% - 28px);padding:20px 18px 20px;gap:6px}
+  .is-home .namecard,.is-home .namecard.has-face{top:auto;bottom:14px;transform:translateX(-50%);padding-top:44px}
+  .namecard .face{width:68px;height:68px}
+  .namecard h1{font-size:36px}
+  .namecard .held{font-size:20px}
+  .is-home .namecard .sub{display:none}
+  .namecard .sub{font-size:14px;line-height:1.5}
+  .namecard .ctas{grid-template-columns:1fr 1fr;gap:8px;margin-top:6px}
+  .namecard .ctas .btn{min-height:44px;font-size:11px;letter-spacing:.12em;padding:0 8px;white-space:normal;text-align:center;line-height:1.25}
+  .nowstrip{padding:11px 16px}
+}
+
+/* ---- rows that swipe on a phone: a peek of the next card says "there is more" ---- */
+@media (max-width:640px){
+  .snap-row>*{flex:0 0 78%}
+  .snap-row{scroll-padding-inline:var(--gut);gap:14px !important}
+  .sec-head{margin-bottom:20px;padding-bottom:12px}
+  .sec-head h2{font-size:31px}
+  .sec-head .link{order:2}
+  .grid{gap:30px 12px}
+  .card-t{font-size:19px}
+  .card .meta{font-size:12.5px}
+  .shows b{font-size:23px}
+}
+
+/* ---- works: one large painting to a row on a phone, or two ---- */
+.count-row{display:flex;justify-content:space-between;align-items:center;gap:16px;margin-bottom:22px}
+.density{display:none}
+@media (max-width:640px){
+  .density{display:flex;gap:4px}
+  .density button{width:40px;height:40px;display:grid;place-items:center;background:none;border:1px solid transparent;color:var(--soft);cursor:pointer}
+  .density button[aria-pressed="true"]{border-color:var(--ink);color:var(--ink)}
+  .density svg{width:18px;height:18px}
+  .works-grid.is-big{grid-template-columns:1fr;gap:44px}
+  .works-grid.is-big .mat{aspect-ratio:auto;padding:22px;margin-inline:calc(-1 * var(--gut))}
+  .works-grid.is-big .mat img{max-height:72svh;max-width:100%}
+  .works-grid.is-big .card-t{font-size:25px}
+  .works-grid.is-big .card .meta{font-size:14px}
+  .works-grid:not(.is-big) .meta{display:none}
+  .filters-line{position:sticky;top:56px;z-index:5;background:rgba(251,249,245,.94);-webkit-backdrop-filter:blur(8px);backdrop-filter:blur(8px);
+    margin-inline:calc(-1 * var(--gut));padding:10px var(--gut);border-bottom:1px solid var(--hair)}
+}
+
+/* ---- a painting's page ---- */
+.viewer{background:var(--mat)}
+.viewer .paper{width:100%;border:0;background:none;cursor:zoom-in;position:relative;font:inherit;color:inherit}
+.viewer .paper img{border-width:6px;box-shadow:var(--shadow-2);transition:transform .7s var(--ease)}
+@media (hover:hover){ .viewer .paper:hover img{transform:scale(1.015)} }
+.paper-hint{position:absolute;right:14px;bottom:14px;width:40px;height:40px;display:grid;place-items:center;background:rgba(251,249,245,.9);color:var(--ink);
+  border-radius:50%;box-shadow:var(--shadow-1);opacity:.85;transition:opacity .3s ease,transform .3s var(--ease)}
+.paper-hint svg{width:18px;height:18px}
+.viewer .paper:hover .paper-hint{opacity:1;transform:scale(1.06)}
+/* until a view is chosen: the room on a computer, the painting on a phone */
+@media (min-width:761px){ .viewer.is-auto .v-paper{display:none} .thumbs.is-auto .t-room{border:2px solid var(--ink)} }
+@media (max-width:760px){ .viewer.is-auto .v-room{display:none} .thumbs.is-auto .t-paint{border:2px solid var(--ink)} }
+.thumbs{align-items:center}
+.thumbs button{transition:border-color .2s ease,opacity .2s ease}
+.thumbs .t-zoom{width:auto;height:auto;padding:0 14px;min-height:44px;display:inline-flex;align-items:center;gap:8px;background:none;border:0;
+  font-size:12px;letter-spacing:.16em;text-transform:uppercase;color:var(--muted);margin-left:auto}
+.thumbs .t-zoom:hover{color:var(--rust)}
+.thumbs .t-zoom svg{width:18px;height:18px}
+.wp-head h1{font-weight:500}
+.side-status b{font-weight:500}
+.wp-bar{display:none}
+.tablist button{transition:color .2s ease,border-color .3s ease}
+.tablist button:hover{color:var(--ink)}
+
+@media (max-width:760px){
+  .wp .crumb{display:none}
+  .wp-grid{padding-top:0;gap:22px}
+  .wp-main{gap:12px}
+  /* the painting first, as large as the screen allows; then its name, briefly */
+  .wp-main>.viewer{order:0;margin-inline:calc(-1 * var(--gut))}
+  .wp-main>.thumbs{order:1}
+  .wp-main>.wp-head{order:2;margin-top:6px}
+  .viewer .paper{min-height:0;padding:28px 18px 34px}
+  .viewer .paper img{max-height:70svh;max-width:100%;border-width:4px}
+  .viewer .paper img.is-small{max-height:300px}
+  .wp-head h1{font-size:38px;line-height:1.05}
+  .wp-head .meta{font-size:14px}
+  .wp-lead{font-size:20px}
+  .thumbs button{width:64px;height:52px}
+  .thumbs .t-zoom{width:auto;height:auto}
+  .side-facts{display:none}
+  .wp-side .btn-solid{display:none}
+  .tablist{flex-wrap:nowrap;overflow-x:auto;gap:22px;scrollbar-width:none;margin-inline:calc(-1 * var(--gut));padding-inline:var(--gut)}
+  .tablist::-webkit-scrollbar{display:none}
+  .tablist button{white-space:nowrap;font-size:12px}
+  .tabpanel dl{grid-template-columns:110px 1fr;font-size:15px}
+  .prevnext a b{font-size:19px}
+  .wp-bar{display:flex;align-items:center;justify-content:space-between;gap:14px;position:fixed;left:0;right:0;bottom:0;z-index:25;
+    padding:10px var(--gut) calc(10px + env(safe-area-inset-bottom));background:rgba(251,249,245,.96);
+    -webkit-backdrop-filter:blur(10px);backdrop-filter:blur(10px);border-top:1px solid var(--hair);
+    transform:translateY(0);transition:transform .4s var(--ease)}
+  .wp-bar span{display:flex;flex-direction:column;min-width:0}
+  .wp-bar b{font-family:var(--serif);font-size:19px;font-weight:500;line-height:1.1;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+  .wp-bar small{font-size:12px;color:var(--soft)}
+  .wp-bar .btn{min-height:44px;flex:none}
+  .site:has(.wp-bar){padding-bottom:72px}
+}
+
+/* ---- the painting, full screen ---- */
+.zoom{position:fixed;inset:0;z-index:100;background:#181513;color:var(--dark-ink);display:flex;flex-direction:column;animation:zoom-in .35s ease}
+@keyframes zoom-in{from{opacity:0}to{opacity:1}}
+.zoom-pane{flex:1;min-height:0;overflow:hidden;display:flex;align-items:center;justify-content:center;padding:clamp(16px,4vw,48px);touch-action:pinch-zoom}
+.zoom-pane img{max-width:100%;max-height:100%;width:auto;height:auto;object-fit:contain;cursor:zoom-in;animation:zoom-img .5s var(--ease)}
+@keyframes zoom-img{from{transform:scale(.96);opacity:0}to{transform:none;opacity:1}}
+.zoom-pane.is-close{overflow:auto;display:block;padding:0}
+.zoom-pane.is-close img{max-width:none;max-height:none;width:240%;cursor:zoom-out}
+@media (min-width:900px){ .zoom-pane.is-close img{width:180%} }
+.zoom-cap{display:flex;flex-direction:column;gap:3px;text-align:center;padding:12px 20px calc(18px + env(safe-area-inset-bottom))}
+.zoom-cap b{font-family:var(--serif);font-size:22px;font-weight:500}
+.zoom-cap span{font-size:13.5px;color:var(--dark-muted)}
+.zoom-cap small{font-size:11px;letter-spacing:.16em;text-transform:uppercase;color:#9E9488;margin-top:4px}
+.zoom-x{position:absolute;top:calc(12px + env(safe-area-inset-top));right:12px;width:48px;height:48px;display:grid;place-items:center;background:rgba(251,249,245,.1);
+  border:0;border-radius:50%;color:var(--dark-ink);cursor:pointer;transition:background-color .2s ease}
+.zoom-x:hover{background:rgba(251,249,245,.22)}
+.zoom-x svg{width:20px;height:20px}
+
+/* ---- collection stories on a phone: chapters of three or four become a swipe ---- */
+@media (max-width:760px){
+  .story-head h1{font-size:54px}
+  .story-hero{padding:24px 0 20px}
+  .story-hero>a{width:calc(100% - 36px)}
+  .story-intro{font-size:17px;line-height:1.7}
+  .chap-works.n3,.chap-works.n4{display:flex;overflow-x:auto;scroll-snap-type:x mandatory;gap:14px;align-items:flex-end;
+    margin-inline:calc(-1 * var(--gut));padding:0 var(--gut) 8px;scrollbar-width:none}
+  .chap-works.n3::-webkit-scrollbar,.chap-works.n4::-webkit-scrollbar{display:none}
+  .chap-works.n3>figure,.chap-works.n4>figure{flex:0 0 80%;scroll-snap-align:center}
+  .chap-works figcaption{font-size:13px}
+  .chap-big{font-size:26px}
+  .chap-h h2{font-size:34px}
+  .next-series>*{padding:24px}
+}
+.chap-works figure a{display:block;overflow:hidden}
+.chap-works .framed,.story-hero .framed{transition:transform .8s var(--ease),box-shadow .8s var(--ease)}
+@media (hover:hover){ .chap-works a:hover .framed,.story-hero a:hover .framed{transform:translateY(-4px);box-shadow:var(--shadow-2)} }
+.chap-works figure a{overflow:visible}
+.next-series .go{transition:background-color .4s ease}
+.next-series .go b{font-weight:500;transition:transform .5s var(--ease)}
+.next-series .go:hover b{transform:translateX(8px)}
+
+/* ---- collections overview: more air, the works breathe ---- */
+.sband .s-txt h2{font-weight:500}
+@media (max-width:640px){
+  .sband .srow{gap:20px}
+  .sband .s-n{font-size:40px}
+  .sband .s-txt h2{font-size:32px}
+  .sband .s-works .grid{display:flex;overflow-x:auto;scroll-snap-type:x mandatory;gap:12px;margin-inline:calc(-1 * var(--gut));padding:0 var(--gut) 6px;scrollbar-width:none}
+  .sband .s-works .grid::-webkit-scrollbar{display:none}
+  .sband .s-works .grid>*{flex:0 0 62%;scroll-snap-align:start}
+}
+
+/* ---- facts in threes: one compact row on a phone, not three tall boxes ---- */
+@media (max-width:760px){
+  .ex-facts,.ab-facts{grid-template-columns:repeat(3,minmax(0,1fr));gap:8px}
+  .ex-facts div,.ab-facts div{flex-direction:column;align-items:flex-start;gap:6px;padding:14px 12px}
+  .ex-facts b,.ab-facts b{font-size:36px;min-width:0}
+  .ex-facts span,.ab-facts span{font-size:12px;line-height:1.35}
+  /* the jump links: one line that swipes */
+  .ex-jump,.jump{flex-wrap:nowrap;overflow-x:auto;scrollbar-width:none;margin-inline:calc(-1 * var(--gut));padding-inline:var(--gut)}
+  .ex-jump::-webkit-scrollbar,.jump::-webkit-scrollbar{display:none}
+  .ex-jump a,.jump a{flex:none;white-space:nowrap}
+  .ex-show{gap:22px}
+  .ex-txt h2{font-size:36px}
+  .slides-tabs{flex-wrap:nowrap;overflow-x:auto;scrollbar-width:none}
+  .slides-tabs button{flex:none;white-space:nowrap}
+  .slides-stage{margin-inline:calc(-1 * var(--gut))}
+  .slides-arrow{width:40px;height:52px;font-size:28px}
+}
+.ex-jump a,.jump a,.chip,.slides-tabs button,.themes-tabs [role="tab"],.pager button{transition:background-color .25s ease,border-color .25s ease,color .25s ease}
+
+/* ---- enquire ---- */
+.field input,.field select,.field textarea{transition:border-color .2s ease,box-shadow .2s ease}
+.field input:hover,.field select:hover,.field textarea:hover{border-color:#B8AD9E}
+@media (max-width:640px){ .page-title{font-size:52px} .enq{padding-top:22px} }
+
+/* ---- footer ---- */
+.ftr-id b{font-weight:600}
+@media (max-width:640px){
+  .ftr-in{flex-direction:column;gap:20px;padding-block:28px}
+  .ftr-links{flex-direction:column;align-items:flex-start;gap:12px}
+}
+
+/* ---- motion: pages fade in; sections rise into place the first time they are seen ---- */
+.page-in{animation:page-in .6s var(--ease) backwards}
+@keyframes page-in{from{opacity:0;transform:translateY(8px)}to{opacity:1;transform:none}}
+.js-motion .rv{opacity:0;transform:translateY(22px);transition:opacity .9s ease,transform 1s var(--ease)}
+.js-motion .rv.is-in{opacity:1;transform:none}
+
+@media (prefers-reduced-motion:reduce){
+  .page-in,.zoom,.zoom-pane img{animation:none}
+  .js-motion .rv{opacity:1;transform:none;transition:none}
+  .flip-in,.card .mat img,.btn,.tile,.sheet-nav a{transition:none}
+  .flip:hover .flip-in{transform:none}
+}
+/* a blurred header would trap the full-screen menu inside it: while the menu is open, the header is plain */
+.hdr.is-open{-webkit-backdrop-filter:none;backdrop-filter:none;background:var(--bg);border-bottom-color:transparent;box-shadow:none}

@@ -103,7 +103,7 @@ export default async function WorkPage({ params }: Props) {
   ];
 
   return (
-    <div className="wrap">
+    <div className="wrap wp">
       <nav className="crumb" aria-label="Breadcrumb">
         <Link href="/works">Works</Link> / <Link href={seriesPath(w.series)}>{w.series}</Link> / {w.title}
       </nav>
@@ -116,7 +116,7 @@ export default async function WorkPage({ params }: Props) {
             {lead && <p className={`wp-lead${words ? " hers" : ""}`}>{words ? `“${lead}”` : lead}{words && <span>Dr Dolly Prasad</span>}</p>}
           </div>
           <Viewer w={w} src={src} thumb={`/site/thumbs/${id}.jpg`} dims={d ? { w: d.w, h: d.h } : undefined}
-                  small={!!d && Math.max(d.w, d.h) < 600} />
+                  small={!!d && Math.max(d.w, d.h) < 600} sub={labelLine(w)} />
         </div>
 
         <aside className="wp-side">
@@ -162,6 +162,12 @@ export default async function WorkPage({ params }: Props) {
         <Link href={workPath(prev.id)}><span>Previous</span><b>{prev.title}</b></Link>
         <Link href={workPath(next.id)} className="nx"><span>Next</span><b>{next.title}</b></Link>
       </nav>
+
+      {/* on a phone, the way to ask stays in reach under the thumb */}
+      <div className="wp-bar">
+        <span><b>{w.title}</b><small>{sold ? "In a private collection" : "Available · Price on request"}</small></span>
+        <Link className="btn btn-solid" href={enquireHref(w)}>{sold ? "Ask" : "Enquire"}</Link>
+      </div>
 
       <script type="application/ld+json" dangerouslySetInnerHTML={{ __html: JSON.stringify(ld) }} />
     </div>

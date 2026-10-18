@@ -12,7 +12,8 @@ export default function Card({ w, label = true, eager = false }: { w: Work; labe
     <Link className="card" href={workPath(w.id)}>
       <div className="mat">
         {/* eslint-disable-next-line @next/next/no-img-element */}
-        <img className="framed thin" src={thumb(w.id)} alt={`${w.title}, ${w.medium.toLowerCase()}, by Dr Dolly Prasad`}
+        <img className="framed thin" src={thumb(w.id)} srcSet={`${thumb(w.id)} 640w, /art/works/${w.id}.jpg 1100w`}
+             sizes="(max-width: 640px) 92vw, (max-width: 1100px) 33vw, 300px" alt={`${w.title}, ${w.medium.toLowerCase()}, by Dr Dolly Prasad`}
              loading={eager ? "eager" : "lazy"} decoding="async" />
       </div>
       <span className="card-t">{w.title}</span>

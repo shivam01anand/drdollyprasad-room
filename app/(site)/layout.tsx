@@ -9,6 +9,7 @@ import "./site.css";
 import Header from "@/components/site/Header";
 import Footer from "@/components/site/Footer";
 import { Band, Rails } from "@/components/site/Borders";
+import Motion from "@/components/site/Motion";
 
 /** every page of the website: the line-work frame, her name and the menu, and the ways to reach her */
 export default function SiteLayout({ children }: { children: React.ReactNode }) {
@@ -20,6 +21,7 @@ export default function SiteLayout({ children }: { children: React.ReactNode }) 
       <main id="main">{children}</main>
       <Footer />
       <Band at="bottom" />
+      <Motion />
     </div>
   );
 }

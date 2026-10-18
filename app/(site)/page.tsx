@@ -58,14 +58,23 @@ export default function Home() {
         </div>
         <div className="grid grid-5 series-tiles snap-row">
           {SERIES_PAGES.map((s) => (
-            <Link key={s.slug} className="card" href={`/series/${s.slug}`}>
-              <div className="mat">
-                {/* eslint-disable-next-line @next/next/no-img-element */}
-                <img className="framed thin" src={thumb(s.hero)} alt={`${BY_ID.get(s.hero)?.title}, from ${s.label}`} loading="lazy" />
+            <Link key={s.slug} className="card flip" href={`/series/${s.slug}`}>
+              {/* on a computer the tile turns over on hover: the painting, then the collection in a line */}
+              <div className="flip-in">
+                <div className="mat flip-front">
+                  {/* eslint-disable-next-line @next/next/no-img-element */}
+                  <img className="framed thin" src={thumb(s.hero)} alt={`${BY_ID.get(s.hero)?.title}, from ${s.label}`} loading="lazy" />
+                </div>
+                <div className="flip-back" aria-hidden="true">
+                  <em>{worksIn(s.label).length} works · {s.period.replace(/^c\. /, "")}</em>
+                  <b>{s.label}</b>
+                  <span>{s.line}</span>
+                  <u>Read the story →</u>
+                </div>
               </div>
               <span className="card-t">{s.label}</span>
               <span className="eyebrow">{worksIn(s.label).length} works <small>{s.period.replace(/^c\. /, "")}</small></span>
-              <span className="meta">{s.line}</span>
+              <span className="meta flip-line">{s.line}</span>
             </Link>
           ))}
         </div>
