@@ -8,6 +8,8 @@
     "check:motion": "node scripts/check-motion.cjs"
   },
   "dependencies": {
+    "@fontsource/cormorant-garamond": "5.3.0",
+    "@fontsource/jost": "5.3.0",
     "@mkkellogg/gaussian-splats-3d": "0.4.7",
     "cannon-es": "0.20.0",
     "gsap": "3.13.0",

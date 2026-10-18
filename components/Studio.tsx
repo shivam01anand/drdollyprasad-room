@@ -701,6 +701,12 @@ export default function Studio({ dims }: { dims: Dims }) {
       <Preloader key={loadEpoch} ref={preRef} pct={pct} loaded={loaded} failed={failed}
                  getHeroRect={getHeroRect} onLift={onLift} onDone={onPreDone} />
 
+      {/* always on screen, from the first frame: the way back to the website */}
+      <a className="studio-exit" href="/" aria-label="Exit the studio and go back to the website">
+        <svg viewBox="0 0 24 24" aria-hidden="true"><path d="M6 6l12 12M18 6L6 18" /></svg>
+        <span>Exit the studio</span>
+      </a>
+
       {/* the header — line work and pills, as in the original */}
       <header className="hud" ref={hudRef} inert={!ready && !failed} data-state="pre">
         <div className="hud-top">
@@ -752,6 +758,7 @@ export default function Studio({ dims }: { dims: Dims }) {
             </div>
           )}
           <nav className="hud-pills" aria-label="Site">
+            <span className="mask"><a className="pill hud-pill" href="/">← The website</a></span>
             <span className="mask"><button type="button" className="pill hud-pill" aria-current={here === "featured" || undefined}
                   onClick={() => go(failed ? "#works" : "[data-chapter='featured']")}>Works<span className="arr"> →</span></button></span>
             {!failed && (
