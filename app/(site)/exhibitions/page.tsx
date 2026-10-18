@@ -2,6 +2,8 @@ import type { Metadata } from "next";
 import Link from "next/link";
 import Until from "@/components/Until";
 import Slideshow from "@/components/site/Slideshow";
+import WallHero from "@/components/site/WallHero";
+import { SHOW_WALL } from "@/components/site/Collage";
 import { NOW, NOW_SHOWING_CONFIRMED, PRESS, RECORD, RECORD_LINE, SHOWS } from "@/lib/site";
 import { BY_ID, WORKS, workPath } from "@/lib/works";
 import { dims } from "@/lib/images";
@@ -16,11 +18,14 @@ const years = [...new Set(RECORD.map((r) => r.year))];
 
 export default function Exhibitions() {
   return (
+    <>
+    <WallHero columns={SHOW_WALL} label="Her exhibitions" eyebrow="2005 to 2018" title="Exhibitions"
+              held="Eighteen shows across galleries and art fairs, from Delhi to Bombay">
+      <a className="btn btn-solid" href="#india-habitat-centre-2010">See the shows</a>
+      <a className="btn" href="#record">The full record</a>
+    </WallHero>
     <div className="wrap">
-      <section className="page-head">
-        <h1 className="page-title">Exhibitions</h1>
-        <p className="lede">Eighteen shows across galleries and art fairs, from Delhi to Bombay. Her paintings have hung at India Habitat Centre, the Indian Council for Cultural Relations, Triveni Kala Sangam, Travancore Art Gallery and Nehru Art Gallery in Bombay, and at the First International Kala Mela organised by Lalit Kala Akademi. Her shows have been covered on television and in the papers.</p>
-      </section>
+      <p className="ex-sum ex-intro">Her paintings have hung at India Habitat Centre, the Indian Council for Cultural Relations, Triveni Kala Sangam, Travancore Art Gallery and Nehru Art Gallery in Bombay, and at the First International Kala Mela organised by Lalit Kala Akademi. Her shows have been covered on television and in the papers.</p>
 
       {NOW_SHOWING_CONFIRMED && <Until until={NOW.until}>
         <section id={NOW.id} style={{ paddingBottom: 28 }}>
@@ -145,5 +150,6 @@ export default function Exhibitions() {
         </div>
       </section>
     </div>
+    </>
   );
 }

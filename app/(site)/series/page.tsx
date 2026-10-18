@@ -5,6 +5,8 @@ import { ON_THE_WORK, SERIES_PAGES, SMALL_PHOTO, worksIn } from "@/lib/site";
 import { BY_ID } from "@/lib/works";
 import { dims } from "@/lib/images";
 import Marquee from "@/components/site/Marquee";
+import WallHero from "@/components/site/WallHero";
+import { SERIES_WALL } from "@/components/site/Collage";
 
 export const metadata: Metadata = {
   title: "Collections",
@@ -16,10 +18,11 @@ export const metadata: Metadata = {
 export default function SeriesIndex() {
   return (
     <>
-      <section className="wrap page-head">
-        <h1 className="page-title">Collections</h1>
-        <p className="lede">Five collections, five walks of life. The things India is quietly leaving behind. The closed doors of old houses. Faith, as it is lived every day. The faces of working lives. And her spring work, among flowers, leaves and birds.</p>
-      </section>
+      <WallHero columns={SERIES_WALL} label="The five collections" eyebrow="Five collections" title="Collections"
+                sub="Five collections, five walks of life. The things India is quietly leaving behind. The closed doors of old houses. Faith, as it is lived every day. The faces of working lives. And her spring work, among flowers, leaves and birds.">
+        <a className="btn btn-solid" href="#gone-are-the-days">The five collections</a>
+        <Link className="btn" href="/works">See all the works</Link>
+      </WallHero>
 
       <section className="wrap" style={{ paddingBottom: 8 }}>
         <div className="big-tiles">
