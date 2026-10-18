@@ -53,9 +53,9 @@ it are hers: a gallery inside a Delhi home, built and lit in Blender.
      the evening bake along the walk, the lamps coming up behind it; dark mode is all of it;
    - then up out of the house for **Featured** and **the plan** (exhibitions, her own words).
 
-   On a computer the wheel, a trackpad or the keys move the walk freely, and when they come to
-   rest it settles on a stop, as a phone's swipe does: a nudge settles back, a real scroll goes
-   on to the next stop (a walk left between stops shows no labels and frames no wall). A window
+   On a computer the wheel and trackpad move the walk freely, as on the live site; the arrow
+   keys and navigation buttons move one stop at a time. A phone's swipe carries on to the
+   next stop, or settles back after a nudge. A window
    made larger or smaller keeps the visitor where they stood (every stop moves with the window's
    height; the walk is carried over in stops, not pixels), and the wall labels are placed again
    for the new size. The header's lettering is light where the room behind it is dark and dark
@@ -64,7 +64,9 @@ it are hers: a gallery inside a Delhi home, built and lit in Blender.
 
    Every room change passes through a doorway, through passing poses where a turn is long
    (`scripts/house/pathcheck.py` proves it for the landscape and the portrait walk). The camera
-   walks: it follows the scroll softly and never takes a step faster than 3.4 s (`Rig.STEP_S`).
+   walks: it follows the scroll softly and never takes a step faster than 2.6 s (`Rig.STEP_S`,
+   restored to the live site's timing). Layout measurements preserve a moving camera instead
+   of finishing its glide immediately.
 4. **Featured** — the original's slider; a click opens the work on a card over the house (the
    room stays in view, dimmed a little; a click outside puts it away), where it can be looked at
    closely (click, scroll, pinch) or seen in the room made for it (`lib/rooms.ts`, Blender renders
@@ -104,7 +106,7 @@ Designed for the thumb, not shrunk from the desktop:
 - **the dock** — one bar where the desktop has three pills: where you are (`04/19 · At her
   easel`) and a menu; the menu is a sheet from the bottom edge (`Stops`) with every stop,
   all her works, contact, mail and Instagram;
-- every copy label sits clear of its painting (the portrait cameras frame each painting high,
+- every copy label sits clear of its painting (the portrait cameras frame the full wall groups high,
   and on a short phone the poem sets in its two stanzas side by side);
 - Featured is a carousel with its plate number (`03 / 12`); a painting opens on a tap, closes
   from a round chip in the corner or with a pull down;
@@ -118,7 +120,7 @@ Designed for the thumb, not shrunk from the desktop:
 | Her | The original painting body, hands, brush and stool remain. Only her head from take 124 is aligned to the painter's neck, looking at the brush contact. Its actual 3D features replace the generic head after loading; the original head is retained as a download-failure fallback. See [figure notes](docs/scan-preview.md). |
 | Into the site | `scripts/house/publish.py` writes `public/house/`: the GLB (textures ≤1024 WebP, Draco), the two lightmaps (and 2k copies for phones) and `house.json` (cameras, canvases, colliders, anchors) in three's coordinates. |
 | Materials | the architecture keeps the photographed PBR sets in `public/tex` (`lib/room/materials.ts`), laid in metres from world position at load; one shader patch (`lib/room/house.ts`) puts the baked light in place of live diffuse (`uBake`) and moves afternoon → evening (`uNight`). Live light remains for moving things and the brass's glint. |
-| Rendering | one `gsap.ticker` loop drives Lenis and `Room.renderFrame(now)`. Render-on-demand; shadow maps re-render only while things move; half-res GTAO, MSAA 2, DPR ≤ 1.5 (phones 1.25, no MSAA, no AO). |
+| Rendering | one `gsap.ticker` loop drives Lenis and `Room.renderFrame(now)`. Render-on-demand; shadow maps re-render only while things move; half-res GTAO, MSAA 2, DPR ≤ 1.5. Phones use DPR ≤ 2, 4× MSAA and no AO; weak devices retain the light tier. Off-screen splat updates are culled, and background texture uploads wait for the camera to rest. |
 | Robustness | one terminal failure path (asset error, timeout, WebGL context loss, render exception) disposes the room and turns the page into the paintings; `prefers-reduced-motion` cuts between chapters; scroll locks have one owner. |
 
 ### Rebuilding the house
@@ -157,6 +159,12 @@ See [the performance audit](docs/performance.md) for the loading/rendering chang
 asset sizes and validation limits.
 
 ## Checking it
+
+`npm run check:motion` checks full phone groups, reduced motion, simulated frame-rate
+independence and scroll continuity through a resize, using the actual camera rig and GSAP.
+With the local Blender source available, `npm run check:motion -- scripts/house/work/v17/house.json`
+also samples every camera path against the walls and door openings. These are geometry and
+animation-math checks, not measured browser FPS.
 
 The Chrome extension's tab is usually hidden, and hidden tabs get no animation frames, so
 WebGL screenshots time out there. In development:

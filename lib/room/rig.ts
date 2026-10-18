@@ -13,7 +13,7 @@ import gsap from "gsap";
  */
 
 export type V3 = [number, number, number];
-export type Pose = { cam: V3; camRot: V3; pivot: V3; pivotRot: V3 };
+export type Pose = { cam: V3; camRot: V3; pivot: V3; pivotRot: V3; fov?: number };
 const KEYS = ["cam", "camRot", "pivot", "pivotRot"] as const;
 
 /**
@@ -29,7 +29,11 @@ export function aim(target: V3, yaw: number, dist: number, pitch = 0, orbit = 0)
 export const clonePose = (p: Pose): Pose => ({
   cam: [...p.cam] as V3, camRot: [...p.camRot] as V3,
   pivot: [...p.pivot] as V3, pivotRot: [...p.pivotRot] as V3,
+  ...(p.fov === undefined ? {} : { fov: p.fov }),
 });
+
+export const fieldOfView = (aspect: number) => aspect > 4 / 3 ? 40
+  : Math.min(62, THREE.MathUtils.radToDeg(2 * Math.atan(Math.tan(THREE.MathUtils.degToRad(20)) / (aspect / (4 / 3)))));
 
 function assign(dst: Pose, src: Pose) {
   for (const k of KEYS) { dst[k][0] = src[k][0]; dst[k][1] = src[k][1]; dst[k][2] = src[k][2]; }
@@ -53,6 +57,8 @@ export class Rig {
   private messTl?: gsap.core.Tween;
   private enabled = false;
   private reduced: boolean;
+  private baseFov = 40;
+  private lens = { fov: 40 };
 
   // David Lee's chain: the scroll fraction approaches its target with a
   // ~100 ms time constant, the camera's own progress follows that at 10 % a
@@ -71,12 +77,14 @@ export class Rig {
   private messK = { v: 0 };
 
   private lastMatrix = new THREE.Matrix4();
+  private lastProjection = new THREE.Matrix4();
 
   constructor(shots: Pose[], start: Pose, mess: Pose, aspect: number, reduced: boolean, vias: (Pose | null)[] = []) {
     this.shots = shots.map(clonePose);
     this.vias = vias.map((v) => (v ? clonePose(v) : null));
     this.mess = clonePose(mess);
     this.reduced = reduced;
+    this.baseFov = this.lens.fov = fieldOfView(aspect);
     this.pivot.rotation.order = "YXZ";
     this.camera = new THREE.PerspectiveCamera(40, aspect, 0.05, 120);
     this.pivot.add(this.camera);
@@ -92,9 +100,8 @@ export class Rig {
     // keep the horizontal field of a 4:3 frame on narrow viewports
     // (capped: on a phone held upright the 4:3 rule asks for 93°, which is
     // mostly ceiling and floor)
-    this.camera.fov = aspect > 4 / 3
-      ? 40
-      : Math.min(62, THREE.MathUtils.radToDeg(2 * Math.atan(Math.tan(THREE.MathUtils.degToRad(20)) / (aspect / (4 / 3)))));
+    this.baseFov = this.lens.fov = fieldOfView(aspect);
+    this.camera.fov = this.lens.fov;
     this.camera.aspect = aspect;
     this.camera.updateProjectionMatrix();
   }
@@ -110,16 +117,19 @@ export class Rig {
     this.introTl?.kill();
     if (this.reduced) {
       assign(this.pose, this.shots[0]);
+      this.lens.fov = this.shots[0].fov ?? this.baseFov;
       this.enabled = true;
       onDone();
       return;
     }
     assign(this.pose, start);
+    this.lens.fov = start.fov ?? this.baseFov;
     const end = this.shots[0];
     const tl = gsap.timeline({ delay, onComplete: () => { this.enabled = true; onDone(); } });
     KEYS.forEach((k, i) =>
       tl.to(this.pose[k], { 0: end[k][0], 1: end[k][1], 2: end[k][2], duration: 2.6, ease: "power2.inOut" }, i * 0.04)
     );
+    tl.to(this.lens, { fov: end.fov ?? this.baseFov, duration: 2.6, ease: "power2.inOut" }, 0);
     this.introTl = tl;
   }
 
@@ -149,6 +159,8 @@ export class Rig {
         tl.fromTo(this.pose[k], v3(from, k), { ...v3(via, k), ease: "power2.in", duration: seg / 2 }, at);
         tl.fromTo(this.pose[k], v3(via, k), { ...v3(s, k), ease: "power2.out", duration: seg / 2 }, at + seg / 2);
       });
+      tl.fromTo(this.lens, { fov: from.fov ?? this.baseFov },
+        { fov: s.fov ?? this.baseFov }, i * span);
     });
     return tl;   // (shots − 1) · 11.5 s
   }
@@ -194,7 +206,7 @@ export class Rig {
   /** how much a look turns the head: a mouse's small sway, or a finger's wider glance */
   private lookGain = 1;
   /** a walking pace: no step from one wall to the next is quicker than this */
-  private static STEP_S = 3.4;
+  private static STEP_S = 2.6;
 
   setMess(on: boolean) {
     this.messTl?.kill();
@@ -209,6 +221,7 @@ export class Rig {
       const index = Math.round(this.scrollTarget * last);
       if (index / last !== this.lastProgress) {
         assign(this.pose, this.shots[index]);
+        this.lens.fov = this.shots[index].fov ?? this.baseFov;
         this.scrollSmooth = this.camProgress = this.lastProgress = index / last;
       }
     } else if (this.enabled) {
@@ -237,8 +250,11 @@ export class Rig {
 
     // update the pivot too: a pivot-only move must still count as motion
     this.camera.updateWorldMatrix(true, false);
-    const moved = !this.lastMatrix.equals(this.camera.matrixWorld);
-    if (moved) this.lastMatrix.copy(this.camera.matrixWorld);
+    const moved = !this.lastMatrix.equals(this.camera.matrixWorld) || !this.lastProjection.equals(this.camera.projectionMatrix);
+    if (moved) {
+      this.lastMatrix.copy(this.camera.matrixWorld);
+      this.lastProjection.copy(this.camera.projectionMatrix);
+    }
     return moved;
   }
 
@@ -256,12 +272,17 @@ export class Rig {
     const shift = 0.2 / this.lookGain;
     this.camera.position.set(mix(p.cam[0], m.cam[0]) - shift * e, mix(p.cam[1], m.cam[1]) + shift * t, dist);
     this.camera.rotation.set(mix(p.camRot[0], m.camRot[0]) - 0.1 * t, mix(p.camRot[1], m.camRot[1]) - 0.1 * e, mix(p.camRot[2], m.camRot[2]));
+    if (this.camera.fov !== this.lens.fov) {
+      this.camera.fov = this.lens.fov;
+      this.camera.updateProjectionMatrix();
+    }
   }
 
   get progress() { return this.camProgress; }
   /** how far the camera still has to travel to where the scroll says (pointer drift aside) */
   get travel() { return Math.abs(this.camProgress - this.scrollTarget); }
   get isEnabled() { return this.enabled; }
+  get isMoving() { return !!this.introTl?.isActive() || this.travel > 0.0001; }
   /** how far the camera has travelled from the scroll target — 0 once it has landed */
   get settling() { return Math.abs(this.camProgress - this.scrollTarget) + Math.abs(this.ptrSmooth.x) + Math.abs(this.ptrSmooth.y); }
 

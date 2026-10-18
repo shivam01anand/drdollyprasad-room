@@ -78,3 +78,37 @@ switching day/night, filtering works and returning to the studio.
 Fonts can be refreshed manually with
 `python3 scripts/performance/vendor-fonts.py`. Normal builds have no external font
 download dependency. Their OFL license files are included in `public/fonts/`.
+
+## Phone framing and glide follow-up
+
+The phone's `n:<view>` cameras intentionally selected one work from multi-painting
+hangs. Phone stops now fit all the labelled works, including their frame edges,
+at the actual viewport aspect. Camera positions stay within the room, and the
+lens changes continuously during the move. The desktop poses and path were
+compared with `2acd359` at 2,595 positions across three viewport sizes: the camera
+world and projection matrices match exactly. The new painter and gallery remain.
+
+Motion uses the live site's 1.6 s touch-scroll glide and 2.6 s camera step limit.
+The later desktop auto-snap has been removed. A layout measurement no longer
+finishes an in-progress glide or copies the scroll target straight into the live
+camera. Real size changes remap the current position and continue the remaining
+move. Phone browser-bar height changes are coalesced for 120 ms before resizing
+the GPU targets; width/orientation changes still apply immediately.
+
+`DropInViewer` disables frustum culling on its update callback. The head now has
+a conservative world-space visibility bound, so its sorter and draw are skipped
+when outside the view. All captured splats, including three standard deviations
+of their support, fit inside 0.20 m of the placement's head centre; the cull bound
+uses 0.35 m. Background normal-map attachment and texture preuploads drain one at
+a time while the camera rests. Photograph downloads and their priority remain;
+an image that becomes visible before its preupload can still upload on that frame.
+Artwork, lighting, render resolution and antialiasing quality are unchanged.
+
+Validation: `npm run check:motion` checks whole-group framing on five portrait
+sizes with normal and reduced motion, plus 30/60/120 Hz simulated camera updates
+and resize continuity. With the local Blender source supplied as its optional
+argument it also checks all camera paths against walls and door openings at six
+viewport sizes. Six offline portrait renders confirm the wall compositions.
+These checks do not measure browser frame rates or prove that all device-specific
+stuttering is resolved. The actual browser regression/profile is still pending
+the disconnected browser connection or permission for headless Chrome.

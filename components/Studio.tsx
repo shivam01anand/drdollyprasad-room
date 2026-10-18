@@ -17,6 +17,7 @@ import * as music from "@/lib/music";
 import { CHAPTERS, WALK_ORDER, stopOf } from "@/lib/chapters";
 import { activeVariant } from "@/lib/room/variants";
 import { BY_ID, EMAIL, FEATURED } from "@/lib/works";
+import { rebaseWalkScroll, walkProgress } from "@/lib/walk-layout";
 
 type Dims = Record<string, { w: number; h: number }>;
 
@@ -138,18 +139,7 @@ export default function Studio({ dims }: { dims: Dims }) {
     let vh = innerHeight;
     let lastActive = -1;
     let lastScroll = 0;
-    let settleTimer = 0;
-    let anchor = 0;                                  // the stop the walk last came to rest at
-
-    const camT = (s: number) => {
-      const n = centers.length;
-      if (n < 2) return 0;
-      if (s <= centers[0]) return 0;
-      if (s >= centers[n - 1]) return 1;
-      let k = 0;
-      while (k < n - 2 && s > centers[k + 1]) k++;
-      return (k + (s - centers[k]) / Math.max(1, centers[k + 1] - centers[k])) / (n - 1);
-    };
+    const camT = (s: number) => walkProgress(s, centers);
 
     const apply = (s: number, sync = false) => {
       lastScroll = s;
@@ -193,37 +183,34 @@ export default function Studio({ dims }: { dims: Dims }) {
     };
 
     const measure = () => {
-      // where the walk is, in stops, before the layout moves under it: a window made smaller or
-      // larger moves every stop, and the visitor must stay where they stood, not be carried on
-      const n0 = centers.length;
-      const inWalk = n0 > 1 && lastScroll >= centers[0] - 2 && lastScroll <= centers[n0 - 1] + 2;
-      const t = inWalk ? camT(lastScroll) : 0;
-      const intoWorks = lastScroll - worksTop;
+      const before = { centers, worksTop };
+      const oldHeight = vh;
       vh = innerHeight;
       const secs = [...(mainRef.current?.querySelectorAll<HTMLElement>(".sec") ?? [])];
       centers = secs.map((el) => el.offsetTop + el.offsetHeight / 2 - vh / 2);
       worksTop = document.getElementById("works")?.offsetTop ?? Infinity;
       const feat = mainRef.current?.querySelector<HTMLElement>(".sec-featured");
       if (feat) { featTop = feat.offsetTop; featBottom = feat.offsetTop + feat.offsetHeight; }
-      const n = centers.length;
-      let y = lastScroll;
-      if (n0 && n && heading >= 0) {
-        // a glide on its way arrives, at once, where its stop now is
-        y = heading < n ? centers[heading] : worksTop;
-        anchor = Math.min(heading, n - 1);
-        heading = -1;
-        delete html.dataset.gliding;
-      } else if (inWalk && n > 1 && !swipe.on) {
-        const f = t * (n - 1), k = Math.min(n - 2, Math.floor(f));
-        y = centers[k] + (f - k) * (centers[k + 1] - centers[k]);
-      } else if (n0 && intoWorks > 0 && Number.isFinite(worksTop) && !swipe.on) {
-        y = worksTop + intoWorks;
+      const changed = oldHeight !== vh || before.worksTop !== worksTop ||
+        before.centers.length !== centers.length || centers.some((c, i) => c !== before.centers[i]);
+      if (!changed) return;
+
+      const mapped = swipe.on ? lastScroll : rebaseWalkScroll(lastScroll, before, { centers, worksTop });
+      const y = Number.isFinite(mapped) ? Math.max(0, mapped) : lastScroll;
+      lenis.resize();
+      if (Math.abs(y - lastScroll) > 0.5) lenis.scrollTo(y, { immediate: true, force: true });
+      // Layout updates change the scroll coordinates, not the live camera pose.
+      // In particular, a font/image resize must never finish a moving camera.
+      apply(y);
+      if (heading >= 0) {
+        const target = heading < centers.length ? centers[heading] : worksTop;
+        const remaining = Math.max(0.1, (glideEndsAt - performance.now()) / 1000);
+        glideTo(target, heading, remaining);
       }
-      if (Number.isFinite(y) && Math.abs(y - lastScroll) > 0.5) lenis.scrollTo(Math.max(0, y), { immediate: true, force: true });
-      apply(Number.isFinite(y) ? Math.max(0, y) : lastScroll, true);
     };
 
-    lenis.on("scroll", (l: Lenis) => { apply(l.scroll); settleSoon(); });
+    // As on the live site, a wheel/trackpad stays under the visitor's control.
+    lenis.on("scroll", (l: Lenis) => apply(l.scroll));
 
     /* On a phone the walk is in the hand. A finger on the house moves it:
        drag up and the walk follows the finger toward the next wall (never
@@ -237,15 +224,16 @@ export default function Studio({ dims }: { dims: Dims }) {
     const coarse = matchMedia("(pointer: coarse)").matches;
     const swipe = { on: false, back: false, mode: "" as "" | "walk" | "look", x0: 0, y0: 0, t0: 0, s0: 0, from: 0, lastY: 0, lastT: 0, v: 0 };
     let heading = -1;
+    let glideEndsAt = 0;
     const nearestStop = (sc: number) => {
       let k = 0, best = Infinity;
       centers.forEach((c, i) => { const d = Math.abs(c - sc); if (d < best) { best = d; k = i; } });
       return k;
     };
-    const glideTo = (y: number, i: number, dur = 2.4) => {
+    const glideTo = (y: number, i: number, dur = 1.6) => {
       heading = i;
-      if (i < centers.length) anchor = i;
       const quick = reducedMotion();
+      glideEndsAt = performance.now() + (quick ? 0 : dur * 1000);
       html.dataset.gliding = "1";
       lenis.scrollTo(y, {
         duration: quick ? 0 : dur, immediate: quick, force: true,
@@ -322,32 +310,7 @@ export default function Studio({ dims }: { dims: Dims }) {
       const next = go ? swipe.from + (dy < 0 ? 1 : -1) : swipe.from;
       if (next < 0) { glideTo(centers[0], 0, 0.9); return; }
       if (next >= n) glideTo(worksTop, n);
-      else glideTo(centers[next], next, go ? 2.4 : 0.9);
-    };
-    /* A wheel, a trackpad or the keys move the walk freely; when they come to rest, the walk
-       settles on a stop, as a phone's swipe does: a nudge settles back to the stop it left, a
-       real scroll goes on to the next one, a long one to the stop nearest where it came to rest.
-       (A walk left between stops shows no wall labels, and frames no wall as it was hung.) */
-    const settle = () => {
-      const n = centers.length;
-      if (!n || heading >= 0 || html.dataset.gliding === "1" || locks.current.size || swipe.on) return;
-      const s = lastScroll;
-      if (s > centers[n - 1] + 2 || s < centers[0] - 2) return;      // the collage and the page are free
-      const near = nearestStop(s);
-      if (Math.abs(s - centers[near]) < 2) { anchor = near; return; }
-      const from = Math.min(n - 1, Math.max(0, anchor));
-      const gap = Math.abs(centers[Math.min(n - 1, from + 1)] - centers[Math.max(0, from - 1)]) / 2 || innerHeight;
-      const d = s - centers[from];
-      let next = near;
-      // a scroll past an eighth of the way is meant: it goes on, never back
-      if (next === from && Math.abs(d) > gap * 0.12) next = Math.max(0, Math.min(n - 1, from + Math.sign(d)));
-      anchor = next;
-      glideTo(centers[next], next, Math.min(2.4, 0.7 + Math.abs(centers[next] - s) / Math.max(1, gap) * 1.6));
-    };
-    const settleSoon = () => {
-      clearTimeout(settleTimer);
-      if (html.dataset.gliding === "1" || heading >= 0) return;
-      settleTimer = window.setTimeout(settle, 260);
+      else glideTo(centers[next], next, go ? 1.6 : 0.9);
     };
 
     // the edge arrows (and the keyboard's): one wall on, or one back
@@ -519,7 +482,6 @@ export default function Studio({ dims }: { dims: Dims }) {
     return () => {
       killed = true;
       clearTimeout(timeout);
-      clearTimeout(settleTimer);
       gsap.ticker.remove(frame);
       gsap.ticker.remove(ink);
       canvas.removeEventListener("webglcontextlost", onContextLost);

@@ -1,5 +1,6 @@
 import { aim, type Pose } from "./room/rig";
 import type { HouseInfo, V3 } from "./room/house";
+import { phoneGroupView } from "./room/phone-framing";
 
 /**
  * One chapter model owns the copy and the camera, so the two can never drift
@@ -215,18 +216,29 @@ const cam = (info: HouseInfo, view: string, narrow: boolean) => (narrow && info.
  * between two chapters the pose it passes through, or null. Yaw is unwrapped
  * along the whole path, through the passing poses too.
  */
-export function resolveWalk(info: HouseInfo, narrow = false): { shots: Pose[]; vias: (Pose | null)[] } {
+export function resolveWalk(info: HouseInfo, narrow = false, aspect = 390 / 844): { shots: Pose[]; vias: (Pose | null)[] } {
   let prev: number | undefined;
   const shots: Pose[] = [], vias: (Pose | null)[] = [];
   CHAPTERS.forEach((c, i) => {
     if (i > 0) {
       // a passing pose the house has (an older build may not): otherwise straight on
-      const vc = c.via ? cam(info, c.via, narrow) : undefined;
+      let vc = c.via ? cam(info, c.via, narrow) : undefined;
+      // Turn toward the floral wall before stepping back to see its full hang.
+      if (narrow && c.id === "floral") vc = info.cams.floral;
+      if (narrow && c.id === "faith" && vc) vc = {
+        ...vc, eye: [vc.eye[0], 1.55, vc.eye[2]], target: [vc.target[0], 1.4, vc.target[2]],
+      };
+      // The wider phone view approaches the Red Room through the door's centre.
+      if (narrow && c.id === "street" && vc) vc = {
+        ...vc, eye: [-4.6, 1.55, -2.2], target: [-4.3, 1.4, 0.2],
+      };
       const v = vc ? viewPose(vc, prev, NARROW_BACK) : null;
       if (v) prev = v.pivotRot[1];
       vias.push(v);
     }
-    const p = viewPose(cam(info, c.view, narrow), prev, NARROW_BACK);
+    const group = narrow ? phoneGroupView(info, c.view, c.labels ?? [], c.room, aspect) : null;
+    const p = viewPose(group ?? cam(info, c.view, narrow), prev, NARROW_BACK);
+    if (group) p.fov = group.fov;
     prev = p.pivotRot[1];
     shots.push(p);
   });

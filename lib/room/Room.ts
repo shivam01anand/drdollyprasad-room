@@ -168,9 +168,13 @@ export class Room {
   private artLoads = 0;
   private artPriority = -1;
   private reliefBuilder = new ReliefBuilder();
+  /** One texture upload at rest; background work must not interrupt a glide. */
+  private textureUploads: (() => void)[] = [];
   private viewRevision = 0;
   private viewport = { left: 0, top: 0, width: 0, height: 0 };
   private narrow = false;
+  private renderSize = { w: 0, h: 0 };
+  private resizeTimer = 0;
   private lastFlame = -Infinity;
 
   private abort = new AbortController();
@@ -252,7 +256,7 @@ export class Room {
 
     const aspect = (canvas.clientWidth || innerWidth) / Math.max(1, canvas.clientHeight || innerHeight);
     this.narrow = isNarrow(aspect);
-    const walk = resolveWalk(this.info, this.narrow);
+    const walk = resolveWalk(this.info, this.narrow, aspect);
     this.rig = new Rig(walk.shots, startPose(this.info, this.narrow), messPose(this.info), aspect, opts.reducedMotion, walk.vias);
     this.scene.add(this.rig.pivot, this.world);
 
@@ -385,6 +389,7 @@ export class Room {
         tex.needsUpdate = true;
         this.owned.push(tex);
         (mesh.material as THREE.MeshStandardMaterial).map = tex;
+        this.textureUploads.push(() => this.renderer?.initTexture(tex));
         this.invalidate();
         void this.addRelief(mesh, 384);
       }).catch(() => { /* the warm ground stays */ }).finally(() => {
@@ -414,7 +419,10 @@ export class Room {
       const relief = await this.reliefBuilder.build(image, longest);
       if (this.disposed) { relief.dispose(); return; }
       this.owned.push(relief);
-      material.normalMap = relief;
+      this.textureUploads.push(() => {
+        this.renderer?.initTexture(relief);
+        material.normalMap = relief;
+      });
       this.invalidate();
     } catch { /* a flat normal retains the painting if background work is cancelled */ }
   }
@@ -1165,9 +1173,25 @@ export class Room {
   };
 
   private resize = () => {
+    if (!this.renderer || !this.composer || this.disposed) return;
+    const w = this.canvas.clientWidth || innerWidth, h = this.canvas.clientHeight || innerHeight;
+    clearTimeout(this.resizeTimer);
+    if (w === this.renderSize.w && h === this.renderSize.h) return;
+    // Phone browser bars resize the viewport repeatedly during a swipe. Keep
+    // the existing buffers until that settles, rather than reallocating MSAA
+    // targets in the middle of every glide. Width/orientation changes are immediate.
+    if (this.tier.phone && w === this.renderSize.w) {
+      this.resizeTimer = window.setTimeout(this.applyResize, 120);
+    } else this.applyResize();
+  };
+
+  private applyResize = () => {
+    if (this.disposed) return;
     if (!this.renderer || !this.composer) return;
     const w = this.canvas.clientWidth || innerWidth;
     const h = this.canvas.clientHeight || innerHeight;
+    if (w === this.renderSize.w && h === this.renderSize.h) return;
+    this.renderSize = { w, h };
     const rect = this.canvas.getBoundingClientRect();
     this.viewport = { left: rect.left, top: rect.top, width: rect.width, height: rect.height };
     this.viewRevision++;
@@ -1175,11 +1199,9 @@ export class Room {
     this.composer.setSize(w, h);
     const aspect = w / Math.max(1, h);
     this.rig.setAspect(aspect);
-    if (isNarrow(aspect) !== this.narrow) {
-      this.narrow = !this.narrow;
-      const walk = resolveWalk(this.info, this.narrow);
-      this.rig.setShots(walk.shots, walk.vias);
-    }
+    this.narrow = isNarrow(aspect);
+    const walk = resolveWalk(this.info, this.narrow, aspect);
+    this.rig.setShots(walk.shots, walk.vias);
     this.wake = 2;
   };
 
@@ -1193,6 +1215,10 @@ export class Room {
     this.last = now;
 
     let draw = this.rig.update(dt);
+    if (this.visible && !this.rig.isMoving && this.textureUploads.length) {
+      this.textureUploads.shift()!();
+      draw = true;
+    }
     if (draw) {
       this.viewRevision++;
       // One layout read per changed view, shared by all projected labels.
@@ -1247,6 +1273,7 @@ export class Room {
       this.ceiling.visible = ceilingOn;
       this.renderer.shadowMap.needsUpdate = true;   // the roof casts too
     }
+    this.dolly?.updateVisibility(this.rig.camera);
     this.composer.render(dt / 1000);
     if (this.lumaAsks.size) {
       const asks = [...this.lumaAsks.values()];
@@ -1386,7 +1413,9 @@ export class Room {
     this.disposed = true;
     this.useMotion(false);
     this.ready = false;
+    clearTimeout(this.resizeTimer);
     this.reliefBuilder.dispose();
+    this.textureUploads.length = 0;
     this.dolly?.dispose();
     this.abort.abort();
     this.modeTl?.kill();

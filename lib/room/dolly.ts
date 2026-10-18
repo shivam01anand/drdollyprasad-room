@@ -9,6 +9,12 @@ export class Dolly {
   private disposed = false;
   private loaded = false;
   private sortCamera = new THREE.PerspectiveCamera();
+  private shown = false;
+  private frustum = new THREE.Frustum();
+  private clip = new THREE.Matrix4();
+  // Includes every captured Gaussian and its visible support (measured < 0.20 m).
+  private bounds = new THREE.Sphere(new THREE.Vector3(), 0.35);
+  private worldBounds = new THREE.Sphere();
 
   constructor(private night: { value: number }, dpr: number, wake: () => void) {
     const object = this.object = new DropInViewer({
@@ -62,7 +68,18 @@ export class Dolly {
     this.loaded = true;
   }
 
-  show(on: boolean) { this.object.visible = this.loaded && !this.disposed && on; }
+  show(on: boolean) { this.shown = on; this.object.visible = this.loaded && !this.disposed && on; }
+
+  /** DropInViewer's callback is never frustum-culled; keep it off-screen too. */
+  updateVisibility(camera: THREE.Camera) {
+    if (!this.loaded || this.disposed || !this.shown) { this.object.visible = false; return; }
+    this.bounds.center.copy(this.anchor);
+    this.worldBounds.copy(this.bounds);
+    if (this.object.parent) this.worldBounds.applyMatrix4(this.object.parent.matrixWorld);
+    this.clip.multiplyMatrices(camera.projectionMatrix, camera.matrixWorldInverse);
+    this.frustum.setFromProjectionMatrix(this.clip);
+    this.object.visible = this.frustum.intersectsSphere(this.worldBounds);
+  }
 
   dispose() {
     if (this.disposed) return;
