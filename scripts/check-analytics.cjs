@@ -106,9 +106,12 @@ const click = async (el) => act(async () => { el.dispatchEvent(new MouseEvent('c
   stop(); link.remove(); captures.length = 0;
 
   const view = createRoot(document.getElementById('root'));
-  history.replaceState(null, '', '/works');
+  sessionStorage.removeItem('dolly-analytics-test');
+  history.replaceState(null, '', '/works?analytics_test=1&utm_source=instagram');
   await act(async () => { view.render(React.createElement(React.Fragment, null, React.createElement(Analytics), React.createElement(WorksBrowser))); });
   assert.equal(byEvent('$pageview').length, 1);
+  assert.equal(byEvent('$pageview')[0].properties.is_test, true, 'Catalogue URL updates must preserve the first-visit verification flag');
+  assert.ok(byEvent('$pageview')[0].properties.$current_url.includes('utm_source=instagram'), 'Campaign attribution must survive initial catalogue URL setup');
   const status = document.querySelectorAll('.filters select')[1];
   status.value = 'available';
   await act(async () => status.dispatchEvent(new Event('change', { bubbles: true })));

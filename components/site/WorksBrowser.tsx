@@ -25,7 +25,9 @@ export default function WorksBrowser() {
     const z = q.get("size"); if (z === "small" || z === "medium" || z === "large") setSize(z);
   }, []);
   useEffect(() => {
-    const q = new URLSearchParams();
+    // Retain campaign attribution and the verification flag while updating only filters.
+    const q = new URLSearchParams(location.search);
+    for (const key of ["series", "status", "size"]) q.delete(key);
     if (series !== "all") q.set("series", series);
     if (status !== "all") q.set("status", status);
     if (size !== "all") q.set("size", size);
