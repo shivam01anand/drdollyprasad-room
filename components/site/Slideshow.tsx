@@ -1,5 +1,6 @@
 "use client";
 
+import { dims } from "@/lib/images";
 import { useCallback, useEffect, useRef, useState } from "react";
 import type { Album } from "@/lib/site";
 
@@ -67,7 +68,7 @@ export default function Slideshow({ albums, label }: { albums: Album[]; label: s
         {album.photos.map((p, k) => (
           // eslint-disable-next-line @next/next/no-img-element
           <img key={p.src} src={p.src} alt={k === i ? p.alt : ""} aria-hidden={k !== i}
-               className={k === i ? "on" : undefined} loading={k === 0 ? "eager" : "lazy"} decoding="async" />
+               className={k === i ? "on" : undefined} loading={k === 0 ? "eager" : "lazy"} decoding="async" {...dims(p.src)} />
         ))}
         {n > 1 && (
           <>
@@ -95,7 +96,7 @@ export default function Slideshow({ albums, label }: { albums: Album[]; label: s
             <button key={p.src} type="button" aria-current={k === i || undefined} onClick={() => go(k)}
                     aria-label={`Photograph ${k + 1}: ${p.alt}`}>
               {/* eslint-disable-next-line @next/next/no-img-element */}
-              <img src={p.src} alt="" loading="lazy" decoding="async" />
+              <img src={p.src.replace("/site/ex/", "/site/ex/sm/")} alt="" loading="lazy" decoding="async" {...dims(p.src.replace("/site/ex/", "/site/ex/sm/"))} />
             </button>
           ))}
         </div>
