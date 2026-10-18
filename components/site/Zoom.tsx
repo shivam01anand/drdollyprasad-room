@@ -37,7 +37,13 @@ export default function Zoom({ id, src, alt, title, sub, onClose }: {
     history.pushState({ zoom: true }, "");
     let popped = false;
     const onPop = () => { popped = true; done.current(); };
-    const onKey = (e: KeyboardEvent) => { if (e.key === "Escape") done.current(); };
+    const onKey = (e: KeyboardEvent) => {
+      if (e.key === "Escape") done.current();
+      // keep the keyboard inside the viewer: its only control is the close button
+      if (e.key === "Tab") { e.preventDefault(); shut.current?.focus(); }
+    };
+    // focus returns to whatever opened the painting when it closes
+    const opener = document.activeElement as HTMLElement | null;
     addEventListener("popstate", onPop);
     addEventListener("keydown", onKey);
     const was = document.documentElement.style.overflow;
@@ -49,6 +55,7 @@ export default function Zoom({ id, src, alt, title, sub, onClose }: {
       removeEventListener("keydown", onKey);
       document.documentElement.style.overflow = was;
       if (!popped && history.state?.zoom) history.back();
+      opener?.focus?.();
     };
   }, [id]);
 

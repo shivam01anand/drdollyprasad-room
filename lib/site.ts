@@ -304,6 +304,13 @@ export type Show = {
 
 const ph = (n: string, alt: string): Photo => ({ src: `/site/ex/${n}.jpg`, alt });
 
+/**
+ * The one switch for "Now showing": the home strip, the Exhibitions panel, the note on a
+ * painting's page and the studio's welcome note stay hidden until Content/COO confirm a
+ * current event record. Set to true only after that confirmation.
+ */
+export const NOW_SHOWING_CONFIRMED = false;
+
 export const NOW = {
   id: "sacred-fragments", title: "Sacred Fragments: A Journey Home", venue: "Visual Arts Gallery, India Habitat Centre", city: "New Delhi",
   address: "Visual Arts Gallery, India Habitat Centre, Lodhi Road, New Delhi",

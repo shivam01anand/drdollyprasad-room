@@ -2,8 +2,9 @@ import type { Metadata } from "next";
 import Link from "next/link";
 import Until from "@/components/Until";
 import Slideshow from "@/components/site/Slideshow";
-import TitleBand from "@/components/site/TitleBand";
-import { NOW, PRESS, RECORD, RECORD_LINE, SHOWS } from "@/lib/site";
+import WallHero from "@/components/site/WallHero";
+import { SHOW_WALL } from "@/components/site/Collage";
+import { NOW, NOW_SHOWING_CONFIRMED, PRESS, RECORD, RECORD_LINE, SHOWS } from "@/lib/site";
 import { BY_ID, WORKS, workPath } from "@/lib/works";
 import { dims } from "@/lib/images";
 
@@ -14,16 +15,19 @@ export const metadata: Metadata = {
 };
 
 const years = [...new Set(RECORD.map((r) => r.year))];
-const BAND = ["monks-and-blue-buddha", "bulls-and-wheel", "rickshaw-rest-framed", "coins-and-clay-bank", "temple-bells", "rickshaw-puller-and-coin", "boy-with-bananas", "mother-india-and-kettles"];
 
 export default function Exhibitions() {
   return (
+    <>
+    <WallHero columns={SHOW_WALL} label="Her exhibitions" eyebrow="2005 to 2018" title="Exhibitions"
+              held="Eighteen shows across galleries and art fairs, from Delhi to Bombay">
+      <a className="btn btn-solid" href="#india-habitat-centre-2010">See the shows</a>
+      <a className="btn" href="#record">The full record</a>
+    </WallHero>
     <div className="wrap">
-      <TitleBand title="Exhibitions" ids={BAND}>
-        <p><b>{RECORD_LINE}</b>, in Delhi, Gurgaon, Jaipur and Bombay. Her paintings are with private collectors in India, the USA and the UK.</p>
-      </TitleBand>
+      <p className="ex-sum ex-intro">Her paintings have hung at India Habitat Centre, the Indian Council for Cultural Relations, Triveni Kala Sangam, Travancore Art Gallery and Nehru Art Gallery in Bombay, and at the First International Kala Mela organised by Lalit Kala Akademi. Her shows have been covered on television and in the papers.</p>
 
-      <Until until={NOW.until}>
+      {NOW_SHOWING_CONFIRMED && <Until until={NOW.until}>
         <section id={NOW.id} className="now-line" aria-label="Now showing">
           <span className="live"><i aria-hidden="true" />Now showing</span>
           <b>{NOW.title}</b>
@@ -35,7 +39,7 @@ export default function Exhibitions() {
             </Link>
           ))}</span>
         </section>
-      </Until>
+      </Until>}
 
       <nav className="ex-jump" aria-label="On this page">
         {SHOWS.map((s) => <a key={s.id} href={`#${s.id}`}>{s.title} <span>{s.year}</span></a>)}
@@ -131,5 +135,6 @@ export default function Exhibitions() {
         </div>
       </section>
     </div>
+    </>
   );
 }
