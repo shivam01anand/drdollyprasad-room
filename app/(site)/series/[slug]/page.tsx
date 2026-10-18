@@ -5,6 +5,10 @@ import Card from "@/components/site/Card";
 import { SERIES_BY_SLUG, SERIES_PAGES, WHATSAPP, shownYear, enquireHref, whatsappHref, worksIn, type Chapter } from "@/lib/site";
 import { TAILORED } from "@/lib/rooms";
 import { BY_ID, LARGE, workPath, type Work } from "@/lib/works";
+import manifest from "@/public/art/manifest.json";
+
+const DIM = new Map(manifest.works.map((d) => [d.id, d]));
+const wh = (id: string) => { const d = DIM.get(id); return d ? { width: d.w, height: d.h } : {}; };
 import { ChatIcon } from "@/components/site/Icons";
 
 export const dynamicParams = false;
@@ -71,7 +75,7 @@ function ChapterView({ c, n }: { c: Chapter; n: number }) {
           <figure key={w.id}>
             <Link href={workPath(w.id)}>
               {/* eslint-disable-next-line @next/next/no-img-element */}
-              <img className="framed" src={works.length > 2 ? `/site/thumbs/${w.id}.jpg` : img(w.id)} alt={alt(w)} loading="lazy" />
+              <img className="framed" src={works.length > 2 ? `/site/thumbs/${w.id}.jpg` : img(w.id)} alt={alt(w)} loading="lazy" {...wh(w.id)} />
             </Link>
             <figcaption>{w.title} · {w.medium}{w.status === "Sold" ? " · Sold" : ""}</figcaption>
           </figure>
@@ -104,7 +108,7 @@ export default async function SeriesStory({ params }: Props) {
       <section className="story-hero">
         <Link href={workPath(hero.id)}>
           {/* eslint-disable-next-line @next/next/no-img-element */}
-          <img className="framed" src={img(hero.id)} alt={alt(hero)} fetchPriority="high" />
+          <img className="framed" src={img(hero.id)} alt={alt(hero)} fetchPriority="high" {...wh(hero.id)} />
         </Link>
         <p className="meta">{hero.title} · {hero.medium}{hero.size ? ` · ${hero.size}` : ""}{shownYear(hero) ? ` · ${shownYear(hero)}` : ""}</p>
       </section>

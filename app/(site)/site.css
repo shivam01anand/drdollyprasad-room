@@ -907,3 +907,15 @@ section.wrap:has(+ .marq) .sec-head{margin-bottom:0}
   .ftr-links{gap:0 22px}
 }
 @media (pointer:coarse),(max-width:900px){ .roll-cap a{display:flex;justify-content:center;align-items:center;min-height:44px} }
+
+/* critique pass 2: the painting's box fits the painting on a phone; small photographs sit in a smaller box;
+   the theme numbers pass contrast; Share is 44 px wide to tap */
+@media (max-width:900px){
+  .viewer .paper{height:auto;min-height:0;padding:14px}
+  .viewer .paper img{max-height:calc(100svh - 210px)}
+}
+.viewer .paper:has(img.is-small){height:auto;min-height:0;padding:clamp(28px,5vw,64px)}
+.themes-tabs [role="tab"] span{color:#8E3B1F}
+@media (pointer:coarse),(max-width:900px){ .side-small .share-btn{min-width:44px;justify-content:center} }
+/* the jump links stay in one sideways row on a phone, so the first show starts sooner */
+@media (max-width:640px){ .ex-jump{flex-wrap:nowrap;overflow-x:auto;scrollbar-width:none;margin-inline:calc(-1 * var(--gut));padding-inline:var(--gut)} .ex-jump a{flex:none} }
