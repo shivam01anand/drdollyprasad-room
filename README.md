@@ -160,6 +160,8 @@ painting body with only her isolated 3D head, aligned to look at the canvas.
     lib/closelook.ts       the lightbox's close look; lib/rooms.ts its rooms at scale
     components/            Studio (page + HUD + copy), Preloader, Featured, Lightbox, Works, Cursor
     scripts/house/         build, export, publish, pathcheck (Blender + tools)
+    scripts/art/           replace.py: new painting photographs into every size the site serves;
+                           room_swap.py: a new photograph into a tailored room render, keeping its light
 
 ## Performance
 

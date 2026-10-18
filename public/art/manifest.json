@@ -60,8 +60,8 @@
  "works": [
   {
    "id": "boy-and-kettle",
-   "w": 967,
-   "h": 1030
+   "w": 1032,
+   "h": 1100
   },
   {
    "id": "boy-with-bananas",
@@ -116,7 +116,7 @@
   {
    "id": "man-among-metal-pans",
    "w": 1100,
-   "h": 829
+   "h": 830
   },
   {
    "id": "milkman-on-bicycle",
@@ -131,7 +131,7 @@
   {
    "id": "monks-and-blue-buddha",
    "w": 1100,
-   "h": 872
+   "h": 873
   },
   {
    "id": "mother-and-child",
@@ -140,22 +140,22 @@
   },
   {
    "id": "mother-india-and-kettles",
-   "w": 833,
+   "w": 834,
    "h": 1100
   },
   {
    "id": "newspaper-reader",
    "w": 1100,
-   "h": 1097
+   "h": 1100
   },
   {
    "id": "offering-of-light",
-   "w": 824,
+   "w": 825,
    "h": 1100
   },
   {
    "id": "patterned-turban-portrait",
-   "w": 1095,
+   "w": 1100,
    "h": 1100
   },
   {
@@ -171,7 +171,7 @@
   {
    "id": "priest-with-flame",
    "w": 816,
-   "h": 1099
+   "h": 1100
   },
   {
    "id": "red-and-teal-door-lock",
@@ -181,7 +181,7 @@
   {
    "id": "red-turban-portrait",
    "w": 1100,
-   "h": 1087
+   "h": 1088
   },
   {
    "id": "rickshaw-and-autorickshaw",
@@ -195,12 +195,12 @@
   },
   {
    "id": "rickshaw-rest-framed",
-   "w": 659,
-   "h": 881
+   "w": 822,
+   "h": 1100
   },
   {
    "id": "rickshaw-rest",
-   "w": 1093,
+   "w": 1074,
    "h": 1100
   },
   {
@@ -211,7 +211,7 @@
   {
    "id": "sacred-tree",
    "w": 1100,
-   "h": 1098
+   "h": 1100
   },
   {
    "id": "shree-420-and-milk-cans",
@@ -236,7 +236,7 @@
   {
    "id": "three-veiled-women",
    "w": 1100,
-   "h": 1084
+   "h": 1076
   },
   {
    "id": "weathered-door-ring",
@@ -261,7 +261,7 @@
   {
    "id": "yellow-turban-portrait",
    "w": 1100,
-   "h": 1091
+   "h": 1100
   }
  ]
 }
