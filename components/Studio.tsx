@@ -653,7 +653,12 @@ export default function Studio({ dims }: { dims: Dims }) {
   };
 
   const onLightbox = useCallback((open: boolean) => lock("lightbox", open), [lock]);
-  const closeStops = useCallback(() => setStops(false), []);
+  const closeStops = useCallback(() => {
+    // Menu destinations run in this same click. Release the sheet's scroll
+    // hold now: waiting for its React effect makes Lenis discard Contact.
+    lock("sheet", false);
+    setStops(false);
+  }, [lock]);
 
   // the first visit on a phone: a hint, until the visitor walks (or it has been seen)
   useEffect(() => {
