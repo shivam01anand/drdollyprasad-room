@@ -163,6 +163,8 @@ const click = async (el) => act(async () => { el.dispatchEvent(new MouseEvent('c
   assert.equal(analytics.analyticsUrl('https://drdollyprasad.com/enquire?work=temple-bells&email=private-visitor%40example.com&message=secret&utm_source=instagram#name'),
     'https://drdollyprasad.com/enquire?work=temple-bells&utm_source=instagram');
   assert.equal(analytics.analyticsUrl('mailto:private-visitor@example.com?body=secret'), '');
+  assert.equal(analytics.analyticsUrl(''), '', 'An empty referrer must remain a direct visit');
+  assert.equal(analytics.analyticsUrl('$direct'), '$direct', 'PostHog’s direct-referrer marker must not become a self-referral');
   const scrubbed = config.before_send({ event: '$pageview', properties: { $referrer: 'https://example.com/?email=private-visitor%40example.com', $session_entry_url: 'https://drdollyprasad.com/?email=private-visitor%40example.com', $set_once: { $initial_current_url: 'https://drdollyprasad.com/?token=private-secret' } } });
   assert.ok(!JSON.stringify(scrubbed).includes('private-visitor'));
   assert.ok(!JSON.stringify(scrubbed).includes('private-secret'));

@@ -12,6 +12,7 @@ const SAFE_QUERY = new Set(["work", "series", "status", "size", "utm_source", "u
 
 /** Keep attribution and catalogue filters, without copying arbitrary query strings. */
 export function analyticsUrl(value: string, base = "https://drdollyprasad.com") {
+  if (!value || value === "$direct") return value;
   try {
     const url = new URL(value, base);
     if (url.protocol !== "https:" && url.protocol !== "http:") return "";
