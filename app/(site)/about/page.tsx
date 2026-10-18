@@ -14,7 +14,7 @@ export const metadata: Metadata = {
 /** paintings for a roll: the painting, its title and year, and its one line */
 const paint = (ids: string[]): RollItem[] => ids.map((id) => {
   const w = BY_ID.get(id)!;
-  return { src: `/art/works/${id}.jpg`, title: `${w.title}${shownYear(w) ? `, ${shownYear(w)}` : ""}`, sub: LOOK[id] ?? (PULL[id] ? `“${PULL[id]}”` : undefined), href: workPath(id) };
+  return { src: `/site/thumbs/${id}.jpg`, title: `${w.title}${shownYear(w) ? `, ${shownYear(w)}` : ""}`, sub: LOOK[id] ?? (PULL[id] ? `“${PULL[id]}”` : undefined), href: workPath(id) };
 });
 
 const SHOW_PHOTOS: RollItem[] = [
@@ -28,6 +28,11 @@ const SHOW_PHOTOS: RollItem[] = [
  * The drafted first-person "From the artist" line is off the page until she
  * approves or rewrites it (website test, round 2). Its draft is kept in the
  * project notes, not here, so it cannot be shown as hers by mistake.
+ *
+ * "Who she is" says only what the record supports (brand thesis §2, §6: a
+ * practising doctor and a self-taught painter; the play of emotion on faces
+ * has always fascinated her). The longer hospital-to-easel story waits for
+ * her own account (backlog sprint, Needs Mummy).
  */
 
 const THREADS: Theme[] = [
@@ -63,10 +68,9 @@ export default function About() {
         <div className="wrap ab-split">
           <div className="ab-txt">
             <p className="eyebrow">Who she is</p>
-            <h2>From the hospital to the easel</h2>
-            <p className="ab-p">She began her working life as a doctor. Years of service in hospitals brought her face to face with every emotion a person can carry: fear and relief, waiting and hope, the quiet of someone counting their days. She learned to read a face before a word was spoken.</p>
-            <p className="ab-p">And she learned that every day matters. Slowly she began to see the same emotions outside the hospital, not only in people but in things: the patience of a clay gullak, the loneliness of a locked door, the devotion in a thread tied to a tree. Each held a story no one stopped to hear.</p>
-            <p className="ab-p">She wanted to keep those stories so much that she turned to painting, in oil on canvas. Her subject became the India around her as it changed: rickshaws giving way to autos, coins going out of use, old doors locked and left. She paints them with the warmth of someone who remembers, never as relics, always as parts of a life.</p>
+            <h2>A doctor who paints</h2>
+            <p className="ab-p">She is a doctor, and a self-taught painter in oil on canvas. The play of emotion on a face has always held her, in her work at the hospital and on the canvas.</p>
+            <p className="ab-p">Her subject is the India around her as it changes: rickshaws giving way to autos, coins going out of use, old doors locked and left. She paints them with the warmth of someone who remembers, never as relics, always as parts of a life.</p>
           </div>
           <Roll label="Faces from her portraits" items={paint(["red-turban-portrait", "three-veiled-women", "boy-and-kettle", "yellow-turban-portrait", "mother-and-child"])} />
         </div>
@@ -74,7 +78,7 @@ export default function About() {
 
       <section className="ab-band tone-dark">
         <div className="wrap ab-statement">
-          <p className="eyebrow">Artist’s statement</p>
+          <p className="eyebrow">The work</p>
           <h2>She captures the everyday: its waiting and wishing, its worship and whispers.</h2>
           <p className="ab-p">A clay gullak and the coins it was made to hold. A door nobody opens any more. A lamp raised to a wall of scripture. She gives these ordinary things the scale, the colour and the stillness we usually keep for the sacred.</p>
           <p className="ab-p">Why these things? Because they are the first a changing country forgets, and they are what made it home. Each painting is a way of saying they mattered. Three threads run through the work.</p>

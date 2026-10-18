@@ -7,7 +7,7 @@ import Until from "@/components/Until";
 import HashRedirect from "@/components/site/HashRedirect";
 import Marquee from "@/components/site/Marquee";
 import {
-  BIO_LINE, BIO_SUB, EMAIL, INSTAGRAM, NOW, PORTRAIT, SERIES_PAGES, SHOWS, SITE, STUDIO_PATH, worksIn,
+  BIO_SUB, EMAIL, INSTAGRAM, NOW, PORTRAIT, SERIES_PAGES, SHOWS, SITE, STUDIO_PATH, worksIn,
 } from "@/lib/site";
 import { BY_ID } from "@/lib/works";
 import { dims } from "@/lib/images";
@@ -39,7 +39,7 @@ export default function Home() {
   return (
     <>
       <WallHero columns={HOME} label="Dr Dolly Prasad" size="home" face={PORTRAIT} eyebrow="Oil on canvas · New Delhi"
-                title="Dr Dolly Prasad" held={BIO_LINE} sub={BIO_SUB}>
+                title="Dr Dolly Prasad" sub={BIO_SUB}>
         <Link className="btn btn-solid" href="/works">See all {total} works</Link>
         <a className="btn" href={STUDIO_PATH}>Walk through the studio</a>
       </WallHero>
@@ -89,7 +89,7 @@ export default function Home() {
         <div className="sec-head">
           <div>
             <h2>On the walls</h2>
-            <p className="sec-line">Eighteen exhibitions and art fairs, 2005 to 2018, from Triveni Kala Sangam to the First International Kala Mela.</p>
+            <p className="sec-line">Eighteen exhibitions and art fairs, 2005 to 2018, among them India Habitat Centre, ICCR and the First International Kala Mela.</p>
           </div>
           <Link className="link" href="/exhibitions">All exhibitions →</Link>
         </div>

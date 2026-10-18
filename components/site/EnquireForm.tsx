@@ -127,7 +127,7 @@ export default function EnquireForm() {
           <div className="mail"><code>{EMAIL}</code>
             <button type="button" className="chip" onClick={copy} aria-live="polite">{copied ? "Copied" : "Copy"}</button>
           </div>
-          <p className="meta">Paintings are offered with price on request. Enquiries and commissions are welcome.</p>
+          <p className="meta">Enquiries and commissions are welcome.</p>
         </div>
       </aside>
     </div>
