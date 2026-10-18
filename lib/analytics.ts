@@ -85,6 +85,7 @@ export function initAnalytics() {
       session_recording: {
         maskAllInputs: true,
         maskTextSelector: ".ph-mask",
+        blockSelector: ".stage, .wall-labels",
         recordCrossOriginIframes: false,
         captureCanvas: { recordCanvas: false },
         recordHeaders: false,
@@ -94,7 +95,7 @@ export function initAnalytics() {
       before_send: (event) => {
         const clean = (props: Record<string, unknown> | undefined) => {
           if (!props) return;
-          for (const key of ["$current_url", "$referrer", "$initial_current_url", "$initial_referrer"]) {
+          for (const key of ["$current_url", "$referrer", "$initial_current_url", "$initial_referrer", "$session_entry_url", "$session_entry_referrer"]) {
             if (typeof props[key] === "string") props[key] = analyticsUrl(props[key]);
           }
         };
@@ -110,6 +111,14 @@ export function initAnalytics() {
           is_test: isTestSession(),
         });
         client = sdk;
+        // The shared project's URL trigger is Book2Kindle-only. Apply an override
+        // to this client/session, including sessions that rotate in a long-lived tab.
+        let recordingSession: string | undefined;
+        sdk.onSessionId((sessionId) => {
+          if (sessionId === recordingSession) return;
+          recordingSession = sessionId;
+          if (!sdk.has_opted_out_capturing()) sdk.startSessionRecording({ url_trigger: true });
+        });
         for (const item of pending.splice(0)) sdk.capture(item.event, item.properties, { timestamp: item.timestamp });
       },
     });

@@ -23,7 +23,7 @@ export default function Analytics() {
     const enquiryWork = path === "/enquire" ? BY_ID.get(query.get("work") || "") : undefined;
     const pageType = w ? "painting" : path === "/" ? "home" : path.split("/").filter(Boolean)[0] || "other";
     const page = {
-      page_view_id: crypto.randomUUID(),
+      page_view_id: globalThis.crypto?.randomUUID?.() || `${Date.now().toString(36)}-${Math.random().toString(36).slice(2)}`,
       page_type: pageType,
       page_path: path,
       page_url: analyticsUrl(location.href),

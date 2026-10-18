@@ -23,7 +23,10 @@ queries, rather than claiming a saved dashboard already exists.
 - Exhibition video starts/completions, studio load failures, settled studio
   chapters, scroll milestones, foreground-tab time and last observed pages.
 - Masked session replays. The existing project's remote configuration was
-  checked and recording is enabled. A session ID alone is not proof its replay
+  checked: recording is enabled but its automatic URL trigger matches only
+  Book2Kindle. Dolly starts recording with an SDK URL-trigger override for each
+  session (including idle-session rotation), subject to the capture opt-out.
+  A session ID alone is not proof its replay
   uploaded successfully; use recordings actually listed in PostHog.
 
 ## Events
@@ -53,8 +56,9 @@ using another device can create another visitor. Names, phone/email input,
 message text and copied message contents are not analytics event properties.
 Replay masks inputs; network headers/bodies, console capture and canvas frame
 recording are disabled. The 3D studio's canvas is not reproduced in replay;
-chapter and painting events describe its journey without recording rendered
-frames. Approximate IP-based location can be affected by VPNs/mobile networks.
+its stage and moving wall labels are blocked from replay mutation recording.
+Chapter and painting events describe its journey while the painting lightbox
+remains recordable. Approximate IP-based location can be affected by VPNs/mobile networks.
 
 Only catalogue/UTM query parameters are retained in analytics URLs. Page
 engagement measures foreground-tab visibility, not attention, and can have
@@ -95,10 +99,11 @@ input, handoff semantics, sharing and listener cleanup. It is not a real-device
 or visual-browser test. Run `npm run check:motion` and `npm run build` as well.
 
 A separate smoke check using the real PostHog SDK accepted tagged test
-pageview, painting-click and verification requests with HTTP 200. The SDK
-reported recording started; playback of a stored recording still requires
-authenticated verification in PostHog. Test sessions are excluded from the
-prepared production views.
+pageview, painting-click and verification requests with HTTP 200. After the
+shared-project URL-trigger override, it also emitted an actual `$snapshot` and
+the recording upload endpoint returned HTTP 200. Playback of a stored recording
+still requires authenticated verification in PostHog. Test sessions are excluded
+from the prepared production views.
 
 The SDK is a separate asynchronous chunk, initiated after hydration. Explicit
 events replace broad DOM autocapture, scroll work is throttled and the studio

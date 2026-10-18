@@ -32,7 +32,12 @@ const { createRoot } = require('react-dom/client');
 const captures = [];
 let config;
 let superProperties = {};
+const recordingOverrides = [];
+let sessionListener;
 const sdk = {
+  onSessionId(listener) { sessionListener = listener; listener('test-session', 'test-window'); return () => {}; },
+  has_opted_out_capturing() { return false; },
+  startSessionRecording(override) { recordingOverrides.push(override); },
   register(props) { superProperties = { ...superProperties, ...props }; },
   capture(event, properties, options) {
     const result = config.before_send({ event, properties: { ...superProperties, ...properties } });
@@ -88,6 +93,11 @@ const click = async (el) => act(async () => { el.dispatchEvent(new MouseEvent('c
   link.dispatchEvent(new MouseEvent('click', { bubbles: true, cancelable: true }));
   history.replaceState(null, '', '/about');
   await analytics.initAnalytics();
+  assert.deepEqual(recordingOverrides, [{ url_trigger: true }], 'Dolly must override the shared Book2Kindle-only recording URL trigger');
+  sessionListener('test-session', 'test-window');
+  assert.equal(recordingOverrides.length, 1, 'The recording override must not loop for the same session');
+  sessionListener('next-session', 'test-window');
+  assert.equal(recordingOverrides.length, 2, 'Recording must also start after an idle session rotates');
   assert.equal(byEvent('painting_clicked').length, 1);
   assert.equal(byEvent('painting_clicked')[0].properties.painting_title, 'Threads of Faith');
   assert.equal(byEvent('painting_clicked')[0].properties.$pathname, '/works');
@@ -149,7 +159,7 @@ const click = async (el) => act(async () => { el.dispatchEvent(new MouseEvent('c
   assert.equal(analytics.analyticsUrl('https://drdollyprasad.com/enquire?work=temple-bells&email=private-visitor%40example.com&message=secret&utm_source=instagram#name'),
     'https://drdollyprasad.com/enquire?work=temple-bells&utm_source=instagram');
   assert.equal(analytics.analyticsUrl('mailto:private-visitor@example.com?body=secret'), '');
-  const scrubbed = config.before_send({ event: '$pageview', properties: { $referrer: 'https://example.com/?email=private-visitor%40example.com', $set_once: { $initial_current_url: 'https://drdollyprasad.com/?token=private-secret' } } });
+  const scrubbed = config.before_send({ event: '$pageview', properties: { $referrer: 'https://example.com/?email=private-visitor%40example.com', $session_entry_url: 'https://drdollyprasad.com/?email=private-visitor%40example.com', $set_once: { $initial_current_url: 'https://drdollyprasad.com/?token=private-secret' } } });
   assert.ok(!JSON.stringify(scrubbed).includes('private-visitor'));
   assert.ok(!JSON.stringify(scrubbed).includes('private-secret'));
   assert.equal(config.session_recording.maskAllInputs, true);
