@@ -789,3 +789,58 @@ section.wrap:has(+ .marq) .sec-head{margin-bottom:0}
 .big-tile .bt-img::after{content:"";position:absolute;inset:0;background:linear-gradient(160deg,rgba(255,255,255,.4),rgba(255,255,255,.05) 55%,rgba(255,255,255,.16))}
 .big-tile .bt-img img{position:relative;z-index:1}
 .ex-facts b{line-height:1}
+
+/* ==========================================================================
+   Backlog sprint, 18 Oct 2026 (docs/WEBSITE-BACKLOG.md, S1 to S11)
+   ========================================================================== */
+
+/* S1 · the painting page opens on the painting: title and label above it, the
+   painting filling the rest of the first screen, a tap or click to look closer */
+.wp-top{display:flex;flex-wrap:wrap;align-items:baseline;gap:2px 18px;padding-block:4px 12px}
+.wp-top h1{font-size:clamp(32px,3.4vw,48px)}
+.wp-top .meta{font-size:15px;margin:0}
+.wp-top .meta a{color:var(--ink)}
+.wp-side .wp-lead{max-width:none;font-size:17px;color:var(--ink)}
+.wp-side .wp-lead span{display:block;margin:6px 0 0}
+.viewer .paper{width:100%;border:0;cursor:zoom-in;font:inherit;color:inherit;
+  height:calc(100svh - 190px);min-height:360px;max-height:none;padding:clamp(12px,2vw,28px)}
+.viewer .paper img{max-height:100%}
+.viewer .paper img.is-small{max-height:min(100%,420px)}
+.paper-hint{position:absolute;z-index:2;right:12px;bottom:12px;display:inline-flex;align-items:center;gap:6px;
+  padding:7px 12px;background:rgba(251,249,245,.92);font-size:13px;letter-spacing:.04em;color:var(--ink);pointer-events:none}
+.paper-hint svg{width:16px;height:16px}
+.viewer .paper:hover .paper-hint{color:var(--rust)}
+.thumbs{align-items:center}
+.thumbs-note{font-size:13px;color:var(--muted);margin-left:4px}
+@media (max-width:900px){
+  .crumb{display:none}
+  .wp-top{padding-block:8px 8px}
+  .wp-top h1{font-size:30px}
+  .wp-top .meta{font-size:13px}
+  .viewer .paper{height:calc(100svh - 170px);min-height:300px;padding:10px;margin-inline:calc(-1 * var(--gut) + 4px);width:auto}
+  .viewer .paper img{border-width:6px}
+}
+
+/* the full-screen close look */
+.zoom{position:fixed;inset:0;z-index:100;background:#171412;color:#F3EEE6;display:flex;flex-direction:column}
+.zoom-stage{position:relative;flex:1;min-height:0;display:flex;align-items:center;justify-content:center;padding:clamp(8px,3vw,40px)}
+.zoom-frame{position:relative;line-height:0;cursor:zoom-in;max-width:100%;max-height:100%;touch-action:none}
+.zoom-frame.is-zoomed{overflow:hidden;cursor:zoom-out}
+.zoom-frame img{display:block;max-width:100%;max-height:calc(100svh - 2 * clamp(8px,3vw,40px) - 64px);width:auto;height:auto;will-change:transform;user-select:none;-webkit-user-select:none}
+.zoom-bar{display:flex;align-items:center;gap:16px;padding:10px clamp(12px,3vw,40px) calc(10px + env(safe-area-inset-bottom,0px));min-height:64px}
+.zoom-bar p{display:flex;flex-direction:column;line-height:1.3}
+.zoom-bar b{font-family:var(--serif);font-size:24px;font-weight:600}
+.zoom-bar span{font-size:13px;color:#CBC1B4}
+.zoom-hint{margin-left:auto !important;font-size:13px;color:#CBC1B4}
+.zoom-close{width:48px;height:48px;border-radius:50%;border:1px solid rgba(243,238,230,.4);background:transparent;color:inherit;cursor:pointer;display:grid;place-items:center;flex:0 0 auto}
+.zoom-close svg{width:20px;height:20px}
+.zoom-close:hover{border-color:#F3EEE6}
+.zoom .lb-zoombar{position:absolute;right:14px;top:50%;height:120px;width:22px;margin-top:-60px;pointer-events:none;
+  opacity:0;transition:opacity .6s ease;display:flex;flex-direction:column;align-items:center;gap:8px;line-height:1}
+.zoom .lb-zoombar i{position:relative;flex:1;width:2px;border-radius:2px;background:rgba(240,234,223,.42);overflow:hidden;
+  box-shadow:0 0 0 1px rgba(48,39,34,.12)}
+.zoom .lb-zoombar i::after{content:"";position:absolute;left:0;right:0;bottom:0;height:100%;background:#F0EADF;
+  transform-origin:50% 100%;transform:scaleY(var(--k,0))}
+.zoom .lb-zoombar span{font-family:var(--sans);font-size:13px;letter-spacing:.04em;color:#F0EADF;text-shadow:0 1px 3px rgba(0,0,0,.45)}
+.zoom .lb-zoombar{right:18px}
+@media (max-width:640px){ .zoom-hint{display:none} .zoom-close{margin-left:auto} }

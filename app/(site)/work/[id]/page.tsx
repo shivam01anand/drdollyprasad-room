@@ -105,12 +105,10 @@ export default async function WorkPage({ params }: Props) {
         <Link href="/works">Works</Link> / <Link href={seriesPath(w.series)}>{w.series}</Link> / {w.title}
       </nav>
 
+      {/* the first screen is the painting: its title and label above, nothing else */}
       <header className="wp-top">
-        <div className="wp-head">
-          <h1>{w.title}</h1>
-          <p className="meta">{labelLine(w)} · <Link href={seriesPath(w.series)}>{w.series}</Link></p>
-        </div>
-        {lead && <p className="wp-lead">{words ? `“${lead}”` : lead}{words && <span>Dr Dolly Prasad</span>}</p>}
+        <h1>{w.title}</h1>
+        <p className="meta">{labelLine(w)} · <Link href={seriesPath(w.series)}>{w.series}</Link></p>
       </header>
 
       <section className="wp-grid">
@@ -120,6 +118,7 @@ export default async function WorkPage({ params }: Props) {
         </div>
 
         <div className="wp-side">
+          {lead && <p className={`wp-lead${words ? " hers" : ""}`}>{words ? `“${lead}”` : lead}{words && <span>Dr Dolly Prasad</span>}</p>}
           <div className="side-status">
             <span className={`status${sold ? " is-sold" : w.status === "Enquire" ? " is-enquire" : ""}`}>{statusWord(w)}</span>
             <b>{sold ? "In a private collection" : "Price on request"}</b>
