@@ -34,6 +34,7 @@ export default function Viewer({ w, src, dims, small, sub }: {
         <img src={src} alt={name} width={dims?.w} height={dims?.h} fetchPriority="high" className={small ? "is-small" : undefined} />
       </button>
       <h1 className="wpa-title">{w.title}</h1>
+      {sub && <p className="wpa-label">{sub}</p>}
       <button type="button" className="wpa-hint" onClick={open}>
         <svg viewBox="0 0 24 24" aria-hidden="true"><circle cx="10.5" cy="10.5" r="6.5" fill="none" stroke="currentColor" strokeWidth="1.6" /><path d="M15.5 15.5L21 21M10.5 7.5v6M7.5 10.5h6" stroke="currentColor" strokeWidth="1.6" /></svg>
         <span className="on-fine">Click to zoom</span><span className="on-touch">Tap to zoom</span>

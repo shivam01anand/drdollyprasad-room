@@ -5,6 +5,7 @@
     "dev": "next dev",
     "build": "next build",
     "start": "next start",
+    "check:rooms": "node scripts/check-rooms.cjs",
     "check:motion": "node scripts/check-motion.cjs",
     "check:analytics": "node scripts/check-analytics.cjs"
   },

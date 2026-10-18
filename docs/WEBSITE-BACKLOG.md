@@ -347,3 +347,46 @@ These are not new from this review but are still open.
 - No em dashes in our own copy; ranges read "2016 to 2018"; no "c.".
 - Never write "18 solo exhibitions": the record is exhibitions and art fairs.
 - Nothing goes live until Shubham says "make it live".
+
+## Divider asset (brief 005, pick C): what the final files must be
+
+The divider is built and placed (`components/site/Divider.tsx`; home page at
+three breaks, Collections page before bands 2 and 4, each collection's story
+page before "The paintings in this collection"). It shows **temporary**
+crops of the rough (`005-Borders-Rough.jpg`), upscaled 5x from a 25 px figure.
+They are a stand-in only and must not go live.
+
+**To drop in the final art, replace these three files, same names, nothing else:**
+
+| Path | Figure |
+|---|---|
+| `public/site/dividers/reading.png` | reading (home breaks 1 and 4 of the Collections story pages, Collections band 2) |
+| `public/site/dividers/praying.png` | praying (home break 2, Collections band 4) |
+| `public/site/dividers/seated.png` | seated (home break 3) |
+
+Spec for each: transparent PNG, **170 x 192 px** (3x of the 64 px tall desktop
+size; the page shows it 58 px tall on a phone and 70 px on a computer, width
+automatic, so keep the same aspect, about 0.885), ink **#26211D** on transparent
+(no white halo, no paper tone), a single crisp line weight like the Instagram
+Faith border, figure centred and facing inward, 6 to 10 px of clear margin
+inside the canvas, under 25 KB each. If the final size differs, change
+`DIVIDER_PX` in `Divider.tsx` to match (it sets width/height so there is no
+layout shift). One file for all three is fine while only one figure exists.
+Rules held by the component: `alt=""`, always its own block between sections
+(at least 41 px from the nearest painting on a phone), never inside a section
+that has paintings.
+
+## Adding a hallway room (brief 004 round 2): data only
+
+1. Put the image at `public/art/rooms/hallway-<id>.webp`: **1536 x 1024 px**,
+   WebP, the painting already composited in (frontal, uncropped), same scene
+   calibration as 05 and 40 (4.25 px/cm, floor line 790, centred at x 768).
+2. Add one line to `lib/hallway-rooms.json`:
+   `{ "id": "<id>", "work": "<work id from lib/works.ts>", "cm": <longest side in cm, default 91.4> }`.
+   Optional overrides if a scene differs: `w`, `h`, `pxPerCm`, `floor`, `cx`.
+3. Run `npm run check:rooms` (fails on a missing image, unknown work id or
+   duplicate id). No code change; the room appears on that painting's page,
+   labelled "Virtual room study", sized against the assumed 120 cm console.
+A thumbnail (`hallway-<id>-thumb.webp`) is not needed: with one room per painting
+the picker is not shown. A hallway entry replaces that painting's own tailored
+room on the website (as 40 does).

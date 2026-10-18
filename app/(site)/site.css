@@ -1362,3 +1362,21 @@ section.wrap:has(+ .marq) .sec-head{margin-bottom:0}
   .slides-arrow{width:44px}
   .brand{min-height:44px}
 }
+
+/* ==== W2 (approved 18 Oct): on a phone the painting is pinned to the top of its page, right under the header ==== */
+.wpa-label{display:none}
+@media (max-width:760px){
+  /* no centring and no minimum height: nothing above the painting but the header */
+  .wpa{min-height:0;justify-content:flex-start;padding:10px 24px 4px;gap:4px}
+  .wpa-art img{max-height:calc(100svh - 93px - 72px - 118px)}
+  .wpa-title{margin-top:10px}
+  .wpa-label{display:block;margin:0;font-size:15px;line-height:1.35;color:var(--muted)}
+  /* the label now sits under the title; the series stays in the breadcrumb */
+  .wp-head .meta{display:none}
+}
+
+/* ==== the single divider (brief 005, pick C): a reading figure between two hairlines at a section break ==== */
+.divider{display:flex;align-items:center;justify-content:center;gap:18px;padding:clamp(34px,5vw,56px) var(--gut);position:relative;z-index:1}
+.divider::before,.divider::after{content:"";height:1px;width:clamp(48px,18vw,150px);background:var(--ink);opacity:.4}
+.divider img{display:block;height:58px;width:auto;flex:none}
+@media (min-width:761px){ .divider img{height:70px} }

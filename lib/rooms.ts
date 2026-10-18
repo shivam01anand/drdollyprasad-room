@@ -1,4 +1,5 @@
 import type { Work } from "./works";
+import hallway from "./hallway-rooms.json";
 
 /**
  * Rooms to see a painting in.
@@ -118,14 +119,20 @@ export const TAILORED: Tailored[] = [
  * (ROOM_SCALE_NOTES.json: 4.25 px/cm on the 1536 px scene), so it is a relative
  * size study and is labelled so, never "to scale".
  */
-export const PILOT: Tailored[] = [
-  { id: "hallway-05", work: "coins-and-clay-bank", label: "A calm hallway", study: true, assumed: "120 cm console",
-    src: "/art/rooms/hallway-05.webp", thumb: "/art/rooms/hallway-05-thumb.webp",
-    w: 1536, h: 1024, pxPerCm: 4.25, floor: 790, cx: 768, sill: 0, cm: 91.4, inPhoto: true },
-  { id: "hallway-40", work: "woman-with-red-flower", label: "A calm hallway", study: true, assumed: "120 cm console",
-    src: "/art/rooms/hallway-40.webp", thumb: "/art/rooms/hallway-40-thumb.webp",
-    w: 1536, h: 1024, pxPerCm: 4.25, floor: 790, cx: 768, sill: 0, cm: 61, inPhoto: true },
-];
+type HallwayEntry = { id: string; work: string; cm?: number; w?: number; h?: number; pxPerCm?: number; floor?: number; cx?: number };
+
+/**
+ * A hallway room is data only: an entry in lib/hallway-rooms.json and the image
+ * public/art/rooms/hallway-<id>.webp (a thumbnail, hallway-<id>-thumb.webp, is
+ * used if present; with one room per painting none is needed). Defaults are the
+ * pilot scene's calibration.
+ */
+export const PILOT: Tailored[] = (hallway.rooms as HallwayEntry[]).map((e) => ({
+  id: `hallway-${e.id}`, work: e.work, label: "A calm hallway", study: true, assumed: "120 cm console",
+  src: `/art/rooms/hallway-${e.id}.webp`, thumb: `/art/rooms/hallway-${e.id}-thumb.webp`,
+  w: e.w ?? 1536, h: e.h ?? 1024, pxPerCm: e.pxPerCm ?? 4.25, floor: e.floor ?? 790, cx: e.cx ?? 768, sill: 0,
+  cm: e.cm ?? 91.4, inPhoto: true,
+}));
 
 /** the fallback rooms, for works with a stated size and no room of their own */
 export const GENERIC: Room[] = [

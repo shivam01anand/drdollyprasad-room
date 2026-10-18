@@ -1,5 +1,7 @@
 import type { Metadata } from "next";
+import { Fragment } from "react";
 import Link from "next/link";
+import Divider from "@/components/site/Divider";
 import Card, { thumb } from "@/components/site/Card";
 import { ON_THE_WORK, SERIES_PAGES, SMALL_PHOTO, worksIn } from "@/lib/site";
 import { BY_ID } from "@/lib/works";
@@ -45,7 +47,9 @@ export default function SeriesIndex() {
         const row = [...works].sort((a, b) => Number(a.status === "Sold") - Number(b.status === "Sold"))
           .filter((w) => !SMALL_PHOTO.has(w.id));
         return (
-          <section key={s.slug} id={s.slug} className={`sband tone-${i % 3}`}>
+          <Fragment key={s.slug}>
+          {(i === 1 || i === 3) && <Divider figure={i === 1 ? "reading" : "praying"} />}
+          <section id={s.slug} className={`sband tone-${i % 3}`}>
             <div className="wrap srow">
               <div className="s-txt">
                 <span className="s-n">{String(i + 1).padStart(2, "0")}</span>
@@ -61,6 +65,7 @@ export default function SeriesIndex() {
               </div>
             </div>
           </section>
+          </Fragment>
         );
       })}
     </>
