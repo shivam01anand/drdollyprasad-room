@@ -18,6 +18,7 @@ export default function SiteLayout({ children }: { children: React.ReactNode }) 
       <Band at="top" />
       <Header />
       <main id="main">{children}</main>
+      <Band at="footer" />
       <Footer />
       <Band at="bottom" />
     </div>

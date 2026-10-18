@@ -24,7 +24,7 @@ export default function Header() {
   return (
     <header className="hdr">
       <div className="wrap hdr-in">
-        <Link href="/" className="brand" aria-label="Dr Dolly Prasad — home">
+        <Link href="/" className="brand" aria-label="Dr Dolly Prasad, home">
           {/* eslint-disable-next-line @next/next/no-img-element */}
           <img src={PORTRAIT} alt="" width={52} height={52} />
           <span className="brand-t"><b>Dr Dolly Prasad</b><i>The everyday, held sacred.</i></span>

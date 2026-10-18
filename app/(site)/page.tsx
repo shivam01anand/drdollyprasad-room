@@ -1,5 +1,6 @@
 import Link from "next/link";
-import Collage from "@/components/site/Collage";
+import WallHero from "@/components/site/WallHero";
+import { HOME } from "@/components/site/Collage";
 import Card, { thumb } from "@/components/site/Card";
 import { InstagramIcon } from "@/components/site/Icons";
 import Until from "@/components/Until";
@@ -23,7 +24,7 @@ const PERSON = {
 };
 
 const AVAILABLE = ["boy-with-bananas", "temple-bells", "bulls-and-wheel", "woman-with-poppies"];
-const IG = ["patterned-turban-portrait", "bulls-and-wheel", "red-turban-portrait", "coins-and-clay-bank", "yellow-turban-portrait", "terracotta-pots"];
+const IG = ["patterned-turban-portrait", "bulls-and-wheel", "temple-bells", "red-turban-portrait", "coins-and-clay-bank", "offering-of-light", "yellow-turban-portrait", "terracotta-pots", "boy-with-bananas", "red-and-teal-door-lock"];
 const now = NOW;
 const CARDS = [
   { id: "india-habitat-centre-2010", src: "/site/ex/ihc-03.jpg", alt: "Dr Dolly Prasad lights the lamp at the opening at India Habitat Centre" },
@@ -35,27 +36,15 @@ export default function Home() {
   const total = SERIES_PAGES.reduce((n, s) => n + worksIn(s.label).length, 0);
   return (
     <>
-      <section className="collage-wrap" aria-label="Dr Dolly Prasad">
-        <div className="collage">
-          <Collage />
-        </div>
-        <div className="namecard">
-          {/* eslint-disable-next-line @next/next/no-img-element */}
-          <img className="face" src={PORTRAIT} alt="Dr Dolly Prasad" width={100} height={100} />
-          <p className="eyebrow">Oil on canvas · New Delhi</p>
-          <h1>Dr Dolly Prasad</h1>
-          <p className="held">{BIO_LINE}</p>
-          <p className="sub">{BIO_SUB}</p>
-          <div className="ctas">
-            <Link className="btn btn-solid" href="/works">See all {total} works</Link>
-            <a className="btn" href={STUDIO_PATH}>Walk through the studio</a>
-          </div>
-        </div>
-      </section>
+      <WallHero columns={HOME} label="Dr Dolly Prasad" size="home" face={PORTRAIT} eyebrow="Oil on canvas · New Delhi"
+                title="Dr Dolly Prasad" held={BIO_LINE} sub={BIO_SUB}>
+        <Link className="btn btn-solid" href="/works">See all {total} works</Link>
+        <a className="btn" href={STUDIO_PATH}>Walk through the studio</a>
+      </WallHero>
 
       <Until until={now.until}>
         <Link className="nowstrip" href="/exhibitions">
-          <em>Now showing</em><b>{now.title}</b><span>{now.city} · {now.when}</span><u>Details →</u>
+          <em>Now showing</em><b>{now.title}</b><span>{now.venue}, {now.city} · {now.when}</span><u>Details →</u>
         </Link>
       </Until>
 
@@ -119,7 +108,7 @@ export default function Home() {
           <img className="round" src="/site/ex/kala-dolly.jpg" alt="Dr Dolly Prasad beside one of her paintings" loading="lazy" />
           <div className="txt">
             <p className="eyebrow">About the artist</p>
-            <p className="big">She paints what daily life passes by — a clay gullak, a closed door, a lamp raised to scripture — and gives it the stillness we keep for prayer.</p>
+            <p className="big">She paints what daily life passes by: a clay gullak, a closed door, a lamp raised to scripture. And she gives it the stillness we keep for prayer.</p>
             <p className="meta" style={{ fontSize: 16 }}>A doctor and a painter in New Delhi. Eighteen exhibitions and art fairs between 2005 and 2018, from Triveni Kala Sangam and India Habitat Centre to ICCR and the First International Kala Mela. Paintings in private collections in India, the USA and London.</p>
             <Link className="link" href="/about">Her story →</Link>
           </div>
@@ -134,13 +123,15 @@ export default function Home() {
             <p className="meta" style={{ fontSize: 16 }}>The paintings, the stories behind them, and the shows they hung in.</p>
             <a className="btn btn-solid" href={INSTAGRAM.url} target="_blank" rel="noopener noreferrer"><InstagramIcon />Open Instagram</a>
           </div>
-          <div className="ig-grid">
-            {IG.map((id) => (
-              <a key={id} href={INSTAGRAM.url} target="_blank" rel="noopener noreferrer" aria-label={`${BY_ID.get(id)?.title} on Instagram`}>
-                {/* eslint-disable-next-line @next/next/no-img-element */}
-                <img src={thumb(id)} alt="" loading="lazy" />
-              </a>
-            ))}
+          <div className="ig-roll" aria-hidden="true">
+            <div className="ig-track">
+              {[...IG, ...IG].map((id, i) => (
+                <a key={i} href={INSTAGRAM.url} target="_blank" rel="noopener noreferrer" tabIndex={-1}>
+                  {/* eslint-disable-next-line @next/next/no-img-element */}
+                  <img src={thumb(id)} alt="" loading="lazy" />
+                </a>
+              ))}
+            </div>
           </div>
         </div>
       </section>

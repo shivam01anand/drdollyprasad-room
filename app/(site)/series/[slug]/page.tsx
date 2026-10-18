@@ -2,7 +2,7 @@ import type { Metadata } from "next";
 import Link from "next/link";
 import { notFound } from "next/navigation";
 import Card from "@/components/site/Card";
-import { SERIES_BY_SLUG, SERIES_PAGES, WHATSAPP, enquireHref, whatsappHref, worksIn, type Chapter } from "@/lib/site";
+import { SERIES_BY_SLUG, SERIES_PAGES, WHATSAPP, shownYear, enquireHref, whatsappHref, worksIn, type Chapter } from "@/lib/site";
 import { TAILORED } from "@/lib/rooms";
 import { BY_ID, LARGE, workPath, type Work } from "@/lib/works";
 import { ChatIcon } from "@/components/site/Icons";
@@ -38,7 +38,7 @@ function Words({ c }: { c: Chapter }) {
   return (
     <>
       {c.big && <p className={`chap-big${c.hers ? " hers" : ""}`}>{c.hers ? `“${c.big}”` : c.big}</p>}
-      {c.hers && <p className="chap-sig">— Dr Dolly Prasad</p>}
+      {c.hers && <p className="chap-sig">Dr Dolly Prasad</p>}
       {c.small && <p className="chap-small">{c.small}</p>}
     </>
   );
@@ -105,7 +105,7 @@ export default async function SeriesStory({ params }: Props) {
           {/* eslint-disable-next-line @next/next/no-img-element */}
           <img className="framed" src={img(hero.id)} alt={alt(hero)} fetchPriority="high" />
         </Link>
-        <p className="meta">{hero.title} · {hero.medium}{hero.size ? ` · ${hero.size}` : ""}{hero.year ? ` · ${hero.year}` : ""}</p>
+        <p className="meta">{hero.title} · {hero.medium}{hero.size ? ` · ${hero.size}` : ""}{shownYear(hero) ? ` · ${shownYear(hero)}` : ""}</p>
       </section>
 
       {s.quote && (

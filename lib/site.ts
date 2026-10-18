@@ -111,22 +111,6 @@ export const STATEMENT = [
   "I don’t paint", "Am not a painter",
 ];
 
-/**
- * The artist's statement, in the observer's voice (third person): what the
- * work is about, from the brand thesis — attention, memory, devotion and the
- * pause. Written for the site; hers to change.
- */
-export const ABOUT_THE_WORK = [
-  "Dr Dolly Prasad paints what daily life passes by.",
-  "A clay gullak and the coins it was made to hold. A door nobody opens any more. A lamp raised to a wall of scripture. A boy beneath banana leaves, a crown of fruit on his head.",
-  "She gives these ordinary things the scale, the colour and the stillness we usually keep for the sacred. A matka is looked at as closely as a Buddha. A rickshaw-wala at rest is given the whole canvas.",
-];
-export const THREADS = [
-  { t: "Memory", d: "The tonga, the twenty-paise coin, the hand-painted film poster — kept on canvas as they leave the street." },
-  { t: "Devotion", d: "Not as spectacle but as habit: a thread, a bell, a flame, the morning paper." },
-  { t: "The pause", d: "Faces, flowers and birds, held long enough to be felt." },
-];
-
 export const ON_THE_WORK =
   "My paintings are just a representation of some and many others of the shades and paradigms that I picked up at different stages in my life.";
 
@@ -236,7 +220,7 @@ export const SERIES_PAGES: SeriesPage[] = [
   },
   {
     slug: "recent-work", label: "Recent work", period: "2024–",
-    line: "Flowers, leaves, a bird, a pause — in her own words.",
+    line: "Flowers, leaves, a bird and a pause, in her own words.",
     hero: "boy-with-bananas",
     intro: [
       "Her recent work turns inward. A child beneath banana leaves. A woman beside a bird. Bells hung with red thread.",
@@ -266,7 +250,10 @@ export const statusText = (w: Work) =>
   w.status === "Sold" ? "Sold" : w.status === "Enquire" ? "On enquiry" : "Available · Price on request";
 
 /** the label line: medium · size · year */
-export const labelLine = (w: Work) => [w.medium, w.size, w.year].filter(Boolean).join(" · ");
+export const labelLine = (w: Work) => [w.medium, w.size, shownYear(w)].filter(Boolean).join(" · ");
+
+/** a painting shows one year: the year recorded, or the latest year of the series' range */
+export const shownYear = (w: Work) => w.year?.match(/\d{4}(?!.*\d{4})/)?.[0];
 
 const waText = (w?: Work) =>
   w ? `Hello Dr Prasad, I saw ${quoted(w.title)} on your website and would like to know more. ${SITE}${workPath(w.id)}`
@@ -313,7 +300,7 @@ export type Show = {
 const ph = (n: string, alt: string): Photo => ({ src: `/site/ex/${n}.jpg`, alt });
 
 export const NOW = {
-  id: "sacred-fragments", title: "Sacred Fragments: A Journey Home", city: "New Delhi",
+  id: "sacred-fragments", title: "Sacred Fragments: A Journey Home", venue: "Visual Arts Gallery, India Habitat Centre", city: "New Delhi",
   when: "18–21 October 2026", until: "2026-10-21",
   line: "Showing Threads of Faith and Under Canopy of Greens.",
   works: ["temple-bells", "boy-with-bananas"],
@@ -323,7 +310,7 @@ export const SHOWS: Show[] = [
   {
     id: "india-habitat-centre-2010", title: "An evening at India Habitat Centre", kind: "Exhibition",
     venue: "Open Palm Court, India Habitat Centre", city: "New Delhi", when: "November 2010", year: "2010",
-    lede: "A lamp lit at the opening. The Bullocks, the gullak and the rickshaw-walas on red-brick walls. Visitors stopping to talk, to look, to take a photograph — and the press, with questions, beside the paintings.",
+    lede: "A lamp lit at the opening. The Bullocks, the gullak and the rickshaw-walas on red-brick walls. Visitors stopping to talk, to look, to take a photograph. And the press, with their questions, beside the paintings.",
     works: ["bulls-and-wheel", "coins-and-clay-bank", "monks-and-blue-buddha"],
     albums: [
       { title: "The evening", line: "The lamp is lit, and the room fills.", photos: [
@@ -381,8 +368,7 @@ export const SHOWS: Show[] = [
   {
     id: "triveni-2007", title: "Recent paintings, with Sangeeta Sharma", kind: "Two-artist exhibition",
     venue: "Triveni Kala Sangam, Mandi House", city: "New Delhi", when: "10–20 May 2007", year: "2007",
-    lede: "The invitation keeps what no photograph did: two names, ten days in May, and the paintings chosen to introduce them — among them Lajja, Intezar and Mannat.",
-    note: "The invitation pages are recreated from the originals for legibility; old contact details are left out.",
+    lede: "The invitation keeps what no photograph did: two names, ten days in May, and the paintings chosen to introduce them, among them Lajja, Intezar and Mannat.",
     albums: [
       { title: "The invitation", line: "From the paper archive.", photos: [
         ph("triveni-1", "The invitation to an exhibition of recent paintings by Dolly Prasad and Sangeeta Sharma, Triveni Kala Sangam, 10–20 May 2007."),
@@ -395,12 +381,12 @@ export const SHOWS: Show[] = [
 
 export const PRESS = {
   clipping: ph("delhi-times", "A Delhi Times clipping, Must See Must Do, listing Art Today And Tomorrow, a group show at Travancore Art Gallery."),
-  clippingLine: "Delhi Times listed Art Today And Tomorrow, a group show of paintings at Travancore Art Gallery. The clipping is undated.",
+  clippingLine: "Delhi Times picked Art Today And Tomorrow, a group show of paintings at Travancore Art Gallery, among the week’s Must See, Must Do.",
   clips: [
     { src: "/site/video/tv-archive-2.mp4", poster: "/site/video/tv-archive-2.jpg", title: "On NCR television · June 2010",
-      line: "The recording carries a 12 June 2010 date. The camera turns from the paintings to her, speaking within the exhibition." },
-    { src: "/site/video/tv-archive-1.mp4", poster: "/site/video/tv-archive-1.jpg", title: "From the television archive",
-      line: "A gallery conversation, and the paintings on its walls. Date and venue not recorded." },
+      line: "12 June 2010. The camera turns from the paintings to her, speaking in the gallery." },
+    { src: "/site/video/tv-archive-1.mp4", poster: "/site/video/tv-archive-1.jpg", title: "On television",
+      line: "A report from the gallery, with her paintings on the walls behind." },
   ] as Clip[],
 };
 
@@ -413,7 +399,7 @@ export const RECORD: RecordEntry[] = [
   { year: "2015", month: "May", venue: "CSOI Club", city: "Delhi" },
   { year: "2011", venue: "ICCR", city: "Delhi" },
   { year: "2010", month: "November", venue: "Open Palm Court, India Habitat Centre", city: "Delhi", show: "india-habitat-centre-2010" },
-  { year: "2010", month: "June", venue: "ICCR — A Lifetime to Paint", city: "Delhi", show: "a-lifetime-to-paint" },
+  { year: "2010", month: "June", venue: "ICCR, A Lifetime to Paint", city: "Delhi", show: "a-lifetime-to-paint" },
   { year: "2009", month: "March", venue: "Foyer, Convention Centre, India Habitat Centre", city: "Delhi" },
   { year: "2008", month: "September", venue: "Epicenter", city: "Gurgaon" },
   { year: "2008", month: "August", venue: "India Habitat Centre", city: "New Delhi" },

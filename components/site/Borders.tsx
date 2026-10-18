@@ -12,6 +12,6 @@ export function Rails() {
   );
 }
 
-export function Band({ at }: { at: "top" | "bottom" }) {
+export function Band({ at }: { at: "top" | "bottom" | "footer" }) {
   return <div className={`band band-${at}`} aria-hidden="true" />;
 }

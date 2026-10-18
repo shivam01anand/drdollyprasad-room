@@ -1,6 +1,6 @@
 import Link from "next/link";
 import { BIO_LINE, EMAIL, INSTAGRAM, PORTRAIT, STUDIO_PATH, WHATSAPP, whatsappHref } from "@/lib/site";
-import { ChatIcon } from "./Icons";
+import { ChatIcon, InstagramIcon } from "./Icons";
 
 export default function Footer() {
   return (
@@ -16,9 +16,12 @@ export default function Footer() {
           </div>
         </div>
         <nav className="ftr-links" aria-label="Contact">
+          <Link className="btn btn-solid" href="/enquire">Enquire</Link>
           {WHATSAPP && <a href={whatsappHref()}>WhatsApp</a>}
-          <Link href="/enquire">{EMAIL}</Link>
-          <a href={INSTAGRAM.url} target="_blank" rel="noopener noreferrer">Instagram {INSTAGRAM.handle}</a>
+          <a href={`mailto:${EMAIL}`}>{EMAIL}</a>
+          <a className="ftr-ig" href={INSTAGRAM.url} target="_blank" rel="noopener noreferrer" aria-label={`Instagram ${INSTAGRAM.handle}`}>
+            <InstagramIcon /><span>{INSTAGRAM.handle}</span>
+          </a>
           <a href={STUDIO_PATH}>Walk through the studio</a>
         </nav>
       </div>

@@ -2,12 +2,14 @@ import type { Metadata } from "next";
 import Link from "next/link";
 import Until from "@/components/Until";
 import Slideshow from "@/components/site/Slideshow";
+import WallHero from "@/components/site/WallHero";
+import { SHOW_WALL } from "@/components/site/Collage";
 import { NOW, PRESS, RECORD, RECORD_LINE, SHOWS } from "@/lib/site";
 import { BY_ID, workPath } from "@/lib/works";
 
 export const metadata: Metadata = {
   title: "Exhibitions",
-  description: "Dr Dolly Prasad’s exhibitions: eighteen exhibitions and art fairs, 2005–2018 — India Habitat Centre (2010), A Lifetime to Paint at ICCR (2010), the First International Kala Mela (2018), Triveni Kala Sangam (2007) and more.",
+  description: "Dr Dolly Prasad’s exhibitions: eighteen exhibitions and art fairs, 2005–2018, including India Habitat Centre (2010), A Lifetime to Paint at ICCR (2010), the First International Kala Mela (2018), Triveni Kala Sangam (2007) and more.",
   alternates: { canonical: "/exhibitions" },
 };
 
@@ -15,14 +17,22 @@ const years = [...new Set(RECORD.map((r) => r.year))];
 
 export default function Exhibitions() {
   return (
+    <>
+    <WallHero columns={SHOW_WALL} label="Her exhibitions" eyebrow="2005 to today" title="Exhibitions" held="When the paintings meet people">
+      <a className="btn btn-solid" href="#india-habitat-centre-2010">See the shows</a>
+      <a className="btn" href="#record">The full record</a>
+    </WallHero>
     <div className="wrap">
       <section className="ex-head">
-        <p className="eyebrow">Exhibitions</p>
-        <h1 className="page-title">When the paintings meet people</h1>
-        <p className="lede">{RECORD_LINE}, in Delhi, Gurgaon, Jaipur and Bombay. Here are the shows the archive remembers best — in photographs, invitations and television — and the full record below.</p>
+        <div className="ex-facts">
+          <div><b>18</b><span>exhibitions and art fairs, 2005–2018</span></div>
+          <div><b>4</b><span>cities: Delhi, Gurgaon, Jaipur and Bombay</span></div>
+          <div><b>3</b><span>continents, in private collections in India, the USA and London</span></div>
+        </div>
+        <p className="ex-sum">Her paintings have hung at India Habitat Centre, the Indian Council for Cultural Relations, Triveni Kala Sangam, Travancore Art Gallery and Nehru Art Gallery in Bombay, and at the First International Kala Mela organised by Lalit Kala Akademi. Her shows have been covered on television and in the papers, and her work is held by private collectors in India, the USA and London.</p>
         <nav className="ex-jump" aria-label="On this page">
           {SHOWS.map((s) => <a key={s.id} href={`#${s.id}`}>{s.title.replace(/^An evening at /, "")} <span>{s.year}</span></a>)}
-          <a href="#on-screen">On screen</a>
+          <a href="#on-screen">In the news</a>
           <a href="#record">The record</a>
         </nav>
       </section>
@@ -33,7 +43,7 @@ export default function Exhibitions() {
             <div className="txt">
               <span className="eyebrow" style={{ color: "inherit" }}>Now showing</span>
               <h2>{NOW.title}</h2>
-              <p>{NOW.city} · {NOW.when}</p>
+              <p>{NOW.venue}, {NOW.city} · {NOW.when}</p>
               <p>{NOW.line}</p>
             </div>
             <div className="imgs">
@@ -77,7 +87,8 @@ export default function Exhibitions() {
         <div className="sec-head">
           <div>
             <p className="eyebrow">From the archive</p>
-            <h2>On screen, and in the papers</h2>
+            <h2>In the news</h2>
+            <p className="lede" style={{ marginTop: 10 }}>Her exhibitions have been covered on television and listed in the papers. Here are two television reports and a page from Delhi Times.</p>
           </div>
         </div>
         <div className="ex-screen-grid">
@@ -86,7 +97,7 @@ export default function Exhibitions() {
               <video controls preload="none" playsInline poster={c.poster} aria-label={c.title}>
                 <source src={c.src} type="video/mp4" />
               </video>
-              <figcaption><b>{c.title}</b><span>{c.line}</span><em>Original broadcast sound.</em></figcaption>
+              <figcaption><b>{c.title}</b><span>{c.line}</span></figcaption>
             </figure>
           ))}
           <figure className="clip">
@@ -120,8 +131,8 @@ export default function Exhibitions() {
             </li>
           ))}
         </ol>
-        <p className="meta" style={{ marginTop: 18 }}>As listed in her own record. Galleries and art fairs are listed together; dates are given as precisely as the record gives them.</p>
       </section>
     </div>
+    </>
   );
 }

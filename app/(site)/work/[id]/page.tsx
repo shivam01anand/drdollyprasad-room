@@ -2,7 +2,7 @@ import type { Metadata } from "next";
 import Link from "next/link";
 import { notFound } from "next/navigation";
 import { BY_ID, LARGE, SHOW, SITE, WORKS, inchDims, quoted, workPath, type Work } from "@/lib/works";
-import { INSTAGRAM, LOOK, PULL, SMALL_PHOTO, STUDIO_PATH, WHATSAPP, WORDS, enquireHref, labelLine, seriesPath, whatsappHref, worksIn } from "@/lib/site";
+import { INSTAGRAM, LOOK, PULL, SMALL_PHOTO, shownYear, STUDIO_PATH, WHATSAPP, WORDS, enquireHref, labelLine, seriesPath, whatsappHref, worksIn } from "@/lib/site";
 import manifest from "@/public/art/manifest.json";
 import Card from "@/components/site/Card";
 import Viewer from "@/components/site/Viewer";
@@ -25,7 +25,7 @@ type Props = { params: Promise<{ id: string }> };
 
 const DIMS = new Map(manifest.works.map((d) => [d.id, d]));
 
-const facts = (w: Work) => [w.medium, w.size, w.year, w.series].filter(Boolean).join(" · ");
+const facts = (w: Work) => [w.medium, w.size, shownYear(w), w.series].filter(Boolean).join(" · ");
 const statusWord = (w: Work) => (w.status === "Sold" ? "Sold" : w.status === "Enquire" ? "On enquiry" : "Available");
 
 export async function generateMetadata({ params }: Props): Promise<Metadata> {
@@ -71,7 +71,7 @@ export default async function WorkPage({ params }: Props) {
     artform: "Painting",
     artMedium: w.medium,
     creator: { "@type": "Person", name: "Dr Dolly Prasad", url: SITE },
-    ...(w.year && /^\d{4}$/.test(w.year) ? { dateCreated: w.year } : {}),
+    ...(shownYear(w) ? { dateCreated: shownYear(w) } : {}),
     ...(size ? {
       width: { "@type": "QuantitativeValue", value: size.width, unitCode: "INH" },
       height: { "@type": "QuantitativeValue", value: size.height, unitCode: "INH" },
@@ -83,7 +83,7 @@ export default async function WorkPage({ params }: Props) {
     ["Title", w.title],
     ["Medium", w.medium],
     ["Size", w.size ? `${w.size}${cm}` : "On request"],
-    ["Year", w.year ?? "—"],
+    ["Year", shownYear(w) ?? "On request"],
     ["Series", <Link key="s" href={seriesPath(w.series)}>{w.series}</Link>],
     ["Status", statusWord(w)],
   ];
@@ -92,7 +92,7 @@ export default async function WorkPage({ params }: Props) {
     ...(words ? [{ label: "In her words", body: (
       <>
         <p className="quote">“{words}”</p>
-        <p className="eyebrow" style={{ marginTop: 14 }}>— Dr Dolly Prasad</p>
+        <p className="eyebrow" style={{ marginTop: 14 }}>Dr Dolly Prasad</p>
       </>) }] : []),
     { label: "Details and size", body: <dl>{rows.map(([k, v]) => <div key={k} style={{ display: "contents" }}><dt>{k}</dt><dd>{v}</dd></div>)}</dl> },
     { label: "Delivery and framing", body: (
@@ -113,7 +113,7 @@ export default async function WorkPage({ params }: Props) {
           <div className="wp-head">
             <h1>{w.title}</h1>
             <p className="meta">{labelLine(w)} · From the series <Link href={seriesPath(w.series)}>{w.series}</Link></p>
-            {lead && <p className={`wp-lead${words ? " hers" : ""}`}>{words ? `“${lead}”` : lead}{words && <span> — Dr Dolly Prasad</span>}</p>}
+            {lead && <p className={`wp-lead${words ? " hers" : ""}`}>{words ? `“${lead}”` : lead}{words && <span>Dr Dolly Prasad</span>}</p>}
           </div>
           <Viewer w={w} src={src} thumb={`/site/thumbs/${id}.jpg`} dims={d ? { w: d.w, h: d.h } : undefined}
                   small={!!d && Math.max(d.w, d.h) < 600} />
@@ -124,7 +124,7 @@ export default async function WorkPage({ params }: Props) {
             <span className="eyebrow">{w.series}</span>
             <span>{w.medium}</span>
             {w.size && <span>{w.size}{cm}</span>}
-            {w.year && <span>{w.year}</span>}
+            {w.year && <span>{shownYear(w)}</span>}
             <span>From the series <Link href={seriesPath(w.series)}>{w.series} →</Link></span>
           </div>
           <div className="side-status">

@@ -5,15 +5,14 @@ import type { Album } from "@/lib/site";
 
 /**
  * Photographs from a show, rolling slowly one into the next. Every photograph
- * is shown whole (never cropped). It plays only while on screen, stops while a
- * hand or a keyboard is on it, has a pause button, and never moves by itself
- * for anyone who has asked for reduced motion.
+ * is shown whole (never cropped). It keeps moving on its own while on screen,
+ * has a pause button, and never moves by itself for anyone who has asked for
+ * reduced motion.
  */
 export default function Slideshow({ albums, label }: { albums: Album[]; label: string }) {
   const [a, setA] = useState(0);
   const [i, setI] = useState(0);
   const [playing, setPlaying] = useState(true);
-  const [held, setHeld] = useState(false);
   const [seen, setSeen] = useState(false);
   const [still, setStill] = useState(false);
   const root = useRef<HTMLDivElement>(null);
@@ -38,7 +37,7 @@ export default function Slideshow({ albums, label }: { albums: Album[]; label: s
 
   const go = useCallback((k: number) => setI(((k % n) + n) % n), [n]);
 
-  const rolling = playing && !held && seen && !still && n > 1;
+  const rolling = playing && seen && !still && n > 1;
   useEffect(() => {
     if (!rolling) return;
     const t = setTimeout(() => go(i + 1), 4200);
@@ -49,8 +48,6 @@ export default function Slideshow({ albums, label }: { albums: Album[]; label: s
 
   return (
     <div className="slides" ref={root} role="region" aria-roledescription="slideshow" aria-label={label}
-         onMouseEnter={() => setHeld(true)} onMouseLeave={() => setHeld(false)}
-         onFocus={() => setHeld(true)} onBlur={(e) => { if (!e.currentTarget.contains(e.relatedTarget)) setHeld(false); }}
          onKeyDown={(e) => { if (e.key === "ArrowRight") go(i + 1); if (e.key === "ArrowLeft") go(i - 1); }}>
       {albums.length > 1 && (
         <div className="slides-tabs" role="tablist" aria-label={`${label}: parts of the show`}>

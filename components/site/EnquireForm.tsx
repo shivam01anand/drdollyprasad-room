@@ -27,7 +27,7 @@ export default function EnquireForm() {
 
   const w = work ? BY_ID.get(work) : undefined;
   const text = () => {
-    const sign = [name && `— ${name}`, city].filter(Boolean).join(", ");
+    const sign = [name, city].filter(Boolean).join(", ");
     return [
       "Hello Dr Prasad,",
       "",
@@ -72,7 +72,7 @@ export default function EnquireForm() {
           <div className="field">
             <label htmlFor="q-work">Painting (optional)</label>
             <select id="q-work" value={work} onChange={(e) => setWork(e.target.value)}>
-              <option value="">— Choose a painting —</option>
+              <option value="">Choose a painting</option>
               {WORKS.map((x) => <option key={x.id} value={x.id}>{x.title}{x.status === "Sold" ? " (sold)" : ""}</option>)}
             </select>
           </div>
