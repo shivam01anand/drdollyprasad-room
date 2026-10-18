@@ -1,7 +1,6 @@
 /**
- * The frame round every page: the prayer frieze from her Faith series —
- * figures with lamps, bells, books and folded hands — as side ribbons on a
- * computer and a frieze above and below everywhere.
+ * The quiet frame round every page: a fine double rule with small diamonds,
+ * in a warm brown. Plain pattern, no figures, so it suits every collection.
  */
 export function Rails() {
   return (

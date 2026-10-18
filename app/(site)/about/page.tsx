@@ -37,7 +37,7 @@ const THREADS: Theme[] = [
   { t: "Devotion", series: "Faith", href: "/series/faith",
     d: "Faith here is a habit, not a spectacle. A lamp raised to a wall of scripture, a peepal wound in red thread, the aarti flame, a man opening his morning paper. The gestures last a moment; the paintings let them last.",
     roll: paint(["offering-of-light", "sacred-tree", "monks-and-blue-buddha", "priest-with-flame"]) },
-  { t: "The pause", series: "Recent work", href: "/series/recent-work",
+  { t: "The pause", series: "Onset of Spring", href: "/series/recent-work",
     d: "Her recent work turns inward: a woman beside a bird, a child beneath banana leaves, bells hung with thread. Faces, flowers and birds, held long enough to be felt. In her words: “Sometimes, I paint not to show, but to pause.”",
     roll: paint(["woman-with-bird", "boy-with-bananas", "woman-with-red-flower", "temple-bells"]) },
 ];

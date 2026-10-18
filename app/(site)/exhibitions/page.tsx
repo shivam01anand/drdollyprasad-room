@@ -8,7 +8,7 @@ import { dims } from "@/lib/images";
 
 export const metadata: Metadata = {
   title: "Exhibitions",
-  description: "Dr Dolly Prasad’s exhibitions: eighteen exhibitions and art fairs, 2005–2018, including India Habitat Centre (2010), A Lifetime to Paint at ICCR (2010), the First International Kala Mela (2018), Triveni Kala Sangam (2007) and more.",
+  description: "Dr Dolly Prasad’s exhibitions: eighteen exhibitions and art fairs, 2005 to 2018, including India Habitat Centre (2010), A Lifetime to Paint at ICCR (2010), the First International Kala Mela (2018), Triveni Kala Sangam (2007) and more.",
   alternates: { canonical: "/exhibitions" },
 };
 
@@ -17,9 +17,9 @@ const years = [...new Set(RECORD.map((r) => r.year))];
 export default function Exhibitions() {
   return (
     <div className="wrap">
-      <section className="sec-tight" style={{ paddingBottom: 20 }}>
+      <section className="page-head">
         <h1 className="page-title">Exhibitions</h1>
-        <p className="lede">Eighteen shows across galleries and art fairs, from Delhi to Bombay.</p>
+        <p className="lede">Eighteen shows across galleries and art fairs, from Delhi to Bombay. Her paintings have hung at India Habitat Centre, the Indian Council for Cultural Relations, Triveni Kala Sangam, Travancore Art Gallery and Nehru Art Gallery in Bombay, and at the First International Kala Mela organised by Lalit Kala Akademi. Her shows have been covered on television and in the papers.</p>
       </section>
 
       <Until until={NOW.until}>
@@ -44,13 +44,12 @@ export default function Exhibitions() {
         </section>
       </Until>
 
-      <section className="ex-head" style={{ paddingTop: 12 }}>
+      <section className="ex-head">
         <div className="ex-facts">
-          <div><b>18</b><span>exhibitions and art fairs, 2005–2018</span></div>
+          <div><b>18</b><span>exhibitions and art fairs, 2005 to 2018</span></div>
           <div><b>4</b><span>cities: Delhi, Gurgaon, Jaipur and Bombay</span></div>
           <div><b>3</b><span>continents, with private collectors in India, the USA and the UK</span></div>
         </div>
-        <p className="ex-sum">Her paintings have hung at India Habitat Centre, the Indian Council for Cultural Relations, Triveni Kala Sangam, Travancore Art Gallery and Nehru Art Gallery in Bombay, and at the First International Kala Mela organised by Lalit Kala Akademi. Her shows have been covered on television and in the papers.</p>
         <nav className="ex-jump" aria-label="On this page">
           {SHOWS.map((s) => <a key={s.id} href={`#${s.id}`}>{s.title.replace(/^An evening at /, "")} <span>{s.year}</span></a>)}
           <a href="#on-screen">In the news</a>

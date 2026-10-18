@@ -5,8 +5,9 @@ import Card, { thumb } from "@/components/site/Card";
 import { InstagramIcon } from "@/components/site/Icons";
 import Until from "@/components/Until";
 import HashRedirect from "@/components/site/HashRedirect";
+import Marquee from "@/components/site/Marquee";
 import {
-  BIO_LINE, BIO_SUB, EMAIL, INSTAGRAM, NOW, PORTRAIT, SERIES_PAGES, SHOWS, SITE, STATEMENT, STUDIO_PATH, worksIn,
+  BIO_LINE, BIO_SUB, EMAIL, INSTAGRAM, NOW, PORTRAIT, SERIES_PAGES, SHOWS, SITE, STUDIO_PATH, worksIn,
 } from "@/lib/site";
 import { BY_ID } from "@/lib/works";
 import { dims } from "@/lib/images";
@@ -45,7 +46,7 @@ export default function Home() {
 
       <Until until={now.until}>
         <Link className="nowstrip" href="/exhibitions">
-          <span className="live"><i aria-hidden="true" />Live now</span><b><span className="nw-long">{now.title}</span><span className="nw-short">{now.title.split(":")[0]}</span></b><span className="nw-where">{now.venue}, {now.city} · {now.when}</span><span className="nw-short nw-when">IHC · 18–21 Oct</span><u>See the show →</u>
+          <span className="live"><i aria-hidden="true" />Live now</span><b><span className="nw-long">{now.title}</span><span className="nw-short">{now.title.split(":")[0]}</span></b><span className="nw-where">{now.venue}, {now.city} · {now.when}</span><span className="nw-short nw-when">IHC · 18 to 21 Oct</span><u>See the show →</u>
         </Link>
       </Until>
 
@@ -57,28 +58,28 @@ export default function Home() {
           </div>
           <Link className="link" href="/series">All collections →</Link>
         </div>
-        <div className="grid grid-5 series-tiles snap-row">
-          {SERIES_PAGES.map((s) => (
-            <Link key={s.slug} className="card" href={`/series/${s.slug}`}>
-              <div className="mat">
-                {/* eslint-disable-next-line @next/next/no-img-element */}
-                <img className="framed thin" src={thumb(s.hero)} alt={`${BY_ID.get(s.hero)?.title}, from ${s.label}`} loading="lazy" {...dims(thumb(s.hero))} />
-              </div>
-              <span className="card-t">{s.label}</span>
-              <span className="meta">{worksIn(s.label).length} works · {s.period}</span>
-              <span className="meta">{s.line}</span>
-            </Link>
-          ))}
-        </div>
       </section>
+      <Marquee seconds={70} label="The five collections" className="series-tiles">
+        {SERIES_PAGES.map((s) => (
+          <Link key={s.slug} className="card m-card" href={`/series/${s.slug}`}>
+            <div className="mat">
+              {/* eslint-disable-next-line @next/next/no-img-element */}
+              <img className="framed thin" src={thumb(s.hero)} alt={`${BY_ID.get(s.hero)?.title}, from ${s.label}`} loading="lazy" {...dims(thumb(s.hero))} />
+            </div>
+            <span className="card-t">{s.label}</span>
+            <span className="meta">{worksIn(s.label).length} works · {s.period}</span>
+            <span className="meta">{s.line}</span>
+          </Link>
+        ))}
+      </Marquee>
 
       <section className="hw-band">
         <div className="wrap hw-in">
           {/* eslint-disable-next-line @next/next/no-img-element */}
           <img className="round" src="/site/ex/kala-dolly.jpg" alt="Dr Dolly Prasad beside one of her paintings" loading="lazy" {...dims("/site/ex/kala-dolly.jpg")} />
           <figure className="hw-q">
-            <blockquote>{STATEMENT[0]}<br />{STATEMENT[1]}</blockquote>
-            <figcaption>Dr Dolly Prasad, from her artist’s statement</figcaption>
+            <blockquote>{SERIES_PAGES[0].quote}</blockquote>
+            <figcaption>Dr Dolly Prasad, on Gone Are The Days</figcaption>
             <Link className="link" href="/about">Her story →</Link>
           </figure>
         </div>
@@ -88,25 +89,25 @@ export default function Home() {
         <div className="sec-head">
           <div>
             <h2>On the walls</h2>
-            <p className="sec-line">Eighteen exhibitions and art fairs, 2005–2018, from Triveni Kala Sangam to the First International Kala Mela.</p>
+            <p className="sec-line">Eighteen exhibitions and art fairs, 2005 to 2018, from Triveni Kala Sangam to the First International Kala Mela.</p>
           </div>
           <Link className="link" href="/exhibitions">All exhibitions →</Link>
         </div>
-        <div className="shows snap-row">
-          {CARDS.map((c) => {
-            const e = SHOWS.find((x) => x.id === c.id)!;
-            return (
-              <Link key={c.id} href={`/exhibitions#${c.id}`}>
-                {/* eslint-disable-next-line @next/next/no-img-element */}
-                <img src={c.src} alt={c.alt} loading="lazy" {...dims(c.src)} />
-                <span className="meta">{e.when.replace(/^Opened 11 /, "").replace(/ · on view.*$/, "")}</span>
-                <b>{e.title}</b>
-                <span className="meta">{e.venue}, {e.city}</span>
-              </Link>
-            );
-          })}
-        </div>
       </section>
+      <Marquee seconds={55} label="Exhibitions" reverse>
+        {CARDS.map((c) => {
+          const e = SHOWS.find((x) => x.id === c.id)!;
+          return (
+            <Link key={c.id} className="show-card" href={`/exhibitions#${c.id}`}>
+              {/* eslint-disable-next-line @next/next/no-img-element */}
+              <img className="framed" src={c.src} alt={c.alt} loading="lazy" {...dims(c.src)} />
+              <span className="meta">{e.when.replace(/^Opened 11 /, "").replace(/ · on view.*$/, "")}</span>
+              <b>{e.title}</b>
+              <span className="meta">{e.venue}, {e.city}</span>
+            </Link>
+          );
+        })}
+      </Marquee>
 
       <section className="sec-tight wrap">
         <div className="sec-head">
@@ -116,10 +117,10 @@ export default function Home() {
           </div>
           <Link className="link" href="/works?status=available">All available →</Link>
         </div>
-        <div className="grid snap-row">
-          {AVAILABLE.map((id) => <Card key={id} w={BY_ID.get(id)!} />)}
-        </div>
       </section>
+      <Marquee seconds={50} label="Available paintings" className="avail">
+        {AVAILABLE.map((id) => <Card key={id} w={BY_ID.get(id)!} />)}
+      </Marquee>
 
       <section className="ig-band">
         <div className="wrap ig-in">

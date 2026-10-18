@@ -10,7 +10,7 @@ export const metadata: Metadata = {
 export default function Enquire() {
   return (
     <div className="wrap">
-      <section className="sec-tight" style={{ paddingBottom: 0 }}>
+      <section className="page-head">
         <h1 className="page-title">Enquire</h1>
         <p className="lede">A painting you would like to know more about, an exhibition, the press, or a commission. Prices are on request.</p>
       </section>

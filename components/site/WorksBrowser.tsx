@@ -87,7 +87,7 @@ export default function WorksBrowser() {
           <select value={size} onChange={(e) => { track("works_filter_changed", { filter: "size", value: e.target.value }); setSize(e.target.value as Size); }}>
             <option value="all">All</option>
             <option value="small">S · under 24 in</option>
-            <option value="medium">M · 24–36 in</option>
+            <option value="medium">M · 24 to 36 in</option>
             <option value="large">L · over 36 in</option>
           </select>
         </label>

@@ -148,7 +148,7 @@ export type SeriesPage = {
 
 export const SERIES_PAGES: SeriesPage[] = [
   {
-    slug: "gone-are-the-days", label: "Gone Are The Days", period: "c. 2016–2018",
+    slug: "gone-are-the-days", label: "Gone Are The Days", period: "2016 to 2018",
     line: "The India that is quietly leaving: the tonga, the gullak, the twenty-paise coin.",
     hero: "bulls-and-wheel",
     quote: "The shades that touched me, the live frames that seemed to tell a story larger than the attention they seemed to draw.",
@@ -187,7 +187,7 @@ export const SERIES_PAGES: SeriesPage[] = [
     ],
   },
   {
-    slug: "faith", label: "Faith", period: "c. 2005–2015",
+    slug: "faith", label: "Faith", period: "2005 to 2015",
     line: "Devotion as daily practice: a lamp, a thread, a page of scripture.",
     hero: "offering-of-light",
     intro: [
@@ -204,7 +204,7 @@ export const SERIES_PAGES: SeriesPage[] = [
     ],
   },
   {
-    slug: "portraits", label: "Portraits", period: "c. 2005–2015",
+    slug: "portraits", label: "Portraits", period: "2005 to 2015",
     line: "Faces, and the things of their day: a turban, a kettle, a stack of kadhais.",
     hero: "three-veiled-women",
     intro: [
@@ -221,11 +221,11 @@ export const SERIES_PAGES: SeriesPage[] = [
     ],
   },
   {
-    slug: "recent-work", label: "Recent work", period: "2024–2026",
+    slug: "recent-work", label: "Onset of Spring", period: "2024 to 2026",
     line: "Flowers, leaves, a bird and a pause, in her own words.",
     hero: "boy-with-bananas",
     intro: [
-      "Her recent work turns inward. A child beneath banana leaves. A woman beside a bird. Bells hung with red thread.",
+      "Her spring work turns inward. A child beneath banana leaves. A woman beside a bird. Bells hung with red thread.",
       "Five of the six paintings come with her own words. They are given here in full.",
     ],
     chapters: [
@@ -272,7 +272,7 @@ export const enquireHref = (w?: Work) => (w ? `/enquire?work=${w.id}` : "/enquir
 /**
  * From the exhibition archive (Project Memory/exhibitions-master.json and the
  * exhibition post records, 18 Oct 2026). Her own record lists eighteen
- * exhibitions and art fairs, 2005–2018; it does not say which were solo, so
+ * exhibitions and art fairs, 2005 to 2018; it does not say which were solo, so
  * nothing here calls them all solo. Dates are given only as precisely as the
  * record gives them.
  */
@@ -304,7 +304,7 @@ const ph = (n: string, alt: string): Photo => ({ src: `/site/ex/${n}.jpg`, alt }
 export const NOW = {
   id: "sacred-fragments", title: "Sacred Fragments: A Journey Home", venue: "Visual Arts Gallery, India Habitat Centre", city: "New Delhi",
   address: "Visual Arts Gallery, India Habitat Centre, Lodhi Road, New Delhi",
-  when: "18–21 October 2026", until: "2026-10-21",
+  when: "18 to 21 October 2026", until: "2026-10-21",
   line: "Showing Threads of Faith and Under Canopy of Greens.",
   works: ["temple-bells", "boy-with-bananas"],
 };
@@ -343,7 +343,7 @@ export const SHOWS: Show[] = [
   },
   {
     id: "a-lifetime-to-paint", title: "A Lifetime to Paint", kind: "Exhibition, presented by the Indian Council for Cultural Relations",
-    venue: "Azad Bhavan Art Gallery, ICCR, I.P. Estate", city: "New Delhi", when: "Opened 11 June 2010 · on view 12–16 June", year: "2010",
+    venue: "Azad Bhavan Art Gallery, ICCR, I.P. Estate", city: "New Delhi", when: "Opened 11 June 2010 · on view 12 to 16 June", year: "2010",
     lede: "She spoke at the opening beside a marigold-decked lamp, The Blue Buddha behind her. The title looks past the walls, to the paintings still to come.",
     quote: "I hope it would be a life-long unraveling with these tinges, an affair to last a lifetime…",
     works: ["monks-and-blue-buddha"],
@@ -351,13 +351,13 @@ export const SHOWS: Show[] = [
       { title: "The opening", line: "11 June 2010, Azad Bhavan Art Gallery.", photos: [
         ph("iccr-speech", "Dr Dolly Prasad speaks at the opening of A Lifetime to Paint, beside a brass lamp, with The Blue Buddha behind her."),
         ph("iccr-02", "Dr Dolly Prasad, holding flowers, beside The Blue Buddha at ICCR."),
-        ph("iccr-sign", "The ICCR sign for A Lifetime to Paint, a painting exhibition by Dr Dolly Prasad, 11–16 June 2010."),
+        ph("iccr-sign", "The ICCR sign for A Lifetime to Paint, a painting exhibition by Dr Dolly Prasad, 11 to 16 June 2010."),
       ] },
     ],
   },
   {
     id: "kala-mela-2018", title: "First International Kala Mela", kind: "Art fair, organised by Lalit Kala Akademi",
-    venue: "Indira Gandhi National Centre for the Arts", city: "New Delhi", when: "4–18 February 2018", year: "2018",
+    venue: "Indira Gandhi National Centre for the Arts", city: "New Delhi", when: "4 to 18 February 2018", year: "2018",
     lede: "Artists from India and abroad, and the people who came to meet them. She stood beside The Cart-Man and the Rupaya, a working man at rest against a giant coin; nearby, a visitor raised her phone for a selfie with the paintings.",
     works: ["rickshaw-rest-framed"],
     albums: [
@@ -371,11 +371,11 @@ export const SHOWS: Show[] = [
   },
   {
     id: "triveni-2007", title: "Recent paintings, with Sangeeta Sharma", kind: "Two-artist exhibition",
-    venue: "Triveni Kala Sangam, Mandi House", city: "New Delhi", when: "10–20 May 2007", year: "2007",
+    venue: "Triveni Kala Sangam, Mandi House", city: "New Delhi", when: "10 to 20 May 2007", year: "2007",
     lede: "The invitation keeps what no photograph did: two names, ten days in May, and the paintings chosen to introduce them, among them Lajja, Intezar and Mannat.",
     albums: [
       { title: "The invitation", line: "From the paper archive.", photos: [
-        ph("triveni-1", "The invitation to an exhibition of recent paintings by Dolly Prasad and Sangeeta Sharma, Triveni Kala Sangam, 10–20 May 2007."),
+        ph("triveni-1", "The invitation to an exhibition of recent paintings by Dolly Prasad and Sangeeta Sharma, Triveni Kala Sangam, 10 to 20 May 2007."),
         ph("triveni-2", "The back of the invitation, with paintings and small portraits of Sangeeta Sharma and Dolly Prasad."),
         ph("triveni-3", "The artist sheet: the invitation, her portrait and three paintings, Lajja, Intezar and Mannat."),
       ] },
@@ -417,7 +417,7 @@ export const RECORD: RecordEntry[] = [
   { year: "2005", venue: "Sriram Centre", city: "New Delhi" },
 ];
 
-export const RECORD_LINE = "Eighteen exhibitions and art fairs, 2005–2018";
+export const RECORD_LINE = "Eighteen exhibitions and art fairs, 2005 to 2018";
 
 export const PORTRAIT = "/site/dolly.jpg";
 export const PORTRAIT_LARGE = "/site/ex/kala-dolly.jpg";

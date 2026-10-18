@@ -9,7 +9,7 @@ import { thumb } from "./Card";
  * whole wall eases left and right. It is made of framed paintings and a few
  * photographs from her exhibitions, nothing else, so the paintings stay the
  * loudest colour on the screen. The wall never stops under the cursor: the
- * painting under it turns over to show its label, and an exhibition photograph
+ * painting under it turns over to show its label (the still tile holds the hover; only the card inside turns, so it can never stall edge-on), and an exhibition photograph
  * lifts a little. Each column holds its list twice, so it loops without a seam.
  */
 
@@ -56,14 +56,16 @@ function Tile({ it }: { it: Item }) {
   const line = PULL[w.id] ? `“${PULL[w.id]}”` : LOOK[w.id];
   return (
     <Link className="tile flip" href={workPath(w.id)} tabIndex={-1}>
-      {/* eslint-disable-next-line @next/next/no-img-element */}
-      <img className="framed" src={thumb(w.id)} alt={w.title} loading="lazy" decoding="async" {...dims(thumb(w.id))} />
-      <span className="back">
-        <em>{w.series}</em>
-        <b>{w.title}</b>
-        <small>{labelLine(w)}</small>
-        {line && <i>{line}</i>}
-        <span className="go">View the painting</span>
+      <span className="flipper">
+        {/* eslint-disable-next-line @next/next/no-img-element */}
+        <img className="framed" src={thumb(w.id)} alt={w.title} loading="lazy" decoding="async" {...dims(thumb(w.id))} />
+        <span className="back">
+          <em>{w.series}</em>
+          <b>{w.title}</b>
+          <small>{labelLine(w)}</small>
+          {line && <i>{line}</i>}
+          <span className="go">View the painting</span>
+        </span>
       </span>
     </Link>
   );

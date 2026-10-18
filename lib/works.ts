@@ -32,64 +32,64 @@ const W = (id: string, title: string, series: string, status: Status, extra: Par
   ({ id, title, series, status, medium: OIL, ...extra });
 
 export const WORKS: Work[] = [
-  // Gone Are The Days — c. 2016–2018
-  W("rickshaw-puller-and-coin", "Twenty Paise", "Gone Are The Days", "Available", { year: "c. 2016–2018" }),
-  W("carriage-and-autorickshaw", "Gone Are The Days [A]", "Gone Are The Days", "Available", { year: "c. 2016–2018" }),
-  W("bullock-cart-and-truck", "Gone Are The Days [B]", "Gone Are The Days", "Available", { year: "c. 2016–2018", size: "24 × 24 in", inches: 24 }),
-  W("rickshaw-rest-framed", "The Cart-Man and the Rupaya", "Gone Are The Days", "Available", { year: "c. 2016–2018" }),
-  W("coins-and-clay-bank", "The Matka and the Coins", "Gone Are The Days", "Available", { year: "c. 2016–2018" }),
-  W("postbox-and-stamps", "Patra Petika", "Gone Are The Days", "Available", { year: "c. 2016–2018" }),
-  W("mother-india-and-kettles", "Mother India", "Gone Are The Days", "Available", { year: "c. 2016–2018" }),
-  W("shree-420-and-milk-cans", "Shree 420", "Gone Are The Days", "Available", { year: "c. 2016–2018" }),
-  W("bulls-and-wheel", "The Bullocks", "Gone Are The Days", "Available", { year: "c. 2016–2018", size: "48 × 48 in", inches: 48 }),
-  W("cycle-rickshaw", "The Cycle Rickshaw-wala", "Gone Are The Days", "Available", { year: "c. 2016–2018" }),
-  W("rickshaw-rest", "The Rickshaw-wala Resting", "Gone Are The Days", "Sold", { year: "c. 2016–2018" }),
-  W("horse-cart-and-autorickshaw", "Small Panel I", "Gone Are The Days", "Available", { year: "c. 2016–2018" }),
-  W("rickshaw-and-autorickshaw", "Small Panel II", "Gone Are The Days", "Available", { year: "c. 2016–2018" }),
+  // Gone Are The Days — 2016 to 2018
+  W("rickshaw-puller-and-coin", "Twenty Paise", "Gone Are The Days", "Available", { year: "2016 to 2018" }),
+  W("carriage-and-autorickshaw", "Gone Are The Days [A]", "Gone Are The Days", "Available", { year: "2016 to 2018" }),
+  W("bullock-cart-and-truck", "Gone Are The Days [B]", "Gone Are The Days", "Available", { year: "2016 to 2018", size: "24 × 24 in", inches: 24 }),
+  W("rickshaw-rest-framed", "The Cart-Man and the Rupaya", "Gone Are The Days", "Available", { year: "2016 to 2018" }),
+  W("coins-and-clay-bank", "The Matka and the Coins", "Gone Are The Days", "Available", { year: "2016 to 2018" }),
+  W("postbox-and-stamps", "Patra Petika", "Gone Are The Days", "Available", { year: "2016 to 2018" }),
+  W("mother-india-and-kettles", "Mother India", "Gone Are The Days", "Available", { year: "2016 to 2018" }),
+  W("shree-420-and-milk-cans", "Shree 420", "Gone Are The Days", "Available", { year: "2016 to 2018" }),
+  W("bulls-and-wheel", "The Bullocks", "Gone Are The Days", "Available", { year: "2016 to 2018", size: "48 × 48 in", inches: 48 }),
+  W("cycle-rickshaw", "The Cycle Rickshaw-wala", "Gone Are The Days", "Available", { year: "2016 to 2018" }),
+  W("rickshaw-rest", "The Rickshaw-wala Resting", "Gone Are The Days", "Sold", { year: "2016 to 2018" }),
+  W("horse-cart-and-autorickshaw", "Small Panel I", "Gone Are The Days", "Available", { year: "2016 to 2018" }),
+  W("rickshaw-and-autorickshaw", "Small Panel II", "Gone Are The Days", "Available", { year: "2016 to 2018" }),
   W("terracotta-pots", "Terracotta", "Gone Are The Days", "Available", { year: "2015", size: "36 × 36 in", inches: 36 }),
   // Bandh Darwaze — 2018, one foot square
   W("weathered-door-ring", "Bandh Darwaze I", "Bandh Darwaze", "Available", { year: "2018", size: "12 × 12 in", inches: 12 }),
   W("red-and-teal-door-lock", "Bandh Darwaze II", "Bandh Darwaze", "Available", { year: "2018", size: "12 × 12 in", inches: 12 }),
   W("teal-door-bolt", "Bandh Darwaze III", "Bandh Darwaze", "Available", { year: "2018", size: "12 × 12 in", inches: 12 }),
   W("carved-door-knocker", "Bandh Darwaze IV", "Bandh Darwaze", "Available", { year: "2018", size: "12 × 12 in", inches: 12 }),
-  // Faith — c. 2005–2015
-  W("monks-and-blue-buddha", "The Blue Buddha", "Faith", "Available", { year: "c. 2005–2015" }),
-  W("monk-and-green-buddha", "Buddha Under the Bodhi Tree", "Faith", "Available", { year: "c. 2005–2015" }),
-  W("offering-of-light", "Vakratunda", "Faith", "Sold", { year: "c. 2005–2015", size: "48 × 30 in", inches: 48 }),
-  W("prayer-and-scripture", "Gayatri", "Faith", "Sold", { year: "c. 2005–2015", size: "48 × 30 in", inches: 48 }),
-  W("priest-with-flame", "The Aarti", "Faith", "Sold", { year: "c. 2005–2015" }),
-  W("sacred-tree", "The Peepal Shrine", "Faith", "Sold", { year: "c. 2005–2015" }),
-  W("newspaper-reader", "The Newspaper Reader", "Faith", "Sold", { year: "c. 2005–2015" }),
-  // Portraits — c. 2005–2015
-  W("elder-woman-portrait", "The Elder Woman", "Portraits", "Available", { year: "c. 2005–2015", size: "30 × 30 in", inches: 30 }),
-  W("red-turban-portrait", "The Red Turban", "Portraits", "Available", { year: "c. 2005–2015", size: "30 × 30 in", inches: 30 }),
-  W("yellow-turban-portrait", "The Yellow Turban", "Portraits", "Available", { year: "c. 2005–2015" }),
-  W("patterned-turban-portrait", "The Lattice Turban", "Portraits", "Available", { year: "c. 2005–2015" }),
-  W("mother-and-child", "Mother and Son", "Portraits", "Available", { year: "c. 2005–2015" }),
-  W("boy-and-kettle", "The Chai Boy", "Portraits", "Sold", { year: "c. 2005–2015" }),
-  W("man-among-metal-pans", "The Kadhai Seller", "Portraits", "Sold", { year: "c. 2005–2015" }),
-  W("three-veiled-women", "Three Women in Red", "Portraits", "Sold", { year: "c. 2005–2015" }),
-  W("milkman-on-bicycle", "The Doodhwala", "Portraits", "Sold", { year: "c. 2005–2015" }),
-  W("riverside-figures", "The Boatmen", "Portraits", "Sold", { year: "c. 2005–2015" }),
-  // Recent work — 2024–, her own titles
-  W("child-among-flowers", "Blooming Innocence", "Recent work", "Available", { year: "2024" }),
-  W("woman-with-poppies", "Woman with Poppies", "Recent work", "Available", { year: "2024" }),
-  // both offered at Sacred Fragments, New Delhi, 18–21 Oct 2026
-  W("temple-bells", "Threads of Faith", "Recent work", "Available", { year: "2026", size: "36 × 30 in", inches: 36 }),
-  W("woman-with-bird", "Whispers of Stillness", "Recent work", "Sold", { year: "2024", size: "24 × 24 in", inches: 24 }),
-  W("woman-with-red-flower", "Petals of Thought", "Recent work", "Enquire",
+  // Faith — 2005 to 2015
+  W("monks-and-blue-buddha", "The Blue Buddha", "Faith", "Available", { year: "2005 to 2015" }),
+  W("monk-and-green-buddha", "Buddha Under the Bodhi Tree", "Faith", "Available", { year: "2005 to 2015" }),
+  W("offering-of-light", "Vakratunda", "Faith", "Sold", { year: "2005 to 2015", size: "48 × 30 in", inches: 48 }),
+  W("prayer-and-scripture", "Gayatri", "Faith", "Sold", { year: "2005 to 2015", size: "48 × 30 in", inches: 48 }),
+  W("priest-with-flame", "The Aarti", "Faith", "Sold", { year: "2005 to 2015" }),
+  W("sacred-tree", "The Peepal Shrine", "Faith", "Sold", { year: "2005 to 2015" }),
+  W("newspaper-reader", "The Newspaper Reader", "Faith", "Sold", { year: "2005 to 2015" }),
+  // Portraits — 2005 to 2015
+  W("elder-woman-portrait", "The Elder Woman", "Portraits", "Available", { year: "2005 to 2015", size: "30 × 30 in", inches: 30 }),
+  W("red-turban-portrait", "The Red Turban", "Portraits", "Available", { year: "2005 to 2015", size: "30 × 30 in", inches: 30 }),
+  W("yellow-turban-portrait", "The Yellow Turban", "Portraits", "Available", { year: "2005 to 2015" }),
+  W("patterned-turban-portrait", "The Lattice Turban", "Portraits", "Available", { year: "2005 to 2015" }),
+  W("mother-and-child", "Mother and Son", "Portraits", "Available", { year: "2005 to 2015" }),
+  W("boy-and-kettle", "The Chai Boy", "Portraits", "Sold", { year: "2005 to 2015" }),
+  W("man-among-metal-pans", "The Kadhai Seller", "Portraits", "Sold", { year: "2005 to 2015" }),
+  W("three-veiled-women", "Three Women in Red", "Portraits", "Sold", { year: "2005 to 2015" }),
+  W("milkman-on-bicycle", "The Doodhwala", "Portraits", "Sold", { year: "2005 to 2015" }),
+  W("riverside-figures", "The Boatmen", "Portraits", "Sold", { year: "2005 to 2015" }),
+  // Onset of Spring — 2024 to 2026, her own titles
+  W("child-among-flowers", "Blooming Innocence", "Onset of Spring", "Available", { year: "2024" }),
+  W("woman-with-poppies", "Woman with Poppies", "Onset of Spring", "Available", { year: "2024" }),
+  // both offered at Sacred Fragments, New Delhi, 18 to 21 Oct 2026
+  W("temple-bells", "Threads of Faith", "Onset of Spring", "Available", { year: "2026", size: "36 × 30 in", inches: 36 }),
+  W("woman-with-bird", "Whispers of Stillness", "Onset of Spring", "Sold", { year: "2024", size: "24 × 24 in", inches: 24 }),
+  W("woman-with-red-flower", "Petals of Thought", "Onset of Spring", "Enquire",
     { year: "2024", size: "24 × 24 in", inches: 24, medium: "Oil and pastel on canvas" }),
-  W("boy-with-bananas", "Under Canopy of Greens", "Recent work", "Available", { year: "2025", size: "36 × 36 in", inches: 36 }),
+  W("boy-with-bananas", "Under Canopy of Greens", "Onset of Spring", "Available", { year: "2025", size: "36 × 36 in", inches: 36 }),
 ];
 
 export const BY_ID = new Map(WORKS.map((w) => [w.id, w]));
 
 export const SERIES: { label: string; note: string }[] = [
-  { label: "Gone Are The Days", note: "c. 2016–2018 · oil on canvas" },
+  { label: "Gone Are The Days", note: "2016 to 2018 · oil on canvas" },
   { label: "Bandh Darwaze", note: "Closed Doors · 2018 · 12 × 12 in each" },
-  { label: "Faith", note: "c. 2005–2015" },
-  { label: "Portraits", note: "c. 2005–2015" },
-  { label: "Recent work", note: "2024– · her own titles" },
+  { label: "Faith", note: "2005 to 2015" },
+  { label: "Portraits", note: "2005 to 2015" },
+  { label: "Onset of Spring", note: "2024 to 2026 · her own titles" },
 ];
 
 /** the featured row, in hanging order; the large files exist for these */
@@ -110,7 +110,7 @@ export const LARGE = new Set([
 /** her exhibition, while it is on: her words as the Threads of Faith chapter gives them, and the
  *  works she is showing there */
 export const SHOW = {
-  line: "Showing at Sacred Fragments: A Journey Home, Visual Arts Gallery, India Habitat Centre, New Delhi, 18–21 October 2026.",
+  line: "Showing at Sacred Fragments: A Journey Home, Visual Arts Gallery, India Habitat Centre, New Delhi, 18 to 21 October 2026.",
   until: "2026-10-21",
   works: ["temple-bells", "boy-with-bananas"],
 };

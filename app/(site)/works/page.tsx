@@ -7,7 +7,7 @@ import { InstagramIcon } from "@/components/site/Icons";
 
 export const metadata: Metadata = {
   title: "Works",
-  description: `All ${WORKS.length} paintings by Dr Dolly Prasad, in five collections: Gone Are The Days, Bandh Darwaze, Faith, Portraits and her recent work.`,
+  description: `All ${WORKS.length} paintings by Dr Dolly Prasad, in five collections: Gone Are The Days, Bandh Darwaze, Faith, Portraits and her spring work.`,
   alternates: { canonical: "/works" },
 };
 
@@ -15,7 +15,7 @@ export const metadata: Metadata = {
 export default function WorksPage() {
   return (
     <div className="wrap">
-      <section className="sec-tight" style={{ paddingBottom: 24 }}>
+      <section className="page-head">
         <h1 className="page-title">Works</h1>
         <p className="lede">All {WORKS.length} paintings, in five collections. Prices on request.</p>
       </section>
