@@ -844,3 +844,6 @@ section.wrap:has(+ .marq) .sec-head{margin-bottom:0}
 .zoom .lb-zoombar span{font-family:var(--sans);font-size:13px;letter-spacing:.04em;color:#F0EADF;text-shadow:0 1px 3px rgba(0,0,0,.45)}
 .zoom .lb-zoombar{right:18px}
 @media (max-width:640px){ .zoom-hint{display:none} .zoom-close{margin-left:auto} }
+
+/* S2 · the enquiry form sends itself; a field only robots fill */
+.hp{position:absolute;left:-9999px;width:1px;height:1px;overflow:hidden}
