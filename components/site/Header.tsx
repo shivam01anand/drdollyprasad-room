@@ -12,6 +12,12 @@ export default function Header() {
   const menu = useRef<HTMLDetailsElement>(null);
   // a phone's menu closes once a page is chosen
   useEffect(() => { if (menu.current) menu.current.open = false; }, [path]);
+  // a tap anywhere outside the open menu closes it
+  useEffect(() => {
+    const close = (e: MouseEvent) => { if (menu.current?.open && !menu.current.contains(e.target as Node)) menu.current.open = false; };
+    document.addEventListener("click", close);
+    return () => document.removeEventListener("click", close);
+  }, []);
   const here = (href: string) => (href === "/" ? path === "/" : path === href || path.startsWith(`${href}/`)) ||
     (href === "/works" && path.startsWith("/work/"));
 
@@ -44,7 +50,7 @@ export default function Header() {
           <div className="menu-panel">
             <Link href="/">Home</Link>
             {links}
-            <a href={INSTAGRAM.url} target="_blank" rel="noopener noreferrer">Instagram {INSTAGRAM.handle}</a>
+            <a href={INSTAGRAM.url} target="_blank" rel="noopener noreferrer">Instagram</a>
             <Link className="btn btn-solid" href="/enquire">Enquire</Link>
           </div>
         </details>

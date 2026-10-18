@@ -6,7 +6,7 @@ import { InstagramIcon } from "@/components/site/Icons";
 import Until from "@/components/Until";
 import HashRedirect from "@/components/site/HashRedirect";
 import {
-  BIO_LINE, BIO_SUB, EMAIL, INSTAGRAM, NOW, PORTRAIT, RECORD_LINE, SERIES_PAGES, SHOWS, SITE, STUDIO_PATH, worksIn,
+  BIO_LINE, BIO_SUB, EMAIL, INSTAGRAM, NOW, PORTRAIT, SERIES_PAGES, SHOWS, SITE, STUDIO_PATH, worksIn,
 } from "@/lib/site";
 import { BY_ID } from "@/lib/works";
 
@@ -44,16 +44,19 @@ export default function Home() {
 
       <Until until={now.until}>
         <Link className="nowstrip" href="/exhibitions">
-          <em>Now showing</em><b>{now.title}</b><span>{now.venue}, {now.city} · {now.when}</span><u>Details →</u>
+          <span className="live"><i aria-hidden="true" />Live now</span><b><span className="nw-long">{now.title}</span><span className="nw-short">{now.title.split(":")[0]}</span></b><span className="nw-where">{now.venue}, {now.city} · {now.when}</span><span className="nw-short nw-when">IHC · 18–21 Oct</span><u>Plan a visit →</u>
         </Link>
       </Until>
 
       <section className="sec wrap">
         <div className="sec-head">
-          <h2>Key collections</h2>
-          <Link className="link" href="/series">All collections and their stories →</Link>
+          <div>
+            <h2>Key collections</h2>
+            <p className="sec-line">Five collections, five walks of life, from a changing India to faith lived every day.</p>
+          </div>
+          <Link className="link" href="/series">All collections →</Link>
         </div>
-        <div className="grid grid-5 series-tiles">
+        <div className="grid grid-5 series-tiles snap-row">
           {SERIES_PAGES.map((s) => (
             <Link key={s.slug} className="card" href={`/series/${s.slug}`}>
               <div className="mat">
@@ -61,7 +64,7 @@ export default function Home() {
                 <img className="framed thin" src={thumb(s.hero)} alt={`${BY_ID.get(s.hero)?.title}, from ${s.label}`} loading="lazy" />
               </div>
               <span className="card-t">{s.label}</span>
-              <span className="eyebrow">{s.period} · {worksIn(s.label).length} works</span>
+              <span className="eyebrow">{worksIn(s.label).length} works <small>{s.period.replace(/^c\. /, "")}</small></span>
               <span className="meta">{s.line}</span>
             </Link>
           ))}
@@ -70,10 +73,13 @@ export default function Home() {
 
       <section className="sec-tight wrap">
         <div className="sec-head">
-          <h2>Available now</h2>
-          <Link className="link" href="/works?status=available">All available works →</Link>
+          <div>
+            <h2>Available now</h2>
+            <p className="sec-line">Original oil paintings, ready for a new home. Prices on request.</p>
+          </div>
+          <Link className="link" href="/works?status=available">All available →</Link>
         </div>
-        <div className="grid">
+        <div className="grid snap-row">
           {AVAILABLE.map((id) => <Card key={id} w={BY_ID.get(id)!} />)}
         </div>
       </section>
@@ -82,11 +88,11 @@ export default function Home() {
         <div className="sec-head">
           <div>
             <h2>On the walls</h2>
-            <p className="meta" style={{ fontSize: 16, marginTop: 8 }}>{RECORD_LINE}.</p>
+            <p className="sec-line">Eighteen exhibitions and art fairs across India, and collectors in India, the USA and London.</p>
           </div>
           <Link className="link" href="/exhibitions">All exhibitions →</Link>
         </div>
-        <div className="shows">
+        <div className="shows snap-row">
           {CARDS.map((c) => {
             const e = SHOWS.find((x) => x.id === c.id)!;
             return (
