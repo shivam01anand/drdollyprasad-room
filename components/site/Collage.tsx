@@ -1,7 +1,7 @@
 import Link from "next/link";
 import { BY_ID, workPath } from "@/lib/works";
 import { LOOK, ON_EXHIBITIONS, ON_THE_WORK, PRESS, PULL, SHOWS, SMALL_PHOTO, labelLine } from "@/lib/site";
-import { dims } from "@/lib/images";
+import { dims, smSet } from "@/lib/images";
 import { thumb } from "./Card";
 
 /**
@@ -125,7 +125,7 @@ function Tile({ it }: { it: Item }) {
     return (
       <Link className="tile xcard" href={it.href} tabIndex={-1}>
         {/* eslint-disable-next-line @next/next/no-img-element */}
-        <img src={it.src} alt={it.alt} decoding="async" {...dims(it.src)} />
+        <img src={it.src} alt={it.alt} decoding="async" {...dims(it.src)} {...smSet(it.src)} />
         <div><em>{it.eyebrow}</em><b>{it.title}</b><small>{it.sub}</small></div>
       </Link>
     );
@@ -138,7 +138,7 @@ function Tile({ it }: { it: Item }) {
     <Link className="tile flip" href={workPath(w.id)} tabIndex={-1}>
       <span className="flipper">
         {/* eslint-disable-next-line @next/next/no-img-element */}
-        <img className="framed" src={thumb(w.id)} alt={w.title} loading="lazy" decoding="async" {...dims(thumb(w.id))} />
+        <img className="framed" src={thumb(w.id)} alt={w.title} loading="lazy" decoding="async" {...dims(thumb(w.id))} {...smSet(thumb(w.id))} />
         <span className="back">
           <em>{w.series}</em>
           <b>{w.title}</b>

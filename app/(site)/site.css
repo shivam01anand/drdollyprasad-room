@@ -1132,7 +1132,8 @@ h1,h2,h3{font-weight:500;letter-spacing:-.005em}
 
 /* ---- motion: pages fade in; sections rise into place the first time they are seen ---- */
 .page-in{animation:page-in .6s var(--ease) backwards}
-@keyframes page-in{from{opacity:0;transform:translateY(8px)}to{opacity:1;transform:none}}
+/* a rise only, no fade from nothing: the painting is visible (and counted as painted) from the first frame */
+@keyframes page-in{from{transform:translateY(8px)}to{transform:none}}
 .js-motion .rv{opacity:0;transform:translateY(22px);transition:opacity .9s ease,transform 1s var(--ease)}
 .js-motion .rv.is-in{opacity:1;transform:none}
 
@@ -1351,4 +1352,13 @@ section.wrap:has(+ .marq) .sec-head{margin-bottom:0}
 @media (pointer:coarse),(max-width:900px){
   .fsel select,.chip,.ftr-links .btn,.btn,.menu-panel .btn{min-height:44px}
   .pager button{min-width:44px;height:44px}
+}
+
+/* release candidate: tap targets the merge brought in, 44 px on a phone without changing how they look */
+@media (pointer:coarse),(max-width:900px){
+  .sband .s-txt h2 a{display:inline-flex;align-items:center;min-height:44px}
+  .density button{width:44px;height:44px}
+  .crumb a{min-width:44px;justify-content:center}
+  .slides-arrow{width:44px}
+  .brand{min-height:44px}
 }
