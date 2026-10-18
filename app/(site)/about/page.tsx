@@ -1,12 +1,13 @@
 import type { Metadata } from "next";
 import Link from "next/link";
 import Roll, { type RollItem } from "@/components/site/Roll";
-import { BIO_LINE, BIO_SUB, LOOK, PULL, ON_THE_WORK, PORTRAIT_LARGE, STATEMENT, STUDIO_PATH, shownYear } from "@/lib/site";
+import ThemeSlider, { type Theme } from "@/components/site/ThemeSlider";
+import { BIO_LINE, LOOK, PULL, ON_THE_WORK, PORTRAIT_LARGE, STUDIO_PATH, shownYear } from "@/lib/site";
 import { BY_ID, workPath } from "@/lib/works";
 
 export const metadata: Metadata = {
   title: "About",
-  description: "Dr Dolly Prasad is a doctor and a painter in New Delhi. Oil on canvas: the everyday, held sacred. Eighteen exhibitions and art fairs, 2005–2018; private collections in India, the USA and London.",
+  description: "Dr Dolly Prasad is a New Delhi artist who makes the everyday memorable: oil paintings of a changing India. Eighteen exhibitions and art fairs; collectors in India, the USA and London.",
   alternates: { canonical: "/about" },
 };
 
@@ -23,15 +24,22 @@ const SHOW_PHOTOS: RollItem[] = [
   { src: "/site/ex/kala-dolly.jpg", title: "First International Kala Mela, 2018", sub: "At the art fair organised by Lalit Kala Akademi.", href: "/exhibitions#kala-mela-2018", framed: false },
 ];
 
-const THREADS = [
+/**
+ * Her line, in the first person, drawn from her poem ("They come to me … I don't
+ * paint"). Written for the site with Shubham; hers to change.
+ */
+const FROM_THE_ARTIST =
+  "Everything I paint was already there: a pot, a door, a face at the turn of a lane. Most people walked past. I stopped, and it stayed with me. A painting is only my way of keeping it.";
+
+const THREADS: Theme[] = [
   { t: "Memory", series: "Gone Are The Days", href: "/series/gone-are-the-days",
-    d: "The tonga, the twenty-paise coin, the clay gullak, the hand-painted film poster. Things leaving the street, kept on canvas.",
+    d: "The tonga and the bullock cart, the twenty-paise coin, the clay gullak, the hand-painted film poster. A country changes fastest in its small things. She paints them as they leave the street, often beside whatever replaced them, so that one canvas holds two times.",
     roll: paint(["bulls-and-wheel", "coins-and-clay-bank", "carriage-and-autorickshaw", "shree-420-and-milk-cans"]) },
   { t: "Devotion", series: "Faith", href: "/series/faith",
-    d: "Faith as habit, not spectacle. A lamp raised to scripture, a peepal wound in red thread, the aarti flame, the morning paper.",
+    d: "Faith here is a habit, not a spectacle. A lamp raised to a wall of scripture, a peepal wound in red thread, the aarti flame, a man opening his morning paper. The gestures last a moment; the paintings let them last.",
     roll: paint(["offering-of-light", "sacred-tree", "monks-and-blue-buddha", "priest-with-flame"]) },
   { t: "The pause", series: "Recent work", href: "/series/recent-work",
-    d: "Faces, flowers and birds, held long enough to be felt. In her words: “Sometimes, I paint not to show, but to pause.”",
+    d: "Her recent work turns inward: a woman beside a bird, a child beneath banana leaves, bells hung with thread. Faces, flowers and birds, held long enough to be felt. In her words: “Sometimes, I paint not to show, but to pause.”",
     roll: paint(["woman-with-bird", "boy-with-bananas", "woman-with-red-flower", "temple-bells"]) },
 ];
 
@@ -48,7 +56,11 @@ export default function About() {
             <p className="eyebrow">About the artist</p>
             <h1>Dr Dolly Prasad</h1>
             <p className="ab-held">{BIO_LINE}</p>
-            <p className="ab-p">{BIO_SUB}</p>
+            <p className="ab-p">A New Delhi artist who makes the everyday memorable. Her oil paintings hold on to an India that is changing fast: the tonga and the gullak, the closed door of an old house, a lamp lifted at aarti, a face at the corner of a lane.</p>
+            <figure className="ab-from">
+              <blockquote>“{FROM_THE_ARTIST}”</blockquote>
+              <figcaption className="eyebrow">From the artist</figcaption>
+            </figure>
             <div className="ab-facts">
               <div><b>18</b><span>exhibitions and art fairs, 2005–2018</span></div>
               <div><b>41</b><span>paintings in five collections</span></div>
@@ -62,9 +74,10 @@ export default function About() {
         <div className="wrap ab-split">
           <div className="ab-txt">
             <p className="eyebrow">Who she is</p>
-            <h2>A doctor who paints</h2>
-            <p className="ab-p">Dr Dolly Prasad is a doctor and a painter in New Delhi. She works in oil on canvas, in five collections.</p>
-            <p className="ab-p">She is as much an artist as a doctor. The play of emotion on the faces around her, and on canvas, has always held her.</p>
+            <h2>An artist of the everyday, and of changing times</h2>
+            <p className="ab-p">She began her working life as a doctor. Medicine kept her close to people: their faces, their waiting, the things they carry without saying. It was that, more than the medicine, that stayed with her, and she soon turned to painting to follow it. She taught herself, in oil on canvas.</p>
+            <p className="ab-p">Her subject became the India around her as it changed. Rickshaws gave way to autos, coins went out of use, old doors were locked and left. She paints these things before they disappear, with the warmth of someone who remembers them: not as relics, but as parts of a life.</p>
+            <p className="ab-p">The nostalgia is never heavy. Her canvases are full of colour, red above all, and full of people: the chai boy between orders, the doodhwala on his round, women in red veils, a child beneath banana leaves.</p>
           </div>
           <Roll label="Faces from her portraits" items={paint(["red-turban-portrait", "three-veiled-women", "boy-and-kettle", "yellow-turban-portrait", "mother-and-child"])} />
         </div>
@@ -73,47 +86,32 @@ export default function About() {
       <section className="ab-band tone-dark">
         <div className="wrap ab-statement">
           <p className="eyebrow">Artist’s statement</p>
-          <h2>She paints what daily life passes by.</h2>
+          <h2>She captures the everyday: its waiting and wishing, its worship and whispers.</h2>
           <p className="ab-p">A clay gullak and the coins it was made to hold. A door nobody opens any more. A lamp raised to a wall of scripture. She gives these ordinary things the scale, the colour and the stillness we usually keep for the sacred.</p>
-          <p className="ab-p">Three threads run through the work.</p>
+          <p className="ab-p">Why these things? Because they are the first a changing country forgets, and they are what made it home. Each painting is a way of saying they mattered. Three threads run through the work.</p>
         </div>
       </section>
 
-      {THREADS.map((t, i) => (
-        <section key={t.t} className={`ab-band ${i % 2 ? "tone-stone" : "tone-light"}`}>
-          <div className={`wrap ab-split${i % 2 ? " flip" : ""}`}>
-            <div className="ab-txt">
-              <p className="eyebrow">{String(i + 1).padStart(2, "0")} · {t.series}</p>
-              <h2>{t.t}</h2>
-              <p className="ab-p">{t.d}</p>
-              <Link className="btn" href={t.href}>The collection: {t.series}</Link>
-            </div>
-            <Roll label={`${t.t}: paintings from ${t.series}`} items={t.roll} />
-          </div>
-        </section>
-      ))}
+      <section className="ab-band tone-stone">
+        <div className="wrap">
+          <ThemeSlider themes={THREADS} />
+        </div>
+      </section>
 
-      <section className="ab-band tone-wall">
+      <section className="ab-band tone-light">
         <div className="wrap ab-split">
           <div className="ab-txt">
             <p className="eyebrow">On the walls, and in the news</p>
             <h2>Eighteen exhibitions and art fairs</h2>
-            <p className="ab-p">Between 2005 and 2018 her paintings hung at India Habitat Centre, the Indian Council for Cultural Relations, Triveni Kala Sangam, Travancore Art Gallery and Nehru Art Gallery in Bombay, and at the First International Kala Mela.</p>
-            <p className="ab-p">Her shows have been covered on television and in the papers, and her paintings are with private collectors in India, the USA and London.</p>
+            <p className="ab-p">Between 2005 and 2018 her paintings hung at India Habitat Centre, the Indian Council for Cultural Relations, Triveni Kala Sangam, Travancore Art Gallery and Nehru Art Gallery in Bombay, and at the First International Kala Mela organised by Lalit Kala Akademi.</p>
+            <p className="ab-p">Her shows have been covered on television and in the papers. Today her paintings are with private collectors across three continents, in India, the USA and London.</p>
             <Link className="btn btn-solid" href="/exhibitions">See the exhibitions</Link>
           </div>
           <Roll label="Her exhibitions" items={SHOW_PHOTOS} shape="wide" />
         </div>
       </section>
 
-      <section className="ab-band tone-rust">
-        <div className="wrap ab-poem">
-          <p className="eyebrow">In her words</p>
-          <p className="poem-lines">{STATEMENT.map((l) => <span key={l}>{l}</span>)}</p>
-        </div>
-      </section>
-
-      <section className="ab-band tone-light">
+      <section className="ab-band tone-wall">
         <div className="wrap ab-close">
           <p className="ab-quote">“{ON_THE_WORK}”</p>
           <p className="eyebrow">Dr Dolly Prasad, on her work</p>

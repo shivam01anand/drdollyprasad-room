@@ -108,8 +108,8 @@ export default function Home() {
           <img className="round" src="/site/ex/kala-dolly.jpg" alt="Dr Dolly Prasad beside one of her paintings" loading="lazy" />
           <div className="txt">
             <p className="eyebrow">About the artist</p>
-            <p className="big">She paints what daily life passes by: a clay gullak, a closed door, a lamp raised to scripture. And she gives it the stillness we keep for prayer.</p>
-            <p className="meta" style={{ fontSize: 16 }}>A doctor and a painter in New Delhi. Eighteen exhibitions and art fairs between 2005 and 2018, from Triveni Kala Sangam and India Habitat Centre to ICCR and the First International Kala Mela. Her paintings are with private collectors in India, the USA and London.</p>
+            <p className="big">An artist who makes the everyday memorable: an India that is changing fast, held in oil on canvas.</p>
+            <p className="meta" style={{ fontSize: 16 }}>She began as a doctor in New Delhi and soon turned to painting. Eighteen exhibitions and art fairs between 2005 and 2018, from Triveni Kala Sangam and India Habitat Centre to ICCR and the First International Kala Mela. Her paintings are with private collectors in India, the USA and London.</p>
             <Link className="link" href="/about">Her story →</Link>
           </div>
         </div>
