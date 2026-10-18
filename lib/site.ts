@@ -283,7 +283,10 @@ export type Clip = { src: string; poster: string; title: string; line: string };
 
 export type Show = {
   id: string;
+  /** one pattern for every show: the place (or the fair's own name) */
   title: string;
+  /** the show's own title, where it had one */
+  name?: string;
   kind: string;
   venue: string;
   city: string;
@@ -311,7 +314,7 @@ export const NOW = {
 
 export const SHOWS: Show[] = [
   {
-    id: "india-habitat-centre-2010", title: "An evening at India Habitat Centre", kind: "Exhibition",
+    id: "india-habitat-centre-2010", title: "India Habitat Centre", kind: "Exhibition",
     venue: "Open Palm Court, India Habitat Centre", city: "New Delhi", when: "November 2010", year: "2010",
     lede: "A lamp lit at the opening. The Bullocks, the gullak and the rickshaw-walas on red-brick walls. Visitors stopping to talk, to look, to take a photograph. And the press, with their questions, beside the paintings.",
     works: ["bulls-and-wheel", "coins-and-clay-bank", "monks-and-blue-buddha"],
@@ -342,7 +345,7 @@ export const SHOWS: Show[] = [
     ],
   },
   {
-    id: "a-lifetime-to-paint", title: "A Lifetime to Paint", kind: "Exhibition, presented by the Indian Council for Cultural Relations",
+    id: "a-lifetime-to-paint", title: "ICCR", name: "A Lifetime to Paint", kind: "Exhibition, presented by the Indian Council for Cultural Relations",
     venue: "Azad Bhavan Art Gallery, ICCR, I.P. Estate", city: "New Delhi", when: "Opened 11 June 2010 · on view 12 to 16 June", year: "2010",
     lede: "She spoke at the opening beside a marigold-decked lamp, The Blue Buddha behind her. The title looks past the walls, to the paintings still to come.",
     quote: "I hope it would be a life-long unraveling with these tinges, an affair to last a lifetime…",
@@ -370,7 +373,7 @@ export const SHOWS: Show[] = [
     ],
   },
   {
-    id: "triveni-2007", title: "Recent paintings, with Sangeeta Sharma", kind: "Two-artist exhibition",
+    id: "triveni-2007", title: "Triveni Kala Sangam", name: "Recent paintings, with Sangeeta Sharma", kind: "Two-artist exhibition",
     venue: "Triveni Kala Sangam, Mandi House", city: "New Delhi", when: "10 to 20 May 2007", year: "2007",
     lede: "The invitation keeps what no photograph did: two names, ten days in May, and the paintings chosen to introduce them, among them Lajja, Intezar and Mannat.",
     albums: [

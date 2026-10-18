@@ -1,5 +1,6 @@
 import type { Metadata } from "next";
 import Link from "next/link";
+import TitleBand from "@/components/site/TitleBand";
 import Card, { thumb } from "@/components/site/Card";
 import { ON_THE_WORK, SERIES_PAGES, SMALL_PHOTO, worksIn } from "@/lib/site";
 import { BY_ID } from "@/lib/works";
@@ -16,10 +17,11 @@ export const metadata: Metadata = {
 export default function SeriesIndex() {
   return (
     <>
-      <section className="wrap page-head">
-        <h1 className="page-title">Collections</h1>
-        <p className="lede">Five collections, five walks of life. The things India is quietly leaving behind. The closed doors of old houses. Faith, as it is lived every day. The faces of working lives. And her spring work, among flowers, leaves and birds.</p>
-      </section>
+      <div className="wrap">
+        <TitleBand title="Collections" ids={SERIES_PAGES.flatMap((x) => worksIn(x.label).filter((w) => !SMALL_PHOTO.has(w.id)).slice(0, 2).map((w) => w.id))}>
+          <p>Five collections, five walks of life: the India that is quietly leaving, closed doors, faith lived every day, working lives, and her spring work.</p>
+        </TitleBand>
+      </div>
 
       <section className="wrap" style={{ paddingBottom: 8 }}>
         <div className="big-tiles">

@@ -847,3 +847,44 @@ section.wrap:has(+ .marq) .sec-head{margin-bottom:0}
 
 /* S2 · the enquiry form sends itself; a field only robots fill */
 .hp{position:absolute;left:-9999px;width:1px;height:1px;overflow:hidden}
+
+/* S5 · Works, Collections, Exhibitions open on a low running band of paintings,
+   softly blurred, with the title card on it */
+.tband{position:relative;height:clamp(200px,24vw,260px);overflow:hidden;background:var(--wall);display:flex;align-items:center;justify-content:center;margin-bottom:clamp(16px,2vw,24px)}
+.tband-row{position:absolute;inset:0;display:flex;align-items:center;filter:blur(2.5px) saturate(1.05);opacity:.9}
+.tband-track{display:flex;gap:18px;width:max-content;padding-inline:9px;animation:tband 90s linear infinite;will-change:transform}
+.tband-track img{height:clamp(150px,18vw,200px);width:auto}
+@keyframes tband{from{transform:translateX(0)}to{transform:translateX(-50%)}}
+.tband-card{position:relative;z-index:1;background:var(--bg);box-shadow:var(--lift-s);padding:clamp(16px,2vw,24px) clamp(20px,3vw,40px);
+  max-width:min(760px,calc(100% - 32px));display:flex;flex-direction:column;align-items:center;gap:8px;text-align:center}
+.tband-card .page-title{font-size:clamp(40px,5vw,64px);line-height:1}
+.tband-card p{font-size:clamp(15px,1.2vw,17px);color:var(--muted);max-width:620px}
+.tband-card p b{color:var(--ink);font-weight:500}
+@media (prefers-reduced-motion:reduce){ .tband-track{animation:none} }
+@media (max-width:640px){
+  .tband{height:200px;margin-inline:calc(-1 * var(--gut))}
+  .tband-track img{height:140px}
+  .tband-card{padding:14px 16px}
+}
+
+/* S6 · Exhibitions gets to the shows: one slim Now showing line, small tabs, one name pattern */
+.now-line{display:flex;flex-wrap:wrap;align-items:center;gap:6px 16px;padding:10px 14px;border:1px solid var(--line);border-left:3px solid var(--rust);margin-bottom:14px}
+.now-line .live{display:inline-flex;align-items:center;gap:7px;color:var(--rust);font-size:13px;font-weight:500;letter-spacing:.12em;text-transform:uppercase}
+.now-line .live i{width:7px;height:7px;border-radius:50%;background:var(--rust);animation:live 1.6s ease-in-out infinite}
+.now-line b{font-family:var(--serif);font-size:24px;font-weight:600;line-height:1.1}
+.now-line>span:not(.live):not(.now-works){font-size:15px;color:var(--muted)}
+.now-works{display:flex;gap:10px;margin-left:auto}
+.now-works img{height:56px;width:auto}
+@media (prefers-reduced-motion:reduce){ .now-line .live i{animation:none} }
+@media (max-width:640px){ .now-works{margin-left:0} .now-line b{font-size:21px} }
+.ex-jump{margin:0 0 8px}
+.ex-kind{font-size:13px;color:var(--rust);letter-spacing:.04em}
+.ex-where i{font-family:var(--serif);font-size:19px;color:var(--ink)}
+.slides-tabs{gap:4px 18px;border-bottom:1px solid var(--line)}
+.slides-tabs button{border:0;border-bottom:2px solid transparent;padding:10px 0 8px;min-height:44px;font-size:15px;background:transparent;color:var(--muted)}
+.slides-tabs button[aria-selected="true"]{background:transparent;border-color:var(--ink);color:var(--ink)}
+.slides-tabs button[aria-selected="true"] span{color:var(--soft)}
+.slides-tabs button span{font-size:13px}
+
+/* S7 · carousel edges crisp: no fade or blur at the ends of any moving row (B2) */
+.marq,.ig-roll{-webkit-mask-image:none;mask-image:none}

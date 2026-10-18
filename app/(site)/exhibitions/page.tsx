@@ -2,6 +2,7 @@ import type { Metadata } from "next";
 import Link from "next/link";
 import Until from "@/components/Until";
 import Slideshow from "@/components/site/Slideshow";
+import TitleBand from "@/components/site/TitleBand";
 import { NOW, PRESS, RECORD, RECORD_LINE, SHOWS } from "@/lib/site";
 import { BY_ID, WORKS, workPath } from "@/lib/works";
 import { dims } from "@/lib/images";
@@ -13,56 +14,41 @@ export const metadata: Metadata = {
 };
 
 const years = [...new Set(RECORD.map((r) => r.year))];
+const BAND = ["monks-and-blue-buddha", "bulls-and-wheel", "rickshaw-rest-framed", "coins-and-clay-bank", "temple-bells", "rickshaw-puller-and-coin", "boy-with-bananas", "mother-india-and-kettles"];
 
 export default function Exhibitions() {
   return (
     <div className="wrap">
-      <section className="page-head">
-        <h1 className="page-title">Exhibitions</h1>
-        <p className="lede">Eighteen shows across galleries and art fairs, from Delhi to Bombay. Her paintings have hung at India Habitat Centre, the Indian Council for Cultural Relations, Triveni Kala Sangam, Travancore Art Gallery and Nehru Art Gallery in Bombay, and at the First International Kala Mela organised by Lalit Kala Akademi. Her shows have been covered on television and in the papers.</p>
-      </section>
+      <TitleBand title="Exhibitions" ids={BAND}>
+        <p><b>{RECORD_LINE}</b>, in Delhi, Gurgaon, Jaipur and Bombay. Her paintings are with private collectors in India, the USA and the UK.</p>
+      </TitleBand>
 
       <Until until={NOW.until}>
-        <section id={NOW.id} style={{ paddingBottom: 28 }}>
-          <div className="now-box">
-            <div className="txt">
-              <span className="eyebrow" style={{ color: "inherit" }}>Now showing</span>
-              <h2>{NOW.title}</h2>
-              <p><b>{NOW.when}</b></p>
-              <p>{NOW.address}</p>
-              <p>{NOW.line}</p>
-            </div>
-            <div className="imgs">
-              {NOW.works.map((id) => (
-                <Link key={id} href={workPath(id)} aria-label={BY_ID.get(id)?.title}>
-                  {/* eslint-disable-next-line @next/next/no-img-element */}
-                  <img src={`/site/thumbs/${id}.jpg`} alt={BY_ID.get(id)?.title ?? ""} {...dims(`/site/thumbs/${id}.jpg`)} />
-                </Link>
-              ))}
-            </div>
-          </div>
+        <section id={NOW.id} className="now-line" aria-label="Now showing">
+          <span className="live"><i aria-hidden="true" />Now showing</span>
+          <b>{NOW.title}</b>
+          <span>{NOW.address} · {NOW.when}</span>
+          <span className="now-works">{NOW.works.map((id) => (
+            <Link key={id} href={workPath(id)}>
+              {/* eslint-disable-next-line @next/next/no-img-element */}
+              <img className="framed thin" src={`/site/thumbs/sm/${id}.jpg`} alt={BY_ID.get(id)?.title ?? ""} {...dims(`/site/thumbs/sm/${id}.jpg`)} />
+            </Link>
+          ))}</span>
         </section>
       </Until>
 
-      <section className="ex-head">
-        <div className="ex-facts">
-          <div><b>18</b><span>exhibitions and art fairs, 2005 to 2018</span></div>
-          <div><b>4</b><span>cities: Delhi, Gurgaon, Jaipur and Bombay</span></div>
-          <div><b>3</b><span>continents, with private collectors in India, the USA and the UK</span></div>
-        </div>
-        <nav className="ex-jump" aria-label="On this page">
-          {SHOWS.map((s) => <a key={s.id} href={`#${s.id}`}>{s.title.replace(/^An evening at /, "")} <span>{s.year}</span></a>)}
-          <a href="#on-screen">In the news</a>
-          <a href="#record">The record</a>
-        </nav>
-      </section>
+      <nav className="ex-jump" aria-label="On this page">
+        {SHOWS.map((s) => <a key={s.id} href={`#${s.id}`}>{s.title} <span>{s.year}</span></a>)}
+        <a href="#on-screen">In the news</a>
+        <a href="#record">The record</a>
+      </nav>
 
       {SHOWS.map((s, k) => (
         <section key={s.id} id={s.id} className={`ex-show${k % 2 ? " flip" : ""}`}>
           <div className="ex-txt">
-            <span className="eyebrow rust">{s.kind}</span>
+            <p className="ex-kind">{s.kind} · {s.when}</p>
             <h2>{s.title}</h2>
-            <p className="ex-where">{s.venue}, {s.city}<br /><b>{s.when}</b></p>
+            <p className="ex-where">{s.name && <><i>{s.name}</i><br /></>}{s.venue}, {s.city}</p>
             <p className="ex-lede">{s.lede}</p>
             {s.quote && (
               <figure className="ex-quote">

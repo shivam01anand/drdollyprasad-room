@@ -1,5 +1,6 @@
 import type { Metadata } from "next";
 import Link from "next/link";
+import TitleBand from "@/components/site/TitleBand";
 import WorksBrowser from "@/components/site/WorksBrowser";
 import { INSTAGRAM } from "@/lib/site";
 import { WORKS } from "@/lib/works";
@@ -11,14 +12,15 @@ export const metadata: Metadata = {
   alternates: { canonical: "/works" },
 };
 
+const BAND = ["bulls-and-wheel", "temple-bells", "red-turban-portrait", "offering-of-light", "weathered-door-ring", "boy-with-bananas", "postbox-and-stamps", "three-veiled-women", "woman-with-bird", "coins-and-clay-bank"];
+
 /** the works page opens on the paintings themselves: a title, one line, then the grid */
 export default function WorksPage() {
   return (
     <div className="wrap">
-      <section className="page-head">
-        <h1 className="page-title">Works</h1>
-        <p className="lede">All {WORKS.length} paintings, in five collections. Prices on request.</p>
-      </section>
+      <TitleBand title="Works" ids={BAND}>
+        <p>All {WORKS.length} paintings, in five collections. Prices on request.</p>
+      </TitleBand>
       <section id="all" style={{ scrollMarginTop: 110 }}>
         <WorksBrowser />
       </section>

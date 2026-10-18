@@ -102,7 +102,7 @@ export default function Home() {
               {/* eslint-disable-next-line @next/next/no-img-element */}
               <img className="framed" src={c.src} alt={c.alt} loading="lazy" {...dims(c.src)} />
               <span className="meta">{e.when.replace(/^Opened 11 /, "").replace(/ · on view.*$/, "")}</span>
-              <b>{e.title}</b>
+              <b>{e.name ?? e.title}</b>
               <span className="meta">{e.venue}, {e.city}</span>
             </Link>
           );
