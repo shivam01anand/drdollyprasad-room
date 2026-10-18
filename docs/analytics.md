@@ -7,9 +7,18 @@ It currently writes into the existing US PostHog project **317586**. No personal
 API key is included in the frontend or committed to Git.
 
 Every event carries `app_name: drdollyprasad`, its `analytics_environment`
-(`production`, `preview` or `local`), and `is_test`. Use all three filters in
-[the prepared analytics views](analytics-views.md). Those links open unsaved
-queries, rather than claiming a saved dashboard already exists.
+(`production`, `preview` or `local`), and `is_test`. The saved
+[Dr Dolly Prasad — Visitor journeys dashboard](https://us.posthog.com/project/317586/dashboard/2226674)
+contains all 14 validated views, with all three filters persisted on the dashboard
+and inside every insight. Book2Kindle, preview and marked test traffic are excluded.
+The default range is the last 30 days in the project's UTC timezone; the three SQL
+tables always use a rolling 30-day window, independent of dashboard date changes.
+[Prepared analytics views](analytics-views.md) remain available as unsaved query links.
+
+All 14 saved dashboard tiles were executed successfully through the authenticated
+PostHog connection on 18 October 2026 (UTC). At validation there were two production
+visitor sessions and seven painting-view events. `enquiry_started` and
+`enquiry_handoff` had not yet appeared; their funnel steps correctly returned zero.
 
 ## What to investigate
 
@@ -109,3 +118,38 @@ The SDK is a separate asynchronous chunk, initiated after hydration. Explicit
 events replace broad DOM autocapture, scroll work is throttled and the studio
 does not add analytics to its rendering loop. Replays load through the SDK's
 existing remote recording configuration.
+
+## Private website dashboard
+
+`/analytics` renders the same 14 reviewed views inside the website, with overview
+counts, 7/30/90-day ranges, refresh and per-view retry. Every request retains the
+Dolly production/non-test scope. The page is absent from public navigation and the
+sitemap, has `noindex` headers and metadata, and is disallowed in robots.txt.
+Authentication protects the data; search indexing controls are additional privacy.
+The page itself is excluded from visitor event capture and session replay.
+
+Before deploying, configure these **server-only** Vercel variables for Preview
+and Production, then redeploy:
+
+- `ANALYTICS_ADMIN_PASSWORD`: a randomly generated password of at least 20
+  characters, shared privately with the admins. Do not use a `NEXT_PUBLIC_` name.
+- `POSTHOG_PERSONAL_API_KEY`: a `phx_…` key restricted to project **317586** with
+  query-read permission. The browser capture token cannot read analytics.
+
+Admins sign in at `/analytics`. Sessions last eight hours, use an HttpOnly,
+SameSite=Strict cookie (Secure on HTTPS), and become invalid immediately when the
+password changes. Rotate the password by updating the environment and redeploying.
+If either secret is missing, the page fails closed or displays a connection setup
+message. Never put either secret in Git, browser code, a public dashboard share,
+or a URL.
+
+Queries run on the server against a fixed project and an allowlist of view IDs;
+the browser cannot submit SQL or change the production scope. Responses are not
+cached by the browser or CDN. The website's range selector applies to every view,
+including SQL tables. Small or zero counts, especially for enquiry handoffs, are
+valid observations and do not imply a tracking failure.
+
+`node scripts/check-analytics-admin.cjs` checks authentication, expiry/password
+rotation, query scoping, date ranges, input validation and upstream failures
+without using real credentials. Existing analytics and motion checks plus the
+production build still apply.

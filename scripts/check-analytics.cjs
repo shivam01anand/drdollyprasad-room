@@ -33,11 +33,13 @@ const captures = [];
 let config;
 let superProperties = {};
 const recordingOverrides = [];
+let recordingStops = 0;
 let sessionListener;
 const sdk = {
   onSessionId(listener) { sessionListener = listener; listener('test-session', 'test-window'); return () => {}; },
   has_opted_out_capturing() { return false; },
   startSessionRecording(override) { recordingOverrides.push(override); },
+  stopSessionRecording() { recordingStops++; },
   register(props) { superProperties = { ...superProperties, ...props }; },
   capture(event, properties, options) {
     const result = config.before_send({ event, properties: { ...superProperties, ...properties } });
@@ -184,16 +186,24 @@ const click = async (el) => act(async () => { el.dispatchEvent(new MouseEvent('c
   sdk.capture = originalCapture;
 
   for (const view of require('./posthog-insights.cjs')) {
-    if (view.query.kind === 'DataTableNode') {
+    if (view.query.source.kind === 'HogQLQuery') {
       assert.ok(view.query.source.query.includes("properties.app_name = 'drdollyprasad'"));
       assert.ok(view.query.source.query.includes('properties.is_test = false'));
     } else {
       const filters = view.query.source.properties;
       assert.deepEqual(filters.find((p) => p.key === 'app_name').value, ['drdollyprasad']);
       assert.deepEqual(filters.find((p) => p.key === 'analytics_environment').value, ['production']);
-      assert.deepEqual(filters.find((p) => p.key === 'is_test').value, [false]);
+      assert.deepEqual(filters.find((p) => p.key === 'is_test').value.map(String), ['false']);
     }
   }
+  pathname = '/analytics';
+  history.replaceState({}, '', '/analytics');
+  await act(async () => { view.render(React.createElement(Analytics)); });
+  assert.ok(recordingStops > 0, 'Entering private analytics must stop session recording');
+  const privateCount = captures.length;
+  analytics.track('$pageview');
+  assert.equal(captures.length, privateCount, 'Admin visits must never enter visitor analytics');
+  assert.equal(config.before_send({ event: '$snapshot', properties: {} }), null, 'Drop automatic SDK events and replay on admin pages');
   await act(async () => view.unmount());
   const before = captures.length;
   document.body.dispatchEvent(new MouseEvent('click', { bubbles: true }));

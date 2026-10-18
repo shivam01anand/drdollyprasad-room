@@ -6,6 +6,12 @@ type Pending = { event: string; properties: Properties; timestamp: Date };
 
 let client: Pick<PostHog, "capture"> | undefined;
 let starting: Promise<void> | undefined;
+let recordingClient: Pick<PostHog, 'startSessionRecording' | 'stopSessionRecording' | 'has_opted_out_capturing'> | undefined;
+const privatePage = () => typeof location !== "undefined" && (location.pathname === "/analytics" || location.pathname.startsWith("/analytics/"));
+export function suspendAnalytics() {
+  pending.length = 0;
+  recordingClient?.stopSessionRecording();
+}
 const pending: Pending[] = [];
 const KEY = process.env.NEXT_PUBLIC_POSTHOG_KEY;
 const SAFE_QUERY = new Set(["work", "series", "status", "size", "utm_source", "utm_medium", "utm_campaign", "utm_content", "utm_term"]);
@@ -42,7 +48,7 @@ function isTestSession() {
 
 /** Small synchronous entry point: the larger SDK loads separately after hydration. */
 export function track(event: string, properties: Properties = {}) {
-  if (typeof window === "undefined" || !KEY) return;
+  if (typeof window === "undefined" || !KEY || privatePage()) return;
   const item: Pending = {
     event,
     timestamp: new Date(),
@@ -63,9 +69,13 @@ export function track(event: string, properties: Properties = {}) {
 }
 
 export function initAnalytics() {
-  if (typeof window === "undefined" || !KEY) return Promise.resolve();
-  if (starting) return starting;
+  if (typeof window === "undefined" || !KEY || privatePage()) return Promise.resolve();
+  if (starting) {
+    if (recordingClient && !recordingClient.has_opted_out_capturing()) recordingClient.startSessionRecording({ url_trigger: true });
+    return starting;
+  }
   starting = import("posthog-js").then(({ default: posthog }) => {
+    if (privatePage()) { starting = undefined; return; }
     posthog.init(KEY, {
       api_host: process.env.NEXT_PUBLIC_POSTHOG_HOST || "https://us.i.posthog.com",
       ui_host: process.env.NEXT_PUBLIC_POSTHOG_UI_HOST || "https://us.posthog.com",
@@ -94,6 +104,7 @@ export function initAnalytics() {
         streamNetworkBody: false,
       },
       before_send: (event) => {
+        if (privatePage()) return null;
         const clean = (props: Record<string, unknown> | undefined) => {
           if (!props) return;
           for (const key of ["$current_url", "$referrer", "$initial_current_url", "$initial_referrer", "$session_entry_url", "$session_entry_referrer"]) {
@@ -106,6 +117,7 @@ export function initAnalytics() {
         return event;
       },
       loaded: (sdk) => {
+        recordingClient = sdk;
         sdk.register({
           app_name: "drdollyprasad",
           analytics_environment: analyticsEnvironment(location.hostname),
@@ -118,7 +130,7 @@ export function initAnalytics() {
         sdk.onSessionId((sessionId) => {
           if (sessionId === recordingSession) return;
           recordingSession = sessionId;
-          if (!sdk.has_opted_out_capturing()) sdk.startSessionRecording({ url_trigger: true });
+          if (!privatePage() && !sdk.has_opted_out_capturing()) sdk.startSessionRecording({ url_trigger: true });
         });
         for (const item of pending.splice(0)) sdk.capture(item.event, item.properties, { timestamp: item.timestamp });
       },
