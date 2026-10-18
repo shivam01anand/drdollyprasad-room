@@ -22,7 +22,7 @@ export const STUDIO_PATH = "/studio";
 
 export const NAV = [
   { href: "/works", label: "Works" },
-  { href: "/series", label: "Series" },
+  { href: "/series", label: "Collections" },
   { href: "/exhibitions", label: "Exhibitions" },
   { href: "/about", label: "About" },
   { href: STUDIO_PATH, label: "Studio" },
@@ -247,7 +247,7 @@ export const SMALL_PHOTO = new Set(["elder-woman-portrait", "horse-cart-and-auto
 
 /** the status line a card shows */
 export const statusText = (w: Work) =>
-  w.status === "Sold" ? "Sold" : w.status === "Enquire" ? "On enquiry" : "Available · Price on request";
+  w.status === "Sold" ? "In a private collection" : w.status === "Enquire" ? "On enquiry" : "Available · Price on request";
 
 /** the label line: medium · size · year */
 export const labelLine = (w: Work) => [w.medium, w.size, shownYear(w)].filter(Boolean).join(" · ");

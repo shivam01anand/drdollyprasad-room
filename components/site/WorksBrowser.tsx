@@ -50,15 +50,15 @@ export default function WorksBrowser() {
     <>
       <div className="filters" role="group" aria-label="Filter the works">
         <div className="frow">
-          <span>Series</span>
+          <span>Collection</span>
           {chip(series === "all", "All", () => setSeries("all"))}
           {SERIES_PAGES.map((s) => chip(series === s.slug, `${s.label} · ${n((w) => w.series === s.label)}`, () => setSeries(s.slug)))}
         </div>
         <div className="frow">
           <span>Status</span>
           {chip(status === "all", "All", () => setStatus("all"))}
-          {chip(status === "available", `Available · ${n(isFree)}`, () => setStatus("available"))}
-          {chip(status === "sold", `Sold · ${n((w) => !isFree(w))}`, () => setStatus("sold"))}
+          {chip(status === "available", "Available", () => setStatus("available"))}
+          {chip(status === "sold", "In private collections", () => setStatus("sold"))}
         </div>
         <div className="frow">
           <span>Size</span>

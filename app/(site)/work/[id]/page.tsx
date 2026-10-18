@@ -84,7 +84,7 @@ export default async function WorkPage({ params }: Props) {
     ["Medium", w.medium],
     ["Size", w.size ? `${w.size}${cm}` : "On request"],
     ["Year", shownYear(w) ?? "On request"],
-    ["Series", <Link key="s" href={seriesPath(w.series)}>{w.series}</Link>],
+    ["Collection", <Link key="s" href={seriesPath(w.series)}>{w.series}</Link>],
     ["Status", statusWord(w)],
   ];
 
@@ -112,7 +112,7 @@ export default async function WorkPage({ params }: Props) {
         <div className="wp-main">
           <div className="wp-head">
             <h1>{w.title}</h1>
-            <p className="meta">{labelLine(w)} · From the series <Link href={seriesPath(w.series)}>{w.series}</Link></p>
+            <p className="meta">{labelLine(w)} · From the collection <Link href={seriesPath(w.series)}>{w.series}</Link></p>
             {lead && <p className={`wp-lead${words ? " hers" : ""}`}>{words ? `“${lead}”` : lead}{words && <span>Dr Dolly Prasad</span>}</p>}
           </div>
           <Viewer w={w} src={src} thumb={`/site/thumbs/${id}.jpg`} dims={d ? { w: d.w, h: d.h } : undefined}
@@ -125,7 +125,7 @@ export default async function WorkPage({ params }: Props) {
             <span>{w.medium}</span>
             {w.size && <span>{w.size}{cm}</span>}
             {w.year && <span>{shownYear(w)}</span>}
-            <span>From the series <Link href={seriesPath(w.series)}>{w.series} →</Link></span>
+            <span>From the collection <Link href={seriesPath(w.series)}>{w.series} →</Link></span>
           </div>
           <div className="side-status">
             <span className={`status${sold ? " is-sold" : w.status === "Enquire" ? " is-enquire" : ""}`}>{statusWord(w)}</span>
@@ -152,7 +152,7 @@ export default async function WorkPage({ params }: Props) {
         <section className="sec-tight">
           <div className="sec-head">
             <h2>More from {w.series}</h2>
-            <Link className="link" href={seriesPath(w.series)}>The series story →</Link>
+            <Link className="link" href={seriesPath(w.series)}>The collection’s story →</Link>
           </div>
           <div className="grid">{more.map((x) => <Card key={x.id} w={x} />)}</div>
         </section>

@@ -51,8 +51,8 @@ export default function About() {
             <p className="ab-p">{BIO_SUB}</p>
             <div className="ab-facts">
               <div><b>18</b><span>exhibitions and art fairs, 2005–2018</span></div>
-              <div><b>41</b><span>paintings in five series</span></div>
-              <div><b>3</b><span>continents: collections in India, the USA and London</span></div>
+              <div><b>41</b><span>paintings in five collections</span></div>
+              <div><b>3</b><span>continents, with private collectors in India, the USA and London</span></div>
             </div>
           </div>
         </div>
@@ -63,7 +63,7 @@ export default function About() {
           <div className="ab-txt">
             <p className="eyebrow">Who she is</p>
             <h2>A doctor who paints</h2>
-            <p className="ab-p">Dr Dolly Prasad is a doctor and a painter in New Delhi. She works in oil on canvas, in series.</p>
+            <p className="ab-p">Dr Dolly Prasad is a doctor and a painter in New Delhi. She works in oil on canvas, in five collections.</p>
             <p className="ab-p">She is as much an artist as a doctor. The play of emotion on the faces around her, and on canvas, has always held her.</p>
           </div>
           <Roll label="Faces from her portraits" items={paint(["red-turban-portrait", "three-veiled-women", "boy-and-kettle", "yellow-turban-portrait", "mother-and-child"])} />
@@ -86,7 +86,7 @@ export default function About() {
               <p className="eyebrow">{String(i + 1).padStart(2, "0")} · {t.series}</p>
               <h2>{t.t}</h2>
               <p className="ab-p">{t.d}</p>
-              <Link className="btn" href={t.href}>The series: {t.series}</Link>
+              <Link className="btn" href={t.href}>The collection: {t.series}</Link>
             </div>
             <Roll label={`${t.t}: paintings from ${t.series}`} items={t.roll} />
           </div>
@@ -99,7 +99,7 @@ export default function About() {
             <p className="eyebrow">On the walls, and in the news</p>
             <h2>Eighteen exhibitions and art fairs</h2>
             <p className="ab-p">Between 2005 and 2018 her paintings hung at India Habitat Centre, the Indian Council for Cultural Relations, Triveni Kala Sangam, Travancore Art Gallery and Nehru Art Gallery in Bombay, and at the First International Kala Mela.</p>
-            <p className="ab-p">Her shows have been covered on television and in the papers, and her work is held by private collectors in India, the USA and London.</p>
+            <p className="ab-p">Her shows have been covered on television and in the papers, and her paintings are with private collectors in India, the USA and London.</p>
             <Link className="btn btn-solid" href="/exhibitions">See the exhibitions</Link>
           </div>
           <Roll label="Her exhibitions" items={SHOW_PHOTOS} shape="wide" />

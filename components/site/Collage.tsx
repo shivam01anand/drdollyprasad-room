@@ -30,7 +30,7 @@ const N = (slug: string, tone: "rust" | "dark" | "stone"): Item => {
 };
 
 const EIGHTEEN = S("18", "Exhibitions and art fairs", "2005–2018 · Delhi, Jaipur, Bombay");
-const WORLD = S("3", "Continents", "Private collections in India, the USA and London");
+const WORLD = S("3", "Continents", "With private collectors in India, the USA and London");
 
 export const HOME: Item[][] = [
   [P("bulls-and-wheel"), C("temple-bells"), P("red-turban-portrait"),
@@ -92,7 +92,7 @@ function Tile({ it }: { it: Item }) {
   if (it.k === "n") {
     return (
       <Link className={`tile ncard ${it.tone}`} href={it.href} tabIndex={-1}>
-        <em>Series</em><b>{it.title}</b><small>{it.sub}</small>
+        <em>Collection</em><b>{it.title}</b><small>{it.sub}</small>
       </Link>
     );
   }

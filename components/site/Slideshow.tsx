@@ -61,6 +61,10 @@ export default function Slideshow({ albums, label }: { albums: Album[]; label: s
 
       <div className="slides-stage">
         {album.photos.map((p, k) => (
+          <span key={`bg-${p.src}`} className={`slides-bg${k === i ? " on" : ""}`} aria-hidden="true"
+                style={{ backgroundImage: k === i || k === (i + 1) % n ? `url("${p.src}")` : undefined }} />
+        ))}
+        {album.photos.map((p, k) => (
           // eslint-disable-next-line @next/next/no-img-element
           <img key={p.src} src={p.src} alt={k === i ? p.alt : ""} aria-hidden={k !== i}
                className={k === i ? "on" : undefined} loading={k === 0 ? "eager" : "lazy"} decoding="async" />

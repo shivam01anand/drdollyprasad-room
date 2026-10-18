@@ -17,7 +17,7 @@ export async function generateMetadata({ params }: Props): Promise<Metadata> {
   if (!s) return {};
   return {
     title: s.label,
-    description: `${s.label}, a series by Dr Dolly Prasad (${s.period}). ${s.line}`,
+    description: `${s.label}, a collection by Dr Dolly Prasad (${s.period}). ${s.line}`,
     alternates: { canonical: `/series/${s.slug}` },
     openGraph: { images: [{ url: `/og/${s.hero}.jpg`, width: 1200, height: 630 }] },
   };
@@ -95,7 +95,7 @@ export default async function SeriesStory({ params }: Props) {
   return (
     <>
       <section className="story-head wrap">
-        <p className="eyebrow">Series {at + 1} of {SERIES_PAGES.length} · {s.period} · {works.length} works</p>
+        <p className="eyebrow">Collection {at + 1} of {SERIES_PAGES.length} · {s.period} · {works.length} works</p>
         <h1>{s.label}</h1>
         <p className="lede">{s.line}</p>
       </section>
@@ -111,7 +111,7 @@ export default async function SeriesStory({ params }: Props) {
       {s.quote && (
         <section className="story-quote wrap">
           <p className="quote">“{s.quote}”</p>
-          <p className="eyebrow" style={{ marginTop: 18 }}>Dr Dolly Prasad, on the series</p>
+          <p className="eyebrow" style={{ marginTop: 18 }}>Dr Dolly Prasad, on the collection</p>
         </section>
       )}
 
@@ -132,7 +132,7 @@ export default async function SeriesStory({ params }: Props) {
       )}
 
       <section className="sec-tight wrap">
-        <div className="sec-head"><h2>The works in this series</h2><Link className="link" href={`/works?series=${s.slug}`}>Filter in all works →</Link></div>
+        <div className="sec-head"><h2>The paintings in this collection</h2><Link className="link" href={`/works?series=${s.slug}`}>Filter in all works →</Link></div>
         <div className="grid grid-5">{works.map((w) => <Card key={w.id} w={w} label={false} />)}</div>
       </section>
 
@@ -140,14 +140,14 @@ export default async function SeriesStory({ params }: Props) {
         <div className="next-series">
           <div className="ask">
             <b>Interested in a work from {s.label}?</b>
-            <p className="meta">Prices on request. Ask about any painting in the series.</p>
+            <p className="meta">Prices on request. Ask about any painting in the collection.</p>
             <div style={{ display: "flex", gap: 10, flexWrap: "wrap" }}>
               {WHATSAPP && <a className="btn btn-wa" href={whatsappHref()}><ChatIcon />Ask on WhatsApp</a>}
               <Link className={WHATSAPP ? "btn" : "btn btn-solid"} href={enquireHref()}>Send an enquiry</Link>
             </div>
           </div>
           <Link className="go" href={`/series/${next.slug}`}>
-            <span className="eyebrow" style={{ color: "inherit" }}>Next series</span>
+            <span className="eyebrow" style={{ color: "inherit" }}>Next collection</span>
             <b>{next.label} →</b>
           </Link>
         </div>

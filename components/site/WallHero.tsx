@@ -4,7 +4,7 @@ import { Wall, type Item } from "./Collage";
  * A page opening: the moving wall behind, and a small card centred on it.
  * `face` sets her portrait in a circle cutting the card's top edge.
  */
-export default function WallHero({ columns, label, face, eyebrow, title, held, sub, children, size = "page", speed }: {
+export default function WallHero({ columns, label, face, eyebrow, title, held, sub, children, size = "page", speed, soft }: {
   columns: Item[][];
   label: string;
   face?: string;
@@ -15,9 +15,11 @@ export default function WallHero({ columns, label, face, eyebrow, title, held, s
   children?: React.ReactNode;
   size?: "home" | "page";
   speed?: number;
+  /** blur the wall a little, so the card reads first */
+  soft?: boolean;
 }) {
   return (
-    <section className={`collage-wrap is-${size}`} aria-label={label}>
+    <section className={`collage-wrap is-${size}${soft ? " is-soft" : ""}`} aria-label={label}>
       <div className="collage">
         <Wall columns={columns} speed={speed} />
         <div className={`namecard${face ? " has-face" : ""}`}>

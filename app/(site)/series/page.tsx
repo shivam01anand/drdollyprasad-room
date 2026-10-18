@@ -7,8 +7,8 @@ import { ON_THE_WORK, SERIES_PAGES, SMALL_PHOTO, worksIn } from "@/lib/site";
 import { WORKS } from "@/lib/works";
 
 export const metadata: Metadata = {
-  title: "Series",
-  description: "Dr Dolly Prasad’s five series: Gone Are The Days, Bandh Darwaze, Faith, Portraits and her recent work.",
+  title: "Collections",
+  description: "Dr Dolly Prasad’s five collections: Gone Are The Days, Bandh Darwaze, Faith, Portraits and her recent work.",
   alternates: { canonical: "/series" },
 };
 
@@ -16,16 +16,16 @@ export const metadata: Metadata = {
 export default function SeriesIndex() {
   return (
     <>
-      <WallHero columns={SERIES_WALL} label="The five series" eyebrow={`Five series · ${WORKS.length} paintings`} title="Series"
+      <WallHero columns={SERIES_WALL} label="The five collections" eyebrow={`Five collections · ${WORKS.length} paintings`} title="Collections"
                 held="Five ways of looking at everyday India">
-        <a className="btn btn-solid" href="#gone-are-the-days">The five series</a>
+        <a className="btn btn-solid" href="#gone-are-the-days">The five collections</a>
         <Link className="btn" href="/works">See all {WORKS.length} works</Link>
       </WallHero>
 
       <section className="wrap series-sum">
-        <p className="ex-sum">Five series, five walks of life. The things India is quietly leaving behind. The closed doors of old houses. Faith, as it is lived every day. The faces of working lives. And her recent turn inward, among flowers, leaves and birds.</p>
+        <p className="ex-sum">Five collections, five walks of life. The things India is quietly leaving behind. The closed doors of old houses. Faith, as it is lived every day. The faces of working lives. And her recent turn inward, among flowers, leaves and birds.</p>
         <p className="quote series-sum-q">“{ON_THE_WORK}”<span className="eyebrow">Dr Dolly Prasad, on her work</span></p>
-        <nav className="ex-jump" aria-label="Go to a series">
+        <nav className="ex-jump" aria-label="Go to a collection">
           {SERIES_PAGES.map((s) => <a key={s.slug} href={`#${s.slug}`}>{s.label} <span>{worksIn(s.label).length}</span></a>)}
         </nav>
       </section>

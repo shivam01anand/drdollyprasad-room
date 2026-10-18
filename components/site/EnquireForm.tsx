@@ -119,12 +119,6 @@ export default function EnquireForm() {
           </div>
           <p className="meta">Paintings are offered with price on request. Enquiries and commissions are welcome.</p>
         </div>
-        {!WHATSAPP && (
-          <div className="note" id="whatsapp">
-            <b>WhatsApp</b>
-            <p className="meta">A WhatsApp number for enquiries is being set up. Until then, please use the form or write by email.</p>
-          </div>
-        )}
       </aside>
     </div>
   );

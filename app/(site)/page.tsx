@@ -50,8 +50,8 @@ export default function Home() {
 
       <section className="sec wrap">
         <div className="sec-head">
-          <h2>Key series</h2>
-          <Link className="link" href="/series">All series and their stories →</Link>
+          <h2>Key collections</h2>
+          <Link className="link" href="/series">All collections and their stories →</Link>
         </div>
         <div className="grid grid-5 series-tiles">
           {SERIES_PAGES.map((s) => (
@@ -109,7 +109,7 @@ export default function Home() {
           <div className="txt">
             <p className="eyebrow">About the artist</p>
             <p className="big">She paints what daily life passes by: a clay gullak, a closed door, a lamp raised to scripture. And she gives it the stillness we keep for prayer.</p>
-            <p className="meta" style={{ fontSize: 16 }}>A doctor and a painter in New Delhi. Eighteen exhibitions and art fairs between 2005 and 2018, from Triveni Kala Sangam and India Habitat Centre to ICCR and the First International Kala Mela. Paintings in private collections in India, the USA and London.</p>
+            <p className="meta" style={{ fontSize: 16 }}>A doctor and a painter in New Delhi. Eighteen exhibitions and art fairs between 2005 and 2018, from Triveni Kala Sangam and India Habitat Centre to ICCR and the First International Kala Mela. Her paintings are with private collectors in India, the USA and London.</p>
             <Link className="link" href="/about">Her story →</Link>
           </div>
         </div>

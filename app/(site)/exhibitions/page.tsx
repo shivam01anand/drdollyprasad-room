@@ -18,7 +18,7 @@ const years = [...new Set(RECORD.map((r) => r.year))];
 export default function Exhibitions() {
   return (
     <>
-    <WallHero columns={SHOW_WALL} label="Her exhibitions" eyebrow="2005 to today" title="Exhibitions" held="When the paintings meet people">
+    <WallHero columns={SHOW_WALL} label="Her exhibitions" eyebrow="2005 to today" title="Exhibitions" held="Eighteen shows across galleries and art fairs, from Delhi to Bombay">
       <a className="btn btn-solid" href="#india-habitat-centre-2010">See the shows</a>
       <a className="btn" href="#record">The full record</a>
     </WallHero>
@@ -27,7 +27,7 @@ export default function Exhibitions() {
         <div className="ex-facts">
           <div><b>18</b><span>exhibitions and art fairs, 2005–2018</span></div>
           <div><b>4</b><span>cities: Delhi, Gurgaon, Jaipur and Bombay</span></div>
-          <div><b>3</b><span>continents, in private collections in India, the USA and London</span></div>
+          <div><b>3</b><span>continents, with private collectors in India, the USA and London</span></div>
         </div>
         <p className="ex-sum">Her paintings have hung at India Habitat Centre, the Indian Council for Cultural Relations, Triveni Kala Sangam, Travancore Art Gallery and Nehru Art Gallery in Bombay, and at the First International Kala Mela organised by Lalit Kala Akademi. Her shows have been covered on television and in the papers, and her work is held by private collectors in India, the USA and London.</p>
         <nav className="ex-jump" aria-label="On this page">
