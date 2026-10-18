@@ -3,6 +3,8 @@
 For the current release, Claude resume command and collaboration/publishing
 instructions, read [CONTINUATION.md](CONTINUATION.md). Pushes to `main` publish
 through Vercel; the original `house` branch is retained for development.
+The step-by-step [contribution guide](CONTRIBUTING.md) covers Claude Code,
+preview branches, pull requests and publishing.
 
 An adaptation of the davidlee.studio technique (teardown: `~/projects/davidlee-studio-teardown`)
 for Dr Dolly Prasad. The mechanics are the original's; the house, its light and everything in

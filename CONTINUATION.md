@@ -151,6 +151,11 @@ to the latest `house` continuation; the original branch and history are retained
 - Merge the feature branch into `main` when it should go live.
 - `house` remains available for the original development history and previews.
 
+See [CONTRIBUTING.md](CONTRIBUTING.md) for the exact Claude Code workflow. `main`
+does not currently require pull-request approval, so direct pushes also publish.
+Preview authentication was disabled for this Vercel project, and an unauthenticated
+request to its Git-created preview was verified to return the website directly.
+
 Keep this repository public for free Vercel collaboration. Making it private
 again changes that arrangement: Vercel requires private-repository commit
 authors to belong to the deploying team, and hooks/CLI automation do not remove
