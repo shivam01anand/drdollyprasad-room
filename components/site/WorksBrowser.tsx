@@ -42,40 +42,70 @@ export default function WorksBrowser() {
     (size === "all" || sizeOf(w) === size));
   const n = (f: (w: Work) => boolean) => all.filter(f).length;
 
-  const chip = (on: boolean, text: string, click: () => void) => (
-    <button key={text} type="button" className="chip" aria-pressed={on} onClick={click}>{text}</button>
-  );
+  // a page at a time: twelve on a phone, twenty-four on a computer
+  const [per, setPer] = useState(24);
+  const [page, setPage] = useState(1);
+  useEffect(() => {
+    const m = matchMedia("(max-width: 640px)");
+    const set = () => setPer(m.matches ? 12 : 24);
+    set();
+    m.addEventListener("change", set);
+    return () => m.removeEventListener("change", set);
+  }, []);
+  useEffect(() => { setPage(1); }, [series, status, size, per]);
+  const pages = Math.max(1, Math.ceil(shown.length / per));
+  const slice = shown.slice((page - 1) * per, page * per);
+  const go = (k: number) => {
+    setPage(k);
+    document.getElementById("all")?.scrollIntoView({ behavior: "smooth", block: "start" });
+  };
 
   return (
     <>
-      <div className="filters" role="group" aria-label="Filter the works">
-        <div className="frow">
+      <div className="filters filters-line" role="group" aria-label="Filter the works">
+        <label className="fsel">
           <span>Collection</span>
-          {chip(series === "all", "All", () => setSeries("all"))}
-          {SERIES_PAGES.map((s) => chip(series === s.slug, `${s.label} · ${n((w) => w.series === s.label)}`, () => setSeries(s.slug)))}
-        </div>
-        <div className="frow">
+          <select value={series} onChange={(e) => setSeries(e.target.value)}>
+            <option value="all">All</option>
+            {SERIES_PAGES.map((s) => <option key={s.slug} value={s.slug}>{s.label} ({n((w) => w.series === s.label)})</option>)}
+          </select>
+        </label>
+        <label className="fsel">
           <span>Status</span>
-          {chip(status === "all", "All", () => setStatus("all"))}
-          {chip(status === "available", "Available", () => setStatus("available"))}
-          {chip(status === "sold", "In private collections", () => setStatus("sold"))}
-        </div>
-        <div className="frow">
+          <select value={status} onChange={(e) => setStatus(e.target.value as Status)}>
+            <option value="all">All</option>
+            <option value="available">Available</option>
+            <option value="sold">In private collections</option>
+          </select>
+        </label>
+        <label className="fsel">
           <span>Size</span>
-          {chip(size === "all", "All", () => setSize("all"))}
-          {chip(size === "small", "Small · under 24 in", () => setSize("small"))}
-          {chip(size === "medium", "Medium · 24–36 in", () => setSize("medium"))}
-          {chip(size === "large", "Large · over 36 in", () => setSize("large"))}
-        </div>
+          <select value={size} onChange={(e) => setSize(e.target.value as Size)}>
+            <option value="all">All</option>
+            <option value="small">S · under 24 in</option>
+            <option value="medium">M · 24–36 in</option>
+            <option value="large">L · over 36 in</option>
+          </select>
+        </label>
       </div>
       <p className="meta" aria-live="polite" style={{ marginBottom: 18 }}>
         {shown.length} {shown.length === 1 ? "painting" : "paintings"}
-        {size !== "all" && " · only works with a stated size"}
+        {size !== "all" && " · only works with a confirmed size"}
+        {pages > 1 && ` · page ${page} of ${pages}`}
       </p>
       {shown.length ? (
-        <div className="grid">{shown.map((w, i) => <Card key={w.id} w={w} eager={i < 8} />)}</div>
+        <div className="grid">{slice.map((w, i) => <Card key={w.id} w={w} eager={i < 8} />)}</div>
       ) : (
         <p className="empty">No paintings match these filters.</p>
+      )}
+      {pages > 1 && (
+        <nav className="pager" aria-label="Pages">
+          <button type="button" onClick={() => go(page - 1)} disabled={page === 1} aria-label="Previous page">‹</button>
+          {Array.from({ length: pages }, (_, k) => (
+            <button key={k} type="button" aria-current={page === k + 1 ? "page" : undefined} onClick={() => go(k + 1)}>{k + 1}</button>
+          ))}
+          <button type="button" onClick={() => go(page + 1)} disabled={page === pages} aria-label="Next page">›</button>
+        </nav>
       )}
     </>
   );

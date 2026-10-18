@@ -29,7 +29,7 @@ const SHOW_PHOTOS: RollItem[] = [
  * paint"). Written for the site with Shubham; hers to change.
  */
 const FROM_THE_ARTIST =
-  "Everything I paint was already there: a pot, a door, a face at the turn of a lane. Most people walked past. I stopped, and it stayed with me. A painting is only my way of keeping it.";
+  "Everything I paint was already there: a pot, a door, a face at the turn of a lane. Most people walked past. I stopped. Years in medicine taught me that no day is ordinary, not when days are counted. The hope and the waiting I saw in my patients, I began to see in things too: in a lock, a lamp, a coin. I paint to keep them.";
 
 const THREADS: Theme[] = [
   { t: "Memory", series: "Gone Are The Days", href: "/series/gone-are-the-days",
@@ -56,7 +56,7 @@ export default function About() {
             <p className="eyebrow">About the artist</p>
             <h1>Dr Dolly Prasad</h1>
             <p className="ab-held">{BIO_LINE}</p>
-            <p className="ab-p">A New Delhi artist who makes the everyday memorable. Her oil paintings hold on to an India that is changing fast: the tonga and the gullak, the closed door of an old house, a lamp lifted at aarti, a face at the corner of a lane.</p>
+            <p className="ab-p">A New Delhi artist who makes the everyday memorable. For her the ordinary is never small: a clay gullak, a closed door, a lamp lifted at aarti, a face at the corner of a lane. Each holds a story, and each is slipping away as India changes.</p>
             <figure className="ab-from">
               <blockquote>“{FROM_THE_ARTIST}”</blockquote>
               <figcaption className="eyebrow">From the artist</figcaption>
@@ -74,10 +74,10 @@ export default function About() {
         <div className="wrap ab-split">
           <div className="ab-txt">
             <p className="eyebrow">Who she is</p>
-            <h2>An artist of the everyday, and of changing times</h2>
-            <p className="ab-p">She began her working life as a doctor. Medicine kept her close to people: their faces, their waiting, the things they carry without saying. It was that, more than the medicine, that stayed with her, and she soon turned to painting to follow it. She taught herself, in oil on canvas.</p>
-            <p className="ab-p">Her subject became the India around her as it changed. Rickshaws gave way to autos, coins went out of use, old doors were locked and left. She paints these things before they disappear, with the warmth of someone who remembers them: not as relics, but as parts of a life.</p>
-            <p className="ab-p">The nostalgia is never heavy. Her canvases are full of colour, red above all, and full of people: the chai boy between orders, the doodhwala on his round, women in red veils, a child beneath banana leaves.</p>
+            <h2>Every day is worth keeping</h2>
+            <p className="ab-p">She began her life’s work as a doctor. Years of service in hospitals brought her face to face with every emotion a person can carry: fear and relief, waiting and hope, the quiet of someone counting their days. She learned to read a face before a word was spoken.</p>
+            <p className="ab-p">And she learned that every day matters. Slowly she began to see the same emotions outside the hospital, not only in people but in things: the patience of a clay gullak, the loneliness of a locked door, the devotion in a thread tied to a tree. Each held a story no one stopped to hear.</p>
+            <p className="ab-p">She wanted to keep those stories so much that she turned to painting, teaching herself in oil on canvas. Her subject became the India around her as it changed: rickshaws giving way to autos, coins going out of use, old doors locked and left. She paints them with the warmth of someone who remembers, never as relics, always as parts of a life.</p>
           </div>
           <Roll label="Faces from her portraits" items={paint(["red-turban-portrait", "three-veiled-women", "boy-and-kettle", "yellow-turban-portrait", "mother-and-child"])} />
         </div>
