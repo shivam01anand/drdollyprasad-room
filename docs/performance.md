@@ -53,8 +53,10 @@ number of milliseconds saved in a browser.
 The normal browser-control connection is unavailable. Headless Chrome profiling
 requires the user's pending approval; no FPS or browser timing improvement is
 claimed before that run. Desktop/mobile navigation, contrast, the worker fallback,
-lightbox/zoom, filters and day/night transitions need the browser regression pass
-before promoting the changes to the live domain.
+lightbox/zoom, filters and day/night transitions still need the browser regression
+pass. The user explicitly requested publication on 18 October, and the latest
+preview was promoted; that release does not replace the outstanding browser
+profile. See [the continuation handover](../CONTINUATION.md) for release details.
 
 Measure cold and repeat loads, greeting-visible/room-ready times, long animation
 frames and CPU tasks while visiting every stop, opening a painting, zooming,
