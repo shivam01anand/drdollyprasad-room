@@ -119,37 +119,31 @@ events replace broad DOM autocapture, scroll work is throttled and the studio
 does not add analytics to its rendering loop. Replays load through the SDK's
 existing remote recording configuration.
 
-## Private website dashboard
+## Unlisted website dashboard
 
 `/analytics` renders the same 14 reviewed views inside the website, with overview
 counts, 7/30/90-day ranges, refresh and per-view retry. Every request retains the
-Dolly production/non-test scope. The page is absent from public navigation and the
-sitemap, has `noindex` headers and metadata, and is disallowed in robots.txt.
-Authentication protects the data; search indexing controls are additional privacy.
-The page itself is excluded from visitor event capture and session replay.
+Dolly production/non-test scope. The page has **no password or sign-in**, as
+requested. Anyone with its URL can view the dashboard, including recent anonymous
+sessions. It is absent from public navigation and the sitemap, has `noindex`
+headers and metadata, and is disallowed in robots.txt. These indexing controls
+reduce discovery; they do not restrict access. The page itself is excluded from
+visitor event capture and session replay.
 
-Before deploying, configure these **server-only** Vercel variables for Preview
-and Production, then redeploy:
-
-- `ANALYTICS_ADMIN_PASSWORD`: a randomly generated password of at least 20
-  characters, shared privately with the admins. Do not use a `NEXT_PUBLIC_` name.
-- `POSTHOG_PERSONAL_API_KEY`: a `phx_…` key restricted to project **317586** with
-  query-read permission. The browser capture token cannot read analytics.
-
-Admins sign in at `/analytics`. Sessions last eight hours, use an HttpOnly,
-SameSite=Strict cookie (Secure on HTTPS), and become invalid immediately when the
-password changes. Rotate the password by updating the environment and redeploying.
-If either secret is missing, the page fails closed or displays a connection setup
-message. Never put either secret in Git, browser code, a public dashboard share,
-or a URL.
+Configure the existing `POSTHOG_PERSONAL_API_KEY` as a **server-only** Vercel
+variable in Preview and Production, then redeploy. It must be a `phx_…` key with
+query-read access to project **317586**. The browser capture token cannot read
+analytics. No `ANALYTICS_ADMIN_PASSWORD` is needed. Never expose the personal key
+in Git, browser code or URLs, even though the dashboard itself is viewable.
 
 Queries run on the server against a fixed project and an allowlist of view IDs;
 the browser cannot submit SQL or change the production scope. Responses are not
 cached by the browser or CDN. The website's range selector applies to every view,
-including SQL tables. Small or zero counts, especially for enquiry handoffs, are
-valid observations and do not imply a tracking failure.
+including SQL tables. Missing credentials display a connection setup message.
+Small or zero counts, especially for enquiry handoffs, are valid observations
+and do not imply a tracking failure.
 
-`node scripts/check-analytics-admin.cjs` checks authentication, expiry/password
-rotation, query scoping, date ranges, input validation and upstream failures
-without using real credentials. Existing analytics and motion checks plus the
-production build still apply.
+`node scripts/check-analytics-admin.cjs` checks the query allowlist, production
+scoping, date ranges, input validation and upstream failures without real
+credentials. Existing analytics and motion checks plus the production build
+still apply.

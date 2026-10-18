@@ -1,4 +1,4 @@
-/* Checks admin session boundaries and the server-only analytics query allowlist. No network. */
+/* Checks the unlisted dashboard query allowlist and production scope. No network. */
 const assert = require('node:assert/strict');
 const fs = require('node:fs');
 const ts = require('typescript');
@@ -12,31 +12,13 @@ function load(relative) {
   if (modules.has(full)) return modules.get(full).exports;
   const mod = new Module(full); modules.set(full, mod); mod.filename = full; mod.paths = Module._nodeModulePaths(path.dirname(full));
   const native = Module.createRequire(full);
-  mod.require = id => id === '@/lib/analytics-admin' ? load('lib/analytics-admin.ts') : id === '@/scripts/posthog-insights.cjs' ? native('./posthog-insights.cjs') : native(id);
-  // The script query module is resolved from the repository, not the route's folder.
-  const baseRequire = mod.require;
-  mod.require = id => id === '@/scripts/posthog-insights.cjs' ? require('./posthog-insights.cjs') : baseRequire(id);
+  mod.require = id => id === '@/scripts/posthog-insights.cjs' ? require('./posthog-insights.cjs') : native(id);
   mod._compile(ts.transpileModule(fs.readFileSync(full, 'utf8'), { compilerOptions: { module: ts.ModuleKind.CommonJS, target: ts.ScriptTarget.ES2022, esModuleInterop: true } }).outputText, full);
   return mod.exports;
 }
 (async () => {
-  const auth = load('lib/analytics-admin.ts');
-  delete process.env.ANALYTICS_ADMIN_PASSWORD;
-  assert.equal(auth.verifyAdminSession('anything'), false);
-  assert.equal(auth.passwordMatches(''), false);
-  process.env.ANALYTICS_ADMIN_PASSWORD = 'local-only-admin-test-password';
-  assert.equal(auth.passwordMatches('wrong'), false);
-  assert.equal(auth.passwordMatches(process.env.ANALYTICS_ADMIN_PASSWORD), true);
-  const now = Date.now(); const token = auth.createAdminSession(now);
-  assert.equal(auth.verifyAdminSession(token, now), true);
-  assert.equal(auth.verifyAdminSession(token, now + 8 * 3600 * 1000), false);
-  assert.equal(auth.verifyAdminSession(token.replace(/.$/, token.endsWith('0') ? '1' : '0'), now), false);
-  process.env.ANALYTICS_ADMIN_PASSWORD += 'rotated';
-  assert.equal(auth.verifyAdminSession(token, now), false);
-  const cookie = auth.createAdminSession();
-  const request = (query, authenticated = true) => new NextRequest(`http://localhost/analytics/data?${query}`, { headers: authenticated ? { cookie: `${auth.ADMIN_COOKIE}=${cookie}` } : {} });
+  const request = query => new NextRequest(`http://localhost/analytics/data?${query}`);
   const route = load('app/analytics/data/route.ts');
-  assert.equal((await route.GET(request('', false))).status, 401);
   delete process.env.POSTHOG_PERSONAL_API_KEY;
   assert.equal((await route.GET(request(''))).status, 503);
   process.env.POSTHOG_PERSONAL_API_KEY = 'phx_local_test_only';
@@ -67,11 +49,5 @@ function load(relative) {
   assert.equal((await route.GET(request('tile=0'))).status, 502);
   global.fetch = async () => Response.json({ query_status: { complete: false } });
   assert.equal((await route.GET(request('tile=0'))).status, 503);
-  const login = load('app/analytics/login/route.ts');
-  assert.equal((await login.POST(new NextRequest('http://localhost/analytics/login', { method: 'POST', headers: { origin: 'https://other.example' } }))).status, 403);
-  const response = await login.POST(new NextRequest('http://localhost/analytics/login', { method: 'POST', headers: { origin: 'http://localhost' }, body: new URLSearchParams({ password: process.env.ANALYTICS_ADMIN_PASSWORD }) }));
-  assert.equal(response.status, 303);
-  assert.ok(response.headers.get('Set-Cookie').includes('HttpOnly'));
-  assert.ok(response.headers.get('Set-Cookie').includes('SameSite=strict'));
-  console.log('Admin analytics checks pass: sessions expire/revoke, unauthenticated requests denied, same-origin login, query allowlist, production scope, date ranges and upstream failures.');
+  console.log('Analytics query checks pass: no login required, query allowlist, production scope, date ranges and upstream failures.');
 })().catch(e => { console.error(e); process.exitCode = 1; });
