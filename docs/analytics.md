@@ -3,7 +3,7 @@
 PostHog covers the latest conventional website and the 3D studio at `/studio`.
 The working **public capture token from the live Book2Kindle browser tracker** is
 stored in this Vercel project's production and preview environment variables.
-It currently writes into the existing US PostHog project **317586**. No personal
+It writes into the US PostHog project **672709** ("Dolly.creates", owned by Shubham) from 18 Oct 2026; earlier data stays in project **317586**. No personal
 API key is included in the frontend or committed to Git.
 
 Every event carries `app_name: drdollyprasad`, its `analytics_environment`

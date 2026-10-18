@@ -7,7 +7,9 @@ type Pending = { event: string; properties: Properties; timestamp: Date };
 let client: Pick<PostHog, "capture"> | undefined;
 let starting: Promise<void> | undefined;
 const pending: Pending[] = [];
-const KEY = process.env.NEXT_PUBLIC_POSTHOG_KEY;
+// Public capture token for Shubham's PostHog project 672709 ("Dolly.creates"), set 18 Oct 2026.
+// phc_ tokens are public by design (they ship to every browser); they can only send events, not read data.
+const KEY = "phc_yDZc5Zmo9p4G2DM6CE645dP8ein4VnVc2pX7L3vuVdtX";
 const SAFE_QUERY = new Set(["work", "series", "status", "size", "utm_source", "utm_medium", "utm_campaign", "utm_content", "utm_term"]);
 
 /** Keep attribution and catalogue filters, without copying arbitrary query strings. */
