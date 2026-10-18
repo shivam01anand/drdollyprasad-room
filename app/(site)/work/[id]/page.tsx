@@ -79,13 +79,10 @@ export default async function WorkPage({ params }: Props) {
   };
 
   const cm = size ? ` · ${Math.round(size.a * 2.54)} × ${Math.round(size.b * 2.54)} cm` : "";
+  // the label (medium, size, year, collection) is shown once, under the title; this adds only what it does not say
   const rows: [string, React.ReactNode][] = [
-    ["Title", w.title],
-    ["Medium", w.medium],
-    ["Size", w.size ? `${w.size}${cm}` : "On request"],
-    ["Year", shownYear(w) ?? "On request"],
-    ["Collection", <Link key="s" href={seriesPath(w.series)}>{w.series}</Link>],
-    ["Status", statusWord(w)],
+    ["Size", w.size ? `${w.size}${cm} (height × width)` : "On request"],
+    ["Status", sold ? "In a private collection" : statusWord(w)],
   ];
 
   const tabs = [
@@ -119,14 +116,7 @@ export default async function WorkPage({ params }: Props) {
                   small={!!d && Math.max(d.w, d.h) < 600} />
         </div>
 
-        <aside className="wp-side">
-          <div className="side-facts">
-            <span className="eyebrow">{w.series}</span>
-            <span>{w.medium}</span>
-            {w.size && <span>{w.size}{cm}</span>}
-            {w.year && <span>{shownYear(w)}</span>}
-            <span>From the collection <Link href={seriesPath(w.series)}>{w.series} →</Link></span>
-          </div>
+        <div className="wp-side">
           <div className="side-status">
             <span className={`status${sold ? " is-sold" : w.status === "Enquire" ? " is-enquire" : ""}`}>{statusWord(w)}</span>
             <b>{sold ? "In a private collection" : "Price on request"}</b>
@@ -141,7 +131,7 @@ export default async function WorkPage({ params }: Props) {
             <a href={`${STUDIO_PATH}#work=${id}`}>See it on the wall in her studio →</a>
             <Share title={`${quoted(w.title)} · Dr Dolly Prasad`} path={workPath(id)} className="link share-btn" />
           </div>
-        </aside>
+        </div>
       </section>
 
       <section style={{ paddingBottom: 40 }}>

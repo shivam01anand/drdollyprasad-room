@@ -2,10 +2,9 @@ import type { Metadata } from "next";
 import Link from "next/link";
 import Until from "@/components/Until";
 import Slideshow from "@/components/site/Slideshow";
-import WallHero from "@/components/site/WallHero";
-import { SHOW_WALL } from "@/components/site/Collage";
 import { NOW, PRESS, RECORD, RECORD_LINE, SHOWS } from "@/lib/site";
-import { BY_ID, workPath } from "@/lib/works";
+import { BY_ID, WORKS, workPath } from "@/lib/works";
+import { dims } from "@/lib/images";
 
 export const metadata: Metadata = {
   title: "Exhibitions",
@@ -17,46 +16,47 @@ const years = [...new Set(RECORD.map((r) => r.year))];
 
 export default function Exhibitions() {
   return (
-    <>
-    <WallHero columns={SHOW_WALL} label="Her exhibitions" eyebrow="2005 to today" title="Exhibitions" held="Eighteen shows across galleries and art fairs, from Delhi to Bombay">
-      <a className="btn btn-solid" href="#india-habitat-centre-2010">See the shows</a>
-      <a className="btn" href="#record">The full record</a>
-    </WallHero>
     <div className="wrap">
-      <section className="ex-head">
-        <div className="ex-facts">
-          <div><b>18</b><span>exhibitions and art fairs, 2005–2018</span></div>
-          <div><b>4</b><span>cities: Delhi, Gurgaon, Jaipur and Bombay</span></div>
-          <div><b>3</b><span>continents, with private collectors in India, the USA and London</span></div>
-        </div>
-        <p className="ex-sum">Her paintings have hung at India Habitat Centre, the Indian Council for Cultural Relations, Triveni Kala Sangam, Travancore Art Gallery and Nehru Art Gallery in Bombay, and at the First International Kala Mela organised by Lalit Kala Akademi. Her shows have been covered on television and in the papers, and her work is held by private collectors in India, the USA and London.</p>
-        <nav className="ex-jump" aria-label="On this page">
-          {SHOWS.map((s) => <a key={s.id} href={`#${s.id}`}>{s.title.replace(/^An evening at /, "")} <span>{s.year}</span></a>)}
-          <a href="#on-screen">In the news</a>
-          <a href="#record">The record</a>
-        </nav>
+      <section className="sec-tight" style={{ paddingBottom: 20 }}>
+        <h1 className="page-title">Exhibitions</h1>
+        <p className="lede">Eighteen shows across galleries and art fairs, from Delhi to Bombay.</p>
       </section>
 
       <Until until={NOW.until}>
-        <section id={NOW.id} style={{ paddingBottom: 24 }}>
+        <section id={NOW.id} style={{ paddingBottom: 28 }}>
           <div className="now-box">
             <div className="txt">
               <span className="eyebrow" style={{ color: "inherit" }}>Now showing</span>
               <h2>{NOW.title}</h2>
-              <p>{NOW.venue}, {NOW.city} · {NOW.when}</p>
+              <p><b>{NOW.when}</b></p>
+              <p>{NOW.address}</p>
               <p>{NOW.line}</p>
             </div>
             <div className="imgs">
               {NOW.works.map((id) => (
                 <Link key={id} href={workPath(id)} aria-label={BY_ID.get(id)?.title}>
                   {/* eslint-disable-next-line @next/next/no-img-element */}
-                  <img src={`/site/thumbs/${id}.jpg`} alt={BY_ID.get(id)?.title ?? ""} />
+                  <img src={`/site/thumbs/${id}.jpg`} alt={BY_ID.get(id)?.title ?? ""} {...dims(`/site/thumbs/${id}.jpg`)} />
                 </Link>
               ))}
             </div>
           </div>
         </section>
       </Until>
+
+      <section className="ex-head" style={{ paddingTop: 12 }}>
+        <div className="ex-facts">
+          <div><b>18</b><span>exhibitions and art fairs, 2005–2018</span></div>
+          <div><b>4</b><span>cities: Delhi, Gurgaon, Jaipur and Bombay</span></div>
+          <div><b>3</b><span>continents, with private collectors in India, the USA and the UK</span></div>
+        </div>
+        <p className="ex-sum">Her paintings have hung at India Habitat Centre, the Indian Council for Cultural Relations, Triveni Kala Sangam, Travancore Art Gallery and Nehru Art Gallery in Bombay, and at the First International Kala Mela organised by Lalit Kala Akademi. Her shows have been covered on television and in the papers.</p>
+        <nav className="ex-jump" aria-label="On this page">
+          {SHOWS.map((s) => <a key={s.id} href={`#${s.id}`}>{s.title.replace(/^An evening at /, "")} <span>{s.year}</span></a>)}
+          <a href="#on-screen">In the news</a>
+          <a href="#record">The record</a>
+        </nav>
+      </section>
 
       {SHOWS.map((s, k) => (
         <section key={s.id} id={s.id} className={`ex-show${k % 2 ? " flip" : ""}`}>
@@ -132,7 +132,19 @@ export default function Exhibitions() {
           ))}
         </ol>
       </section>
+
+      <section className="sec-tight">
+        <div className="next-series">
+          <div className="ask">
+            <b>See the paintings that hung on these walls</b>
+            <p className="meta">All {WORKS.length} works, with the ones still available. Prices on request.</p>
+            <div style={{ display: "flex", gap: 10, flexWrap: "wrap" }}>
+              <Link className="btn btn-solid" href="/works">See the works</Link>
+              <Link className="btn" href="/enquire">Enquire about an exhibition</Link>
+            </div>
+          </div>
+        </div>
+      </section>
     </div>
-    </>
   );
 }

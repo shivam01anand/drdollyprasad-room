@@ -2,12 +2,12 @@ import type { Metadata } from "next";
 import Link from "next/link";
 import Roll, { type RollItem } from "@/components/site/Roll";
 import ThemeSlider, { type Theme } from "@/components/site/ThemeSlider";
-import { BIO_LINE, LOOK, PULL, ON_THE_WORK, PORTRAIT_LARGE, STUDIO_PATH, shownYear } from "@/lib/site";
+import { LOOK, PULL, ON_THE_WORK, PORTRAIT_LARGE, STUDIO_PATH, shownYear } from "@/lib/site";
 import { BY_ID, workPath } from "@/lib/works";
 
 export const metadata: Metadata = {
   title: "About",
-  description: "Dr Dolly Prasad is a New Delhi artist who makes the everyday memorable: oil paintings of a changing India. Eighteen exhibitions and art fairs; collectors in India, the USA and London.",
+  description: "Dr Dolly Prasad is a New Delhi artist who makes the everyday memorable: oil paintings of a changing India. Eighteen exhibitions and art fairs; collectors in India, the USA and the UK.",
   alternates: { canonical: "/about" },
 };
 
@@ -24,12 +24,11 @@ const SHOW_PHOTOS: RollItem[] = [
   { src: "/site/ex/kala-dolly.jpg", title: "First International Kala Mela, 2018", sub: "At the art fair organised by Lalit Kala Akademi.", href: "/exhibitions#kala-mela-2018", framed: false },
 ];
 
-/**
- * Her line, in the first person, drawn from her poem ("They come to me … I don't
- * paint"). Written for the site with Shubham; hers to change.
+/*
+ * The drafted first-person "From the artist" line is off the page until she
+ * approves or rewrites it (website test, round 2). Its draft is kept in the
+ * project notes, not here, so it cannot be shown as hers by mistake.
  */
-const FROM_THE_ARTIST =
-  "Everything I paint was already there: a pot, a door, a face at the turn of a lane. Most people walked past. I stopped. Years in medicine taught me that no day is ordinary, not when days are counted. The hope and the waiting I saw in my patients, I began to see in things too: in a lock, a lamp, a coin. I paint to keep them.";
 
 const THREADS: Theme[] = [
   { t: "Memory", series: "Gone Are The Days", href: "/series/gone-are-the-days",
@@ -55,17 +54,7 @@ export default function About() {
           <div className="ab-txt">
             <p className="eyebrow">About the artist</p>
             <h1>Dr Dolly Prasad</h1>
-            <p className="ab-held">{BIO_LINE}</p>
-            <p className="ab-p">A New Delhi artist who makes the everyday memorable. For her the ordinary is never small: a clay gullak, a closed door, a lamp lifted at aarti, a face at the corner of a lane. Each holds a story, and each is slipping away as India changes.</p>
-            <figure className="ab-from">
-              <blockquote>“{FROM_THE_ARTIST}”</blockquote>
-              <figcaption className="eyebrow">From the artist</figcaption>
-            </figure>
-            <div className="ab-facts">
-              <div><b>18</b><span>exhibitions and art fairs, 2005–2018</span></div>
-              <div><b>41</b><span>paintings in five collections</span></div>
-              <div><b>3</b><span>continents, with private collectors in India, the USA and London</span></div>
-            </div>
+            <p className="ab-p">A New Delhi artist who makes the everyday memorable. For her, the ordinary is never small: a clay gullak, a closed door, a lamp lifted at aarti, a face at the corner of a lane. Each holds a story, and each is slipping away as India changes.</p>
           </div>
         </div>
       </section>
@@ -74,10 +63,10 @@ export default function About() {
         <div className="wrap ab-split">
           <div className="ab-txt">
             <p className="eyebrow">Who she is</p>
-            <h2>Every day is worth keeping</h2>
-            <p className="ab-p">She began her life’s work as a doctor. Years of service in hospitals brought her face to face with every emotion a person can carry: fear and relief, waiting and hope, the quiet of someone counting their days. She learned to read a face before a word was spoken.</p>
+            <h2>From the hospital to the easel</h2>
+            <p className="ab-p">She began her working life as a doctor. Years of service in hospitals brought her face to face with every emotion a person can carry: fear and relief, waiting and hope, the quiet of someone counting their days. She learned to read a face before a word was spoken.</p>
             <p className="ab-p">And she learned that every day matters. Slowly she began to see the same emotions outside the hospital, not only in people but in things: the patience of a clay gullak, the loneliness of a locked door, the devotion in a thread tied to a tree. Each held a story no one stopped to hear.</p>
-            <p className="ab-p">She wanted to keep those stories so much that she turned to painting, teaching herself in oil on canvas. Her subject became the India around her as it changed: rickshaws giving way to autos, coins going out of use, old doors locked and left. She paints them with the warmth of someone who remembers, never as relics, always as parts of a life.</p>
+            <p className="ab-p">She wanted to keep those stories so much that she turned to painting, in oil on canvas. Her subject became the India around her as it changed: rickshaws giving way to autos, coins going out of use, old doors locked and left. She paints them with the warmth of someone who remembers, never as relics, always as parts of a life.</p>
           </div>
           <Roll label="Faces from her portraits" items={paint(["red-turban-portrait", "three-veiled-women", "boy-and-kettle", "yellow-turban-portrait", "mother-and-child"])} />
         </div>
@@ -104,7 +93,7 @@ export default function About() {
             <p className="eyebrow">On the walls, and in the news</p>
             <h2>Eighteen exhibitions and art fairs</h2>
             <p className="ab-p">Between 2005 and 2018 her paintings hung at India Habitat Centre, the Indian Council for Cultural Relations, Triveni Kala Sangam, Travancore Art Gallery and Nehru Art Gallery in Bombay, and at the First International Kala Mela organised by Lalit Kala Akademi.</p>
-            <p className="ab-p">Her shows have been covered on television and in the papers. Today her paintings are with private collectors across three continents, in India, the USA and London.</p>
+            <p className="ab-p">Her shows have been covered on television and in the papers. Today her paintings are with private collectors across three continents, in India, the USA and the UK.</p>
             <Link className="btn btn-solid" href="/exhibitions">See the exhibitions</Link>
           </div>
           <Roll label="Her exhibitions" items={SHOW_PHOTOS} shape="wide" />

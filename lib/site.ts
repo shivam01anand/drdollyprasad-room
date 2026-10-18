@@ -121,6 +121,8 @@ export type Chapter = {
   title: string;
   /** works shown, in order */
   works: string[];
+  /** a line that comes before the larger one, setting it up */
+  setup?: string;
   /** the larger line, editorial or hers (`hers`) */
   big?: string;
   small?: string;
@@ -151,15 +153,15 @@ export const SERIES_PAGES: SeriesPage[] = [
     hero: "bulls-and-wheel",
     quote: "The shades that touched me, the live frames that seemed to tell a story larger than the attention they seemed to draw.",
     intro: [
-      "Fourteen canvases of the things daily life is letting go of. The bullock cart and the tonga. The clay gullak and the coins it was made to hold. The red letterbox. The hand-painted film poster.",
-      "Often an old thing shares the canvas with what replaced it: a cart beside a truck, a tonga beside an autorickshaw. Two times, one painting.",
+      "Fourteen canvases of the things daily life is letting go of. The bullock cart and the tonga. The clay gullak and its coins. The red letterbox. The hand-painted film poster.",
+      "Often an old thing shares the canvas with whatever replaced it.",
     ],
     chapters: [
       { title: "Coins and clay", works: ["rickshaw-puller-and-coin", "coins-and-clay-bank", "terracotta-pots"],
         big: "A clay gullak, and the coins it was made to hold: 20 paise, 5 naye paise, 4 annas.",
         small: "Now the coins are gone, and the gullak waits." },
       { title: "Roads", works: ["bulls-and-wheel"], room: true, dark: true,
-        small: "Before engines, there were these two. Shoulder to shoulder under one yoke, pulling the wheel that carried a village’s harvest, its weddings, its markets.",
+        setup: "Before engines, there were these two. Shoulder to shoulder under one yoke, pulling the wheel that carried a village’s harvest, its weddings, its markets.",
         big: "The wheel still stands. The road has moved on." },
       { title: "Then and now", works: ["carriage-and-autorickshaw", "bullock-cart-and-truck", "cycle-rickshaw", "rickshaw-rest"],
         big: "A tonga beside an autorickshaw. A bullock cart beside a truck.",
@@ -219,7 +221,7 @@ export const SERIES_PAGES: SeriesPage[] = [
     ],
   },
   {
-    slug: "recent-work", label: "Recent work", period: "2024–",
+    slug: "recent-work", label: "Recent work", period: "2024–2026",
     line: "Flowers, leaves, a bird and a pause, in her own words.",
     hero: "boy-with-bananas",
     intro: [
@@ -247,7 +249,7 @@ export const SMALL_PHOTO = new Set(["elder-woman-portrait", "horse-cart-and-auto
 
 /** the status line a card shows */
 export const statusText = (w: Work) =>
-  w.status === "Sold" ? "In a private collection" : w.status === "Enquire" ? "On enquiry" : "Available · Price on request";
+  w.status === "Sold" ? "In a private collection" : w.status === "Enquire" ? "On enquiry" : "Available";
 
 /** the label line: medium · size · year */
 export const labelLine = (w: Work) => [w.medium, w.size, shownYear(w)].filter(Boolean).join(" · ");
@@ -301,6 +303,7 @@ const ph = (n: string, alt: string): Photo => ({ src: `/site/ex/${n}.jpg`, alt }
 
 export const NOW = {
   id: "sacred-fragments", title: "Sacred Fragments: A Journey Home", venue: "Visual Arts Gallery, India Habitat Centre", city: "New Delhi",
+  address: "Visual Arts Gallery, India Habitat Centre, Lodhi Road, New Delhi",
   when: "18–21 October 2026", until: "2026-10-21",
   line: "Showing Threads of Faith and Under Canopy of Greens.",
   works: ["temple-bells", "boy-with-bananas"],
@@ -355,11 +358,12 @@ export const SHOWS: Show[] = [
   {
     id: "kala-mela-2018", title: "First International Kala Mela", kind: "Art fair, organised by Lalit Kala Akademi",
     venue: "Indira Gandhi National Centre for the Arts", city: "New Delhi", when: "4–18 February 2018", year: "2018",
-    lede: "Artists from India and abroad, and the people who came to meet them. She stood beside a seated working figure painted against a rupee; nearby, a visitor raised her phone for a selfie with the paintings.",
+    lede: "Artists from India and abroad, and the people who came to meet them. She stood beside The Cart-Man and the Rupaya, a working man at rest against a giant coin; nearby, a visitor raised her phone for a selfie with the paintings.",
+    works: ["rickshaw-rest-framed"],
     albums: [
       { title: "At the fair", line: "February 2018, IGNCA.", photos: [
         ph("kala-dolly", "Dr Dolly Prasad in a red coat beside her framed painting at the Kala Mela."),
-        ph("kala-painting", "Her painting of a seated working figure against a rupee, in its black frame at the Kala Mela."),
+        ph("kala-painting", "The Cart-Man and the Rupaya in its black frame at the Kala Mela."),
         ph("kala-selfie", "A visitor takes a selfie beside the paintings at the Kala Mela."),
         ph("kala-booklet", "The booklet of the First International Kala Mela."),
       ] },

@@ -1,10 +1,9 @@
 import type { Metadata } from "next";
 import Link from "next/link";
-import Card from "@/components/site/Card";
-import WallHero from "@/components/site/WallHero";
-import { SERIES_WALL } from "@/components/site/Collage";
+import Card, { thumb } from "@/components/site/Card";
 import { ON_THE_WORK, SERIES_PAGES, SMALL_PHOTO, worksIn } from "@/lib/site";
-import { WORKS } from "@/lib/works";
+import { BY_ID } from "@/lib/works";
+import { dims } from "@/lib/images";
 
 export const metadata: Metadata = {
   title: "Collections",
@@ -12,22 +11,29 @@ export const metadata: Metadata = {
   alternates: { canonical: "/series" },
 };
 
-/** the overview: a moving wall of the five series, then each series as a band of its own */
+/** the overview: the five collections as large tiles, then each collection as a band of its own */
 export default function SeriesIndex() {
   return (
     <>
-      <WallHero columns={SERIES_WALL} label="The five collections" eyebrow={`Five collections · ${WORKS.length} paintings`} title="Collections"
-                held="Five ways of looking at everyday India">
-        <a className="btn btn-solid" href="#gone-are-the-days">The five collections</a>
-        <Link className="btn" href="/works">See all {WORKS.length} works</Link>
-      </WallHero>
+      <section className="wrap sec-tight" style={{ paddingBottom: 0 }}>
+        <h1 className="page-title">Collections</h1>
+        <p className="lede">Five collections, five walks of life. The things India is quietly leaving behind. The closed doors of old houses. Faith, as it is lived every day. The faces of working lives. And her recent turn inward, among flowers, leaves and birds.</p>
+      </section>
 
-      <section className="wrap series-sum">
-        <p className="ex-sum">Five collections, five walks of life. The things India is quietly leaving behind. The closed doors of old houses. Faith, as it is lived every day. The faces of working lives. And her recent turn inward, among flowers, leaves and birds.</p>
+      <section className="wrap sec-tight">
+        <div className="big-tiles">
+          {SERIES_PAGES.map((s) => (
+            <Link key={s.slug} className="big-tile" href={`/series/${s.slug}`}>
+              <span className="bt-img">
+                {/* eslint-disable-next-line @next/next/no-img-element */}
+                <img className="framed" src={thumb(s.hero)} alt={`${BY_ID.get(s.hero)?.title}, from ${s.label}`} {...dims(thumb(s.hero))} />
+              </span>
+              <b>{s.label}</b>
+              <span className="meta">{worksIn(s.label).length} works · {s.period}</span>
+            </Link>
+          ))}
+        </div>
         <p className="quote series-sum-q">“{ON_THE_WORK}”<span className="eyebrow">Dr Dolly Prasad, on her work</span></p>
-        <nav className="ex-jump" aria-label="Go to a collection">
-          {SERIES_PAGES.map((s) => <a key={s.slug} href={`#${s.slug}`}>{s.label} <span>{worksIn(s.label).length}</span></a>)}
-        </nav>
       </section>
 
       {SERIES_PAGES.map((s, i) => {

@@ -1,5 +1,5 @@
 import Link from "next/link";
-import { BIO_LINE, EMAIL, INSTAGRAM, PORTRAIT, STUDIO_PATH, WHATSAPP, whatsappHref } from "@/lib/site";
+import { EMAIL, INSTAGRAM, PORTRAIT, STUDIO_PATH, WHATSAPP, whatsappHref } from "@/lib/site";
 import { ChatIcon, InstagramIcon } from "./Icons";
 
 export default function Footer() {
@@ -11,8 +11,7 @@ export default function Footer() {
           <img src={PORTRAIT} alt="" width={44} height={44} />
           <div>
             <b>Dr Dolly Prasad</b>
-            <span className="ftr-line">{BIO_LINE}</span>
-            <span className="meta">Oil on canvas · New Delhi · Enquiries welcome</span>
+            <span className="meta">Paintings in oil, New Delhi</span>
           </div>
         </div>
         <nav className="ftr-links" aria-label="Contact">
@@ -26,7 +25,7 @@ export default function Footer() {
         </nav>
       </div>
       <div className="wrap" style={{ paddingBottom: 18 }}>
-        <p className="meta">© {new Date().getFullYear()} Dr Dolly Prasad · Oil on canvas · New Delhi</p>
+        <p className="meta">© {new Date().getFullYear()} Dr Dolly Prasad</p>
       </div>
       {WHATSAPP && <a className="btn btn-wa float-ask" href={whatsappHref()}><ChatIcon />Ask on WhatsApp</a>}
     </footer>

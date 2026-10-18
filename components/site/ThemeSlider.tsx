@@ -35,12 +35,15 @@ export default function ThemeSlider({ themes, every = 9000 }: { themes: Theme[];
 
   return (
     <div className="themes" ref={root} role="region" aria-roledescription="carousel" aria-label="The threads of her work">
-      <div className="themes-tabs" role="tablist">
-        {themes.map((t, k) => (
-          <button key={t.t} type="button" role="tab" aria-selected={k === i} onClick={() => setI(k)}>
-            <span>{String(k + 1).padStart(2, "0")}</span>{t.t}
-          </button>
-        ))}
+      <div className="themes-tabs">
+        {/* the tablist holds only the tabs; the arrows sit beside it */}
+        <div role="tablist" aria-label="Threads" style={{ display: "contents" }}>
+          {themes.map((t, k) => (
+            <button key={t.t} type="button" role="tab" aria-selected={k === i} onClick={() => setI(k)}>
+              <span>{String(k + 1).padStart(2, "0")}</span>{t.t}
+            </button>
+          ))}
+        </div>
         <span className="themes-arrows">
           <button type="button" aria-label="Previous" onClick={() => setI((i - 1 + n) % n)}>‹</button>
           <button type="button" aria-label="Next" onClick={() => setI((i + 1) % n)}>›</button>

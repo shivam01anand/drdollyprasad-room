@@ -6,9 +6,10 @@ import { InstagramIcon } from "@/components/site/Icons";
 import Until from "@/components/Until";
 import HashRedirect from "@/components/site/HashRedirect";
 import {
-  BIO_LINE, BIO_SUB, EMAIL, INSTAGRAM, NOW, PORTRAIT, SERIES_PAGES, SHOWS, SITE, STUDIO_PATH, worksIn,
+  BIO_LINE, BIO_SUB, EMAIL, INSTAGRAM, NOW, PORTRAIT, SERIES_PAGES, SHOWS, SITE, STATEMENT, STUDIO_PATH, worksIn,
 } from "@/lib/site";
 import { BY_ID } from "@/lib/works";
+import { dims } from "@/lib/images";
 
 const PERSON = {
   "@context": "https://schema.org",
@@ -44,7 +45,7 @@ export default function Home() {
 
       <Until until={now.until}>
         <Link className="nowstrip" href="/exhibitions">
-          <span className="live"><i aria-hidden="true" />Live now</span><b><span className="nw-long">{now.title}</span><span className="nw-short">{now.title.split(":")[0]}</span></b><span className="nw-where">{now.venue}, {now.city} · {now.when}</span><span className="nw-short nw-when">IHC · 18–21 Oct</span><u>Plan a visit →</u>
+          <span className="live"><i aria-hidden="true" />Live now</span><b><span className="nw-long">{now.title}</span><span className="nw-short">{now.title.split(":")[0]}</span></b><span className="nw-where">{now.venue}, {now.city} · {now.when}</span><span className="nw-short nw-when">IHC · 18–21 Oct</span><u>See the show →</u>
         </Link>
       </Until>
 
@@ -52,7 +53,7 @@ export default function Home() {
         <div className="sec-head">
           <div>
             <h2>Key collections</h2>
-            <p className="sec-line">Five collections, five walks of life, from a changing India to faith lived every day.</p>
+            <p className="sec-line">What she paints, from the India that is quietly leaving to faith lived every day.</p>
           </div>
           <Link className="link" href="/series">All collections →</Link>
         </div>
@@ -61,26 +62,25 @@ export default function Home() {
             <Link key={s.slug} className="card" href={`/series/${s.slug}`}>
               <div className="mat">
                 {/* eslint-disable-next-line @next/next/no-img-element */}
-                <img className="framed thin" src={thumb(s.hero)} alt={`${BY_ID.get(s.hero)?.title}, from ${s.label}`} loading="lazy" />
+                <img className="framed thin" src={thumb(s.hero)} alt={`${BY_ID.get(s.hero)?.title}, from ${s.label}`} loading="lazy" {...dims(thumb(s.hero))} />
               </div>
               <span className="card-t">{s.label}</span>
-              <span className="eyebrow">{worksIn(s.label).length} works <small>{s.period.replace(/^c\. /, "")}</small></span>
+              <span className="meta">{worksIn(s.label).length} works · {s.period}</span>
               <span className="meta">{s.line}</span>
             </Link>
           ))}
         </div>
       </section>
 
-      <section className="sec-tight wrap">
-        <div className="sec-head">
-          <div>
-            <h2>Available now</h2>
-            <p className="sec-line">Original oil paintings, ready for a new home. Prices on request.</p>
-          </div>
-          <Link className="link" href="/works?status=available">All available →</Link>
-        </div>
-        <div className="grid snap-row">
-          {AVAILABLE.map((id) => <Card key={id} w={BY_ID.get(id)!} />)}
+      <section className="hw-band">
+        <div className="wrap hw-in">
+          {/* eslint-disable-next-line @next/next/no-img-element */}
+          <img className="round" src="/site/ex/kala-dolly.jpg" alt="Dr Dolly Prasad beside one of her paintings" loading="lazy" {...dims("/site/ex/kala-dolly.jpg")} />
+          <figure className="hw-q">
+            <blockquote>{STATEMENT[0]}<br />{STATEMENT[1]}</blockquote>
+            <figcaption>Dr Dolly Prasad, from her artist’s statement</figcaption>
+            <Link className="link" href="/about">Her story →</Link>
+          </figure>
         </div>
       </section>
 
@@ -88,7 +88,7 @@ export default function Home() {
         <div className="sec-head">
           <div>
             <h2>On the walls</h2>
-            <p className="sec-line">Eighteen exhibitions and art fairs across India, and collectors in India, the USA and London.</p>
+            <p className="sec-line">Eighteen exhibitions and art fairs, 2005–2018, from Triveni Kala Sangam to the First International Kala Mela.</p>
           </div>
           <Link className="link" href="/exhibitions">All exhibitions →</Link>
         </div>
@@ -98,8 +98,8 @@ export default function Home() {
             return (
               <Link key={c.id} href={`/exhibitions#${c.id}`}>
                 {/* eslint-disable-next-line @next/next/no-img-element */}
-                <img src={c.src} alt={c.alt} loading="lazy" />
-                <span className="eyebrow rust">{e.when.replace(/^Opened 11 /, "").replace(/ · on view.*$/, "")}</span>
+                <img src={c.src} alt={c.alt} loading="lazy" {...dims(c.src)} />
+                <span className="meta">{e.when.replace(/^Opened 11 /, "").replace(/ · on view.*$/, "")}</span>
                 <b>{e.title}</b>
                 <span className="meta">{e.venue}, {e.city}</span>
               </Link>
@@ -109,32 +109,34 @@ export default function Home() {
       </section>
 
       <section className="sec-tight wrap">
-        <div className="about-row">
-          {/* eslint-disable-next-line @next/next/no-img-element */}
-          <img className="round" src="/site/ex/kala-dolly.jpg" alt="Dr Dolly Prasad beside one of her paintings" loading="lazy" />
-          <div className="txt">
-            <p className="eyebrow">About the artist</p>
-            <p className="big">An artist who makes the everyday memorable: an India that is changing fast, held in oil on canvas.</p>
-            <p className="meta" style={{ fontSize: 16 }}>She began as a doctor in New Delhi and soon turned to painting. Eighteen exhibitions and art fairs between 2005 and 2018, from Triveni Kala Sangam and India Habitat Centre to ICCR and the First International Kala Mela. Her paintings are with private collectors in India, the USA and London.</p>
-            <Link className="link" href="/about">Her story →</Link>
+        <div className="sec-head">
+          <div>
+            <h2>Available now</h2>
+            <p className="sec-line">Originals still with the artist. Prices on request.</p>
           </div>
+          <Link className="link" href="/works?status=available">All available →</Link>
+        </div>
+        <div className="grid snap-row">
+          {AVAILABLE.map((id) => <Card key={id} w={BY_ID.get(id)!} />)}
         </div>
       </section>
 
       <section className="ig-band">
         <div className="wrap ig-in">
           <div className="txt">
-            <p className="eyebrow">From the studio</p>
-            <h2>Follow {INSTAGRAM.handle} on Instagram</h2>
+            <h2>Follow {INSTAGRAM.handle}, or ask about a painting</h2>
             <p className="meta" style={{ fontSize: 16 }}>The paintings, the stories behind them, and the shows they hung in.</p>
-            <a className="btn btn-solid" href={INSTAGRAM.url} target="_blank" rel="noopener noreferrer"><InstagramIcon />Open Instagram</a>
+            <div className="ig-ctas">
+              <a className="btn btn-solid" href={INSTAGRAM.url} target="_blank" rel="noopener noreferrer"><InstagramIcon />Open Instagram</a>
+              <Link className="btn" href="/enquire">Enquire</Link>
+            </div>
           </div>
           <div className="ig-roll" aria-hidden="true">
             <div className="ig-track">
               {[...IG, ...IG].map((id, i) => (
                 <a key={i} href={INSTAGRAM.url} target="_blank" rel="noopener noreferrer" tabIndex={-1}>
                   {/* eslint-disable-next-line @next/next/no-img-element */}
-                  <img src={thumb(id)} alt="" loading="lazy" />
+                  <img src={thumb(id)} alt="" loading="lazy" {...dims(thumb(id))} />
                 </a>
               ))}
             </div>
