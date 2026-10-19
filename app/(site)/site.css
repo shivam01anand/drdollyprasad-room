@@ -2098,3 +2098,7 @@ body *{font-style:normal !important}
   .wh .namecard h1{font-size:36px}
   .wh .namecard .ctas .btn{min-height:44px}
 }
+.ftr-links .btn{min-height:44px;padding:0 24px}
+.pager button{min-width:44px;height:44px}
+.chip,.jump a{min-height:44px}
+.menu-panel .btn{min-height:44px}
