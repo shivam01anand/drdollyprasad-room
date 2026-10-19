@@ -1,5 +1,6 @@
 import type { Metadata } from "next";
 import { Fragment } from "react";
+import IndigoBand from "@/components/site/IndigoBand";
 import Link from "next/link";
 import Card, { thumb } from "@/components/site/Card";
 import { ON_THE_WORK, SERIES_PAGES, SMALL_PHOTO, worksIn } from "@/lib/site";
@@ -72,6 +73,9 @@ export default function SeriesIndex() {
           </Fragment>
         );
       })}
+      <IndigoBand title="Ask about a painting" line="Prices are on request. Write about any painting, or about her work in general." href="/enquire" label="Send an enquiry">
+        <div className="ibnd-chips"><Link className="btn btn-light" href="/works">See all the works</Link><Link className="btn btn-light" href="/exhibitions">Exhibitions</Link></div>
+      </IndigoBand>
     </>
   );
 }

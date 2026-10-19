@@ -23,20 +23,36 @@ const FOCUS: Record<string, string> = {
  */
 export default function Press({ items, more }: { items: PressItem[]; more?: { href: string; label: string } }) {
   const stills = items.filter((p) => p.kind !== "video");
+  const videos = items.filter((p) => p.kind === "video");
   const [open, setOpen] = useState<number | null>(null);
   return (
     <>
+      {videos.length > 0 && (
+        <ul className="press-videos" role="list">
+          {videos.map((p) => (
+            <li key={p.id} className="press-item is-video">
+              <figure>
+                <Clip p={p} />
+                <figcaption>
+                  <em>{p.source}</em>
+                  <b>{p.title}</b>
+                  <span>{p.line}</span>
+                  {p.credit && <small>{p.credit}</small>}
+                </figcaption>
+              </figure>
+            </li>
+          ))}
+        </ul>
+      )}
       <ul className="press" role="list">
-        {items.map((p) => (
+        {stills.map((p) => (
           <li key={p.id} className={`press-item is-${p.kind}`}>
             <figure>
-              {p.kind === "video" ? <Clip p={p} /> : (
-                <button type="button" className="press-open" onClick={() => setOpen(stills.indexOf(p))}
-                        aria-label={`Open full screen: ${p.title}`}>
-                  {/* eslint-disable-next-line @next/next/no-img-element */}
-                  <img src={p.sm ?? p.src} alt={p.alt} loading="eager" decoding="async" {...dims(p.sm ?? p.src)} style={{ objectPosition: FOCUS[p.id] ?? "50% 30%" }} />
-                </button>
-              )}
+              <button type="button" className="press-open" onClick={() => setOpen(stills.indexOf(p))}
+                      aria-label={`Open full screen: ${p.title}`}>
+                {/* eslint-disable-next-line @next/next/no-img-element */}
+                <img src={p.sm ?? p.src} alt={p.alt} loading="eager" decoding="async" {...dims(p.sm ?? p.src)} style={{ objectPosition: FOCUS[p.id] ?? "50% 30%" }} />
+              </button>
               <figcaption>
                 <em>{p.source}</em>
                 <b>{p.title}</b>
@@ -78,7 +94,7 @@ function Clip({ p }: { p: PressItem }) {
           <svg viewBox="0 0 24 24" aria-hidden="true"><path d="M8 5.5v13l11-6.5z" fill="currentColor" /></svg>
         </button>
       )}
-      {!on && <span className="press-watch" aria-hidden="true">Watch · NCR, 2010</span>}
+      {!on && <span className="press-watch" aria-hidden="true">Watch · {p.id === "tv-ncr-2010" ? "NCR, 2010" : "Television"}</span>}
     </div>
   );
 }

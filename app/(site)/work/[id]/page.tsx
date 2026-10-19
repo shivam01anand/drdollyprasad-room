@@ -1,5 +1,6 @@
 import type { Metadata } from "next";
 import Link from "next/link";
+import IndigoBand from "@/components/site/IndigoBand";
 import { notFound } from "next/navigation";
 import { BY_ID, LARGE, SHOW, SITE, WORKS, inchDims, quoted, workPath, type Work } from "@/lib/works";
 import { INSTAGRAM, LOOK, NOW_SHOWING_CONFIRMED, PULL, SMALL_PHOTO, shownYear, STUDIO_PATH, WHATSAPP, WORDS, enquireHref, labelLine, seriesPath, whatsappHref, worksIn } from "@/lib/site";
@@ -135,13 +136,9 @@ export default async function WorkPage({ params }: Props) {
       </section>
 
       {more.length > 0 && (
-        <section className="sec-tight">
-          <div className="sec-head">
-            <h2>More from {w.series}</h2>
-            <Link className="link" href={seriesPath(w.series)}>The collection’s story →</Link>
-          </div>
+        <IndigoBand title={`More from ${w.series}`} href={seriesPath(w.series)} label="The collection’s story">
           <div className="grid">{more.map((x) => <Card key={x.id} w={x} />)}</div>
-        </section>
+        </IndigoBand>
       )}
 
       <nav className="prevnext" aria-label="More of her work">

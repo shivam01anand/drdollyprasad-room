@@ -91,7 +91,7 @@ export default function Exhibitions() {
           <div>
             <p className="eyebrow">From the archive</p>
             <h2 id="press-h">In the press</h2>
-            <p className="sec-line">At India Habitat Centre in November 2010 she was interviewed beside the paintings themselves. Here too are an excerpt from NCR television and a listing from Delhi Times.</p>
+            <p className="sec-line">At India Habitat Centre in November 2010 she was interviewed beside the paintings themselves. Here too are two television excerpts and a listing from Delhi Times.</p>
           </div>
         </div>
         <Press items={PRESS_ITEMS} />
