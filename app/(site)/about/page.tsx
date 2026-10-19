@@ -70,19 +70,6 @@ export default function About() {
         </div>
       </section>
 
-      {/* In the press, short (CR-005): right after the second section, linking to the full set on Exhibitions */}
-      <section className="ab-band tone-stone ab-press" aria-labelledby="ab-press-h">
-        <div className="wrap">
-          <div className="sec-head">
-            <div>
-              <p className="eyebrow">From the archive</p>
-              <h2 id="ab-press-h">In the press</h2>
-            </div>
-          </div>
-          <Press items={PRESS_SHORT} more={{ href: "/exhibitions#press", label: "All the press, on Exhibitions" }} />
-        </div>
-      </section>
-
       <section className="ab-band tone-dark">
         <div className="wrap ab-statement">
           <p className="eyebrow">The work</p>
@@ -92,7 +79,7 @@ export default function About() {
         </div>
       </section>
 
-      <section className="ab-band tone-stone">
+      <section className="ab-band tone-light">
         <div className="wrap ab-split">
           <div className="ab-txt">
             <p className="eyebrow">Looking twice</p>
@@ -101,6 +88,19 @@ export default function About() {
             <Link className="btn btn-solid" href="/series">The five collections</Link>
           </div>
           <Roll label="A few of her paintings" items={paint(["bulls-and-wheel", "offering-of-light", "boy-with-bananas", "temple-bells", "woman-with-bird"])} />
+        </div>
+      </section>
+
+      {/* In the press, short (CR-005): right after the second section, linking to the full set on Exhibitions */}
+      <section className="ab-band tone-dark band-indigo ab-press" aria-labelledby="ab-press-h">
+        <div className="wrap">
+          <div className="sec-head">
+            <div>
+              <p className="eyebrow">From the archive</p>
+              <h2 id="ab-press-h">In the press</h2>
+            </div>
+          </div>
+          <Press items={PRESS_SHORT} more={{ href: "/exhibitions#press", label: "All the press, on Exhibitions" }} />
         </div>
       </section>
 

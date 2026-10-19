@@ -2248,3 +2248,10 @@ body *{font-style:normal !important}
   .card .meta,.m-card .meta,.ex-kind,.series-tiles .meta,.press figcaption span{font-size:15px}
   .pp-story{font-size:18px}
 }
+.wgroup .card .mat{background:transparent}
+.wgroup.band-white .card .card-t,.wgroup.band-white .card.is-sold .card-t{color:#141210}
+.wgroup.band-indigo .card .card-t,.wgroup.band-indigo .card.is-sold .card-t{color:#fff}
+.card.is-sold .card-t{color:#141210}
+.band-indigo .card.is-sold .card-t{color:#fff}
+.ab-band.tone-dark.ab-press .eyebrow,.ab-band.tone-dark.ab-press h2{color:#fff}
+.ab-band.tone-light + .ab-band.tone-light,.ab-hero + .ab-band.tone-light{border-top:1px solid var(--hair)}
