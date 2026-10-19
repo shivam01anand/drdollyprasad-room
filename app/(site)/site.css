@@ -2327,3 +2327,4 @@ body *{font-style:normal !important}
 .series-tiles .m-card{text-align:center;align-items:center}
 .series-tiles .m-card .card-t,.series-tiles .m-card .meta{text-align:center}
 .sband .eyebrow,.sband .btn{font-size:13px}
+.series-tiles .m-card .mat{width:100%;align-self:stretch}
