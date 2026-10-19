@@ -2277,3 +2277,53 @@ body *{font-style:normal !important}
 .ncard.rust small,.ncard.dark small,.ccard.indigo small{color:#D9DEEE !important}
 .ccard{padding:22px 16px;text-align:center;display:flex;flex-direction:column;gap:6px;text-decoration:none;justify-content:center}
 @media (max-width:640px){ .xcard b,.ncard b,.ccard b{font-size:17px} .ccard{padding:14px 10px} .ccard small{display:block;font-size:12px} .xcard small{display:none} }
+
+/* ======================================================================
+   v6 · batch 19 Oct
+   ====================================================================== */
+
+/* painting page: the views sit right under the two buttons, as small icons on ONE line (a 48 px tap area each) */
+.pp .pp-bar{margin-top:8px;gap:8px}
+.pp .pp-toggle,.pp .pp-zoom{min-height:30px;padding:0 12px;font-size:13px;letter-spacing:.08em;gap:6px}
+.pp .pp-toggle svg{width:14px;height:14px}
+.pp .pp-toggle::after,.pp .pp-zoom::after{inset:-7px -4px}
+@media (max-width:760px){ .pp .pp-toggle,.pp .pp-zoom{min-height:32px} .pp .pp-toggle::after,.pp .pp-zoom::after{inset:-6px -4px} }
+.pp .pp-strip{display:flex;flex-wrap:nowrap;justify-content:center;align-items:center;gap:4px;overflow:visible;margin:10px auto 0;padding:0;max-width:100%}
+.pp .pp-chip{flex:0 1 48px;width:48px;min-width:44px;height:48px;min-height:44px;padding:4px;border:0;background:transparent;opacity:.7;overflow:visible;position:relative}
+.pp .pp-chip>img,.pp .pp-chip>.pp-crop{display:block;width:100%;height:100%;border:1px solid #CFC6B9;background:#fff;object-fit:cover;box-sizing:border-box}
+.pp .pp-chip:first-child>img{object-fit:contain;padding:2px}
+.pp .pp-crop{background-size:320%}
+.pp .pp-chip:hover{opacity:1}
+.pp .pp-chip[aria-pressed="true"]{opacity:1;border:0}
+.pp .pp-chip[aria-pressed="true"]>img,.pp .pp-chip[aria-pressed="true"]>.pp-crop{border:2px solid var(--ink);box-shadow:0 0 0 2px #fff,0 0 0 3px var(--ink)}
+.pp .pp-chip:focus-visible{outline:2px solid var(--ink);outline-offset:1px}
+/* the story first, then the status line, so the page reads as one story */
+.pp .pp-text .pp-story{margin-top:4px}
+.pp .pp-text .pp-status{margin-top:4px}
+
+/* home: Key collections, the pictures much bigger, centred in their space */
+.series-tiles .m-card{width:clamp(270px,34vw,500px)}
+.series-tiles .mat{--mh:clamp(290px,31vw,470px);aspect-ratio:auto;height:var(--mh);padding:6px 4px 10px;align-items:center;justify-content:center}
+.series-tiles .mat img{width:min(100%,calc((var(--mh) - 16px) * var(--ar,.8)));height:auto;max-height:calc(var(--mh) - 16px);max-width:100%}
+@media (max-width:640px){ .series-tiles .m-card{width:min(78vw,340px)} .series-tiles .mat{--mh:clamp(290px,82vw,340px)} }
+.series-tiles .m-card .meta{max-width:46ch}
+
+/* collections: five bands, white and indigo in turn (as Works does); the last is white, so the closing indigo band is never doubled */
+.sband.band-white{background:#fff}
+.sband.band-indigo{background:var(--indigo);color:#fff}
+.sband.band-white,.sband.band-indigo{padding-block:clamp(28px,4vw,56px)}
+.sband.band-indigo .s-n{color:#FF9A9F}
+.sband.band-indigo h2,.sband.band-indigo h2 a{color:#fff}
+.sband.band-indigo .eyebrow{color:#D3D8E8}
+.sband.band-indigo .s-line{color:#E3E7F3}
+.sband.band-indigo .btn-light{border-color:rgba(255,255,255,.7);color:#fff;background-image:none}
+.sband.band-indigo .btn-light:hover{background:#fff;color:var(--indigo)}
+.sband.band-indigo .card .card-t,.sband.band-indigo .card.is-sold .card-t{color:#fff}
+.sband.band-indigo .card .status,.sband.band-indigo .card .st-sold,.sband.band-indigo .card .meta{color:#D3D8E8}
+.sband.band-white .card .card-t{color:#141210}
+
+/* collection stories: a dark chapter is the middle indigo band; it runs edge to edge */
+.chap-dark{box-shadow:0 0 0 100vmax var(--dark);clip-path:inset(0 -100vmax)}
+.series-tiles .m-card{text-align:center;align-items:center}
+.series-tiles .m-card .card-t,.series-tiles .m-card .meta{text-align:center}
+.sband .eyebrow,.sband .btn{font-size:13px}

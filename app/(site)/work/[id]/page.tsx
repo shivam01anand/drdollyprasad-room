@@ -109,9 +109,9 @@ export default async function WorkPage({ params }: Props) {
         <div className="pp-text">
           <h1 className="pp-title">{w.title}</h1>
           <p className="pp-facts">{[w.medium, w.size, shownYear(w)].filter(Boolean).join(" · ")}</p>
+          {lead && <p className="pp-story">{words ? `“${lead}”` : lead}{words && <span>Dr Dolly Prasad</span>}</p>}
           <p className="pp-status"><span className={`status st-${sold ? "sold" : w.status === "Enquire" ? "enquire" : "free"}`}><i aria-hidden="true" />{sold ? "In a private collection" : statusWord(w)}</span>
             <Link href={seriesPath(w.series)}>{w.series}</Link></p>
-          {lead && <p className="pp-story">{words ? `“${lead}”` : lead}{words && <span>Dr Dolly Prasad</span>}</p>}
         </div>
       </PaintingStage>
 

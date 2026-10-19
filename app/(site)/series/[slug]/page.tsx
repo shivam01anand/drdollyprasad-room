@@ -121,7 +121,13 @@ export default async function SeriesStory({ params }: Props) {
         </section>
       )}
 
-      <section className="story-intro wrap" style={s.quote ? undefined : { paddingTop: 48 }}>
+      {!s.quote && s.held && (
+        <section className="story-quote wrap">
+          <p className="quote">{s.held}</p>
+        </section>
+      )}
+
+      <section className="story-intro wrap" style={s.quote || s.held ? undefined : { paddingTop: 48 }}>
         {s.intro.map((p, i) => <p key={i}>{p}</p>)}
       </section>
 

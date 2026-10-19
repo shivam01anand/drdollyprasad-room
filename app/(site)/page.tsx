@@ -66,7 +66,8 @@ export default function Home() {
           <Link key={s.slug} className="card m-card" href={`/series/${s.slug}`}>
             <div className="mat">
               {/* eslint-disable-next-line @next/next/no-img-element */}
-              <img className="framed thin" src={thumb(s.hero)} alt={`${BY_ID.get(s.hero)?.title}, from ${s.label}`} loading="lazy" {...dims(thumb(s.hero))} />
+              <img className="framed thin" src={thumb(s.hero)} alt={`${BY_ID.get(s.hero)?.title}, from ${s.label}`} loading="lazy" {...dims(thumb(s.hero))}
+                   style={{ ["--ar" as string]: `${dims(thumb(s.hero)).width} / ${dims(thumb(s.hero)).height}` }} />
             </div>
             <span className="card-t">{s.label}</span>
             <span className="meta">{worksIn(s.label).length} works · {s.period}</span>

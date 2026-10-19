@@ -54,14 +54,14 @@ export default function SeriesIndex() {
           .filter((w) => !SMALL_PHOTO.has(w.id));
         return (
           <Fragment key={s.slug}>
-          <section id={s.slug} className={`sband tone-${i % 3}`}>
+          <section id={s.slug} className={`sband ${i % 2 ? "band-indigo" : "band-white"}`}>
             <div className="wrap srow">
               <div className="s-txt">
                 <span className="s-n">{String(i + 1).padStart(2, "0")}</span>
                 <h2><Link href={`/series/${s.slug}`}>{s.label}</Link></h2>
                 <span className="eyebrow">{s.period} · {works.length} works</span>
                 <p className="s-line">{s.line}</p>
-                <Link className="btn" href={`/series/${s.slug}`}>Read the story</Link>
+                <Link className={i % 2 ? "btn btn-light" : "btn"} href={`/series/${s.slug}`}>Read the story</Link>
               </div>
               <div className="s-works">
                 <Marquee seconds={Math.max(36, row.length * 9)} copies={row.length < 6 ? 6 : 4} reverse={i % 2 === 1} label={`Paintings from ${s.label}`} className="band-marq">

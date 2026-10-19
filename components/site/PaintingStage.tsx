@@ -96,8 +96,6 @@ export default function PaintingStage({ w, src, dims, small, sub, children }: {
         )}
       </div>
 
-      {children}
-
       <div className="pp-strip" ref={strip} role="group" aria-label="Other views">
         {items.map((it) => (
           <button key={it.label + (it.v.k === "detail" ? it.v.i : "")} type="button" className="pp-chip" aria-pressed={same(it.v)} aria-label={it.label} title={it.label} onClick={() => setView(it.v)}>
@@ -105,6 +103,8 @@ export default function PaintingStage({ w, src, dims, small, sub, children }: {
           </button>
         ))}
       </div>
+      {children}
+
       {zoom && <Zoom id={w.id} src={src} alt={name} title={w.title} sub={sub} onClose={() => setZoom(false)} />}
     </section>
   );
