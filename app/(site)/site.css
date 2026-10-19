@@ -2028,3 +2028,10 @@ body *{font-style:normal !important}
 }
 @media (max-width:640px){ .press-item.is-clipping .press-open img{aspect-ratio:auto;object-fit:contain} }
 @media (max-width:640px){ .press-item.is-clipping .press-open img{max-height:300px;background:#E8E1D5} }
+
+/* CR-009 QA: tap targets >= 44px without changing the look */
+.nav a{padding-block:7px;margin-block:-3px}
+.hdr-cta .btn{min-height:44px}
+.ss-list a{padding-block:9px;margin-block:-9px 0}
+@media (max-width:760px){ .pp-toggle,.pp-zoom{min-height:36px} }
+@media (max-width:640px){ .press-item.is-clipping .press-open img{max-height:230px} .press{align-items:stretch} }
