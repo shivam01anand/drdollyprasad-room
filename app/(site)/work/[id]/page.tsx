@@ -6,6 +6,7 @@ import { INSTAGRAM, LOOK, NOW_SHOWING_CONFIRMED, PULL, SMALL_PHOTO, shownYear, S
 import manifest from "@/public/art/manifest.json";
 import Card from "@/components/site/Card";
 import PaintingStage from "@/components/site/PaintingStage";
+import WpBar from "@/components/site/WpBar";
 import Tabs from "@/components/site/Tabs";
 import Share from "@/components/Share";
 import Until from "@/components/Until";
@@ -151,10 +152,10 @@ export default async function WorkPage({ params }: Props) {
       </div>
 
       {/* on a phone, the way to ask stays in reach under the thumb */}
-      <div className="wp-bar">
+      <WpBar>
         <span><b>{w.title}</b><small>{sold ? "In a private collection" : w.status === "Enquire" ? "Availability on enquiry" : "Available · Price on request"}</small></span>
         <Link className="btn btn-solid" href={enquireHref(w)}>{sold ? "Ask" : "Enquire"}</Link>
-      </div>
+      </WpBar>
 
       <script type="application/ld+json" dangerouslySetInnerHTML={{ __html: JSON.stringify(ld) }} />
     </div>

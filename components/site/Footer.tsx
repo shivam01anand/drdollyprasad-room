@@ -1,6 +1,7 @@
 import Link from "next/link";
 import { EMAIL, INSTAGRAM, PORTRAIT, STUDIO_PATH, WHATSAPP, whatsappHref } from "@/lib/site";
-import { ChatIcon, InstagramIcon } from "./Icons";
+import { InstagramIcon } from "./Icons";
+import FloatAsk from "./FloatAsk";
 
 export default function Footer() {
   return (
@@ -27,7 +28,7 @@ export default function Footer() {
       <div className="wrap" style={{ paddingBottom: 18 }}>
         <p className="meta">© {new Date().getFullYear()} Dr Dolly Prasad</p>
       </div>
-      {WHATSAPP && <a className="btn btn-wa float-ask" href={whatsappHref()}><ChatIcon />Ask on WhatsApp</a>}
+      {WHATSAPP && <FloatAsk href={whatsappHref()} />}
     </footer>
   );
 }

@@ -114,6 +114,8 @@ p{margin:0}
 @media (max-width:760px){
   .float-ask{display:flex;position:fixed;left:14px;right:14px;bottom:14px;z-index:25;min-height:52px;box-shadow:0 10px 26px rgba(0,0,0,.28)}
   .site{padding-bottom:76px}
+  .float-ask{transition:opacity .25s ease,transform .25s ease}
+  .float-ask.is-away{opacity:0;transform:translateY(16px);pointer-events:none;visibility:hidden}
 }
 
 /* ---- paintings in their frames ---- */
@@ -1034,6 +1036,8 @@ h1,h2,h3{font-weight:500;letter-spacing:-.005em}
   .wp-bar small{font-size:13px;color:var(--soft)}
   .wp-bar .btn{min-height:44px;flex:none}
   .site:has(.wp-bar){padding-bottom:72px}
+  .wp-bar.is-away{transform:translateY(110%);pointer-events:none;visibility:hidden;transition:transform .4s var(--ease),visibility 0s .4s}
+  body:has(.wp-bar) .float-ask{display:none}
 }
 
 /* ---- the painting, full screen ---- */
@@ -2036,3 +2040,61 @@ body *{font-style:normal !important}
 @media (max-width:760px){ .pp-toggle,.pp-zoom{min-height:36px} }
 @media (max-width:640px){ .press-item.is-clipping .press-open img{max-height:230px} .press{align-items:stretch} }
 .nav .ig{width:44px;height:44px}
+
+/* ===== CR-010 · fine paper, slim buttons, one rhythm ===== */
+:root{
+  --paper-shadow:0 1px 1px rgba(60,40,20,.05),0 6px 14px -6px rgba(60,40,20,.14),0 28px 60px -24px rgba(60,40,20,.28);
+  --sec-y:clamp(56px,7vw,104px); --sec-y-tight:clamp(40px,5vw,72px);
+}
+/* the white card is paper lying on the wall: soft warm shadow, generous air, a quiet hairline */
+.namecard{box-shadow:var(--paper-shadow);outline:1px solid rgba(120,100,80,.12);outline-offset:-1px;
+  padding:clamp(34px,3.4vw,44px) clamp(24px,3.4vw,44px) clamp(32px,3vw,40px);gap:12px}
+.namecard.has-face{padding-top:66px}
+.namecard .eyebrow{letter-spacing:.26em;font-size:12px;color:var(--soft)}
+.namecard h1{letter-spacing:-.01em}
+.namecard .held,.namecard .sub{letter-spacing:.01em}
+.namecard .ctas{margin-top:12px;gap:10px}
+@media (max-width:640px){
+  .namecard{padding:28px 22px 26px}
+  .namecard.has-face{padding-top:52px}
+}
+.xcard,.tcard,.ncard,.scard,.menu-panel{box-shadow:var(--shadow-1)}
+.menu-panel{border-color:var(--hair)}
+.menu summary{border-color:rgba(38,33,29,.55)}
+
+/* slim, refined buttons: 44px, small caps tracking, one weight */
+.btn{min-height:44px;padding:0 26px;font-size:12px;font-weight:500;letter-spacing:.18em}
+.namecard .ctas .btn{padding:0 14px;min-height:44px}
+.btn-solid{font-weight:500}
+
+/* one vertical rhythm between sections */
+.sec{padding-block:var(--sec-y)}
+.sec-tight{padding-block:var(--sec-y-tight)}
+.sec-head{margin-bottom:clamp(24px,3vw,36px)}
+
+/* one type scale: eyebrow 12, body 17, card title 24, section 32-44 */
+.eyebrow{font-size:12px;letter-spacing:.24em}
+.card-t{font-size:clamp(21px,2vw,24px);font-weight:500}
+
+/* the record list: every row the same height */
+.timeline>li{padding-block:14px}
+.timeline ul{gap:0}
+.timeline ul li{align-items:center;gap:0 14px}
+.timeline ul li>span,.timeline ul li>small{display:inline-flex;align-items:center;min-height:44px}
+@media (max-width:560px){ .timeline ul li{gap:0 12px} .timeline>li{gap:2px} }
+
+/* tap-to-zoom chip */
+.pp-chip{min-height:44px}
+/* hero card as fine paper (overrides the .wh rules above) */
+.wh .namecard,.wh .namecard.has-face{width:460px;min-height:0;padding:46px 52px 44px;gap:12px;
+  background:#FFFEFC;box-shadow:var(--paper-shadow);outline:1px solid rgba(120,100,80,.14);outline-offset:-1px}
+.wh .namecard .eyebrow{letter-spacing:.28em;color:var(--soft)}
+.wh .namecard h1{letter-spacing:-.005em;font-weight:500}
+.wh .namecard .wh-line{letter-spacing:.015em;color:var(--muted)}
+.wh .namecard .ctas{margin-top:14px;gap:10px}
+.wh .namecard .ctas .btn{min-height:44px;font-size:12px;letter-spacing:.2em}
+@media (max-width:640px){
+  .wh .namecard,.wh .namecard.has-face{width:340px;max-width:calc(100% - 48px);min-height:0;padding:34px 26px 30px;gap:10px}
+  .wh .namecard h1{font-size:36px}
+  .wh .namecard .ctas .btn{min-height:44px}
+}
