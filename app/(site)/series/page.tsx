@@ -20,7 +20,7 @@ export default function SeriesIndex() {
   return (
     <>
       <WallHero columns={SERIES_WALL} label="The five collections" eyebrow="Five collections" title="Collections"
-                sub="Five collections, five walks of life. The things India is quietly leaving behind. The closed doors of old houses. Faith, as it is lived every day. The faces of working lives. And her spring work, among flowers, leaves and birds.">
+                sub="Five collections, five walks of life.">
         <a className="btn btn-solid" href="#gone-are-the-days">The five collections</a>
         <Link className="btn" href="/works">See all the works</Link>
       </WallHero>

@@ -65,6 +65,10 @@ export const SERIES_WALL: Item[][] = [
   [P("mother-and-child"), P("man-among-metal-pans"), P("rickshaw-puller-and-coin"), P("bullock-cart-and-truck"), P("carriage-and-autorickshaw")],
 ];
 
+/** Works and About (CR-006): the same paintings, in another order, so every landing has its wall */
+export const WORKS_WALL: Item[][] = [...SERIES_WALL].reverse().map((c) => [...c].reverse());
+export const ABOUT_WALL: Item[][] = [...SERIES_WALL.slice(3), ...SERIES_WALL.slice(0, 3)].map((c, i) => (i % 2 ? [...c].reverse() : c));
+
 /**
  * Exhibitions: the shows in photographs, the press, her words on exhibiting and
  * short lines about each show, the venues by name and the numbers from her record.

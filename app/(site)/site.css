@@ -1558,25 +1558,10 @@ section.wrap:has(+ .marq) .sec-head{margin-bottom:0}
   .tband-open .tband-card{padding-top:16px;flex-direction:column;gap:4px}
 }
 
-/* ---- 3 · a painting under the mouse lifts well clear of its neighbours, and the row or wall holds still ---- */
+/* ---- 3 · hover: CR-006 returns to the gentle lift from before CR-005 (the 1.2x grow was "too big").
+   Rows and the wall still hold still under the mouse; the grown tile is no longer clipped. ---- */
 .marq .card .mat,.marq .mat{overflow:visible}
 .marq,.ig-roll{overflow-x:clip;overflow-y:visible}
-@media (hover:hover) and (pointer:fine){
-  .collage .tile,.marq .card .mat img,.show-card img,.tband-track img,.ig-track a img{
-    transition:transform .28s cubic-bezier(.2,.7,.2,1),box-shadow .28s ease,filter .28s ease}
-  .collage .col:has(.tile:hover){position:relative;z-index:6}
-  .collage .tile:hover,.collage .xcard:hover{position:relative;z-index:6;transform:scale(1.2);filter:none}
-  .collage .tile.flip:hover .framed,.collage .tile.flip:hover .back,.collage .xcard:hover,.collage .tile.ncard:hover,.collage .tile.qcard:hover,.collage .tile.scard:hover{
-    box-shadow:0 2px 6px rgba(20,12,6,.2),0 22px 44px -10px rgba(20,12,6,.5)}
-  .marq .card:hover,.show-card:hover,.tband-track a:hover,.ig-track a:hover{position:relative;z-index:6}
-  .marq .card:hover .mat img{transform:scale(1.2);box-shadow:0 2px 6px rgba(20,12,6,.2),0 22px 44px -10px rgba(20,12,6,.5)}
-  .show-card:hover img{transform:scale(1.18);box-shadow:0 2px 6px rgba(20,12,6,.2),0 22px 44px -10px rgba(20,12,6,.5)}
-  .tband-track a:hover img,.ig-track a:hover img{transform:scale(1.2);box-shadow:0 2px 6px rgba(20,12,6,.2),0 22px 44px -10px rgba(20,12,6,.5)}
-}
-@media (prefers-reduced-motion:reduce){
-  .collage .tile:hover,.collage .xcard:hover,.marq .card:hover .mat img,.show-card:hover img,.tband-track a:hover img,.ig-track a:hover img{transform:none}
-  .collage .tile:hover .framed,.marq .card:hover .mat img,.show-card:hover img,.tband-track a:hover img,.ig-track a:hover img{outline:2px solid var(--rust);outline-offset:3px}
-}
 
 /* ---- 4 · About: a calm, compact rhythm ---- */
 .ab-band{padding-block:clamp(36px,4.6vw,64px)}
@@ -1738,3 +1723,83 @@ main + .divider{padding:clamp(36px,4vw,56px) var(--gut) clamp(28px,3vw,40px)}
 /* P1-4 · the NCR clip opens on a real frame (her, speaking); the play button sits in the corner, clear of her face and the channel's text */
 .press-clip{aspect-ratio:1186/720}
 .press-play{left:14px;top:auto;bottom:14px;margin:0;width:56px;height:56px}
+
+/* ==========================================================================
+   CR-006 (Shubham's iPhone review, 19 Oct): the small white card returns to the
+   centre of every moving wall and title band, with the paintings running all
+   round it, on a phone and a computer; a smaller, minimal phone header.
+   ========================================================================== */
+
+/* ---- 1 · the centre card, smaller and tighter, over a vibrant wall ---- */
+.wh{display:block;position:relative;background:var(--wall)}
+.wh .collage{order:0}
+.wh-home .collage{height:min(80vh,780px)}
+.wh-page .collage{height:min(64vh,580px)}
+.wh .namecard{position:absolute;left:50%;top:50%;transform:translate(-50%,-50%);z-index:3;
+  width:min(400px,calc(100% - 64px));align-items:center;text-align:center;gap:6px;
+  padding:22px 26px 24px;background:var(--bg);box-shadow:0 24px 60px -18px rgba(38,33,29,.5)}
+.wh .namecard .face{width:56px;height:56px;margin:0 0 4px;border:2px solid var(--bg);outline:1px solid var(--ink)}
+.wh .namecard h1{font-size:clamp(36px,3.4vw,48px);line-height:1.04}
+.wh .namecard .held{font-size:19px;line-height:1.3}
+.wh .namecard .sub{font-size:15px;line-height:1.5;max-width:340px}
+.wh .namecard .ctas{display:flex;flex-wrap:wrap;justify-content:center;gap:8px;margin-top:8px;max-width:none;width:100%}
+.wh .namecard .ctas .btn{flex:1 1 auto;min-height:44px;padding:0 14px;font-size:13px;letter-spacing:.12em}
+@media (max-width:999px){
+  .wh-home .collage{height:min(74svh,640px)}
+  .wh-page .collage{height:min(64svh,520px)}
+  .wh .namecard{padding:20px 20px 22px;gap:6px}
+}
+@media (max-width:640px){
+  .wh-home .collage{height:min(72svh,600px)}
+  .wh-page .collage{height:min(62svh,480px)}
+  .wh .namecard{width:calc(100% - 64px);max-width:330px;padding:16px 16px 18px;gap:4px}
+  .wh .namecard .face{display:none}
+  .wh .namecard .eyebrow{font-size:13px;letter-spacing:.16em}
+  .wh .namecard h1{font-size:32px}
+  .wh .namecard .held{font-size:17px}
+  .wh .namecard .sub{display:none}
+  .wh .namecard .ctas{margin-top:6px;gap:6px}
+  .wh .namecard .ctas .btn{flex:1 1 100%;letter-spacing:.1em}
+}
+
+/* the Works band: the small white card centred on the running paintings */
+.tband.tband-open{position:relative;height:clamp(240px,22vw,300px);display:flex;align-items:center;justify-content:center;
+  overflow:hidden;background:var(--wall);margin:0 calc(-1 * var(--gut)) clamp(16px,2vw,24px)}
+.tband-open .tband-row{position:absolute;inset:0;height:auto;margin:0;overflow:visible}
+.tband-open .tband-track img{height:clamp(170px,16vw,220px)}
+.tband-open .tband-card{position:relative;z-index:2;background:var(--bg);box-shadow:0 20px 50px -16px rgba(38,33,29,.5);
+  flex-direction:column;align-items:center;text-align:center;gap:4px;padding:16px 24px 18px;max-width:min(420px,calc(100% - 64px))}
+.tband-open .tband-card .page-title{font-size:clamp(36px,3.4vw,48px)}
+.tband-open .tband-card p{font-size:15px}
+@media (max-width:640px){
+  .tband.tband-open{height:230px;margin-inline:calc(-1 * var(--gut))}
+  .tband-open .tband-row{height:auto}
+  .tband-open .tband-track img{height:170px}
+  .tband-open .tband-card{padding:12px 16px 14px;flex-direction:column;gap:2px}
+  .tband-open .tband-card .page-title{font-size:32px}
+}
+
+/* ---- 3 · phone header: a thin village strip, the name on one line, a compact menu (63 px; 52 px once scrolled) ---- */
+@media (max-width:640px){
+  :root{--hdr-tuck:11px}
+  .hdr{padding-top:0}
+  .hdr .band-top{height:18px;background-image:url(/site/borders/border-phone@2x.png);background-size:auto 100%}
+  .hdr-in,.is-scrolled .hdr-in{padding-block:0;min-height:44px}
+  .brand,.is-scrolled .brand{gap:8px;min-height:44px}
+  .brand img,.is-scrolled .brand img{width:30px;height:30px}
+  .brand-t{gap:0}
+  .brand-t b,.is-scrolled .brand-t b{font-size:21px;white-space:nowrap}
+  .brand-t i{display:none}
+  .burger{width:44px;height:44px;gap:6px}
+}
+
+/* CR-006 mocks: every landing the same wall height and the same card (size, centre, anatomy) */
+.wh-home .collage,.wh-page .collage{height:min(64vh,576px)}
+.wh .namecard{width:400px;max-width:calc(100% - 64px)}
+.wh .namecard .wh-line{font-family:var(--serif);font-style:italic;font-size:19px;line-height:1.3;color:var(--muted);max-width:330px}
+@media (max-width:999px){ .wh-home .collage,.wh-page .collage{height:min(60svh,500px)} }
+@media (max-width:640px){
+  .wh-home .collage,.wh-page .collage{height:min(60svh,480px)}
+  .wh .namecard{width:300px;max-width:calc(100% - 64px)}
+  .wh .namecard .wh-line{font-size:17px}
+}

@@ -1,6 +1,8 @@
 import type { Metadata } from "next";
 import Link from "next/link";
 import Roll, { type RollItem } from "@/components/site/Roll";
+import WallHero from "@/components/site/WallHero";
+import { ABOUT_WALL } from "@/components/site/Collage";
 import ThemeSlider, { type Theme } from "@/components/site/ThemeSlider";
 import Press from "@/components/site/Press";
 import { PRESS_SHORT } from "@/lib/press";
@@ -52,15 +54,18 @@ const THREADS: Theme[] = [
 export default function About() {
   return (
     <>
-      <section className="ab-band ab-hero">
+      {/* CR-006: About opens like every landing, the white card centred on a wall of her paintings */}
+      <WallHero columns={ABOUT_WALL} label="About the artist" eyebrow="About the artist" title="Dr Dolly Prasad" held="A doctor who paints.">
+        <a className="btn btn-solid" href="#story">Her story</a>
+        <Link className="btn" href="/works">See her work</Link>
+      </WallHero>
+      <section id="story" className="ab-band ab-hero">
         <div className="wrap ab-hero-in">
           <figure className="ab-portrait">
             {/* eslint-disable-next-line @next/next/no-img-element */}
             <img src={PORTRAIT_LARGE} alt="Dr Dolly Prasad beside one of her paintings at the First International Kala Mela, 2018" />
           </figure>
           <div className="ab-txt">
-            <p className="eyebrow">About the artist</p>
-            <h1>Dr Dolly Prasad</h1>
             <p className="ab-p">A New Delhi artist who makes the everyday memorable. For her, the ordinary is never small: a clay gullak, a closed door, a lamp lifted at aarti, a face at the corner of a lane. Each holds a story, and each is slipping away as India changes.</p>
           </div>
         </div>

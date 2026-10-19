@@ -1,6 +1,7 @@
 import type { Metadata } from "next";
 import Link from "next/link";
-import TitleBand from "@/components/site/TitleBand";
+import WallHero from "@/components/site/WallHero";
+import { WORKS_WALL } from "@/components/site/Collage";
 import WorksBrowser from "@/components/site/WorksBrowser";
 import { INSTAGRAM } from "@/lib/site";
 import { WORKS } from "@/lib/works";
@@ -12,15 +13,17 @@ export const metadata: Metadata = {
   alternates: { canonical: "/works" },
 };
 
-const BAND = ["bulls-and-wheel", "temple-bells", "red-turban-portrait", "offering-of-light", "weathered-door-ring", "boy-with-bananas", "postbox-and-stamps", "three-veiled-women", "woman-with-bird", "coins-and-clay-bank"];
 
 /** the works page opens on the paintings themselves: a title, one line, then the grid */
 export default function WorksPage() {
   return (
+    <>
+    <WallHero columns={WORKS_WALL} label="Her paintings" eyebrow="Oil on canvas" title="Works"
+              held={`All ${WORKS.length} paintings, in five collections. Prices on request.`}>
+      <a className="btn btn-solid" href="#all">See the paintings</a>
+      <Link className="btn" href="/enquire">Enquire</Link>
+    </WallHero>
     <div className="wrap">
-      <TitleBand title="Works" ids={BAND}>
-        <p>All {WORKS.length} paintings, in five collections. Prices on request.</p>
-      </TitleBand>
       <section id="all" style={{ scrollMarginTop: 110 }}>
         <WorksBrowser />
       </section>
@@ -33,5 +36,6 @@ export default function WorksPage() {
         <p className="meta" style={{ marginTop: 18 }}>Looking for something in particular? <Link href="/enquire">Ask about a painting</Link>, or see <Link href="/series">the five collections</Link>.</p>
       </section>
     </div>
+    </>
   );
 }
