@@ -2259,3 +2259,4 @@ body *{font-style:normal !important}
 .ex-lede,p.meta,.lede,.ig-in .txt p,.pp-story,.pp-story span{font-size:17px !important;line-height:1.6}
 .ex-kind,.ex-ch small,.ex-ch-where small,small{font-size:15px !important}
 @media (max-width:640px){ .ex-lede,p.meta,.lede,.ig-in .txt p{font-size:16px !important} .pp-story{font-size:18px !important} }
+.wgroup .card .mat{overflow:visible}
