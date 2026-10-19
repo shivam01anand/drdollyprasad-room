@@ -11,6 +11,8 @@
  * a recent work with no known status reads "Enquire".
  */
 
+import { dims } from "./images";
+
 export type Status = "Available" | "Sold" | "Enquire";
 
 export type Work = {
@@ -31,7 +33,7 @@ const OIL = "Oil on canvas";
 const W = (id: string, title: string, series: string, status: Status, extra: Partial<Work> = {}): Work =>
   ({ id, title, series, status, medium: OIL, ...extra });
 
-export const WORKS: Work[] = [
+const CATALOGUE: Work[] = [
   // Gone Are The Days — 2016 to 2018
   W("rickshaw-puller-and-coin", "Twenty Paise", "Gone Are The Days", "Available", { year: "2016 to 2018" }),
   W("carriage-and-autorickshaw", "Gone Are The Days [A]", "Gone Are The Days", "Available", { year: "2016 to 2018" }),
@@ -81,6 +83,28 @@ export const WORKS: Work[] = [
     { year: "2024", size: "24 × 24 in", inches: 24, medium: "Oil and pastel on canvas" }),
   W("boy-with-bananas", "Under Canopy of Greens", "Onset of Spring", "Available", { year: "2025", size: "36 × 36 in", inches: 36 }),
 ];
+
+/**
+ * MISSING SIZES (Shubham, 19 Oct 2026, 01:16; the COO adds "approx." until confirmed).
+ * A painting with no stated size is shown by the shape of its photograph:
+ *   tall rectangle  -> "approx. 48 × 36 in"   (height × width)
+ *   landscape       -> "approx. 36 × 48 in"
+ *   square          -> left blank
+ * Confirmed sizes are never touched. `inches` stays unset, so an approximate size never
+ * drives the true-scale hang or the S / M / L filter. Every id changed is listed in
+ * qa-shots/v5/DIMENSIONS.md; replace the entry with her real size when she confirms it.
+ */
+const shapeSize = (w: Work): Work => {
+  if (w.size) return w;
+  const d = dims(`/site/thumbs/${w.id}.jpg`);
+  if (!d.width || !d.height) return w;
+  const r = d.height / d.width;
+  if (r > 1.1) return { ...w, size: "approx. 48 × 36 in" };
+  if (r < 0.91) return { ...w, size: "approx. 36 × 48 in" };
+  return w;
+};
+
+export const WORKS: Work[] = CATALOGUE.map(shapeSize);
 
 export const BY_ID = new Map(WORKS.map((w) => [w.id, w]));
 
