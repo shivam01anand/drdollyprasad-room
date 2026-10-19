@@ -1450,12 +1450,15 @@ section.wrap:has(+ .marq) .sec-head{margin-bottom:0}
    Each painting whole (contained in a square mat, never cropped), its title under it. */
 
 .works-grid{grid-template-columns:repeat(2,minmax(0,1fr));gap:clamp(28px,4vw,56px) clamp(12px,3vw,48px);max-width:1080px;margin-inline:auto}
-.works-grid .mat{aspect-ratio:1/1;padding:4% 4% 4%;margin-inline:0;margin-bottom:8px;align-items:flex-end}
-.works-grid .mat img{max-width:100%;max-height:calc(100cqw - 8cqw);width:auto;height:auto;object-fit:contain}
+.works-grid{align-items:stretch}
+.works-grid .card{display:flex;flex-direction:column}
+/* each row is as tall as its taller painting; both sit on one line above their titles */
+.works-grid .mat{aspect-ratio:auto;flex:1 1 auto;padding:12px 4% 24px;margin-inline:0;margin-bottom:0;align-items:flex-end}
+.works-grid .mat img{aspect-ratio:auto var(--ar,1);width:min(100%,calc(125cqw * var(--ar,1)));max-width:100%;max-height:none;height:auto}
 .works-grid .card-t{font-size:clamp(17px,1.6vw,24px);line-height:1.15}
 @media (max-width:640px){
   .works-grid{gap:26px 12px}
-  .works-grid .mat{padding:4%;margin-bottom:6px}
+  .works-grid .mat{padding:8px 3% 18px;margin-bottom:0}
   .works-grid .card-t{font-size:17px}
   .works-grid .card .meta{display:none}
   .works-grid .status{font-size:13px}
@@ -1469,3 +1472,5 @@ section.wrap:has(+ .marq) .sec-head{margin-bottom:0}
   .next-series>*{padding:22px 18px}
   .next-series .btn{white-space:normal;text-align:center;flex:1 1 100%}
 }
+/* the venue cards on the Exhibitions wall: full-strength type on rust (contrast) */
+.ncard.rust em,.ncard.rust small{opacity:1}
