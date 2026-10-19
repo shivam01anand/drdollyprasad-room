@@ -6,6 +6,12 @@ import Gallery from "./Gallery";
 import { dims } from "@/lib/images";
 import type { PressItem } from "@/lib/press";
 
+/** where each face is (object-position), so a phone crop never cuts her head */
+const FOCUS: Record<string, string> = {
+  "ihc-press-01": "78% 40%", "ihc-press-06": "60% 72%", "ihc-press-03": "55% 45%", "ihc-press-02": "55% 35%",
+  "ihc-press-04": "30% 55%", "ihc-press-05": "58% 48%", "ihc-press-b": "75% 40%", "delhi-times": "50% 30%",
+};
+
 /**
  * In the press (CR-005): an editorial collage of the interviews, the papers and
  * the television archive, each in a thin black frame with a soft shadow.
@@ -28,7 +34,7 @@ export default function Press({ items, more }: { items: PressItem[]; more?: { hr
                 <button type="button" className="press-open" onClick={() => setOpen(stills.indexOf(p))}
                         aria-label={`Open full screen: ${p.title}`}>
                   {/* eslint-disable-next-line @next/next/no-img-element */}
-                  <img src={p.sm ?? p.src} alt={p.alt} loading="lazy" decoding="async" {...dims(p.sm ?? p.src)} />
+                  <img src={p.sm ?? p.src} alt={p.alt} loading="eager" decoding="async" {...dims(p.sm ?? p.src)} style={{ objectPosition: FOCUS[p.id] ?? "50% 30%" }} />
                 </button>
               )}
               <figcaption>
@@ -72,6 +78,7 @@ function Clip({ p }: { p: PressItem }) {
           <svg viewBox="0 0 24 24" aria-hidden="true"><path d="M8 5.5v13l11-6.5z" fill="currentColor" /></svg>
         </button>
       )}
+      {!on && <span className="press-watch" aria-hidden="true">Watch · NCR, 2010</span>}
     </div>
   );
 }

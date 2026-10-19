@@ -103,15 +103,18 @@ export default async function WorkPage({ params }: Props) {
     <div className="wp">
       {/* CR-007: the big painting, the other views under it, then the text */}
       <PaintingStage w={w} src={src} dims={d ? { w: d.w, h: d.h } : undefined}
-                     small={!!d && Math.max(d.w, d.h) < 600} sub={labelLine(w)} />
+                     small={!!d && Math.max(d.w, d.h) < 600} sub={labelLine(w)}>
+        <div className="pp-text">
+          <h1 className="pp-title">{w.title}</h1>
+          <p className="pp-facts">{[w.medium, w.size, shownYear(w)].filter(Boolean).join(" · ")}</p>
+          <p className="pp-status"><span className={`status st-${sold ? "sold" : w.status === "Enquire" ? "enquire" : "free"}`}><i aria-hidden="true" />{sold ? "In a private collection" : statusWord(w)}</span>
+            <Link href={seriesPath(w.series)}>{w.series}</Link></p>
+          {lead && <p className="pp-story">{words ? `“${lead}”` : lead}{words && <span>Dr Dolly Prasad</span>}</p>}
+        </div>
+      </PaintingStage>
 
       <div className="wrap">
-      <article className="pp-text">
-        <h1 className="pp-title">{w.title}</h1>
-        <p className="pp-facts">{[w.medium, w.size, shownYear(w)].filter(Boolean).join(" · ")}</p>
-        <p className="pp-status"><span className={`status st-${sold ? "sold" : w.status === "Enquire" ? "enquire" : "free"}`}><i aria-hidden="true" />{sold ? "In a private collection" : statusWord(w)}</span>
-          <Link href={seriesPath(w.series)}>{w.series}</Link></p>
-        {lead && <p className="pp-story">{words ? `“${lead}”` : lead}{words && <span>Dr Dolly Prasad</span>}</p>}
+      <div className="pp-text pp-after">
         {NOW_SHOWING_CONFIRMED && SHOW.works.includes(id) && (
           <Until until={SHOW.until}><p className="show-note">{SHOW.line}</p></Until>
         )}
@@ -124,7 +127,7 @@ export default async function WorkPage({ params }: Props) {
           <a href={`${STUDIO_PATH}#work=${id}`}>In her studio →</a>
           <Share title={`${quoted(w.title)} · Dr Dolly Prasad`} path={workPath(id)} className="link share-btn" />
         </div>
-      </article>
+      </div>
 
       <section className="wp-lower" style={{ paddingBottom: 28 }}>
         <Tabs tabs={tabs} />

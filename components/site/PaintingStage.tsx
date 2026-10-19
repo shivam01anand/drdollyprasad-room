@@ -19,8 +19,8 @@ type View = { k: "full" } | { k: "detail"; i: number } | { k: "room"; id: string
  * strip of the other views (close details, rooms); and a quiet "See it in a room"
  * switch that puts the painting on a wall, with its stated size as the caption.
  */
-export default function PaintingStage({ w, src, dims, small, sub }: {
-  w: Work; src: string; dims?: { w: number; h: number }; small: boolean; sub?: string;
+export default function PaintingStage({ w, src, dims, small, sub, children }: {
+  w: Work; src: string; dims?: { w: number; h: number }; small: boolean; sub?: string; children?: React.ReactNode;
 }) {
   const rooms: RoomView[] = dims ? roomsFor(w, dims.w / dims.h, { pilot: true }) : [];
   const [view, setView] = useState<View>({ k: "full" });
@@ -91,10 +91,12 @@ export default function PaintingStage({ w, src, dims, small, sub }: {
         )}
         {!inRoom && (
           <button type="button" className="pp-zoom" onClick={open}>
-            <span className="on-fine">Click to zoom</span><span className="on-touch">Tap to zoom</span>
+            <span className="z-fine">Click to zoom</span><span className="z-touch">Tap to zoom</span>
           </button>
         )}
       </div>
+
+      {children}
 
       <div className="pp-strip" ref={strip} role="group" aria-label="Other views">
         {items.map((it) => (

@@ -54,7 +54,7 @@ export default function Exhibitions() {
         const photos = s.albums.flatMap((a) => a.photos);
         return (
           <Fragment key={s.id}>
-          <section id={s.id} className="ex-ch" aria-labelledby={`${s.id}-h`}>
+          <section id={s.id} className={`ex-ch${k % 2 ? " band-cream" : ""}`} aria-labelledby={`${s.id}-h`}>
             <header className="ex-ch-head">
               <span className="ex-ch-year">{s.year}</span>
               <div>
@@ -85,7 +85,7 @@ export default function Exhibitions() {
           </section>
           {/* In the press is the page's third section: right after India Habitat Centre, the show the interviews are from (QA P1-1) */}
           {k === 0 && (
-            <section id="press" className="ex-press" aria-labelledby="press-h">
+            <section id="press" className="ex-press band-indigo" aria-labelledby="press-h">
         <span id="on-screen" aria-hidden="true" />
         <div className="sec-head">
           <div>

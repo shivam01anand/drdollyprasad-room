@@ -143,10 +143,15 @@ function Tile({ it }: { it: Item }) {
 /** every column holds its list REP times, so it is full at the start and loops without a seam, however tall the wall */
 const repFor = (items: Item[]) => (items.length >= 8 ? 2 : 4);
 
+/** every wall is seven columns wide, so a tile is the same size on every page (CR-008); a short wall repeats its columns, the repeats started half way down */
+const WALL_COLS = 7;
+const half = (items: Item[]) => [...items.slice(Math.ceil(items.length / 2)), ...items.slice(0, Math.ceil(items.length / 2))];
+
 export function Wall({ columns, speed = 95 }: { columns: Item[][]; speed?: number }) {
+  const all = Array.from({ length: Math.max(WALL_COLS, columns.length) }, (_, i) => (i < columns.length ? columns[i] : half(columns[i % columns.length])));
   return (
-    <WallDrift n={columns.length}>
-      {columns.map((items, i) => (
+    <WallDrift n={all.length}>
+      {all.map((items, i) => (
         <div key={i} data-rep={repFor(items)} className={`col${i % 2 ? " down" : ""}`} style={{ ["--dur" as string]: `${Math.round(speed * (1 + (i % 3) * 0.17))}s` }}>
           {Array.from({ length: repFor(items) }, () => items).flat().map((it, j) => <Tile key={j} it={it} />)}
         </div>

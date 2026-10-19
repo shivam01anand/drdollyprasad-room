@@ -2,7 +2,7 @@
 
 import Link from "next/link";
 import { usePathname } from "next/navigation";
-import { useEffect, useState } from "react";
+import { useEffect, useRef, useState } from "react";
 import { INSTAGRAM, NAV, PORTRAIT, STUDIO_PATH, WHATSAPP, whatsappHref } from "@/lib/site";
 import { ChatIcon, InstagramIcon } from "./Icons";
 
@@ -17,14 +17,15 @@ export default function Header() {
 
   // a page chosen closes the menu
   useEffect(() => { setOpen(false); }, [path]);
-  // while the menu is open the page beneath stays still, and Escape closes it
+  // Escape or a tap outside the panel closes it; the page beneath keeps scrolling (CR-008: a small dropdown, not a takeover)
+  const bar = useRef<HTMLElement>(null);
   useEffect(() => {
     if (!open) return;
-    const prev = document.body.style.overflow;
-    document.body.style.overflow = "hidden";
     const key = (e: KeyboardEvent) => { if (e.key === "Escape") setOpen(false); };
+    const away = (e: PointerEvent) => { if (bar.current && !bar.current.contains(e.target as Node)) setOpen(false); };
     addEventListener("keydown", key);
-    return () => { document.body.style.overflow = prev; removeEventListener("keydown", key); };
+    document.addEventListener("pointerdown", away);
+    return () => { removeEventListener("keydown", key); document.removeEventListener("pointerdown", away); };
   }, [open]);
 
   const here = (href: string) => (href === "/" ? path === "/" : path === href || path.startsWith(`${href}/`)) ||
@@ -33,13 +34,13 @@ export default function Header() {
   const link = (n: { href: string; label: string }, i?: number) =>
     n.href === STUDIO_PATH
       // the studio is its own page with its own styles: a full load
-      ? <a key={n.href} href={n.href} style={i !== undefined ? { ["--i" as string]: i } : undefined}>{n.label}</a>
+      ? <a key={n.href} href={n.href} onClick={() => setOpen(false)} style={i !== undefined ? { ["--i" as string]: i } : undefined}>{n.label}</a>
       : <Link key={n.href} href={n.href} aria-current={here(n.href) ? "page" : undefined}
               style={i !== undefined ? { ["--i" as string]: i } : undefined}
               onClick={() => setOpen(false)}>{n.label}</Link>;
 
   return (
-    <header className={`hdr${open ? " is-open" : ""}`}>
+    <header ref={bar} className={`hdr${open ? " is-open" : ""}`}>
       {/* the village line sketch rides with the bar: crisp at the top of the page, frosted with it once the page moves (CR-005) */}
       <div className="band band-top" aria-hidden="true" />
       <div className="wrap hdr-in">

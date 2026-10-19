@@ -44,7 +44,7 @@ export const PRESS_ITEMS: PressItem[] = [
     "In front of the cameras",
     "Interviewed beside The Bullocks at Open Palm Court, India Habitat Centre, New Delhi."),
   {
-    id: "tv-ncr-2010", kind: "video", src: "/site/press/tv-ncr-2010.mp4", poster: "/site/press/tv-ncr-2010.jpg",
+    id: "tv-ncr-2010", kind: "video", src: "/site/press/tv-ncr-2010.mp4", poster: "/site/press/tv-ncr-2010-smile.jpg",
     alt: "A television excerpt: the camera moves from her paintings to Dr Dolly Prasad, speaking in the exhibition.",
     title: "On screen · June 2010",
     line: "The recording carries a 12 June 2010 date display. The camera turns from the paintings to her, speaking within the exhibition.",

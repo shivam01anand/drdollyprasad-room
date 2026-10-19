@@ -51,6 +51,7 @@ export default function Home() {
         </Link>
       </Until>}
 
+      <div className="layer band-indigo">
       <section className="sec wrap">
         <div className="sec-head">
           <div>
@@ -73,7 +74,7 @@ export default function Home() {
           </Link>
         ))}
       </Marquee>
-
+      </div>
 
       <section className="hw-band">
         <div className="wrap hw-in">
@@ -87,6 +88,7 @@ export default function Home() {
         </div>
       </section>
 
+      <div className="layer band-cream">
       <section className="sec wrap">
         <div className="sec-head">
           <div>
@@ -110,7 +112,7 @@ export default function Home() {
           );
         })}
       </Marquee>
-
+      </div>
 
       <section className="sec-tight wrap">
         <div className="sec-head">

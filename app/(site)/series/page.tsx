@@ -6,6 +6,7 @@ import { ON_THE_WORK, SERIES_PAGES, SMALL_PHOTO, worksIn } from "@/lib/site";
 import { BY_ID } from "@/lib/works";
 import { dims } from "@/lib/images";
 import Marquee from "@/components/site/Marquee";
+import SeriesSlides from "@/components/site/SeriesSlides";
 import WallHero from "@/components/site/WallHero";
 import { SERIES_WALL } from "@/components/site/Collage";
 
@@ -26,17 +27,19 @@ export default function SeriesIndex() {
       </WallHero>
 
       <section className="wrap" style={{ paddingBottom: 8 }}>
-        <div className="big-tiles">
-          {SERIES_PAGES.map((s) => (
-            <Link key={s.slug} className="big-tile" href={`/series/${s.slug}`}>
-              <span className="bt-img" style={{ ["--art" as string]: `url(${thumb(s.hero)})` }}>
-                {/* eslint-disable-next-line @next/next/no-img-element */}
-                <img className="framed" src={thumb(s.hero)} alt={`${BY_ID.get(s.hero)?.title}, from ${s.label}`} {...dims(thumb(s.hero))} />
-              </span>
-              <b>{s.label}</b>
-              <span className="meta">{worksIn(s.label).length} works · {s.period}</span>
-            </Link>
-          ))}
+        <div className="ss-intro">
+          <div className="ss-txt">
+            <p className="eyebrow">Five collections</p>
+            <h2>One painter, five ways of looking</h2>
+            <ol className="ss-list">
+              {SERIES_PAGES.map((s, i) => (
+                <li key={s.slug}><span>{String(i + 1).padStart(2, "0")}</span>
+                  <div><Link href={`/series/${s.slug}`}>{s.label}</Link><small>{s.line}</small></div></li>
+              ))}
+            </ol>
+          </div>
+          <SeriesSlides slides={SERIES_PAGES.map((s) => ({ slug: s.slug, label: s.label, n: worksIn(s.label).length, src: thumb(s.hero),
+            alt: `${BY_ID.get(s.hero)?.title}, from ${s.label}`, ...dims(thumb(s.hero)) }))} />
         </div>
         <p className="quote series-sum-q">“{ON_THE_WORK}”<span className="eyebrow">Dr Dolly Prasad, on her work</span></p>
       </section>
