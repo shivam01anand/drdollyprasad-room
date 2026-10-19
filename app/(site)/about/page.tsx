@@ -63,7 +63,7 @@ export default function About() {
           <div className="ab-txt">
             <p className="eyebrow">Who she is</p>
             <h2>The good days were the everyday</h2>
-            <p className="ab-p">She is a doctor, and a painter in oil on canvas. The play of emotion on a face has always held her, in her work at the hospital and on the canvas.</p>
+            <p className="ab-p">She is a doctor, and a painter in oil on canvas. Doctors learn to look at people carefully, and she kept that habit when she picked up the brush: the play of emotion on a face has always held her, at the hospital and on the canvas.</p>
             <p className="ab-p">Her subject is the India around her as it changes: rickshaws sharing the road with autos, coins out of use, old doors shut and kept. She paints them with the warmth of someone who remembers, and the hope of someone who still looks. Never relics; always parts of a life.</p>
           </div>
           <Roll label="Faces from her portraits" items={paint(["red-turban-portrait", "three-veiled-women", "boy-and-kettle", "yellow-turban-portrait", "mother-and-child"])} />
