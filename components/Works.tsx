@@ -80,7 +80,7 @@ export default function Works({ dims }: { dims: Dims }) {
 
 /** her approved introduction (the Sacred Fragments catalogue, Oct 2026) */
 const STATEMENT =
-  "Dr. Dolly Prasad’s art is the everyday held sacred. A\u00A0self-taught painter, she catches the hues of " +
+  "Dr. Dolly Prasad’s art is the everyday held sacred. A\u00A0painter, she catches the hues of " +
   "India in its waiting and its wishing, its worship and its whispers.";
 
 /**

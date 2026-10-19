@@ -61,10 +61,10 @@ export const PULL: Record<string, string> = {
  */
 export const LOOK: Record<string, string> = {
   "rickshaw-puller-and-coin": "Broad shoulders in front, a twenty-paise coin behind. What is earned and what is carried, on one canvas.",
-  "carriage-and-autorickshaw": "A tonga and an autorickshaw on the same road. One is arriving; the other has almost gone.",
+  "carriage-and-autorickshaw": "A tonga and an autorickshaw on the same road, given the same light.",
   "bullock-cart-and-truck": "A bullock cart beside a truck. Two speeds, one street.",
-  "rickshaw-rest-framed": "A working man at rest against a giant rupee. For a moment, the money waits for him.",
-  "coins-and-clay-bank": "A clay gullak, and the coins it was made to hold: 20 paise, 5 naye paise, 4 annas. Now the coins are gone, and the gullak waits.",
+  "rickshaw-rest-framed": "A working man at rest against a giant rupee. For a moment, the money waits for him, and so does the day.",
+  "coins-and-clay-bank": "A clay gullak, and the coins it was made to hold: 20 paise, 5 naye paise, 4 annas. The coins have moved on. The gullak is still here, still holding.",
   "postbox-and-stamps": "Patra petika: the red letterbox, set against a field of stamps. Letters went in; the world came back.",
   "mother-india-and-kettles": "Steel kettles in front of a Mother India poster: the street’s tea, and the street’s cinema.",
   "shree-420-and-milk-cans": "Milk cans beneath a peeling Shree 420 poster. The morning round passes an old film still on the wall.",
@@ -85,7 +85,7 @@ export const LOOK: Record<string, string> = {
   "priest-with-flame": "The aarti flame, lifted: a gesture of seconds, held on canvas.",
   "sacred-tree": "A peepal trunk wound in red thread, a thread for every wish.",
   "newspaper-reader": "The morning paper, opened like a ritual.",
-  "elder-woman-portrait": "An elder’s face, painted close.",
+  "elder-woman-portrait": "An elder’s face, painted close, and given all the time it asks for.",
   "red-turban-portrait": "A red turban, a gold earring, a smile. The rest of his story stays his own.",
   "yellow-turban-portrait": "The yellow catches you first. Then the eyes, which ask for longer.",
   "patterned-turban-portrait": "A lattice of cloth tied above the face, and the lines of a life beneath it.",
@@ -101,7 +101,7 @@ export const LOOK: Record<string, string> = {
 /** approved editorial lines (third person), for cards and chapters */
 export const LINES: Record<string, string> = {
   "bulls-and-wheel": "The wheel still stands. The road has moved on.",
-  "coins-and-clay-bank": "Now the coins are gone, and the gullak waits.",
+  "coins-and-clay-bank": "The coins have moved on. The gullak is still here, still holding.",
 };
 
 /** her poem, verbatim (its opening two lines were withdrawn by Shubham with her agreement, 18 Oct 2026; do not restore) */
@@ -149,17 +149,17 @@ export type SeriesPage = {
 export const SERIES_PAGES: SeriesPage[] = [
   {
     slug: "gone-are-the-days", label: "Gone Are The Days", period: "2016 to 2018",
-    line: "The India that is quietly leaving: the tonga, the gullak, the twenty-paise coin.",
+    line: "A tonga, a clay gullak, a twenty-paise coin. The ordinary days were the good ones, and here they still are.",
     hero: "bulls-and-wheel",
     quote: "The shades that touched me, the live frames that seemed to tell a story larger than the attention they seemed to draw.",
     intro: [
-      "Fourteen canvases of the things daily life is letting go of. The bullock cart and the tonga. The clay gullak and its coins. The red letterbox. The hand-painted film poster.",
-      "Often an old thing shares the canvas with whatever replaced it.",
+      "Fourteen canvases of ordinary things. The bullock cart and the tonga. The clay gullak and its coins. The red letterbox. The hand-painted film poster. None felt special while it was happening; it was just a Tuesday.",
+      "Often an old thing shares the canvas with whatever came after it, and both are given the same light.",
     ],
     chapters: [
       { title: "Coins and clay", works: ["rickshaw-puller-and-coin", "coins-and-clay-bank", "terracotta-pots"],
         big: "A clay gullak, and the coins it was made to hold: 20 paise, 5 naye paise, 4 annas.",
-        small: "Now the coins are gone, and the gullak waits." },
+        small: "The coins have moved on. The gullak is still here, still holding." },
       { title: "Roads", works: ["bulls-and-wheel"], room: true, dark: true,
         setup: "Before engines, there were these two. Shoulder to shoulder under one yoke, pulling the wheel that carried a village’s harvest, its weddings, its markets.",
         big: "The wheel still stands. The road has moved on." },
@@ -173,11 +173,11 @@ export const SERIES_PAGES: SeriesPage[] = [
   },
   {
     slug: "bandh-darwaze", label: "Bandh Darwaze", period: "2018",
-    line: "Four closed doors: a ring, a lock, a bolt, a knocker.",
+    line: "Four shut doors: a ring, a lock, a bolt, a knocker. A closed door is a door someone cared for.",
     hero: "red-and-teal-door-lock",
     intro: [
       "Bandh darwaze: closed doors. Four small square canvases, each a close look at the hardware of an old door, painted over worn, colour-washed wood.",
-      "No people, no rooms. Only what a hand reaches for at a threshold.",
+      "No people, no rooms. Only what a hand reaches for at a threshold. Shut, but kept: the layered paint is proof of care.",
     ],
     chapters: [
       { title: "The ring and the lock", works: ["weathered-door-ring", "red-and-teal-door-lock"],
@@ -188,7 +188,7 @@ export const SERIES_PAGES: SeriesPage[] = [
   },
   {
     slug: "faith", label: "Faith", period: "2005 to 2015",
-    line: "Devotion as daily practice: a lamp, a thread, a page of scripture.",
+    line: "A lamp, a thread, a page of scripture, the morning paper. Devotion as attention, given daily.",
     hero: "offering-of-light",
     intro: [
       "Not spectacle, but habit. A lamp is raised to a wall of scripture. A devotee sits before it. A priest lifts the aarti flame. A peepal is wound in red thread.",
@@ -205,11 +205,11 @@ export const SERIES_PAGES: SeriesPage[] = [
   },
   {
     slug: "portraits", label: "Portraits", period: "2005 to 2015",
-    line: "Faces, and the things of their day: a turban, a kettle, a stack of kadhais.",
+    line: "A turban, a kettle, a stack of kadhais. The people who carry our days, given a long, unhurried look.",
     hero: "three-veiled-women",
     intro: [
       "The play of emotion on a face has always held her. These portraits stay close: elders in turbans, a chai boy between orders, a kadhai seller among his pans, a doodhwala on his round.",
-      "Each figure is painted with the things of their work beside them. The face is where you meet them. The rest is left to them.",
+      "Each figure is painted with the things of their work beside them. The face is where you meet them; the rest is theirs to keep. The people who carry our days are given the time the street did not.",
     ],
     chapters: [
       { title: "Turbans", works: ["red-turban-portrait", "yellow-turban-portrait", "patterned-turban-portrait"],
@@ -222,10 +222,10 @@ export const SERIES_PAGES: SeriesPage[] = [
   },
   {
     slug: "recent-work", label: "Onset of Spring", period: "2024 to 2026",
-    line: "Flowers, leaves, a bird and a pause, in her own words.",
+    line: "Flowers, leaves, a bird and a pause, in her own words. Beauty, found even among the thorns.",
     hero: "boy-with-bananas",
     intro: [
-      "Her spring work turns inward. A child beneath banana leaves. A woman beside a bird. Bells hung with red thread.",
+      "Her spring work turns inward, and looks up. A child beneath banana leaves. A woman beside a bird. Bells hung with red thread. Beauty, noticed anyway.",
       "Five of the six paintings come with her own words. They are given here in full.",
     ],
     chapters: [

@@ -2221,3 +2221,17 @@ body *{font-style:normal !important}
   background:#fff !important;color:#141210 !important;border:0 !important;border-radius:50%;box-shadow:0 2px 10px rgba(0,0,0,.4)}
 .press-play svg{width:16px !important;height:16px !important;margin-left:2px !important}
 @media (max-width:640px){ .press-play{width:30px !important;height:30px !important;margin:-15px 0 0 -15px !important} .press-play svg{width:13px !important;height:13px !important} }
+
+/* ---- v5 · works: one band per collection, white then indigo, the way the home page alternates ---- */
+.wfilters{background:#fff;padding-top:clamp(18px,2.4vw,32px)}
+.wgroup{padding-block:clamp(36px,5vw,72px)}
+.wgroup.band-white{background:#fff}
+.wgroup.band-white + .wgroup.band-white{border-top:0}
+.wgroup .wg-head{margin-bottom:clamp(20px,3vw,36px)}
+.wgroup .wg-head h2{font-size:clamp(30px,3.4vw,44px)}
+.wgroup .sec-line{margin:6px 0 4px;max-width:60ch}
+.wgroup .meta{margin:0}
+.wgroup.band-indigo .card .meta,.wgroup.band-indigo .card .status,.wgroup.band-indigo .card .st-sold,.wgroup.band-indigo .card .cap-details{color:#D3D8E8}
+.wgroup.band-indigo .card-t{color:#fff}
+.wgroup.band-indigo .pill{color:#fff;border-color:#8F9AC0}
+.ig-band{background:#fff !important}

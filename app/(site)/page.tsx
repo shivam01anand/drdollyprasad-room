@@ -40,7 +40,7 @@ export default function Home() {
   return (
     <>
       <WallHero columns={HOME} label="Dr Dolly Prasad" size="home" face={PORTRAIT} eyebrow="Oil on canvas · New Delhi"
-                title="Dr Dolly Prasad" red="Dolly" sub="Everyday India, held sacred.">
+                title="Dr Dolly Prasad" red="Dolly" sub="The everyday, held sacred.">
         <Link className="btn btn-solid" href="/works">See all {total} works</Link>
         <a className="btn" href={STUDIO_PATH}>Walk through the studio</a>
       </WallHero>
@@ -56,7 +56,7 @@ export default function Home() {
         <div className="sec-head">
           <div>
             <h2>Key collections</h2>
-            <p className="sec-line">What she paints, from the India that is quietly leaving to faith lived every day.</p>
+            <p className="sec-line">The ordinary days were the good ones. Five collections of a changing India, looked at twice.</p>
           </div>
           <Link className="link" href="/series">All collections →</Link>
         </div>
@@ -93,7 +93,7 @@ export default function Home() {
         <div className="sec-head">
           <div>
             <h2>On the walls</h2>
-            <p className="sec-line">Eighteen exhibitions and art fairs, 2005 to 2018, among them India Habitat Centre, ICCR and the First International Kala Mela.</p>
+            <p className="sec-line">Eighteen exhibitions and art fairs, 2005 to 2018: India Habitat Centre, ICCR, the First International Kala Mela, and the people who came to look.</p>
           </div>
           <Link className="link" href="/exhibitions">All exhibitions →</Link>
         </div>
@@ -132,7 +132,7 @@ export default function Home() {
         <div className="wrap ig-in">
           <div className="txt">
             <h2>Follow {INSTAGRAM.handle}, or ask about a painting</h2>
-            <p className="meta" style={{ fontSize: 16 }}>The paintings, the stories behind them, and the shows they hung in.</p>
+            <p className="meta" style={{ fontSize: 16 }}>The paintings, the small stories behind them, and the shows they hung in.</p>
             <div className="ig-ctas">
               <a className="btn btn-solid" href={INSTAGRAM.url} target="_blank" rel="noopener noreferrer"><InstagramIcon />Open Instagram</a>
               <Link className="btn" href="/enquire">Enquire</Link>

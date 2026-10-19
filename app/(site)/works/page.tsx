@@ -25,10 +25,10 @@ export default function WorksPage() {
       <a className="btn btn-solid" href="#all">See the paintings</a>
       <Link className="btn" href="/enquire">Enquire</Link>
     </WallHero>
+    <section id="all" style={{ scrollMarginTop: 110 }}>
+      <WorksBrowser />
+    </section>
     <div className="wrap">
-      <section id="all" style={{ scrollMarginTop: 110 }}>
-        <WorksBrowser />
-      </section>
       <section className="sec-tight">
         <a className="note ig-note" href={INSTAGRAM.url} target="_blank" rel="noopener noreferrer"
            style={{ flexDirection: "row", justifyContent: "space-between", alignItems: "center", flexWrap: "wrap", textDecoration: "none" }}>
@@ -38,7 +38,7 @@ export default function WorksPage() {
         <p className="meta" style={{ marginTop: 18 }}>Looking for something in particular? <Link href="/enquire">Ask about a painting</Link>, or see <Link href="/series">the five collections</Link>.</p>
       </section>
     </div>
-    <IndigoBand title="Key collections" line="Five ways of looking: the India that is quietly leaving, closed doors, faith lived every day, faces, and her spring work." href="/series" label="All collections">
+    <IndigoBand title="Key collections" line="Five collections, one habit: look at an ordinary thing twice." href="/series" label="All collections">
       <div className="ibnd-chips">{SERIES_PAGES.map((s) => <Link key={s.slug} className="btn btn-light" href={`/series/${s.slug}`}>{s.label}</Link>)}</div>
     </IndigoBand>
     </>

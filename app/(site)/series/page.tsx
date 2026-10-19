@@ -24,7 +24,7 @@ export default function SeriesIndex() {
   return (
     <>
       <WallHero columns={SERIES_WALL} label="The five collections" eyebrow="Five collections" title="Her Collections" red="Collections"
-                sub="Five collections, five walks of life.">
+                sub="The everyday, held sacred, in five collections.">
         <a className="btn btn-solid" href="#gone-are-the-days">The five collections</a>
         <Link className="btn" href="/works">See all the works</Link>
       </WallHero>
@@ -33,7 +33,7 @@ export default function SeriesIndex() {
         <div className="ss-intro">
           <div className="ss-txt">
             <p className="eyebrow">Five collections</p>
-            <h2>One painter, five ways of looking</h2>
+            <h2>One painter, looking twice</h2>
             <ol className="ss-list">
               {SERIES_PAGES.map((s, i) => (
                 <li key={s.slug}><span>{String(i + 1).padStart(2, "0")}</span>

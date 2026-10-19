@@ -23,7 +23,7 @@ export default function Exhibitions() {
   return (
     <>
     <WallHero columns={SHOW_WALL} label="Her exhibitions" eyebrow="2005 to 2018" title="Her Exhibitions" red="Exhibitions"
-              held="Eighteen shows, Delhi to Bombay.">
+              held="Eighteen shows, Delhi to Bombay: the everyday, hung on a wall.">
       <a className="btn btn-solid" href="#india-habitat-centre-2010">See the shows</a>
       <a className="btn" href="#record">The full record</a>
     </WallHero>
@@ -91,7 +91,7 @@ export default function Exhibitions() {
           <div>
             <p className="eyebrow">From the archive</p>
             <h2 id="press-h">In the press</h2>
-            <p className="sec-line">At India Habitat Centre in November 2010 she was interviewed beside the paintings themselves. Here too are two television excerpts and a listing from Delhi Times.</p>
+            <p className="sec-line">At India Habitat Centre in November 2010 she was interviewed beside the paintings themselves. Alongside are two television excerpts and a listing from Delhi Times: the shows, as the cameras and the papers saw them.</p>
           </div>
         </div>
         <Press items={PRESS_ITEMS} />
