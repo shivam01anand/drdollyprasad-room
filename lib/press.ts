@@ -4,14 +4,15 @@
  *
  * Every line here comes from the approved post records in "Exhibition Posts -
  * Production/Posts" (02 In Front of the Cameras, 05 From the Paper Archive,
- * 07 and 08 Television Archive), written in the website's third person. Names
+ * 08 Television Archive II), written in the website's third person. Names
  * of papers and channels appear only where those records name them: Delhi
  * Times (05) and NCR (08). Nothing recreated is used: the Triveni invitation
- * pages and the restored ICCR opening still are left out; the clipping is the
+ * pages and the restored ICCR opening still are left out, and so is the
+ * "Television Archive I" excerpt (it shows Sangeeta Sharma, not her: QA P1-5); the clipping is the
  * genuine scan, cropped to her entry.
  *
- * Files: public/site/press (1600 px photographs, 640 px copies in sm/, the two
- * television excerpts at 720p with their cover posters).
+ * Files: public/site/press (1600 px photographs, 640 px copies in sm/, the NCR
+ * television excerpt at 720p with their cover posters).
  */
 
 export type PressItem = {
@@ -65,13 +66,6 @@ export const PRESS_ITEMS: PressItem[] = [
   ph("ihc-press-02", "Dr Dolly Prasad speaks into a reporter’s microphone, The Bullocks behind her.",
     "In conversation",
     "Listening to the artist offers another way into the work."),
-  {
-    id: "tv-archive", kind: "video", src: "/site/press/tv-archive.mp4", poster: "/site/press/tv-archive.jpg",
-    alt: "A soft, archival television excerpt moving between a gallery conversation and the paintings on its walls.",
-    title: "Beyond the canvas",
-    line: "A broadcast fragment that moves between a gallery conversation and the paintings on its walls, with its original sound. Its date and venue are not recorded.",
-    source: "Television archive",
-  },
   ph("ihc-press-04", "Dr Dolly Prasad is interviewed against the red-brick wall, her rickshaw puller painting behind her.",
     "On the red-brick wall",
     "The people and objects she paints are right there behind her."),

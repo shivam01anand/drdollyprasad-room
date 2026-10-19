@@ -1,5 +1,6 @@
 import type { Metadata } from "next";
 import Link from "next/link";
+import { Fragment } from "react";
 import Until from "@/components/Until";
 import ShowMedia from "@/components/site/ShowMedia";
 import Press from "@/components/site/Press";
@@ -42,16 +43,18 @@ export default function Exhibitions() {
       </Until>}
 
       <nav className="ex-index" aria-label="On this page">
-        {SHOWS.map((s) => <a key={s.id} href={`#${s.id}`}><span>{s.year}</span>{s.name ?? s.title}</a>)}
+        {SHOWS.slice(0, 1).map((s) => <a key={s.id} href={`#${s.id}`}><span>{s.year}</span>{s.name ?? s.title}</a>)}
         <a href="#press"><span>Press</span>In the press</a>
+        {SHOWS.slice(1).map((s) => <a key={s.id} href={`#${s.id}`}><span>{s.year}</span>{s.name ?? s.title}</a>)}
         <a href="#record"><span>2005–18</span>The record</a>
       </nav>
 
       {/* each show a calm chapter: year, title, venue; a few lines; one photograph large and a strip under it (CR-005) */}
-      {SHOWS.map((s) => {
+      {SHOWS.map((s, k) => {
         const photos = s.albums.flatMap((a) => a.photos);
         return (
-          <section key={s.id} id={s.id} className="ex-ch" aria-labelledby={`${s.id}-h`}>
+          <Fragment key={s.id}>
+          <section id={s.id} className="ex-ch" aria-labelledby={`${s.id}-h`}>
             <header className="ex-ch-head">
               <span className="ex-ch-year">{s.year}</span>
               <div>
@@ -80,20 +83,23 @@ export default function Exhibitions() {
               <ShowMedia photos={photos} label={`Photographs: ${s.name ?? s.title}`} />
             </div>
           </section>
-        );
-      })}
-
-      <section id="press" className="ex-press" aria-labelledby="press-h">
+          {/* In the press is the page's third section: right after India Habitat Centre, the show the interviews are from (QA P1-1) */}
+          {k === 0 && (
+            <section id="press" className="ex-press" aria-labelledby="press-h">
         <span id="on-screen" aria-hidden="true" />
         <div className="sec-head">
           <div>
             <p className="eyebrow">From the archive</p>
             <h2 id="press-h">In the press</h2>
-            <p className="sec-line">At India Habitat Centre in November 2010 she was interviewed beside the paintings themselves. Here too are two television excerpts and a listing from Delhi Times.</p>
+            <p className="sec-line">At India Habitat Centre in November 2010 she was interviewed beside the paintings themselves. Here too are an excerpt from NCR television and a listing from Delhi Times.</p>
           </div>
         </div>
         <Press items={PRESS_ITEMS} />
       </section>
+          )}
+          </Fragment>
+        );
+      })}
 
       <section id="record" className="ex-record">
         <div className="sec-head">

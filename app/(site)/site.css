@@ -1727,3 +1727,14 @@ main + .divider{padding:clamp(36px,4vw,56px) var(--gut) clamp(28px,3vw,40px)}
   .press-item figure{gap:10px}
 }
 .sm-strip button{min-height:46px}
+
+/* ==== CR-005 QA P1s (18 Oct, night) ==== */
+/* P1-2 · the full-screen look: a near-solid ground and a solid caption panel */
+.gal{background:rgba(20,18,16,.96);-webkit-backdrop-filter:blur(8px);backdrop-filter:blur(8px)}
+.gal-bar{background:#141210;border-top:1px solid rgba(243,238,230,.12)}
+/* P1-3 · the back of a short or narrow wall tile keeps its title whole */
+@container (max-height:190px){ .tile.flip .back em,.tile.flip .back .go{display:none} }
+@container (max-width:170px){ .tile.flip .back b{font-size:18px} }
+/* P1-4 · the NCR clip opens on a real frame (her, speaking); the play button sits in the corner, clear of her face and the channel's text */
+.press-clip{aspect-ratio:1186/720}
+.press-play{left:14px;top:auto;bottom:14px;margin:0;width:56px;height:56px}

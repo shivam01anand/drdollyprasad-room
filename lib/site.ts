@@ -399,8 +399,6 @@ export const PRESS = {
   clips: [
     { src: "/site/video/tv-archive-2.mp4", poster: "/site/video/tv-archive-2.jpg", title: "On NCR television · June 2010",
       line: "12 June 2010. The camera turns from the paintings to her, speaking in the gallery." },
-    { src: "/site/video/tv-archive-1.mp4", poster: "/site/video/tv-archive-1.jpg", title: "On television",
-      line: "A report from the gallery, with her paintings on the walls behind." },
   ] as Clip[],
 };
 
