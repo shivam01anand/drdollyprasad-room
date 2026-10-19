@@ -1444,25 +1444,26 @@ section.wrap:has(+ .marq) .sec-head{margin-bottom:0}
 }
 
 /* ---- 3 · About opens on crisp white, then settles into the off-cream ground ---- */
-.ab-hero{background:linear-gradient(180deg,#fff 0,#fff calc(100% - 140px),var(--bg) 100%)}
+.ab-hero{background:linear-gradient(180deg,#fff 0,#fff calc(100% - 140px),var(--bg) 100%);margin-inline:calc(-1 * var(--rail));padding-inline:var(--rail)}
 
 /* ---- 4 · Works: two to a row on a computer and a phone ("two, two, two") ----
    Each painting whole (contained in a square mat, never cropped), its title under it. */
 
-.works-grid{grid-template-columns:repeat(2,minmax(0,1fr));gap:clamp(28px,4vw,56px) clamp(12px,3vw,48px);max-width:1180px;margin-inline:auto}
-.works-grid .mat{aspect-ratio:1/1;padding:6%;margin-inline:0}
-.works-grid .mat img{max-width:100%;max-height:calc(100cqw - 12cqw);width:auto;height:auto;object-fit:contain}
+.works-grid{grid-template-columns:repeat(2,minmax(0,1fr));gap:clamp(28px,4vw,56px) clamp(12px,3vw,48px);max-width:1080px;margin-inline:auto}
+.works-grid .mat{aspect-ratio:1/1;padding:4% 4% 4%;margin-inline:0;margin-bottom:8px;align-items:flex-end}
+.works-grid .mat img{max-width:100%;max-height:calc(100cqw - 8cqw);width:auto;height:auto;object-fit:contain}
 .works-grid .card-t{font-size:clamp(17px,1.6vw,24px);line-height:1.15}
-.count-row{max-width:1180px;margin-inline:auto}
 @media (max-width:640px){
   .works-grid{gap:26px 12px}
-  .works-grid .mat{padding:5%;margin-bottom:6px}
+  .works-grid .mat{padding:4%;margin-bottom:6px}
   .works-grid .card-t{font-size:17px}
   .works-grid .card .meta{display:none}
   .works-grid .status{font-size:13px}
 }
 
 /* ---- 5 · phone scaling ---- */
+/* the exhibition captions on the moving wall: the title only on a phone, so a narrow tile is not four lines of capitals */
+@media (max-width:640px){ .collage .xcard em{display:none} }
 /* the closing card on Exhibitions: its buttons wrap instead of pushing the page sideways at 360 px */
 @media (max-width:480px){
   .next-series>*{padding:22px 18px}

@@ -181,8 +181,10 @@ export function driftRow(view: HTMLElement, track: HTMLElement, o: { seconds: nu
 
   // the keyboard: a focused card is brought fully into view and the row waits
   const fin = (e: FocusEvent) => {
-    focus = true;
     const t = e.target as HTMLElement;
+    // a mouse press focuses the link too; only the keyboard's focus holds the row
+    if (!t.matches?.(":focus-visible")) return;
+    focus = true;
     const r = t.getBoundingClientRect(), b = view.getBoundingClientRect();
     if (r.left < b.left + 16) x += b.left + 16 - r.left;
     else if (r.right > b.right - 16) x -= r.right - (b.right - 16);
