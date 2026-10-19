@@ -4,7 +4,7 @@ The live list of what is still wrong or missing on drdollyprasad.com. It is
 not an instruction to build anything today. Every team reads it, adds to it,
 and works from it in the next website run.
 
-Last updated 18 October 2026 (evening): backlog sprint on branch
+Last updated 18 October 2026 (night, PR #11 review fixes; earlier: evening): backlog sprint on branch
 `backlog-2026-10-18`, which builds on PR #7 (`content-round-2`). Critique pass 1
 is below; items marked **Built** are on the sprint preview and leave this file
 when Shubham makes them live.
@@ -347,6 +347,48 @@ These are not new from this review but are still open.
 - No em dashes in our own copy; ranges read "2016 to 2018"; no "c.".
 - Never write "18 solo exhibitions": the record is exhibitions and art fairs.
 - Nothing goes live until Shubham says "make it live".
+
+## PR #11 review fixes (18 Oct 2026, night): P2 left open
+
+Website test on the local production build at 360, 390, 768 and 1440 px (13
+pages): no sideways scroll, no text under 13 px, no phone tap target under
+40 px, no axe issues, no console errors, worst CLS 0.071 (Exhibitions,
+computer). P2s not fixed in this pass:
+
+- **P2 · Works is long on a computer.** Two to a row at 24 a page is about 10
+  screens at 1440 px. Option: 12 a page, or 3 to a row above 1600 px. Owner: Brand.
+- **P2 · Long phone pages.** Exhibitions (10 to 12 screens), collection stories
+  (9 to 10). Unchanged by this pass. Owner: Content.
+- **P2 · Slideshow arrows on a phone** sit a few pixels outside the narrower
+  photographs now that the mat is gone. Option: small round arrows inside the
+  frame. Owner: Design.
+- **P2 · "On the walls" links on Exhibitions** wrap with a wide gap on a phone. Owner: Design.
+
+## Border and divider drop-in (brief 006): where ChatGPT's files go
+
+Shubham's PR #11 review replaced the dotted and diamond rules. Both slots below
+take new files **with no code change**: copy the files in, rebuild, preview.
+
+| Asset | Drop-in path (in the repo) | File size (2x) | Shown at | Notes |
+|---|---|---|---|---|
+| Border strip, computer | `public/site/borders/border-desktop@2x.png` | any width x 96 px | 48 px tall | Tiles sideways (`repeat-x`), so the left and right edges must meet without a seam. Ink #26211D on transparent. Under 60 KB. |
+| Border strip, phone (640 px and under) | `public/site/borders/border-phone@2x.png` | any width x 72 px | 36 px tall | Same rules. A larger excerpt, not a shrunk copy of the computer strip. |
+| Divider, the painting lady, computer | `public/site/dividers/painter-desktop@2x.png` | 104 x 128 | 52 x 64 | Transparent, ink only, centred, `alt=""`. |
+| Divider, the painting lady, phone | `public/site/dividers/painter-phone@2x.png` | 78 x 96 | 39 x 48 | As above. |
+
+- **Today's border files** are a clean strip cropped from the approved
+  high-resolution `Team Handoffs/002-template-kit-80-posts/outputs/kit/T-a-single-4part/assets/village-perimeter.png`
+  (the ground-line frieze, x 1024 to 3746, y 1176 to 1322, cut where the ground
+  line matches so it tiles without a seam), recoloured to ink #26211D on
+  transparent and downscaled only. They show at 80% opacity, top and bottom of
+  every page (`components/site/Borders.tsx`, `.band` in `site.css`; the bottom
+  strip starts at a different point so the two do not mirror). A height change
+  means changing `--band` (48 px, 36 px on a phone) in the PR #11 block of `site.css`.
+- **The painter divider** switches on by itself: `components/site/Divider.tsx`
+  checks at build time for **both** painter files and, when they are there, uses
+  them in every divider slot instead of the reading figure. Drop in only the
+  approved pair (the 006 RETURN files of 18 Oct are review studies, not approved).
+- The side rails are now a single hairline; there is no file for them.
 
 ## Divider asset (brief 005, pick C): what the final files must be
 
