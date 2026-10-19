@@ -18,8 +18,8 @@ export const metadata: Metadata = {
 export default function WorksPage() {
   return (
     <>
-    <WallHero columns={WORKS_WALL} label="Her paintings" eyebrow="Oil on canvas" title="Works"
-              held={`All ${WORKS.length} paintings, in five collections. Prices on request.`}>
+    <WallHero columns={WORKS_WALL} label="Her paintings" eyebrow="Oil on canvas" title="Her Works" red="Works"
+              held={`All ${WORKS.length} paintings, in five collections.`}>
       <a className="btn btn-solid" href="#all">See the paintings</a>
       <Link className="btn" href="/enquire">Enquire</Link>
     </WallHero>

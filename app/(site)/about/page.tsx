@@ -55,7 +55,7 @@ export default function About() {
   return (
     <>
       {/* CR-006: About opens like every landing, the white card centred on a wall of her paintings */}
-      <WallHero columns={ABOUT_WALL} label="About the artist" eyebrow="About the artist" title="Dr Dolly Prasad" held="A doctor who paints.">
+      <WallHero columns={ABOUT_WALL} label="About the artist" eyebrow="About the artist" title="A doctor who paints" red="paints" held="Dr Dolly Prasad, New Delhi.">
         <a className="btn btn-solid" href="#story">Her story</a>
         <Link className="btn" href="/works">See her work</Link>
       </WallHero>

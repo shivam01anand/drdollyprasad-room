@@ -1803,3 +1803,49 @@ main + .divider{padding:clamp(36px,4vw,56px) var(--gut) clamp(28px,3vw,40px)}
   .wh .namecard{width:300px;max-width:calc(100% - 64px)}
   .wh .namecard .wh-line{font-size:17px}
 }
+
+/* ==========================================================================
+   CR-006 mocks (round 1): the thesis card. Pure white, centred both ways on the
+   wall, one size on every landing; blood-red double hairline; one red word;
+   no italics anywhere; gentle hover; minimal phone header.
+   ========================================================================== */
+:root{--red:#A01B1B;--black:#141210}
+body *{font-style:normal}
+.wh{display:block;position:relative;background:var(--wall);overflow:hidden}
+.wh .collage{height:min(calc(100svh - 96px),720px);min-height:480px}
+.wh-home .collage,.wh-page .collage{height:min(calc(100svh - 96px),720px)}
+.wh .namecard,.wh .namecard.has-face{position:absolute;left:50%;top:50%;right:auto;bottom:auto;transform:translate(-50%,-50%);margin:0;z-index:3;
+  box-sizing:border-box;width:420px;max-width:calc(100% - 56px);min-height:300px;
+  display:flex;flex-direction:column;align-items:center;justify-content:center;text-align:center;gap:10px;
+  padding:34px 36px 32px;background:#FFFFFF;box-shadow:0 26px 70px -18px rgba(20,18,16,.55),0 2px 6px rgba(20,18,16,.18)}
+.wh .namecard::before,.wh .namecard::after{content:"";position:absolute;pointer-events:none;border:1px solid var(--red)}
+.wh .namecard::before{inset:7px}
+.wh .namecard::after{inset:11px}
+.wh .namecard .eyebrow{font-family:var(--sans);font-weight:500;font-size:12px;letter-spacing:.2em;text-transform:uppercase;color:var(--black);margin:0}
+.wh .namecard h1{font-family:var(--serif);font-weight:600;font-size:clamp(40px,3.6vw,52px);line-height:1.04;letter-spacing:-.01em;color:var(--black);margin:0}
+.wh .namecard h1 .red{color:var(--red)}
+.wh .namecard .wh-line{font-family:var(--serif);font-style:normal;font-weight:500;font-size:19px;line-height:1.3;color:var(--black);max-width:330px;margin:0}
+.wh .namecard .ctas{display:flex;flex-wrap:wrap;justify-content:center;gap:8px;margin-top:8px;width:100%;max-width:none}
+.wh .namecard .ctas .btn{flex:1 1 auto;min-height:44px;padding:0 14px;font-size:12px;letter-spacing:.16em;text-transform:uppercase;font-family:var(--sans);font-weight:500;white-space:nowrap}
+@media (max-width:640px){
+  .wh .collage,.wh-home .collage,.wh-page .collage{height:min(calc(100svh - 84px),620px);min-height:0}
+  .wh .namecard,.wh .namecard.has-face{width:300px;max-width:calc(100% - 64px);min-height:296px;padding:26px 24px 24px;gap:8px}
+  .wh .namecard h1{font-size:34px}
+  .wh .namecard .wh-line{font-size:17px}
+  .wh .namecard .ctas{flex-direction:column;gap:8px;margin-top:6px}
+  .wh .namecard .ctas .btn{flex:none;width:100%;min-height:42px}
+  .wh-home .namecard .sub{display:none}
+}
+/* card keeps its own state when the wall is touched */
+.wh .collage .tile:hover{transform:scale(1.04)}
+/* ---- phone header: village strip, one-line name, compact menu, <= 64 px ---- */
+@media (max-width:640px){
+  .hdr .band-top{height:18px}
+  .brand-t b,.is-scrolled .brand-t b{font-size:20px;line-height:1}
+  .brand-t i{display:none}
+  .hdr-in,.is-scrolled .hdr-in{min-height:40px}
+  .brand,.is-scrolled .brand{min-height:40px}
+  .burger{width:40px;height:40px}
+}
+/* ---- Works status: sold = red dot + plain text; available = green dot ---- */
+.card .st-sold,.works-grid .st-sold{font-family:var(--sans);font-style:normal;font-size:13px;letter-spacing:.02em;color:var(--muted)}

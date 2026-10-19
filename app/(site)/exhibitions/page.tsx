@@ -22,8 +22,8 @@ const years = [...new Set(RECORD.map((r) => r.year))];
 export default function Exhibitions() {
   return (
     <>
-    <WallHero columns={SHOW_WALL} label="Her exhibitions" eyebrow="2005 to 2018" title="Exhibitions"
-              held="Eighteen shows across galleries and art fairs, from Delhi to Bombay">
+    <WallHero columns={SHOW_WALL} label="Her exhibitions" eyebrow="2005 to 2018" title="Her Exhibitions" red="Exhibitions"
+              held="Eighteen shows, from Delhi to Bombay.">
       <a className="btn btn-solid" href="#india-habitat-centre-2010">See the shows</a>
       <a className="btn" href="#record">The full record</a>
     </WallHero>

@@ -19,7 +19,7 @@ export const metadata: Metadata = {
 export default function SeriesIndex() {
   return (
     <>
-      <WallHero columns={SERIES_WALL} label="The five collections" eyebrow="Five collections" title="Collections"
+      <WallHero columns={SERIES_WALL} label="The five collections" eyebrow="Five collections" title="Her Collections" red="Collections"
                 sub="Five collections, five walks of life.">
         <a className="btn btn-solid" href="#gone-are-the-days">The five collections</a>
         <Link className="btn" href="/works">See all the works</Link>
