@@ -2150,3 +2150,62 @@ body *{font-style:normal !important}
 .pp-art img,.room-art img{border:9px solid var(--frame) !important;padding:9px !important;background:#FFFFFF !important;
   box-shadow:inset 0 0 0 1px rgba(0,0,0,.06),var(--lift3d) !important}
 @media (max-width:640px){ .pp-art img,.room-art img{border-width:5px !important;padding:5px !important} }
+
+/* ==========================================================================
+   v4 (Shubham, 19 Oct 00:55): no cream grounds; one indigo band on every page;
+   both television clips side by side. (/studio keeps its own styles.)
+   ========================================================================== */
+:root{ --pale:#F7F5F1; --indigo:#161E3A }
+.band-cream{--c:#FFFFFF;background:#FFFFFF}
+.ig-band{background:var(--pale)}
+.wh,.hw-band,.collage{background:#FFFFFF}
+.ab-hero,.ab-band.tone-wall,.ab-band.tone-light{background:#FFFFFF}
+.ab-band.tone-stone{background:var(--pale)}
+.ab-band.tone-dark{background:var(--indigo)}
+.sband.tone-0,.sband.tone-1{background:#FFFFFF}
+.sband.tone-2{background:var(--pale)}
+.ss-stage,.story-hero,.viewer,.note,.ex-facts div,.next-series .ask,.tband,.slides-stage{background:var(--pale)}
+.story-hero{background:#FFFFFF}
+.ftr{background:#FFFFFF}
+.pp-chip,.thumbs button,.slides-thumbs button,.sm-strip button{background:#FFFFFF}
+.press-item.is-clipping .press-open img{background:#FFFFFF}
+.wp-lower{background:var(--pale);box-shadow:0 0 0 100vmax var(--pale);clip-path:inset(0 -100vmax);margin-top:28px;padding-top:12px}
+
+/* the shared indigo band: same colour, same type, same spacing as home's "Key collections" */
+.band-indigo{--c:var(--indigo);background:var(--indigo);color:#FFFFFF}
+.band-indigo.ibnd{margin-top:clamp(32px,5vw,64px)}
+.band-indigo .sec{padding-block:clamp(28px,4vw,56px)}
+.band-indigo .sec-head{border-color:rgba(255,255,255,.28)}
+.band-indigo .card,.band-indigo .card *{color:#FFFFFF}
+.band-indigo .card .meta,.band-indigo .card small,.band-indigo .card .status{color:#D3D8E8}
+.band-indigo .card .status.st-free i{background:#7FD6A0}
+.band-indigo .card:hover .card-t{color:#FFFFFF}
+.band-indigo .btn-light{border-color:rgba(255,255,255,.7);color:#FFFFFF;background-image:none}
+.band-indigo .btn-light:hover{background:#FFFFFF;color:var(--indigo)}
+.ibnd-chips{display:flex;flex-wrap:wrap;gap:10px;margin-top:6px}
+.ab-band.tone-dark,.ab-band.tone-dark h2,.ab-band.tone-dark .eyebrow{color:#FFFFFF}
+.ab-band.tone-dark .ab-p{color:#D3D8E8}
+
+/* both television clips, side by side; stacked on a phone */
+.press-videos{list-style:none;margin:0 0 clamp(24px,3vw,40px);padding:0;display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:clamp(18px,2.6vw,36px)}
+.press-videos .press-item{margin:0;flex:none}
+.press-videos .press-clip{aspect-ratio:16/10}
+.press-videos figcaption b{font-size:22px}
+.press-videos figcaption span{font-size:15px}
+@media (max-width:640px){
+  .press-videos{grid-template-columns:1fr;gap:24px}
+  .press-videos .press-item{flex:none}
+  .press-videos .press-play{width:56px;height:56px}
+}
+.press-videos figure{margin:0;display:flex;flex-direction:column;gap:12px}
+.press-videos figcaption{display:flex;flex-direction:column;gap:3px}
+.press-videos figcaption em{font-style:normal;font-size:13px;letter-spacing:.14em;text-transform:uppercase;color:#FF8F95}
+.press-videos figcaption b{font-family:var(--serif);font-weight:500;line-height:1.15;color:#FFFFFF}
+.press-videos figcaption span{color:#D3D8E8;line-height:1.45}
+.press-videos figcaption small{font-size:13px;color:#D3D8E8}
+.ab-press .press-videos figcaption b{color:var(--ink)}
+.ab-press .press-videos figcaption span,.ab-press .press-videos figcaption small{color:var(--muted)}
+.ab-press .press-videos figcaption em{color:#8E3B1F}
+.ig-roll{background:transparent}
+.card.is-sold .card-t,.band-indigo .card.is-sold .card-t,.band-indigo .card .card-t{color:#FFFFFF}
+.band-indigo .card .st-sold{color:#D3D8E8}

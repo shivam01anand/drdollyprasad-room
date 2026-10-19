@@ -50,6 +50,13 @@ export const PRESS_ITEMS: PressItem[] = [
     line: "The recording carries a 12 June 2010 date display. The camera turns from the paintings to her, speaking within the exhibition.",
     source: "Television archive", credit: "NCR television. Original broadcast sound.",
   },
+  {
+    id: "tv-archive", kind: "video", src: "/site/press/tv-archive.mp4", poster: "/site/press/tv-archive.jpg",
+    alt: "A television excerpt: a reporter stands in a gallery with paintings on its walls, then the camera moves across the work.",
+    title: "On television",
+    line: "A report from a gallery, with paintings on the walls behind. Its date and channel are not recorded.",
+    source: "Television archive", credit: "Original broadcast sound.",
+  },
   ph("ihc-press-06", "Dr Dolly Prasad answers a reporter beside The Bullocks.",
     "Beside The Bullocks",
     "The interviews took place beside the paintings themselves."),
@@ -77,5 +84,5 @@ export const PRESS_ITEMS: PressItem[] = [
 ];
 
 /** the shorter set for About: four photographs and the NCR excerpt */
-export const PRESS_SHORT = ["ihc-press-01", "tv-ncr-2010", "ihc-press-06", "ihc-press-03", "delhi-times"]
+export const PRESS_SHORT = ["ihc-press-01", "tv-ncr-2010", "tv-archive", "ihc-press-06", "ihc-press-03", "delhi-times"]
   .map((id) => PRESS_ITEMS.find((p) => p.id === id)!);

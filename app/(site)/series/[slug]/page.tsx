@@ -1,5 +1,6 @@
 import type { Metadata } from "next";
 import Link from "next/link";
+import IndigoBand from "@/components/site/IndigoBand";
 import { notFound } from "next/navigation";
 import Card from "@/components/site/Card";
 import { SERIES_BY_SLUG, SERIES_PAGES, WHATSAPP, shownYear, enquireHref, whatsappHref, worksIn, type Chapter } from "@/lib/site";
@@ -137,10 +138,9 @@ export default async function SeriesStory({ params }: Props) {
       )}
 
 
-      <section className="sec-tight wrap">
-        <div className="sec-head"><h2>The paintings in this collection</h2><Link className="link" href={`/works?series=${s.slug}`}>Filter in all works →</Link></div>
+      <IndigoBand title="The paintings in this collection" href={`/works?series=${s.slug}`} label="Filter in all works">
         <div className="grid grid-5">{works.map((w) => <Card key={w.id} w={w} label={false} />)}</div>
-      </section>
+      </IndigoBand>
 
       <section className="sec-tight wrap">
         <div className="next-series">

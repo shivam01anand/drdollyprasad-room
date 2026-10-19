@@ -1,5 +1,7 @@
 import type { Metadata } from "next";
 import Link from "next/link";
+import IndigoBand from "@/components/site/IndigoBand";
+import { SERIES_PAGES } from "@/lib/site";
 import WallHero from "@/components/site/WallHero";
 import { WORKS_WALL } from "@/components/site/Collage";
 import WorksBrowser from "@/components/site/WorksBrowser";
@@ -36,6 +38,9 @@ export default function WorksPage() {
         <p className="meta" style={{ marginTop: 18 }}>Looking for something in particular? <Link href="/enquire">Ask about a painting</Link>, or see <Link href="/series">the five collections</Link>.</p>
       </section>
     </div>
+    <IndigoBand title="Key collections" line="Five ways of looking: the India that is quietly leaving, closed doors, faith lived every day, faces, and her spring work." href="/series" label="All collections">
+      <div className="ibnd-chips">{SERIES_PAGES.map((s) => <Link key={s.slug} className="btn btn-light" href={`/series/${s.slug}`}>{s.label}</Link>)}</div>
+    </IndigoBand>
     </>
   );
 }
