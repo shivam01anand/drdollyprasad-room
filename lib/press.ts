@@ -39,7 +39,7 @@ const ph = (n: string, alt: string, title: string, line: string): PressItem => (
   id: n, kind: "photo", src: `/site/press/${n}.jpg`, sm: `/site/press/sm/${n}.jpg`, alt, title, line, source: IHC,
 });
 
-export const PRESS_ITEMS: PressItem[] = [
+const RAW: PressItem[] = [
   ph("ihc-press-01", "Dr Dolly Prasad smiles as a cameraman films her beside The Bullocks, a reporter’s microphone held up to her.",
     "In front of the cameras",
     "Interviewed beside The Bullocks at Open Palm Court, India Habitat Centre, New Delhi."),
@@ -83,6 +83,12 @@ export const PRESS_ITEMS: PressItem[] = [
     "Meeting an audience through conversation as well as through paint."),
 ];
 
+/** one mosaic, stills and the two television clips mixed and spread out (Shubham, 19 Oct 2026):
+ *  the India Habitat Centre interview first, top left; a clip never sits next to the other */
+const ORDER = ["ihc-press-01", "tv-ncr-2010", "ihc-press-06", "ihc-press-03", "delhi-times", "ihc-press-02",
+  "tv-archive", "ihc-press-04", "ihc-press-b", "ihc-press-05"];
+export const PRESS_ITEMS: PressItem[] = ORDER.map((id) => RAW.find((p) => p.id === id)!);
+
 /** the shorter set for About: four photographs and the NCR excerpt */
-export const PRESS_SHORT = ["ihc-press-01", "tv-ncr-2010", "tv-archive", "ihc-press-06", "ihc-press-03", "delhi-times"]
+export const PRESS_SHORT = ["ihc-press-01", "tv-ncr-2010", "ihc-press-06", "ihc-press-03", "tv-archive", "delhi-times"]
   .map((id) => PRESS_ITEMS.find((p) => p.id === id)!);
