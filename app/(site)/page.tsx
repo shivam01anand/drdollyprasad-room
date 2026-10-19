@@ -7,6 +7,7 @@ import Until from "@/components/Until";
 import HashRedirect from "@/components/site/HashRedirect";
 import Marquee from "@/components/site/Marquee";
 import Divider from "@/components/site/Divider";
+import IgRoll from "@/components/site/IgRoll";
 import {
   BIO_LINE, BIO_SUB, EMAIL, INSTAGRAM, NOW, NOW_SHOWING_CONFIRMED, PORTRAIT, SERIES_PAGES, SHOWS, SITE, STUDIO_PATH, worksIn,
 } from "@/lib/site";
@@ -139,16 +140,7 @@ export default function Home() {
               <Link className="btn" href="/enquire">Enquire</Link>
             </div>
           </div>
-          <div className="ig-roll" aria-hidden="true">
-            <div className="ig-track">
-              {[...IG, ...IG].map((id, i) => (
-                <a key={i} href={INSTAGRAM.url} target="_blank" rel="noopener noreferrer" tabIndex={-1}>
-                  {/* eslint-disable-next-line @next/next/no-img-element */}
-                  <img src={thumb(id)} alt="" loading="lazy" {...dims(thumb(id))} />
-                </a>
-              ))}
-            </div>
-          </div>
+          <IgRoll items={IG.map((id) => ({ src: thumb(id), ...dims(thumb(id)) }))} href={INSTAGRAM.url} />
         </div>
       </section>
 

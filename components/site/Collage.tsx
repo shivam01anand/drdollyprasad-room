@@ -3,6 +3,7 @@ import { BY_ID, workPath } from "@/lib/works";
 import { LOOK, ON_EXHIBITIONS, ON_THE_WORK, PRESS, PULL, SHOWS, SMALL_PHOTO, labelLine } from "@/lib/site";
 import { dims, smSet } from "@/lib/images";
 import { thumb } from "./Card";
+import WallDrift from "./WallDrift";
 
 /**
  * The moving wall: columns drifting slowly up and down (alternately) while the
@@ -11,6 +12,8 @@ import { thumb } from "./Card";
  * loudest colour on the screen. The wall never stops under the cursor: the
  * painting under it turns over to show its label (the still tile holds the hover; only the card inside turns, so it can never stall edge-on), and an exhibition photograph
  * lifts a little. Each column holds its list twice, so it loops without a seam.
+ * Every tile opens on a click or tap; the wall can be dragged by hand and picks
+ * up its slow motion again after a moment (WallDrift, lib/drift).
  */
 
 export type Item =
@@ -153,14 +156,13 @@ function Tile({ it }: { it: Item }) {
 
 export function Wall({ columns, speed = 95 }: { columns: Item[][]; speed?: number }) {
   return (
-    // the moving wall is decoration over real links elsewhere on the page; keyboard users skip it
-    <div className="cols" aria-hidden="true" style={{ ["--n" as string]: columns.length }}>
+    <WallDrift n={columns.length}>
       {columns.map((items, i) => (
         <div key={i} className={`col${i % 2 ? " down" : ""}`} style={{ ["--dur" as string]: `${Math.round(speed * (1 + (i % 3) * 0.17))}s` }}>
           {[...items, ...items].map((it, j) => <Tile key={j} it={it} />)}
         </div>
       ))}
-    </div>
+    </WallDrift>
   );
 }
 

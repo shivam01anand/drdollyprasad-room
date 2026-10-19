@@ -104,9 +104,9 @@ export const LINES: Record<string, string> = {
   "coins-and-clay-bank": "Now the coins are gone, and the gullak waits.",
 };
 
-/** her poem, verbatim */
+/** her poem, verbatim (its opening two lines were withdrawn by Shubham with her agreement, 18 Oct 2026; do not restore) */
 export const STATEMENT = [
-  "They are not things,", "They are everything", "They come to me", "They hold my hand",
+  "They come to me", "They hold my hand",
   "They give me a brush", "Then sit quietly", "In front of me", "I put them on canvas",
   "I don’t paint", "Am not a painter",
 ];

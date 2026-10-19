@@ -971,20 +971,9 @@ h1,h2,h3{font-weight:500;letter-spacing:-.005em}
   .shows b{font-size:24px}
 }
 
-/* ---- works: one large painting to a row on a phone, or two ---- */
+/* ---- works: two to a row everywhere (see the PR #11 block at the end) ---- */
 .count-row{display:flex;justify-content:space-between;align-items:center;gap:16px;margin-bottom:22px}
-.density{display:none}
 @media (max-width:640px){
-  .density{display:flex;gap:4px}
-  .density button{width:40px;height:40px;display:grid;place-items:center;background:none;border:1px solid transparent;color:var(--soft);cursor:pointer}
-  .density button[aria-pressed="true"]{border-color:var(--ink);color:var(--ink)}
-  .density svg{width:18px;height:18px}
-  .works-grid.is-big{grid-template-columns:1fr;gap:44px}
-  .works-grid.is-big .mat{aspect-ratio:auto;padding:22px;margin-inline:calc(-1 * var(--gut))}
-  .works-grid.is-big .mat img{max-height:72svh;max-width:100%}
-  .works-grid.is-big .card-t{font-size:25px}
-  .works-grid.is-big .card .meta{font-size:15px}
-  .works-grid:not(.is-big) .meta{display:none}
   .filters-line{position:sticky;top:56px;z-index:5;background:rgba(251,249,245,.94);-webkit-backdrop-filter:blur(8px);backdrop-filter:blur(8px);
     margin-inline:calc(-1 * var(--gut));padding:10px var(--gut);border-bottom:1px solid var(--hair)}
 }
@@ -1357,7 +1346,6 @@ section.wrap:has(+ .marq) .sec-head{margin-bottom:0}
 /* release candidate: tap targets the merge brought in, 44 px on a phone without changing how they look */
 @media (pointer:coarse),(max-width:900px){
   .sband .s-txt h2 a{display:inline-flex;align-items:center;min-height:44px}
-  .density button{width:44px;height:44px}
   .crumb a{min-width:44px;justify-content:center}
   .slides-arrow{width:44px}
   .brand{min-height:44px}
@@ -1381,3 +1369,102 @@ section.wrap:has(+ .marq) .sec-head{margin-bottom:0}
 .divider picture{display:block;flex:none}
 .divider img{display:block;height:48px;width:auto;flex:none}
 @media (min-width:761px){ .divider{padding-block:88px} .divider::before,.divider::after{width:80px} .divider img{height:64px} }
+
+/* ==========================================================================
+   PR #11 review (Shubham, 18 Oct 2026, evening)
+   ========================================================================== */
+
+/* ---- 6 · the frame: her village line sketch, not dotted rules ----
+   One strip that tiles sideways without a seam (components/site/Borders.tsx
+   lists the drop-in files). Ink on transparent, quiet: it sits a little
+   lighter than the type. The side rails become a single hairline. */
+:root{--band:48px}
+.band{height:var(--band);background:url(/site/borders/border-desktop@2x.png) repeat-x left bottom/auto 100%;
+  -webkit-mask:none;mask:none;background-color:transparent;opacity:.8}
+.band-top{margin-top:4px}
+.band-bottom{margin-bottom:4px;background-position:37% bottom}
+.rail{-webkit-mask:none;mask:none;background:transparent}
+.rail::after{content:"";position:absolute;top:0;bottom:0;left:50%;width:1px;background:var(--ink);opacity:.16}
+@media (max-width:640px){
+  :root{--band:36px}
+  .band{background-image:url(/site/borders/border-phone@2x.png)}
+}
+
+/* ---- 1 · everything that moves can be moved by hand ----
+   lib/drift takes over from the CSS animation once the page is running (is-live):
+   drag with the mouse, swipe with a finger, click or tap to open, and the
+   gentle motion comes back a moment later. Touch keeps the page's vertical scroll. */
+.marq,.ig-roll,.tband-row,.collage .cols,.slides-stage,.roll-stage,.themes-window{touch-action:pan-y;-webkit-user-select:none;user-select:none}
+.marq,.ig-roll,.tband-row,.collage .cols{cursor:grab}
+.marq.is-dragging,.ig-roll.is-dragging,.tband-row.is-dragging,.collage .cols.is-dragging,
+.marq.is-dragging *,.ig-roll.is-dragging *,.tband-row.is-dragging *,.collage .cols.is-dragging *{cursor:grabbing}
+.marq a,.ig-roll a,.tband-row a,.collage .tile{cursor:pointer}
+.marq img,.ig-roll img,.tband-row img,.collage img,.slides-stage img,.roll-stage img{-webkit-user-drag:none;user-select:none}
+.marq.is-live .marq-track,.ig-roll.is-live .ig-track,.tband-row.is-live .tband-track,
+.collage .cols.is-live,.collage .cols.is-live>.col{animation:none}
+/* the hand can always move them, so under reduced motion they keep their full row (still, unless dragged) */
+@media (prefers-reduced-motion:reduce){
+  .marq.is-live{overflow:hidden}
+  .marq.is-live .marq-set:not(:first-child){display:flex}
+}
+/* a clear invitation to open: tiles lift and sharpen under the cursor */
+.ig-track a img{transition:transform .35s var(--ease),box-shadow .35s var(--ease)}
+.tband-row{filter:none;opacity:1}
+.tband-track a{flex:none;display:block}
+.tband-track img{filter:blur(2.5px) saturate(1.05);opacity:.9;transition:filter .35s ease,opacity .35s ease,transform .35s var(--ease)}
+@media (hover:hover){
+  .ig-track a:hover img{transform:translateY(-5px);box-shadow:var(--shadow-2)}
+  .tband-track a:hover img{filter:none;opacity:1;transform:translateY(-4px)}
+  .show-card:hover img{transform:translateY(-5px);box-shadow:var(--shadow-2)}
+  .collage .xcard{cursor:pointer}
+}
+.show-card img{transition:transform .5s var(--ease),box-shadow .5s var(--ease)}
+.marq.is-dragging .card .mat img,.marq.is-dragging .show-card img{transform:none}
+/* a swipe pulls the photograph a little with the finger */
+.slides-stage img.on,.roll-stage img.on{translate:var(--pull,0) 0;transition:opacity 1.1s ease,translate .3s var(--ease)}
+.slides-stage.is-dragging img.on,.roll-stage.is-dragging img.on{transition:opacity 1.1s ease}
+.roll-stage.is-link{cursor:pointer}
+.slides-open{position:absolute;inset:0;z-index:1;background:transparent;border:0;padding:0;cursor:zoom-in}
+.slides-arrow{z-index:3}
+.slides-open:focus-visible{outline-offset:-4px}
+
+/* ---- 2 · exhibition photographs hang like the paintings ----
+   No mat or coloured ground behind them: a thin black frame and a soft,
+   layered shadow, on the page's own ground. */
+.slides-stage{background:transparent;box-shadow:none;overflow:visible}
+.slides-bg{display:none}
+.slides-stage img{filter:none;max-width:calc(100% - 24px);max-height:calc(100% - 24px);border:3px solid var(--frame);
+  box-shadow:0 1px 2px rgba(20,12,6,.16),0 6px 14px -4px rgba(20,12,6,.2),0 18px 36px -14px rgba(20,12,6,.3)}
+.slides-thumbs img{border:0;box-shadow:none}
+.clip img{border:3px solid var(--frame);box-shadow:0 1px 2px rgba(20,12,6,.16),0 6px 14px -4px rgba(20,12,6,.2),0 18px 36px -14px rgba(20,12,6,.3)}
+@media (max-width:760px){
+  .slides-stage{margin-inline:0}
+  .slides-stage img{max-width:calc(100% - 8px);max-height:calc(100% - 8px)}
+  .slides-arrow{background:rgba(31,28,26,.5)}
+}
+
+/* ---- 3 · About opens on crisp white, then settles into the off-cream ground ---- */
+.ab-hero{background:linear-gradient(180deg,#fff 0,#fff calc(100% - 140px),var(--bg) 100%)}
+
+/* ---- 4 · Works: two to a row on a computer and a phone ("two, two, two") ----
+   Each painting whole (contained in a square mat, never cropped), its title under it. */
+
+.works-grid{grid-template-columns:repeat(2,minmax(0,1fr));gap:clamp(28px,4vw,56px) clamp(12px,3vw,48px);max-width:1180px;margin-inline:auto}
+.works-grid .mat{aspect-ratio:1/1;padding:6%;margin-inline:0}
+.works-grid .mat img{max-width:100%;max-height:calc(100cqw - 12cqw);width:auto;height:auto;object-fit:contain}
+.works-grid .card-t{font-size:clamp(17px,1.6vw,24px);line-height:1.15}
+.count-row{max-width:1180px;margin-inline:auto}
+@media (max-width:640px){
+  .works-grid{gap:26px 12px}
+  .works-grid .mat{padding:5%;margin-bottom:6px}
+  .works-grid .card-t{font-size:17px}
+  .works-grid .card .meta{display:none}
+  .works-grid .status{font-size:13px}
+}
+
+/* ---- 5 · phone scaling ---- */
+/* the closing card on Exhibitions: its buttons wrap instead of pushing the page sideways at 360 px */
+@media (max-width:480px){
+  .next-series>*{padding:22px 18px}
+  .next-series .btn{white-space:normal;text-align:center;flex:1 1 100%}
+}

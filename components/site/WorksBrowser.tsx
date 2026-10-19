@@ -12,13 +12,15 @@ type Size = "all" | "small" | "medium" | "large";
 const sizeOf = (w: Work): Size | null => (!w.inches ? null : w.inches < 24 ? "small" : w.inches <= 36 ? "medium" : "large");
 const isFree = (w: Work) => w.status !== "Sold";
 
-/** every painting, newest series first, filtered by series, status and size (the filter is kept in the address) */
+/**
+ * every painting, newest series first, filtered by series, status and size (the
+ * filter is kept in the address). Two to a row on a computer and a phone alike
+ * (Shubham, PR #11 review), each painting whole with its title under it.
+ */
 export default function WorksBrowser() {
   const [series, setSeries] = useState("all");
   const [status, setStatus] = useState<Status>("all");
   const [size, setSize] = useState<Size>("all");
-  // on a phone: one large painting at a time, or two to a row
-  const [big, setBig] = useState(true);
 
   useEffect(() => {
     const q = new URLSearchParams(location.search);
@@ -100,17 +102,9 @@ export default function WorksBrowser() {
           {size !== "all" && " · only works with a confirmed size"}
           {pages > 1 && ` · page ${page} of ${pages}`}
         </p>
-        <div className="density" role="group" aria-label="How many to a row">
-          <button type="button" aria-pressed={big} onClick={() => setBig(true)} aria-label="One large painting to a row">
-            <svg viewBox="0 0 20 20" aria-hidden="true"><rect x="3" y="3" width="14" height="14" fill="none" stroke="currentColor" strokeWidth="1.4" /></svg>
-          </button>
-          <button type="button" aria-pressed={!big} onClick={() => setBig(false)} aria-label="Two to a row">
-            <svg viewBox="0 0 20 20" aria-hidden="true"><path d="M3 3h6v6H3zM11 3h6v6h-6zM3 11h6v6H3zM11 11h6v6h-6z" fill="none" stroke="currentColor" strokeWidth="1.4" /></svg>
-          </button>
-        </div>
       </div>
       {shown.length ? (
-        <div className={`grid works-grid${big ? " is-big" : ""}`}>{slice.map((w, i) => <Card key={w.id} w={w} eager={i < 8} />)}</div>
+        <div className="grid works-grid">{slice.map((w, i) => <Card key={w.id} w={w} eager={i < 8} />)}</div>
       ) : (
         <p className="empty">No paintings match these filters.</p>
       )}
