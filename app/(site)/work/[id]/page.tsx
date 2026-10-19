@@ -5,7 +5,7 @@ import { BY_ID, LARGE, SHOW, SITE, WORKS, inchDims, quoted, workPath, type Work 
 import { INSTAGRAM, LOOK, NOW_SHOWING_CONFIRMED, PULL, SMALL_PHOTO, shownYear, STUDIO_PATH, WHATSAPP, WORDS, enquireHref, labelLine, seriesPath, whatsappHref, worksIn } from "@/lib/site";
 import manifest from "@/public/art/manifest.json";
 import Card from "@/components/site/Card";
-import Viewer, { RoomStudy } from "@/components/site/Viewer";
+import PaintingStage from "@/components/site/PaintingStage";
 import Tabs from "@/components/site/Tabs";
 import Share from "@/components/Share";
 import Until from "@/components/Until";
@@ -101,41 +101,30 @@ export default async function WorkPage({ params }: Props) {
 
   return (
     <div className="wp">
-      {/* the first screen: the whole painting, its title, and a way to look closer */}
-      <Viewer w={w} src={src} dims={d ? { w: d.w, h: d.h } : undefined}
-              small={!!d && Math.max(d.w, d.h) < 600} sub={labelLine(w)} />
+      {/* CR-007: the big painting, the other views under it, then the text */}
+      <PaintingStage w={w} src={src} dims={d ? { w: d.w, h: d.h } : undefined}
+                     small={!!d && Math.max(d.w, d.h) < 600} sub={labelLine(w)} />
 
       <div className="wrap">
-      <nav className="crumb" aria-label="Breadcrumb">
-        <Link href="/works">Works</Link> / <Link href={seriesPath(w.series)}>{w.series}</Link> / {w.title}
-      </nav>
-
-      <section className="wp-grid">
-        <div className="wp-main">
-          <header className="wp-head">
-            <p className="meta">{labelLine(w)} · <Link href={seriesPath(w.series)}>{w.series}</Link></p>
-            {lead && <p className="wp-lead">{words ? `“${lead}”` : lead}{words && <span>Dr Dolly Prasad</span>}</p>}
-          </header>
-          <RoomStudy w={w} src={src} dims={d ? { w: d.w, h: d.h } : undefined} />
+      <article className="pp-text">
+        <h1 className="pp-title">{w.title}</h1>
+        <p className="pp-facts">{[w.medium, w.size, shownYear(w)].filter(Boolean).join(" · ")}</p>
+        <p className="pp-status"><span className={`status st-${sold ? "sold" : w.status === "Enquire" ? "enquire" : "free"}`}><i aria-hidden="true" />{sold ? "In a private collection" : statusWord(w)}</span>
+          <Link href={seriesPath(w.series)}>{w.series}</Link></p>
+        {lead && <p className="pp-story">{words ? `“${lead}”` : lead}{words && <span>Dr Dolly Prasad</span>}</p>}
+        {NOW_SHOWING_CONFIRMED && SHOW.works.includes(id) && (
+          <Until until={SHOW.until}><p className="show-note">{SHOW.line}</p></Until>
+        )}
+        <div className="pp-ctas">
+          <Link className="btn btn-solid" href={enquireHref(w)}>{sold ? "Ask about her work" : "Enquire about this painting"}</Link>
+          {WHATSAPP && <a className="btn" href={whatsappHref(w)}><ChatIcon />WhatsApp</a>}
         </div>
-
-        <div className="wp-side">
-          <div className="side-status">
-            <span className={`status${sold ? " is-sold" : w.status === "Enquire" ? " is-enquire" : ""}`}>{statusWord(w)}</span>
-            <b>{sold ? "In a private collection" : "Price on request"}</b>
-          </div>
-          {NOW_SHOWING_CONFIRMED && SHOW.works.includes(id) && (
-            <Until until={SHOW.until}><p className="show-note">{SHOW.line}</p></Until>
-          )}
-          {WHATSAPP && <a className="btn btn-wa" href={whatsappHref(w)}><ChatIcon />{sold ? "Ask about her work" : "Ask on WhatsApp"}</a>}
-          <Link className={WHATSAPP ? "btn" : "btn btn-solid"} href={enquireHref(w)}>{sold ? "Ask about her work" : "Enquire about this painting"}</Link>
-          <div className="side-small">
-            <a href={INSTAGRAM.url} target="_blank" rel="noopener noreferrer"><InstagramIcon />Instagram</a>
-            <a href={`${STUDIO_PATH}#work=${id}`}>In her studio →</a>
-            <Share title={`${quoted(w.title)} · Dr Dolly Prasad`} path={workPath(id)} className="link share-btn" />
-          </div>
+        <div className="side-small">
+          <a href={INSTAGRAM.url} target="_blank" rel="noopener noreferrer"><InstagramIcon />Instagram</a>
+          <a href={`${STUDIO_PATH}#work=${id}`}>In her studio →</a>
+          <Share title={`${quoted(w.title)} · Dr Dolly Prasad`} path={workPath(id)} className="link share-btn" />
         </div>
-      </section>
+      </article>
 
       <section className="wp-lower" style={{ paddingBottom: 28 }}>
         <Tabs tabs={tabs} />

@@ -1809,7 +1809,7 @@ main + .divider{padding:clamp(36px,4vw,56px) var(--gut) clamp(28px,3vw,40px)}
    wall, one size on every landing; blood-red double hairline; one red word;
    no italics anywhere; gentle hover; minimal phone header.
    ========================================================================== */
-:root{--red:#A01B1B;--black:#141210}
+:root{--red:#D4202A;--black:#141210}
 body *{font-style:normal}
 .wh{display:block;position:relative;background:var(--wall);overflow:hidden}
 .wh .collage{height:min(calc(100svh - 96px),720px);min-height:480px}
@@ -1818,9 +1818,6 @@ body *{font-style:normal}
   box-sizing:border-box;width:420px;max-width:calc(100% - 56px);min-height:300px;
   display:flex;flex-direction:column;align-items:center;justify-content:center;text-align:center;gap:10px;
   padding:34px 36px 32px;background:#FFFFFF;box-shadow:0 26px 70px -18px rgba(20,18,16,.55),0 2px 6px rgba(20,18,16,.18)}
-.wh .namecard::before,.wh .namecard::after{content:"";position:absolute;pointer-events:none;border:1px solid var(--red)}
-.wh .namecard::before{inset:7px}
-.wh .namecard::after{inset:11px}
 .wh .namecard .eyebrow{font-family:var(--sans);font-weight:500;font-size:12px;letter-spacing:.2em;text-transform:uppercase;color:var(--black);margin:0}
 .wh .namecard h1{font-family:var(--serif);font-weight:600;font-size:clamp(40px,3.6vw,52px);line-height:1.04;letter-spacing:-.01em;color:var(--black);margin:0}
 .wh .namecard h1 .red{color:var(--red)}
@@ -1849,3 +1846,53 @@ body *{font-style:normal}
 }
 /* ---- Works status: sold = red dot + plain text; available = green dot ---- */
 .card .st-sold,.works-grid .st-sold{font-family:var(--sans);font-style:normal;font-size:13px;letter-spacing:.02em;color:var(--muted)}
+
+/* ==========================================================================
+   CR-007 mocks: the painting page. Big painting, a strip of other views,
+   a quiet room switch, then the text.
+   ========================================================================== */
+.pp{display:flex;flex-direction:column;align-items:center;gap:10px;padding:clamp(16px,2.4vw,32px) var(--gut) 8px}
+.pp-stage{width:100%;display:flex;justify-content:center;align-items:center;min-height:min(70svh,760px)}
+.pp-art{display:block;border:0;padding:0;margin:0;background:none;cursor:zoom-in;line-height:0;max-width:100%}
+.pp-art img{display:block;width:auto;height:auto;max-width:min(100%,1100px);max-height:min(72svh,780px);object-fit:contain;border:5px solid var(--frame);box-shadow:var(--shadow-2)}
+.pp-art img.is-small{max-height:min(360px,60svh)}
+.pp-detail-in{display:block;width:min(88vw,820px);aspect-ratio:4/3;max-height:70svh;border:5px solid var(--frame);box-shadow:var(--shadow-2);background-size:260%;background-repeat:no-repeat;background-color:var(--wall)}
+.pp-room{width:min(100%,900px,calc(64svh * 1.5));display:flex;flex-direction:column;gap:10px}
+.pp-room .room{box-shadow:0 18px 44px rgba(20,12,6,.18)}
+.pp-cap{margin:0;text-align:center;font-family:var(--sans);font-size:13px;letter-spacing:.14em;text-transform:uppercase;color:var(--muted)}
+.pp-bar{display:flex;align-items:center;justify-content:center;flex-wrap:wrap;gap:6px 18px;min-height:44px}
+.pp-toggle{display:inline-flex;align-items:center;gap:9px;min-height:44px;padding:0 20px;border:1px solid var(--ink);border-radius:999px;background:transparent;color:var(--ink);
+  font:500 12px/1 var(--sans);letter-spacing:.16em;text-transform:uppercase;cursor:pointer;transition:background-color .25s ease,color .25s ease}
+.pp-toggle svg{width:18px;height:18px}
+.pp-toggle:hover,.pp-toggle[aria-pressed="true"]{background:var(--ink);color:#fff}
+.pp-zoom{border:0;background:none;min-height:44px;padding:0 6px;font:inherit;font-size:13px;letter-spacing:.08em;color:var(--muted);cursor:pointer}
+.pp-zoom .on-touch{display:none}
+@media (hover:none){ .pp-zoom .on-touch{display:inline} .pp-zoom .on-fine{display:none} }
+.pp-strip{display:flex;gap:10px;overflow-x:auto;scroll-snap-type:x proximity;max-width:100%;padding:4px 2px 10px;scrollbar-width:none}
+.pp-strip::-webkit-scrollbar{display:none}
+.pp-chip{flex:none;width:92px;height:70px;padding:0;border:1px solid #CFC6B9;background:var(--wall);cursor:pointer;overflow:hidden;scroll-snap-align:center;opacity:.8;transition:opacity .2s ease}
+.pp-chip:hover,.pp-chip[aria-pressed="true"]{opacity:1}
+.pp-chip[aria-pressed="true"]{border:2px solid var(--ink)}
+.pp-chip img{width:100%;height:100%;object-fit:cover}
+.pp-chip:first-child img{object-fit:contain;padding:6px}
+.pp-crop{display:block;width:100%;height:100%;background-size:320%;background-repeat:no-repeat}
+.pp-text{max-width:680px;margin:clamp(20px,3vw,40px) auto clamp(24px,4vw,48px);text-align:center;display:flex;flex-direction:column;align-items:center;gap:10px}
+.pp-title{font-family:var(--serif);font-weight:600;font-size:clamp(38px,4.4vw,58px);line-height:1.04;letter-spacing:-.01em;margin:0;color:var(--black)}
+.pp-facts{margin:0;font-size:16px;color:var(--muted);letter-spacing:.02em}
+.pp-status{margin:0;display:flex;flex-wrap:wrap;justify-content:center;gap:6px 16px;font-size:14px;color:var(--muted)}
+.pp-status a{color:var(--ink)}
+.pp-text .status{display:inline-flex;align-items:center;gap:8px;font-size:14px;color:var(--ink)}
+.pp-text .status::before{display:none}
+.pp-text .status i{width:8px;height:8px;border-radius:50%;flex:none}
+.pp-text .st-sold i{background:#C0261B}.pp-text .st-free i{background:var(--green)}.pp-text .st-enquire i{background:transparent;box-shadow:inset 0 0 0 1px var(--ink)}
+.pp-story{margin:6px 0 0;font-family:var(--serif);font-weight:500;font-size:clamp(21px,1.9vw,25px);line-height:1.42;color:var(--black);text-wrap:balance}
+.pp-story span{display:block;margin-top:6px;font-family:var(--sans);font-size:13px;letter-spacing:.14em;text-transform:uppercase;color:var(--muted)}
+.pp-ctas{display:flex;flex-wrap:wrap;justify-content:center;gap:10px;margin-top:10px;width:100%}
+.pp-text .side-small{justify-content:center}
+@media (max-width:640px){
+  .pp{padding:10px 16px 4px}
+  .pp-stage{min-height:0}
+  .pp-art img{max-width:calc(100vw - 32px);max-height:64svh;border-width:3px}
+  .pp-detail-in{width:calc(100vw - 32px);border-width:3px}
+  .pp-ctas .btn{flex:1 1 100%}
+}

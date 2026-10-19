@@ -23,7 +23,7 @@ export default function Exhibitions() {
   return (
     <>
     <WallHero columns={SHOW_WALL} label="Her exhibitions" eyebrow="2005 to 2018" title="Her Exhibitions" red="Exhibitions"
-              held="Eighteen shows, from Delhi to Bombay.">
+              held="Eighteen shows, Delhi to Bombay.">
       <a className="btn btn-solid" href="#india-habitat-centre-2010">See the shows</a>
       <a className="btn" href="#record">The full record</a>
     </WallHero>

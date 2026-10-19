@@ -1,6 +1,6 @@
 import Link from "next/link";
 import { BY_ID, workPath } from "@/lib/works";
-import { LOOK, ON_EXHIBITIONS, ON_THE_WORK, PRESS, PULL, SHOWS, SMALL_PHOTO, labelLine } from "@/lib/site";
+import { LOOK, SERIES_PAGES, worksIn, ON_EXHIBITIONS, ON_THE_WORK, PRESS, PULL, SHOWS, SMALL_PHOTO, labelLine } from "@/lib/site";
 import { dims, smSet } from "@/lib/images";
 import { thumb } from "./Card";
 import WallDrift from "./WallDrift";
@@ -54,8 +54,8 @@ export const HOME: Item[][] = [
   [P("sacred-tree"), P("rickshaw-rest"), P("carriage-and-autorickshaw"), P("newspaper-reader"), P("mother-and-child"), P("carved-door-knocker")],
 ];
 
-/** Collections: her paintings only, moving behind the page's card */
-export const SERIES_WALL: Item[][] = [
+/** the mixed wall (Works, About): her paintings only */
+export const MIXED_WALL: Item[][] = [
   [P("bulls-and-wheel"), P("coins-and-clay-bank"), P("cycle-rickshaw"), P("terracotta-pots"), P("postbox-and-stamps")],
   [P("red-and-teal-door-lock"), P("weathered-door-ring"), P("teal-door-bolt"), P("carved-door-knocker"), P("mother-india-and-kettles")],
   [P("offering-of-light"), P("monks-and-blue-buddha"), P("sacred-tree"), P("prayer-and-scripture"), P("priest-with-flame")],
@@ -65,45 +65,27 @@ export const SERIES_WALL: Item[][] = [
   [P("mother-and-child"), P("man-among-metal-pans"), P("rickshaw-puller-and-coin"), P("bullock-cart-and-truck"), P("carriage-and-autorickshaw")],
 ];
 
+/** Collections (CR-007): one column per collection, led by its own label tile, then its paintings */
+const TONES = ["rust", "dark", "stone", "rust", "dark"] as const;
+export const SERIES_WALL: Item[][] = SERIES_PAGES.map((s, i) => [
+  { k: "n", em: "Collection", title: s.label, sub: `${worksIn(s.label).length} works · ${s.period}`, href: `/series/${s.slug}`, tone: TONES[i % TONES.length] } as Item,
+  ...worksIn(s.label).map((w) => P(w.id)),
+]);
+
 /** Works and About (CR-006): the same paintings, in another order, so every landing has its wall */
-export const WORKS_WALL: Item[][] = [...SERIES_WALL].reverse().map((c) => [...c].reverse());
-export const ABOUT_WALL: Item[][] = [...SERIES_WALL.slice(3), ...SERIES_WALL.slice(0, 3)].map((c, i) => (i % 2 ? [...c].reverse() : c));
+export const WORKS_WALL: Item[][] = [...MIXED_WALL].reverse().map((c) => [...c].reverse());
+export const ABOUT_WALL: Item[][] = [...MIXED_WALL.slice(3), ...MIXED_WALL.slice(0, 3)].map((c, i) => (i % 2 ? [...c].reverse() : c));
 
 /**
  * Exhibitions: the shows in photographs, the press, her words on exhibiting and
  * short lines about each show, the venues by name and the numbers from her record.
  * Everything here is from the site's own records (lib/site: SHOWS, PRESS, RECORD).
  */
-export const SHOW_WALL: Item[][] = [
-  [V("India Habitat Centre", "New Delhi · 2008, 2009, 2010", "rust", "#india-habitat-centre-2010"),
-    X("/site/ex/ihc-03.jpg", "November 2010", "Lighting the lamp", "Open Palm Court, IHC", "Dr Dolly Prasad lights the lamp at the opening", "#india-habitat-centre-2010"),
-    Q(lede("india-habitat-centre-2010"), "India Habitat Centre, 2010", "#india-habitat-centre-2010", false),
-    X("/site/ex/ihc-room-c.jpg", "On the wall", "The Bullocks", "India Habitat Centre", "The Bullocks on the exhibition wall", "#india-habitat-centre-2010")],
-  [S("18", "Exhibitions and art fairs", "2005 to 2018 · Delhi, Gurgaon, Jaipur, Bombay"),
-    X("/site/ex/iccr-speech.jpg", "June 2010", "A Lifetime to Paint", "ICCR, Azad Bhavan Art Gallery", "Dr Dolly Prasad speaks at the opening at ICCR", "#a-lifetime-to-paint"),
-    V("Nehru Art Gallery", "Bombay · 2006", "dark"),
-    X("/site/ex/kala-selfie.jpg", "February 2018", "Kala Mela", "IGNCA, New Delhi", "A visitor takes a selfie with the paintings at the Kala Mela", "#kala-mela-2018")],
-  [Q(ON_EXHIBITIONS, "Dr Dolly Prasad, on her exhibitions", "#a-lifetime-to-paint", true),
-    X("/site/ex/ihc-press-a.jpg", "In front of the cameras", "The press", "India Habitat Centre · 2010", "Dr Dolly Prasad in conversation with a reporter", "#india-habitat-centre-2010"),
-    V("Indian Council for Cultural Relations", "Azad Bhavan, New Delhi · 2010, 2011", "stone", "#a-lifetime-to-paint"),
-    X("/site/ex/triveni-3.jpg", "May 2007", "Triveni Kala Sangam", "With Sangeeta Sharma", "The Triveni invitation", "#triveni-2007")],
-  [X("/site/ex/kala-dolly.jpg", "February 2018", "First International Kala Mela", "IGNCA, New Delhi", "Dr Dolly Prasad beside her painting at the Kala Mela", "#kala-mela-2018"),
-    Q(lede("kala-mela-2018"), "First International Kala Mela, 2018", "#kala-mela-2018", false),
-    X("/site/ex/ihc-05.jpg", "The evening", "Along the wall", "India Habitat Centre · 2010", "Visitors look along a wall of her paintings", "#india-habitat-centre-2010"),
-    V("Cabinet Secretariat Gallery", "Delhi · 2016", "rust")],
-  [V("Triveni Kala Sangam", "Mandi House, New Delhi · 2007", "stone", "#triveni-2007"),
-    X("/site/ex/delhi-times.jpg", "In the papers", "Delhi Times", "Must See, Must Do", PRESS.clipping.alt, "#press"),
-    Q(PRESS.clippingLine, "In the papers", "#press", false),
-    X("/site/ex/iccr-02.jpg", "June 2010", "Beside The Blue Buddha", "ICCR, New Delhi", "Dr Dolly Prasad beside The Blue Buddha", "#a-lifetime-to-paint")],
-  [X("/site/video/tv-archive-2.jpg", "12 June 2010", "On NCR television", "In the news", "A still from the NCR television report", "#press"),
-    S("3", "Continents", "With private collectors in India, the USA and the UK"),
-    X("/site/ex/ihc-08.jpg", "November 2010", "The Blue Buddha", "India Habitat Centre", "Dr Dolly Prasad beside The Blue Buddha", "#india-habitat-centre-2010"),
-    V("International Art Fair", "Jaipur · 2018", "dark")],
-  [V("Travancore Art Gallery", "New Delhi · 2006, 2007", "stone"),
-    X("/site/ex/iccr-sign.jpg", "June 2010", "A Lifetime to Paint", "ICCR", "The ICCR sign for A Lifetime to Paint", "#a-lifetime-to-paint"),
-    Q(ON_THE_WORK, "Dr Dolly Prasad, on her work", "/about", true),
-    X("/site/ex/ihc-02.jpg", "Opening night", "The lamp is lit", "India Habitat Centre · 2010", "Visitors gathered around the lit lamp", "#india-habitat-centre-2010")],
-];
+export const SHOW_WALL: Item[][] = SHOWS.map((sh, i) => [
+  { k: "n", em: sh.when, title: sh.name ?? sh.title, sub: `${sh.venue}, ${sh.city}`, href: `#${sh.id}`, tone: TONES[i % TONES.length] } as Item,
+  ...sh.albums.flatMap((al) => al.photos.map((ph) => X(ph.src, al.title, sh.title, sh.venue, ph.alt, `#${sh.id}`))),
+  ...(sh.works ?? []).map((id) => P(id)),
+]);
 
 function Tile({ it }: { it: Item }) {
   if (it.k === "s") {
@@ -158,12 +140,15 @@ function Tile({ it }: { it: Item }) {
   );
 }
 
+/** every column holds its list REP times, so it is full at the start and loops without a seam, however tall the wall */
+const repFor = (items: Item[]) => (items.length >= 8 ? 2 : 4);
+
 export function Wall({ columns, speed = 95 }: { columns: Item[][]; speed?: number }) {
   return (
     <WallDrift n={columns.length}>
       {columns.map((items, i) => (
-        <div key={i} className={`col${i % 2 ? " down" : ""}`} style={{ ["--dur" as string]: `${Math.round(speed * (1 + (i % 3) * 0.17))}s` }}>
-          {[...items, ...items].map((it, j) => <Tile key={j} it={it} />)}
+        <div key={i} data-rep={repFor(items)} className={`col${i % 2 ? " down" : ""}`} style={{ ["--dur" as string]: `${Math.round(speed * (1 + (i % 3) * 0.17))}s` }}>
+          {Array.from({ length: repFor(items) }, () => items).flat().map((it, j) => <Tile key={j} it={it} />)}
         </div>
       ))}
     </WallDrift>

@@ -174,7 +174,7 @@ export function driftRow(view: HTMLElement, track: HTMLElement, o: { seconds: nu
   };
   view.addEventListener("wheel", wheel, { passive: false });
 
-  const enter = (e: PointerEvent) => { if (o.pauseOnHover && e.pointerType === "mouse") hover = true; };
+  const enter = (e: PointerEvent) => { void e; /* CR-007: rows keep moving under the mouse */ };
   const leave = () => { hover = false; };
   view.addEventListener("pointerenter", enter);
   view.addEventListener("pointerleave", leave);
@@ -229,7 +229,7 @@ export function driftWall(cols: HTMLElement, o: { swaySeconds?: number } = {}): 
   const measure = () => {
     const d = parseFloat(getComputedStyle(cols).getPropertyValue("--drift")) || 0;
     amp = (d / 100) * cols.offsetWidth;
-    for (const s of st) s.h = Math.max(1, s.c.scrollHeight / 2);
+    for (const s of st) s.h = Math.max(1, s.c.scrollHeight / (Number(s.c.dataset.rep) || 2));
   };
   measure();
   // pick up exactly where the CSS animation had got to
@@ -249,7 +249,6 @@ export function driftWall(cols: HTMLElement, o: { swaySeconds?: number } = {}): 
   const stopClock = clock(cols, (dt, now) => {
     if (held || still) return;
     // a painting under the mouse holds the wall still while it is lifted (CR-005), then it eases off again
-    if (hover) { scale = 0; return; }
     if (now < holdUntil) return;
     scale = Math.min(1, scale + dt / RAMP_S);
     const k = scale * scale * (3 - 2 * scale);
@@ -280,7 +279,7 @@ export function driftWall(cols: HTMLElement, o: { swaySeconds?: number } = {}): 
   });
 
   // the mouse resting on a tile pauses the wall (touch never does: a finger is either tapping or dragging)
-  const over = (e: PointerEvent) => { if (e.pointerType === "mouse") hover = !!(e.target as Element).closest?.(".tile"); };
+  const over = (e: PointerEvent) => { if (e.pointerType === "mouse") hover = false; };
   const out = (e: PointerEvent) => { if (!cols.contains(e.relatedTarget as Node)) hover = false; };
   cols.addEventListener("pointerover", over);
   cols.addEventListener("pointerout", out);
