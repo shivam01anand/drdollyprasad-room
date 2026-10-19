@@ -8,6 +8,8 @@ import { dims } from "@/lib/images";
 import Marquee from "@/components/site/Marquee";
 import SeriesSlides from "@/components/site/SeriesSlides";
 import WallHero from "@/components/site/WallHero";
+import FadeReel from "@/components/site/FadeReel";
+import { WORKS } from "@/lib/works";
 import { SERIES_WALL } from "@/components/site/Collage";
 
 export const metadata: Metadata = {
@@ -37,6 +39,7 @@ export default function SeriesIndex() {
                   <div><Link href={`/series/${s.slug}`}>{s.label}</Link><small>{s.line}</small></div></li>
               ))}
             </ol>
+            <FadeReel items={WORKS.filter((w) => !SMALL_PHOTO.has(w.id)).map((w) => ({ id: w.id, title: w.title, src: thumb(w.id) }))} />
           </div>
           <SeriesSlides slides={SERIES_PAGES.map((s) => ({ slug: s.slug, label: s.label, n: worksIn(s.label).length, src: thumb(s.hero),
             alt: `${BY_ID.get(s.hero)?.title}, from ${s.label}`, ...dims(thumb(s.hero)) }))} />

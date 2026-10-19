@@ -88,7 +88,7 @@ export default function Home() {
         </div>
       </section>
 
-      <div className="layer band-cream">
+      <div className="layer band-indigo">
       <section className="sec wrap">
         <div className="sec-head">
           <div>

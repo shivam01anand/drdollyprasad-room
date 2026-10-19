@@ -55,7 +55,7 @@ export default function About() {
   return (
     <>
       {/* CR-006: About opens like every landing, the white card centred on a wall of her paintings */}
-      <WallHero columns={ABOUT_WALL} label="About the artist" eyebrow="About the artist" title="A doctor who paints" red="paints" held="Dr Dolly Prasad, New Delhi.">
+      <WallHero columns={ABOUT_WALL} label="About the artist" eyebrow="About the artist" title="The everyday, held sacred" red="sacred" held="Dr Dolly Prasad, New Delhi.">
         <a className="btn btn-solid" href="#story">Her story</a>
         <Link className="btn" href="/works">See her work</Link>
       </WallHero>
@@ -66,7 +66,7 @@ export default function About() {
             <img src={PORTRAIT_LARGE} alt="Dr Dolly Prasad beside one of her paintings at the First International Kala Mela, 2018" />
           </figure>
           <div className="ab-txt">
-            <p className="ab-p">A New Delhi artist who makes the everyday memorable. For her, the ordinary is never small: a clay gullak, a closed door, a lamp lifted at aarti, a face at the corner of a lane. Each holds a story, and each is slipping away as India changes.</p>
+            <p className="ab-p">A New Delhi artist who makes the everyday memorable. For her, the ordinary is never small: a clay gullak, a closed door, a lamp lifted at aarti, a face at the corner of a lane. Each holds a story, and each is slipping away as India changes. Looking back, those ordinary days were the good ones, and she paints them so they can be seen while they are still here.</p>
           </div>
         </div>
       </section>
@@ -75,7 +75,7 @@ export default function About() {
         <div className="wrap ab-split">
           <div className="ab-txt">
             <p className="eyebrow">Who she is</p>
-            <h2>A doctor who paints</h2>
+            <h2>The good days were the everyday</h2>
             <p className="ab-p">She is a doctor, and a self-taught painter in oil on canvas. The play of emotion on a face has always held her, in her work at the hospital and on the canvas.</p>
             <p className="ab-p">Her subject is the India around her as it changes: rickshaws giving way to autos, coins going out of use, old doors locked and left. She paints them with the warmth of someone who remembers, never as relics, always as parts of a life.</p>
           </div>

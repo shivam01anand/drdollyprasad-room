@@ -2102,3 +2102,51 @@ body *{font-style:normal !important}
 .pager button{min-width:44px;height:44px}
 .chip,.jump a{min-height:44px}
 .menu-panel .btn{min-height:44px}
+
+/* ==========================================================================
+   v3 (Shubham, 19 Oct 00:20): crisp white grounds, less cream, a deeper indigo,
+   and every painting in a black frame with a white mat, lifted off the wall.
+   ========================================================================== */
+:root{
+  --wall:#FFFFFF; --stone:#F7F5F1; --dark:#161E3A; --dark-ink:#F4EFE6; --dark-muted:#CDD2E2;
+  --frame:#141210;
+  --mat:6px;
+  --lift3d:0 0 0 1px rgba(255,255,255,.06),0 1px 2px rgba(10,8,6,.4),0 10px 18px rgba(10,8,6,.26),0 28px 54px rgba(10,8,6,.24);
+}
+.band-cream{--c:#FFFFFF}
+.band-indigo{--c:#161E3A}
+.sband.tone-0,.sband.tone-1{background:#FFFFFF}
+.sband.tone-2{background:#F7F5F1}
+
+/* black frame + white mat: the frame is the border, the mat is padding on white */
+.framed,.framed.thin,.tile .framed,
+.viewer .paper img,.roll-stage img.framed,.slides-stage img,.clip img,
+.ab-portrait img,.ig-track img,.now-box .imgs img,.wpa-art img,.freel-stage img{
+  border:6px solid var(--frame) !important;
+  padding:var(--mat) !important;
+  background:#FFFFFF !important;
+  object-fit:contain;
+  box-shadow:inset 0 0 0 1px rgba(0,0,0,.06),var(--lift3d) !important;
+}
+.viewer .paper img{border-width:9px !important;padding:9px !important}
+@media (max-width:640px){
+  :root{--mat:4px}
+  .framed,.framed.thin,.tile .framed,.slides-stage img,.clip img,.ig-track img,.freel-stage img{border-width:4px !important}
+  .viewer .paper img{border-width:6px !important;padding:6px !important}
+}
+
+/* the small crossfade of every painting under the five collections */
+.freel{margin-top:22px;display:flex;flex-direction:column;align-items:flex-start;gap:8px}
+.freel-stage{position:relative;display:block;width:min(100%,300px);aspect-ratio:1/1}
+.freel-stage img{position:absolute;inset:0;margin:auto;max-width:calc(100% - 20px);max-height:calc(100% - 20px);width:auto;height:auto;
+  opacity:0;transition:opacity .9s ease}
+.freel-stage img.is-on{opacity:1}
+.freel-cap{font-family:var(--serif);font-size:18px;font-weight:600;margin:0;color:var(--muted)}
+@media (max-width:860px){ .freel{align-items:center} .freel-stage{width:min(100%,260px)} }
+@media (prefers-reduced-motion:reduce){ .freel-stage img{transition:none} }
+.wpa-art img{border-width:9px !important;padding:9px !important}
+@media (max-width:640px){ .wpa-art img{border-width:5px !important;padding:5px !important} }
+.ss-stage{background:#F7F5F1}
+.pp-art img,.room-art img{border:9px solid var(--frame) !important;padding:9px !important;background:#FFFFFF !important;
+  box-shadow:inset 0 0 0 1px rgba(0,0,0,.06),var(--lift3d) !important}
+@media (max-width:640px){ .pp-art img,.room-art img{border-width:5px !important;padding:5px !important} }
