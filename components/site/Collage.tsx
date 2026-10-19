@@ -20,6 +20,7 @@ export type Item =
   | { k: "p"; id: string }
   | { k: "x"; src: string; eyebrow: string; title: string; sub: string; alt: string; href: string }
   | { k: "n"; em: string; title: string; sub: string; href: string; tone: "rust" | "dark" | "stone" }
+  | { k: "c"; em: string; title: string; sub: string; href: string; tone: "white" | "indigo" }
   | { k: "s"; big: string; mid: string; small: string; href: string }
   | { k: "q"; text: string; by: string; href: string; hers: boolean };
 
@@ -29,6 +30,9 @@ export const X = (src: string, eyebrow: string, title: string, sub: string, alt:
 
 /** a venue she has shown at (years from her own record, RECORD in lib/site) */
 const V = (title: string, sub: string, tone: "rust" | "dark" | "stone", href = "#record"): Item => ({ k: "n", em: "Exhibited at", title, sub, href, tone });
+/** a credential placard, like a museum wall label: a quiet line of fact, white or indigo. Only facts the repo records
+ *  (lib/site SHOWS and RECORD): the venue, the show, the fair, the count of her record. */
+const C = (em: string, title: string, sub: string, tone: "white" | "indigo", href: string): Item => ({ k: "c", em, title, sub, tone, href });
 /** a number from her record */
 const S = (big: string, mid: string, small: string, href = "#record"): Item => ({ k: "s", big, mid, small, href });
 /** words: hers verbatim (in quote marks, with her name), or a short editorial line about a show */
@@ -74,7 +78,18 @@ export const SERIES_WALL: Item[][] = SERIES_PAGES.map((s, i) => [
 
 /** Works and About (CR-006): the same paintings, in another order, so every landing has its wall */
 export const WORKS_WALL: Item[][] = [...MIXED_WALL].reverse().map((c) => [...c].reverse());
-export const ABOUT_WALL: Item[][] = [...MIXED_WALL.slice(3), ...MIXED_WALL.slice(0, 3)].map((c, i) => (i % 2 ? [...c].reverse() : c));
+const ABOUT_BASE: Item[][] = [...MIXED_WALL.slice(3), ...MIXED_WALL.slice(0, 3)].map((c, i) => (i % 2 ? [...c].reverse() : c));
+/** About: the same painting-heavy wall, with three placards (about one tile in twelve), quiet and spread across the columns */
+const PLACARDS: [number, number, Item][] = [
+  [1, 2, C("Exhibited at", "India Habitat Centre", "New Delhi", "white", "/exhibitions#india-habitat-centre-2010")],
+  [3, 3, C("Her record", "Eighteen exhibitions and art fairs", "2005–2018", "indigo", "/exhibitions#record")],
+  [5, 1, C("ICCR · June 2010", "A Lifetime to Paint", "Azad Bhavan Art Gallery, New Delhi", "white", "/exhibitions#a-lifetime-to-paint")],
+];
+export const ABOUT_WALL: Item[][] = ABOUT_BASE.map((col, i) => {
+  const out = [...col];
+  for (const [ci, at, it] of PLACARDS) if (ci === i) out.splice(at, 0, it);
+  return out;
+});
 
 /**
  * Exhibitions: the shows in photographs, the press, her words on exhibiting and
@@ -92,6 +107,13 @@ function Tile({ it }: { it: Item }) {
     return (
       <Link className="tile scard" href={it.href} tabIndex={-1}>
         <b>{it.big}</b><em>{it.mid}</em><small>{it.small}</small>
+      </Link>
+    );
+  }
+  if (it.k === "c") {
+    return (
+      <Link className={`tile ccard ${it.tone}`} href={it.href} tabIndex={-1}>
+        <em>{it.em}</em><b>{it.title}</b><small>{it.sub}</small>
       </Link>
     );
   }
@@ -127,7 +149,7 @@ function Tile({ it }: { it: Item }) {
     <Link className="tile flip" href={workPath(w.id)} tabIndex={-1}>
       <span className="flipper">
         {/* eslint-disable-next-line @next/next/no-img-element */}
-        <img className="framed" src={thumb(w.id)} alt={w.title} loading="lazy" decoding="async" {...dims(thumb(w.id))} {...smSet(thumb(w.id))} />
+        <img className="framed" src={thumb(w.id)} alt={w.title} loading="eager" decoding="async" {...dims(thumb(w.id))} {...smSet(thumb(w.id))} />
         <span className="back">
           <em>{w.series}</em>
           <b>{w.title}</b>

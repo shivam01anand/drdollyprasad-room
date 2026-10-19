@@ -1,6 +1,7 @@
 "use client";
 
 import { useEffect, useMemo, useState } from "react";
+import Link from "next/link";
 import Card from "./Card";
 import { SERIES_PAGES } from "@/lib/site";
 import { WORKS, type Work } from "@/lib/works";
@@ -49,27 +50,15 @@ export default function WorksBrowser() {
     (size === "all" || sizeOf(w) === size));
   const n = (f: (w: Work) => boolean) => all.filter(f).length;
 
-  // a page at a time: twelve on a phone, twenty-four on a computer
-  const [per, setPer] = useState(24);
-  const [page, setPage] = useState(1);
-  useEffect(() => {
-    const m = matchMedia("(max-width: 640px)");
-    const set = () => setPer(m.matches ? 12 : 24);
-    set();
-    m.addEventListener("change", set);
-    return () => m.removeEventListener("change", set);
-  }, []);
-  useEffect(() => { setPage(1); }, [series, status, size, per]);
-  const pages = Math.max(1, Math.ceil(shown.length / per));
-  const slice = shown.slice((page - 1) * per, page * per);
-  const go = (k: number) => {
-    track("works_page_changed", { page: k, per_page: per, collection_filter: series, status_filter: status, size_filter: size });
-    setPage(k);
-    document.getElementById("all")?.scrollIntoView({ behavior: "smooth", block: "start" });
-  };
+  // grouped by collection, the bands alternating white and indigo as the home page does
+  const groups = SERIES_PAGES.slice().reverse()
+    .map((sp) => ({ sp, items: shown.filter((w) => w.series === sp.label) })).filter((g) => g.items.length);
+  const SECTION_OPEN = 8; // the first eight paintings load at once; the rest as you scroll
+  let seen = 0;
 
   return (
     <>
+      <div className="wrap wfilters">
       <div className="filters filters-line" role="group" aria-label="Filter the works">
         <label className="fsel">
           <span>Collection</span>
@@ -100,23 +89,27 @@ export default function WorksBrowser() {
         <p className="meta" aria-live="polite">
           {shown.length} {shown.length === 1 ? "painting" : "paintings"}
           {size !== "all" && " · only works with a confirmed size"}
-          {pages > 1 && ` · page ${page} of ${pages}`}
         </p>
       </div>
-      {shown.length ? (
-        <div className="grid works-grid">{slice.map((w, i) => <Card key={w.id} w={w} eager={i < 8} />)}</div>
-      ) : (
-        <p className="empty">No paintings match these filters.</p>
-      )}
-      {pages > 1 && (
-        <nav className="pager" aria-label="Pages">
-          <button type="button" onClick={() => go(page - 1)} disabled={page === 1} aria-label="Previous page">‹</button>
-          {Array.from({ length: pages }, (_, k) => (
-            <button key={k} type="button" aria-current={page === k + 1 ? "page" : undefined} onClick={() => go(k + 1)}>{k + 1}</button>
-          ))}
-          <button type="button" onClick={() => go(page + 1)} disabled={page === pages} aria-label="Next page">›</button>
-        </nav>
-      )}
+      </div>
+      {groups.length ? groups.map((g, k) => {
+        const first = seen; seen += g.items.length;
+        return (
+          <section key={g.sp.slug} className={`wgroup ${k % 2 ? "band-indigo" : "band-white"}`} aria-labelledby={`wg-${g.sp.slug}`}>
+            <div className="wrap">
+              <div className="sec-head wg-head">
+                <div>
+                  <h2 id={`wg-${g.sp.slug}`}>{g.sp.label}</h2>
+                  <p className="sec-line">{g.sp.line}</p>
+                  <p className="meta">{g.items.length} {g.items.length === 1 ? "painting" : "paintings"} · {g.sp.period}</p>
+                </div>
+                <Link className="link" href={`/series/${g.sp.slug}`}>The collection →</Link>
+              </div>
+              <div className="grid works-grid">{g.items.map((w, i) => <Card key={w.id} w={w} eager={first + i < SECTION_OPEN} />)}</div>
+            </div>
+          </section>
+        );
+      }) : <div className="wrap"><p className="empty">No paintings match these filters.</p></div>}
     </>
   );
 }

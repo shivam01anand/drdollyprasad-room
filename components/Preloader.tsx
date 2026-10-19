@@ -80,17 +80,17 @@ const Preloader = forwardRef<PreloaderHandle, Props>(function Preloader(props, r
     };
   }, []);
 
-  // the greeting comes in word by word, as soon as the face is in
+  // the greeting is on screen from the first paint (never a blank panel) and only settles into place
   useEffect(() => {
     const g = greet.current;
     if (!g) return;
     const quick = reducedMotion();
     let cancelled = false;
-    Promise.race([document.fonts?.ready ?? Promise.resolve(), new Promise((r) => setTimeout(r, 900))]).then(() => {
+    Promise.resolve().then(() => {
       if (cancelled) return;
       const parts = [...g.querySelectorAll<HTMLElement>("[data-in]")];
-      own(gsap.fromTo(parts, { autoAlpha: 0, y: 14, filter: "blur(8px)" },
-        { autoAlpha: 1, y: 0, filter: "blur(0px)", duration: quick ? 0 : 1.3, ease: "power2.out", stagger: quick ? 0 : 0.16,
+      own(gsap.fromTo(parts, { autoAlpha: 1, y: 10, filter: "blur(0px)" },
+        { autoAlpha: 1, y: 0, filter: "blur(0px)", duration: quick ? 0 : 0.7, ease: "power2.out", stagger: quick ? 0 : 0.08,
           onComplete: () => { state.current.said = true; if (cb.current.loaded) setReady(true); } }));
     });
     return () => { cancelled = true; };

@@ -23,29 +23,23 @@ const FOCUS: Record<string, string> = {
  */
 export default function Press({ items, more }: { items: PressItem[]; more?: { href: string; label: string } }) {
   const stills = items.filter((p) => p.kind !== "video");
-  const videos = items.filter((p) => p.kind === "video");
   const [open, setOpen] = useState<number | null>(null);
   return (
     <>
-      {videos.length > 0 && (
-        <ul className="press-videos" role="list">
-          {videos.map((p) => (
-            <li key={p.id} className="press-item is-video">
-              <figure>
-                <Clip p={p} />
-                <figcaption>
-                  <em>{p.source}</em>
-                  <b>{p.title}</b>
-                  <span>{p.line}</span>
-                  {p.credit && <small>{p.credit}</small>}
-                </figcaption>
-              </figure>
-            </li>
-          ))}
-        </ul>
-      )}
       <ul className="press" role="list">
-        {stills.map((p) => (
+        {items.map((p) => p.kind === "video" ? (
+          <li key={p.id} className="press-item is-video">
+            <figure>
+              <Clip p={p} />
+              <figcaption>
+                <em>{p.source}</em>
+                <b>{p.title}</b>
+                <span>{p.line}</span>
+                {p.credit && <small>{p.credit}</small>}
+              </figcaption>
+            </figure>
+          </li>
+        ) : (
           <li key={p.id} className={`press-item is-${p.kind}`}>
             <figure>
               <button type="button" className="press-open" onClick={() => setOpen(stills.indexOf(p))}
@@ -94,7 +88,6 @@ function Clip({ p }: { p: PressItem }) {
           <svg viewBox="0 0 24 24" aria-hidden="true"><path d="M8 5.5v13l11-6.5z" fill="currentColor" /></svg>
         </button>
       )}
-      {!on && <span className="press-watch" aria-hidden="true">Watch · {p.id === "tv-ncr-2010" ? "NCR, 2010" : "Television"}</span>}
     </div>
   );
 }

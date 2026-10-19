@@ -3,7 +3,6 @@ import Link from "next/link";
 import Roll, { type RollItem } from "@/components/site/Roll";
 import WallHero from "@/components/site/WallHero";
 import { ABOUT_WALL } from "@/components/site/Collage";
-import ThemeSlider, { type Theme } from "@/components/site/ThemeSlider";
 import Press from "@/components/site/Press";
 import { PRESS_SHORT } from "@/lib/press";
 import { LOOK, PULL, ON_THE_WORK, PORTRAIT_LARGE, STUDIO_PATH, shownYear } from "@/lib/site";
@@ -34,22 +33,10 @@ const SHOW_PHOTOS: RollItem[] = [
  * project notes, not here, so it cannot be shown as hers by mistake.
  *
  * "Who she is" says only what the record supports (brand thesis §2, §6: a
- * practising doctor and a self-taught painter; the play of emotion on faces
+ * practising doctor and a painter; the play of emotion on faces
  * has always fascinated her). The longer hospital-to-easel story waits for
  * her own account (backlog sprint, Needs Mummy).
  */
-
-const THREADS: Theme[] = [
-  { t: "Memory", series: "Gone Are The Days", href: "/series/gone-are-the-days",
-    d: "The tonga and the bullock cart, the twenty-paise coin, the clay gullak, the hand-painted film poster. A country changes fastest in its small things. She paints them as they leave the street, often beside whatever replaced them, so that one canvas holds two times.",
-    roll: paint(["bulls-and-wheel", "coins-and-clay-bank", "carriage-and-autorickshaw", "shree-420-and-milk-cans"]) },
-  { t: "Devotion", series: "Faith", href: "/series/faith",
-    d: "Faith here is a habit, not a spectacle. A lamp raised to a wall of scripture, a peepal wound in red thread, the aarti flame, a man opening his morning paper. The gestures last a moment; the paintings let them last.",
-    roll: paint(["offering-of-light", "sacred-tree", "monks-and-blue-buddha", "priest-with-flame"]) },
-  { t: "The pause", series: "Onset of Spring", href: "/series/recent-work",
-    d: "Her recent work turns inward: a woman beside a bird, a child beneath banana leaves, bells hung with thread. Faces, flowers and birds, held long enough to be felt. In her words: “Sometimes, I paint not to show, but to pause.”",
-    roll: paint(["woman-with-bird", "boy-with-bananas", "woman-with-red-flower", "temple-bells"]) },
-];
 
 export default function About() {
   return (
@@ -66,7 +53,7 @@ export default function About() {
             <img src={PORTRAIT_LARGE} alt="Dr Dolly Prasad beside one of her paintings at the First International Kala Mela, 2018" />
           </figure>
           <div className="ab-txt">
-            <p className="ab-p">A New Delhi artist who makes the everyday memorable. For her, the ordinary is never small: a clay gullak, a closed door, a lamp lifted at aarti, a face at the corner of a lane. Each holds a story, and each is slipping away as India changes. Looking back, those ordinary days were the good ones, and she paints them so they can be seen while they are still here.</p>
+            <p className="ab-p">Dr Dolly Prasad is a New Delhi artist who holds the everyday sacred. For her, the ordinary is never small: a clay gullak, a closed door, a lamp lifted at aarti, a face at the corner of a lane. Each holds a story. Looking back, those ordinary days were the good ones, and she paints them so we can see them clearly now, and keep seeing the ones we are living today.</p>
           </div>
         </div>
       </section>
@@ -76,23 +63,10 @@ export default function About() {
           <div className="ab-txt">
             <p className="eyebrow">Who she is</p>
             <h2>The good days were the everyday</h2>
-            <p className="ab-p">She is a doctor, and a self-taught painter in oil on canvas. The play of emotion on a face has always held her, in her work at the hospital and on the canvas.</p>
-            <p className="ab-p">Her subject is the India around her as it changes: rickshaws giving way to autos, coins going out of use, old doors locked and left. She paints them with the warmth of someone who remembers, never as relics, always as parts of a life.</p>
+            <p className="ab-p">She is a doctor, and a painter in oil on canvas. Doctors learn to look at people carefully, and she kept that habit when she picked up the brush: the play of emotion on a face has always held her, at the hospital and on the canvas.</p>
+            <p className="ab-p">Her subject is the India around her as it changes: rickshaws sharing the road with autos, coins out of use, old doors shut and kept. She paints them with the warmth of someone who remembers, and the hope of someone who still looks. Never relics; always parts of a life.</p>
           </div>
           <Roll label="Faces from her portraits" items={paint(["red-turban-portrait", "three-veiled-women", "boy-and-kettle", "yellow-turban-portrait", "mother-and-child"])} />
-        </div>
-      </section>
-
-      {/* In the press, short (CR-005): right after the second section, linking to the full set on Exhibitions */}
-      <section className="ab-band tone-stone ab-press" aria-labelledby="ab-press-h">
-        <div className="wrap">
-          <div className="sec-head">
-            <div>
-              <p className="eyebrow">From the archive</p>
-              <h2 id="ab-press-h">In the press</h2>
-            </div>
-          </div>
-          <Press items={PRESS_SHORT} more={{ href: "/exhibitions#press", label: "All the press, on Exhibitions" }} />
         </div>
       </section>
 
@@ -101,13 +75,32 @@ export default function About() {
           <p className="eyebrow">The work</p>
           <h2>She captures the everyday: its waiting and wishing, its worship and whispers.</h2>
           <p className="ab-p">A clay gullak and the coins it was made to hold. A door nobody opens any more. A lamp raised to a wall of scripture. She gives these ordinary things the scale, the colour and the stillness we usually keep for the sacred.</p>
-          <p className="ab-p">Why these things? Because they are the first a changing country forgets, and they are what made it home. Each painting is a way of saying they mattered. Three threads run through the work.</p>
+          <p className="ab-p">Why these things? Because they are what made it home, and they are the first a changing country overlooks. Each painting is a way of saying they matter, and that looking twice is how we keep them.</p>
         </div>
       </section>
 
-      <section className="ab-band tone-stone">
+      <section className="ab-band tone-light">
+        <div className="wrap ab-split">
+          <div className="ab-txt">
+            <p className="eyebrow">Looking twice</p>
+            <h2>From a bullock cart to a child beneath banana leaves</h2>
+            <p className="ab-p">One habit runs through all of it: look at an ordinary thing a second time, and it opens. A lamp, a thread, a pause. In her words: “Sometimes, I paint not to show, but to pause.”</p>
+            <Link className="btn btn-solid" href="/series">The five collections</Link>
+          </div>
+          <Roll label="A few of her paintings" items={paint(["bulls-and-wheel", "offering-of-light", "boy-with-bananas", "temple-bells", "woman-with-bird"])} />
+        </div>
+      </section>
+
+      {/* In the press, short (CR-005): right after the second section, linking to the full set on Exhibitions */}
+      <section className="ab-band tone-dark band-indigo ab-press" aria-labelledby="ab-press-h">
         <div className="wrap">
-          <ThemeSlider themes={THREADS} />
+          <div className="sec-head">
+            <div>
+              <p className="eyebrow">From the archive</p>
+              <h2 id="ab-press-h">In the press</h2>
+            </div>
+          </div>
+          <Press items={PRESS_SHORT} more={{ href: "/exhibitions#press", label: "All the press, on Exhibitions" }} />
         </div>
       </section>
 
