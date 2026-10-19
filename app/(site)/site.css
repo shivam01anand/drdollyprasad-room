@@ -2235,3 +2235,16 @@ body *{font-style:normal !important}
 .wgroup.band-indigo .card-t{color:#fff}
 .wgroup.band-indigo .pill{color:#fff;border-color:#8F9AC0}
 .ig-band{background:#fff !important}
+
+/* ---- v5 · readability: body 17px on a computer, 16px on a phone; captions 15px+; a comfortable measure ---- */
+.ab-p,.sec-line,.ex-lede,.lede,p.meta,.s-line,.sm-cap,.ss-list small,.pp-story,.pp-text p{font-size:17px;line-height:1.6}
+.ab-p,.sec-line,.ex-lede,.lede,.s-line{max-width:64ch}
+.press figcaption span,.press figcaption small,.press figcaption{font-size:15px;line-height:1.45}
+.card .meta,.m-card .meta,.ex-kind,.series-tiles .meta{font-size:15px;line-height:1.45}
+.ex-kind{letter-spacing:.06em}
+.band-indigo .sec-line,.band-indigo p.meta,.band-indigo .card .meta{color:#E3E7F3}
+@media (max-width:640px){
+  .ab-p,.sec-line,.ex-lede,.lede,p.meta,.s-line,.sm-cap,.ss-list small,.pp-text p{font-size:16px;line-height:1.55}
+  .card .meta,.m-card .meta,.ex-kind,.series-tiles .meta,.press figcaption span{font-size:15px}
+  .pp-story{font-size:18px}
+}
