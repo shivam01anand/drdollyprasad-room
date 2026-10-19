@@ -2,6 +2,15 @@
   "_how": "To add a calm-hallway room for a painting: drop public/art/rooms/hallway-<id>.webp (1536 x 1024) and add one line below. Optional per-room overrides: cm (painting's longest side, default 91.4), w, h, pxPerCm, floor, cx. No code change. See docs/WEBSITE-BACKLOG.md, 'Adding a hallway room'.",
   "rooms": [
     { "id": "05", "work": "coins-and-clay-bank", "cm": 91.4 },
-    { "id": "40", "work": "woman-with-red-flower", "cm": 61 }
+    { "id": "40", "work": "woman-with-red-flower", "cm": 61 },
+    { "id": "03", "work": "bullock-cart-and-truck", "cm": 61 },
+    { "id": "14", "work": "terracotta-pots", "cm": 91.4 },
+    { "id": "15", "work": "weathered-door-ring", "cm": 30.5 },
+    { "id": "16", "work": "red-and-teal-door-lock", "cm": 30.5 },
+    { "id": "17", "work": "teal-door-bolt", "cm": 30.5 },
+    { "id": "18", "work": "carved-door-knocker", "cm": 30.5 },
+    { "id": "27", "work": "red-turban-portrait", "cm": 76.2 },
+    { "id": "38", "work": "temple-bells", "cm": 91.4 },
+    { "id": "41", "work": "boy-with-bananas", "cm": 91.4 }
   ]
 }
