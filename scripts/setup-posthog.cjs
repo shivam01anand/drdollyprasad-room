@@ -9,7 +9,7 @@ const name = 'Dr Dolly Prasad — Visitor journeys';
 const tag = 'managed:drdollyprasad-analytics';
 
 function insightLink(query) {
-  if (query.kind === 'DataTableNode') return `${prefix}/sql?open_query=${encodeURIComponent(JSON.stringify(query))}`;
+  if (query.source?.kind === 'HogQLQuery') return `${prefix}/sql?open_query=${encodeURIComponent(JSON.stringify(query))}`;
   return `${prefix}/insights/new#q=${encodeURIComponent(JSON.stringify(query))}`;
 }
 function writeLinks() {

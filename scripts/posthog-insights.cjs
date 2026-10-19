@@ -2,7 +2,7 @@
 const properties = [
   { type: 'event', key: 'app_name', operator: 'exact', value: ['drdollyprasad'] },
   { type: 'event', key: 'analytics_environment', operator: 'exact', value: ['production'] },
-  { type: 'event', key: 'is_test', operator: 'exact', value: [false] },
+  { type: 'event', key: 'is_test', operator: 'exact', value: ['false'] },
 ];
 const scope = "properties.app_name = 'drdollyprasad' AND properties.analytics_environment = 'production' AND properties.is_test = false AND timestamp >= now() - INTERVAL 30 DAY";
 const common = { dateRange: { date_from: '-30d', date_to: null }, properties };
@@ -11,7 +11,7 @@ const viz = (source) => ({ kind: 'InsightVizNode', source });
 const trends = (series, breakdown, display = 'ActionsBarValue') => viz({
   kind: 'TrendsQuery', ...common, interval: 'day', series,
   trendsFilter: { display, showLegend: true },
-  ...(breakdown ? { breakdownFilter: { breakdown, breakdown_type: 'event', breakdown_limit: 15 } } : {}),
+  ...(breakdown ? { breakdownFilter: { breakdowns: [{ property: breakdown, type: 'event' }], breakdown_limit: 15 } } : {}),
 });
 const funnel = (series) => viz({
   kind: 'FunnelsQuery', ...common, series,
@@ -21,7 +21,7 @@ const funnel = (series) => viz({
     funnelAggregateByHogQL: 'properties.$session_id',
   },
 });
-const sql = (query) => ({ kind: 'DataTableNode', source: { kind: 'HogQLQuery', query } });
+const sql = (query) => ({ kind: 'DataVisualizationNode', display: 'ActionsTable', source: { kind: 'HogQLQuery', query } });
 
 module.exports = [
   { name: 'Visitors over time', description: 'Unique anonymous browsers per day. A browser is not a verified person.', query: trends([event('$pageview', 'Visitors', { math: 'dau' })], null, 'ActionsLineGraph') },
@@ -34,7 +34,7 @@ module.exports = [
   { name: 'Visit → painting → contact', description: 'Ordered funnel within one session and one hour. Contact means opening email/WhatsApp, not a confirmed sent message.', query: funnel([event('$pageview', 'Website visit'), event('painting_viewed', 'Opened a painting'), event('enquiry_handoff', 'Opened email or WhatsApp')]) },
   { name: 'Enquiry form drop-off', description: 'Opened the form → focused a field → handed off to email/WhatsApp. Copying a message is tracked separately.', query: funnel([event('enquiry_viewed', 'Opened enquiry form'), event('enquiry_started', 'Started enquiry'), event('enquiry_handoff', 'Opened email or WhatsApp', { properties: [{ type: 'event', key: 'source', operator: 'exact', value: ['enquiry_form'] }] })]) },
   { name: 'Studio loading → painting', description: 'Started the 3D studio → intro finished → opened a painting in its lightbox.', query: funnel([event('studio_load_started', 'Studio load started'), event('studio_ready', 'Studio ready'), event('painting_viewed', 'Opened a studio painting', { properties: [{ type: 'event', key: 'surface', operator: 'exact', value: ['studio_lightbox'] }] })]) },
-  { name: 'Pages visitors follow', description: 'Page-to-page paths; the outgoing drop-offs show where no next page was observed.', query: viz({ kind: 'PathsQuery', ...common, pathsFilter: { includeEventTypes: ['$pageview'], stepLimit: 8, edgeLimit: 50, stripQueryString: true } }) },
+  { name: 'Pages visitors follow', description: 'Page-to-page paths; the outgoing drop-offs show where no next page was observed.', query: viz({ kind: 'PathsQuery', ...common, pathsFilter: { includeEventTypes: ['$pageview'], stepLimit: 8, edgeLimit: 50, localPathCleaningFilters: [{ regex: '[?].*$', alias: '' }] } }) },
   { name: 'Recent visitor sessions', description: 'Anonymous browser/session, approximate location, device and browser, first/last observation and paintings opened.', query: sql(`SELECT properties.$session_id AS session_id, distinct_id AS visitor_id,
   min(timestamp) AS first_seen, max(timestamp) AS last_seen,
   any(properties.$geoip_city_name) AS city, any(properties.$geoip_country_name) AS country,

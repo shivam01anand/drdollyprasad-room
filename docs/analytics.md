@@ -7,9 +7,18 @@ It currently writes into the existing US PostHog project **317586**. No personal
 API key is included in the frontend or committed to Git.
 
 Every event carries `app_name: drdollyprasad`, its `analytics_environment`
-(`production`, `preview` or `local`), and `is_test`. Use all three filters in
-[the prepared analytics views](analytics-views.md). Those links open unsaved
-queries, rather than claiming a saved dashboard already exists.
+(`production`, `preview` or `local`), and `is_test`. The saved
+[Dr Dolly Prasad — Visitor journeys dashboard](https://us.posthog.com/project/317586/dashboard/2226674)
+contains all 14 validated views, with all three filters persisted on the dashboard
+and inside every insight. Book2Kindle, preview and marked test traffic are excluded.
+The default range is the last 30 days in the project's UTC timezone; the three SQL
+tables always use a rolling 30-day window, independent of dashboard date changes.
+[Prepared analytics views](analytics-views.md) remain available as unsaved query links.
+
+All 14 saved dashboard tiles were executed successfully through the authenticated
+PostHog connection on 18 October 2026 (UTC). At validation there were two production
+visitor sessions and seven painting-view events. `enquiry_started` and
+`enquiry_handoff` had not yet appeared; their funnel steps correctly returned zero.
 
 ## What to investigate
 
@@ -109,3 +118,32 @@ The SDK is a separate asynchronous chunk, initiated after hydration. Explicit
 events replace broad DOM autocapture, scroll work is throttled and the studio
 does not add analytics to its rendering loop. Replays load through the SDK's
 existing remote recording configuration.
+
+## Unlisted website dashboard
+
+`/analytics` renders the same 14 reviewed views inside the website, with overview
+counts, 7/30/90-day ranges, refresh and per-view retry. Every request retains the
+Dolly production/non-test scope. The page has **no password or sign-in**, as
+requested. Anyone with its URL can view the dashboard, including recent anonymous
+sessions. It is absent from public navigation and the sitemap, has `noindex`
+headers and metadata, and is disallowed in robots.txt. These indexing controls
+reduce discovery; they do not restrict access. The page itself is excluded from
+visitor event capture and session replay.
+
+Configure the existing `POSTHOG_PERSONAL_API_KEY` as a **server-only** Vercel
+variable in Preview and Production, then redeploy. It must be a `phx_…` key with
+query-read access to project **317586**. The browser capture token cannot read
+analytics. No `ANALYTICS_ADMIN_PASSWORD` is needed. Never expose the personal key
+in Git, browser code or URLs, even though the dashboard itself is viewable.
+
+Queries run on the server against a fixed project and an allowlist of view IDs;
+the browser cannot submit SQL or change the production scope. Responses are not
+cached by the browser or CDN. The website's range selector applies to every view,
+including SQL tables. Missing credentials display a connection setup message.
+Small or zero counts, especially for enquiry handoffs, are valid observations
+and do not imply a tracking failure.
+
+`node scripts/check-analytics-admin.cjs` checks the query allowlist, production
+scoping, date ranges, input validation and upstream failures without real
+credentials. Existing analytics and motion checks plus the production build
+still apply.

@@ -3,11 +3,18 @@
 import { useEffect } from "react";
 import { usePathname } from "next/navigation";
 import { BY_ID } from "@/lib/works";
-import { analyticsUrl, initAnalytics, paintingProperties, track } from "@/lib/analytics";
+import { analyticsUrl, initAnalytics, paintingProperties, suspendAnalytics, track } from "@/lib/analytics";
 import { observeAnalyticsInteractions, pagePainting } from "@/lib/analytics-interactions";
 
 /** Independent of either visual layout, so the website and /studio share a visitor/session. */
 export default function Analytics() {
+  const path = usePathname();
+  const privatePage = path === "/analytics" || path?.startsWith("/analytics/");
+  useEffect(() => { if (privatePage) suspendAnalytics(); }, [privatePage]);
+  return privatePage ? null : <VisitorAnalytics />;
+}
+
+function VisitorAnalytics() {
   const path = usePathname();
   useEffect(() => {
     const stop = observeAnalyticsInteractions();

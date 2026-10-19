@@ -12,6 +12,14 @@ export default {
   distDir: process.env.DIST_DIR || ".next",
   async headers() {
     return [{
+      source: "/analytics/:path*",
+      headers: [
+        { key: "Cache-Control", value: "private, no-store" },
+        { key: "X-Robots-Tag", value: "noindex, nofollow, noarchive" },
+        { key: "Referrer-Policy", value: "same-origin" },
+        { key: "X-Frame-Options", value: "DENY" },
+      ],
+    }, {
       // Font filenames contain their content hash, so repeat visits reuse them.
       source: "/fonts/:path*",
       headers: [{ key: "Cache-Control", value: "public, max-age=31536000, immutable" }],
