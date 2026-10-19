@@ -3,20 +3,29 @@
 import Link from "next/link";
 import { useEffect, useRef, useState } from "react";
 import Roll, { type RollItem } from "./Roll";
+import { swipe } from "@/lib/drift";
 
 export type Theme = { t: string; series: string; href: string; d: string; roll: RollItem[] };
 
 /**
  * The threads of her work in one tile: words on one half, her paintings
  * rolling on the other, sliding on to the next thread by itself while on
- * screen. Tabs and arrows move it by hand; still for reduced motion.
+ * screen. Tabs, arrows, a swipe or a drag move it by hand; still for reduced motion.
  */
 export default function ThemeSlider({ themes, every = 9000 }: { themes: Theme[]; every?: number }) {
   const [i, setI] = useState(0);
   const [seen, setSeen] = useState(false);
   const [still, setStill] = useState(false);
+  const [held, setHeld] = useState(0);
   const root = useRef<HTMLDivElement>(null);
+  const win = useRef<HTMLDivElement>(null);
   const n = themes.length;
+
+  useEffect(() => {
+    const el = win.current;
+    if (!el || n < 2) return;
+    return swipe(el, (d) => { setI((k) => (((k + d) % n) + n) % n); setHeld((h) => h + 1); });
+  }, [n]);
 
   useEffect(() => {
     setStill(matchMedia("(prefers-reduced-motion: reduce)").matches);
@@ -29,24 +38,27 @@ export default function ThemeSlider({ themes, every = 9000 }: { themes: Theme[];
 
   useEffect(() => {
     if (!seen || still || n < 2) return;
-    const t = setTimeout(() => setI((k) => (k + 1) % n), every);
+    const t = setTimeout(() => { setHeld(0); setI((k) => (k + 1) % n); }, held ? every + 4000 : every);
     return () => clearTimeout(t);
-  }, [seen, still, i, n, every]);
+  }, [seen, still, i, n, every, held]);
 
   return (
     <div className="themes" ref={root} role="region" aria-roledescription="carousel" aria-label="The threads of her work">
-      <div className="themes-tabs" role="tablist">
-        {themes.map((t, k) => (
-          <button key={t.t} type="button" role="tab" aria-selected={k === i} onClick={() => setI(k)}>
-            <span>{String(k + 1).padStart(2, "0")}</span>{t.t}
-          </button>
-        ))}
+      <div className="themes-tabs">
+        {/* the tablist holds only the tabs; the arrows sit beside it */}
+        <div role="tablist" aria-label="Threads" style={{ display: "contents" }}>
+          {themes.map((t, k) => (
+            <button key={t.t} type="button" role="tab" aria-selected={k === i} onClick={() => setI(k)}>
+              <span>{String(k + 1).padStart(2, "0")}</span>{t.t}
+            </button>
+          ))}
+        </div>
         <span className="themes-arrows">
           <button type="button" aria-label="Previous" onClick={() => setI((i - 1 + n) % n)}>‹</button>
           <button type="button" aria-label="Next" onClick={() => setI((i + 1) % n)}>›</button>
         </span>
       </div>
-      <div className="themes-window">
+      <div className="themes-window" ref={win}>
         <div className="themes-track" style={{ transform: `translateX(-${i * 100}%)` }}>
           {themes.map((t, k) => (
             <div key={t.t} className="theme" aria-hidden={k !== i} inert={k !== i}>
@@ -61,7 +73,7 @@ export default function ThemeSlider({ themes, every = 9000 }: { themes: Theme[];
           ))}
         </div>
       </div>
-      {!still && seen && <span className="themes-timer" key={i} aria-hidden="true" style={{ animationDuration: `${every}ms` }} />}
+      {!still && seen && <span className="themes-timer" key={`${i}-${held}`} aria-hidden="true" style={{ animationDuration: `${held ? every + 4000 : every}ms` }} />}
     </div>
   );
 }

@@ -2,33 +2,47 @@
 
 import Link from "next/link";
 import { usePathname } from "next/navigation";
-import { useEffect, useRef } from "react";
+import { useEffect, useRef, useState } from "react";
 import { INSTAGRAM, NAV, PORTRAIT, STUDIO_PATH, WHATSAPP, whatsappHref } from "@/lib/site";
-import { ChatIcon, InstagramIcon, MenuIcon } from "./Icons";
+import { ChatIcon, InstagramIcon } from "./Icons";
 
-/** her portrait and name top-left, the rooms of the site, and the two ways to ask */
+/**
+ * Her portrait and name top-left, the rooms of the site, and the two ways to ask.
+ * On a phone the menu opens as a full screen of its own, the pages in large
+ * type, one under the other.
+ */
 export default function Header() {
   const path = usePathname();
-  const menu = useRef<HTMLDetailsElement>(null);
-  // a phone's menu closes once a page is chosen
-  useEffect(() => { if (menu.current) menu.current.open = false; }, [path]);
-  // a tap anywhere outside the open menu closes it
+  const [open, setOpen] = useState(false);
+
+  // a page chosen closes the menu
+  useEffect(() => { setOpen(false); }, [path]);
+  // Escape or a tap outside the panel closes it; the page beneath keeps scrolling (CR-008: a small dropdown, not a takeover)
+  const bar = useRef<HTMLElement>(null);
   useEffect(() => {
-    const close = (e: MouseEvent) => { if (menu.current?.open && !menu.current.contains(e.target as Node)) menu.current.open = false; };
-    document.addEventListener("click", close);
-    return () => document.removeEventListener("click", close);
-  }, []);
+    if (!open) return;
+    const key = (e: KeyboardEvent) => { if (e.key === "Escape") setOpen(false); };
+    const away = (e: PointerEvent) => { if (bar.current && !bar.current.contains(e.target as Node)) setOpen(false); };
+    addEventListener("keydown", key);
+    document.addEventListener("pointerdown", away);
+    return () => { removeEventListener("keydown", key); document.removeEventListener("pointerdown", away); };
+  }, [open]);
+
   const here = (href: string) => (href === "/" ? path === "/" : path === href || path.startsWith(`${href}/`)) ||
     (href === "/works" && path.startsWith("/work/"));
 
-  const links = NAV.map((n) =>
+  const link = (n: { href: string; label: string }, i?: number) =>
     n.href === STUDIO_PATH
       // the studio is its own page with its own styles: a full load
-      ? <a key={n.href} href={n.href}>{n.label}</a>
-      : <Link key={n.href} href={n.href} aria-current={here(n.href) ? "page" : undefined}>{n.label}</Link>);
+      ? <a key={n.href} href={n.href} onClick={() => setOpen(false)} style={i !== undefined ? { ["--i" as string]: i } : undefined}>{n.label}</a>
+      : <Link key={n.href} href={n.href} aria-current={here(n.href) ? "page" : undefined}
+              style={i !== undefined ? { ["--i" as string]: i } : undefined}
+              onClick={() => setOpen(false)}>{n.label}</Link>;
 
   return (
-    <header className="hdr">
+    <header ref={bar} className={`hdr${open ? " is-open" : ""}`}>
+      {/* the village line sketch rides with the bar: crisp at the top of the page, frosted with it once the page moves (CR-005) */}
+      <div className="band band-top" aria-hidden="true" />
       <div className="wrap hdr-in">
         <Link href="/" className="brand" aria-label="Dr Dolly Prasad, home">
           {/* eslint-disable-next-line @next/next/no-img-element */}
@@ -36,7 +50,7 @@ export default function Header() {
           <span className="brand-t"><b>Dr Dolly Prasad</b><i>The everyday, held sacred.</i></span>
         </Link>
         <nav className="nav" aria-label="Main">
-          {links}
+          {NAV.map((n) => link(n))}
           <a className="ig" href={INSTAGRAM.url} target="_blank" rel="noopener noreferrer" aria-label={`Instagram ${INSTAGRAM.handle}`}>
             <InstagramIcon />
           </a>
@@ -45,15 +59,20 @@ export default function Header() {
           {WHATSAPP && <a className="btn btn-wa" href={whatsappHref()}><ChatIcon />WhatsApp</a>}
           <Link className="btn btn-solid" href="/enquire">Enquire</Link>
         </div>
-        <details className="menu" ref={menu}>
-          <summary aria-label="Menu"><MenuIcon /></summary>
-          <div className="menu-panel">
-            <Link href="/">Home</Link>
-            {links}
-            <a href={INSTAGRAM.url} target="_blank" rel="noopener noreferrer">Instagram</a>
-            <Link className="btn btn-solid" href="/enquire">Enquire</Link>
-          </div>
-        </details>
+        <button type="button" className="burger" aria-expanded={open} aria-controls="phone-menu"
+                aria-label={open ? "Close the menu" : "Menu"} onClick={() => setOpen((o) => !o)}>
+          <span /><span />
+        </button>
+      </div>
+      <div id="phone-menu" className="sheet" inert={!open} aria-hidden={!open}>
+        <nav className="sheet-nav" aria-label="Main">
+          {link({ href: "/", label: "Home" }, 0)}
+          {NAV.map((n, i) => link(n, i + 1))}
+        </nav>
+        <div className="sheet-foot">
+          <Link className="btn btn-solid" href="/enquire" onClick={() => setOpen(false)}>Enquire about a painting</Link>
+          <a className="sheet-ig" href={INSTAGRAM.url} target="_blank" rel="noopener noreferrer"><InstagramIcon />{INSTAGRAM.handle}</a>
+        </div>
       </div>
     </header>
   );

@@ -12,7 +12,11 @@ type Size = "all" | "small" | "medium" | "large";
 const sizeOf = (w: Work): Size | null => (!w.inches ? null : w.inches < 24 ? "small" : w.inches <= 36 ? "medium" : "large");
 const isFree = (w: Work) => w.status !== "Sold";
 
-/** every painting, newest series first, filtered by series, status and size (the filter is kept in the address) */
+/**
+ * every painting, newest series first, filtered by series, status and size (the
+ * filter is kept in the address). Two to a row on a computer and a phone alike
+ * (Shubham, PR #11 review), each painting whole with its title under it.
+ */
 export default function WorksBrowser() {
   const [series, setSeries] = useState("all");
   const [status, setStatus] = useState<Status>("all");
@@ -87,18 +91,20 @@ export default function WorksBrowser() {
           <select value={size} onChange={(e) => { track("works_filter_changed", { filter: "size", value: e.target.value }); setSize(e.target.value as Size); }}>
             <option value="all">All</option>
             <option value="small">S · under 24 in</option>
-            <option value="medium">M · 24–36 in</option>
+            <option value="medium">M · 24 to 36 in</option>
             <option value="large">L · over 36 in</option>
           </select>
         </label>
       </div>
-      <p className="meta" aria-live="polite" style={{ marginBottom: 18 }}>
-        {shown.length} {shown.length === 1 ? "painting" : "paintings"}
-        {size !== "all" && " · only works with a confirmed size"}
-        {pages > 1 && ` · page ${page} of ${pages}`}
-      </p>
+      <div className="count-row">
+        <p className="meta" aria-live="polite">
+          {shown.length} {shown.length === 1 ? "painting" : "paintings"}
+          {size !== "all" && " · only works with a confirmed size"}
+          {pages > 1 && ` · page ${page} of ${pages}`}
+        </p>
+      </div>
       {shown.length ? (
-        <div className="grid">{slice.map((w, i) => <Card key={w.id} w={w} eager={i < 8} />)}</div>
+        <div className="grid works-grid">{slice.map((w, i) => <Card key={w.id} w={w} eager={i < 8} />)}</div>
       ) : (
         <p className="empty">No paintings match these filters.</p>
       )}

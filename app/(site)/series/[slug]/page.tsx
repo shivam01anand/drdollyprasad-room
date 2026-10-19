@@ -5,6 +5,10 @@ import Card from "@/components/site/Card";
 import { SERIES_BY_SLUG, SERIES_PAGES, WHATSAPP, shownYear, enquireHref, whatsappHref, worksIn, type Chapter } from "@/lib/site";
 import { TAILORED } from "@/lib/rooms";
 import { BY_ID, LARGE, workPath, type Work } from "@/lib/works";
+import manifest from "@/public/art/manifest.json";
+
+const DIM = new Map(manifest.works.map((d) => [d.id, d]));
+const wh = (id: string) => { const d = DIM.get(id); return d ? { width: d.w, height: d.h } : {}; };
 import { ChatIcon } from "@/components/site/Icons";
 
 export const dynamicParams = false;
@@ -37,6 +41,7 @@ const alt = (w: Work) => `${w.title}, ${w.medium.toLowerCase()}, by Dr Dolly Pra
 function Words({ c }: { c: Chapter }) {
   return (
     <>
+      {c.setup && <p className="chap-small">{c.setup}</p>}
       {c.big && <p className={`chap-big${c.hers ? " hers" : ""}`}>{c.hers ? `“${c.big}”` : c.big}</p>}
       {c.hers && <p className="chap-sig">Dr Dolly Prasad</p>}
       {c.small && <p className="chap-small">{c.small}</p>}
@@ -70,7 +75,7 @@ function ChapterView({ c, n }: { c: Chapter; n: number }) {
           <figure key={w.id}>
             <Link href={workPath(w.id)}>
               {/* eslint-disable-next-line @next/next/no-img-element */}
-              <img className="framed" src={works.length > 2 ? `/site/thumbs/${w.id}.jpg` : img(w.id)} alt={alt(w)} loading="lazy" />
+              <img className="framed" src={works.length > 2 ? `/site/thumbs/${w.id}.jpg` : img(w.id)} alt={alt(w)} loading="lazy" {...wh(w.id)} />
             </Link>
             <figcaption>{w.title} · {w.medium}{w.status === "Sold" ? " · Sold" : ""}</figcaption>
           </figure>
@@ -103,7 +108,7 @@ export default async function SeriesStory({ params }: Props) {
       <section className="story-hero">
         <Link href={workPath(hero.id)}>
           {/* eslint-disable-next-line @next/next/no-img-element */}
-          <img className="framed" src={img(hero.id)} alt={alt(hero)} fetchPriority="high" />
+          <img className="framed" src={img(hero.id)} alt={alt(hero)} fetchPriority="high" {...wh(hero.id)} />
         </Link>
         <p className="meta">{hero.title} · {hero.medium}{hero.size ? ` · ${hero.size}` : ""}{shownYear(hero) ? ` · ${shownYear(hero)}` : ""}</p>
       </section>
@@ -131,6 +136,7 @@ export default async function SeriesStory({ params }: Props) {
         </section>
       )}
 
+
       <section className="sec-tight wrap">
         <div className="sec-head"><h2>The paintings in this collection</h2><Link className="link" href={`/works?series=${s.slug}`}>Filter in all works →</Link></div>
         <div className="grid grid-5">{works.map((w) => <Card key={w.id} w={w} label={false} />)}</div>
@@ -139,8 +145,8 @@ export default async function SeriesStory({ params }: Props) {
       <section className="sec-tight wrap">
         <div className="next-series">
           <div className="ask">
-            <b>Interested in a work from {s.label}?</b>
-            <p className="meta">Prices on request. Ask about any painting in the collection.</p>
+            <b>Interested in one of these paintings?</b>
+            <p className="meta">Prices on request. Ask about any painting here, or about her work in general.</p>
             <div style={{ display: "flex", gap: 10, flexWrap: "wrap" }}>
               {WHATSAPP && <a className="btn btn-wa" href={whatsappHref()}><ChatIcon />Ask on WhatsApp</a>}
               <Link className={WHATSAPP ? "btn" : "btn btn-solid"} href={enquireHref()}>Send an enquiry</Link>

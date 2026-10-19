@@ -7,9 +7,11 @@ import { paintingProperties, track } from "@/lib/analytics";
 
 /**
  * An enquiry, written once and sent the way the visitor prefers: WhatsApp
- * (when her number is set) or email. The message names the painting and links
- * its page. The email address is always shown as text with a copy button, so
- * nobody depends on a mail app being set up.
+ * (when her number is set) or email. "Send" posts to /api/enquire, which
+ * delivers it to her inbox with no further step; if the site's mail service
+ * is not set up (or fails), the visitor's mail app opens with the message
+ * ready, as before. The message names the painting and links its page. The
+ * email address is always shown as text with a copy button.
  */
 export default function EnquireForm() {
   const [work, setWork] = useState("");
@@ -19,7 +21,8 @@ export default function EnquireForm() {
   const [kind, setKind] = useState("A painting");
   const [msg, setMsg] = useState("");
   const [copied, setCopied] = useState(false);
-  const [sent, setSent] = useState<"" | "wa" | "mail">("");
+  const [sent, setSent] = useState<"" | "wa" | "mail" | "sending" | "sent">("");
+  const [trap, setTrap] = useState("");
   const started = useRef(false);
 
   useEffect(() => {
@@ -48,11 +51,27 @@ export default function EnquireForm() {
   };
 
   const subject = w ? `Enquiry: ${w.title}` : `Enquiry: ${kind}`;
-  const viaMail = (e?: React.FormEvent) => {
-    e?.preventDefault();
+  const mailApp = () => {
     track("enquiry_handoff", { ...context(), method: "email" });
     setSent("mail");
     location.href = `mailto:${EMAIL}?subject=${encodeURIComponent(subject)}&body=${encodeURIComponent(text())}`;
+  };
+  const viaMail = async (e?: React.FormEvent) => {
+    e?.preventDefault();
+    if (sent === "sending") return;
+    setSent("sending");
+    try {
+      const r = await fetch("/api/enquire", {
+        method: "POST", headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ name, reply, subject, text: text(), website: trap }),
+      });
+      if (r.ok) {
+        track("enquiry_handoff", { ...context(), method: "form" });
+        setSent("sent");
+        return;
+      }
+    } catch { /* offline or blocked: the mail app is the fallback */ }
+    mailApp();
   };
   const viaWa = () => {
     track("enquiry_handoff", { ...context(), method: "whatsapp" });
@@ -101,6 +120,10 @@ export default function EnquireForm() {
           <label htmlFor="q-reply">Phone or email, for the reply</label>
           <input id="q-reply" autoComplete="email" value={reply} onChange={(e) => setReply(e.target.value)} required />
         </div>
+        <div className="hp" aria-hidden="true">
+          <label htmlFor="q-web">Leave this empty</label>
+          <input id="q-web" tabIndex={-1} autoComplete="off" value={trap} onChange={(e) => setTrap(e.target.value)} />
+        </div>
         <div className="field">
           <label htmlFor="q-msg">Message</label>
           <textarea id="q-msg" value={msg} onChange={(e) => setMsg(e.target.value)}
@@ -108,14 +131,20 @@ export default function EnquireForm() {
         </div>
         <div style={{ display: "flex", gap: 10, flexWrap: "wrap" }}>
           {WHATSAPP && <button type="submit" className="btn btn-wa">Send on WhatsApp</button>}
-          <button type={WHATSAPP ? "button" : "submit"} className={WHATSAPP ? "btn" : "btn btn-solid"} onClick={WHATSAPP ? () => viaMail() : undefined}>
-            Send by email
+          <button type={WHATSAPP ? "button" : "submit"} className={WHATSAPP ? "btn" : "btn btn-solid"} onClick={WHATSAPP ? () => viaMail() : undefined}
+                  disabled={sent === "sending"}>
+            {sent === "sending" ? "Sending…" : WHATSAPP ? "Send by email" : "Send"}
           </button>
           <button type="button" className="btn" onClick={copyMessage}>Copy the message</button>
         </div>
         {sent === "mail" && (
           <p className="done" role="status">
             Your mail app should open with the message ready to send. If nothing opened, copy the message and send it to <b>{EMAIL}</b> from any email account.
+          </p>
+        )}
+        {sent === "sent" && (
+          <p className="done" role="status">
+            Thank you{name ? `, ${name.split(" ")[0]}` : ""}. Your enquiry has been sent, and the reply will come to {reply}.
           </p>
         )}
         {sent === "wa" && <p className="done" role="status">WhatsApp should open with your message ready to send.</p>}
@@ -127,7 +156,7 @@ export default function EnquireForm() {
           <div className="mail"><code>{EMAIL}</code>
             <button type="button" className="chip" onClick={copy} aria-live="polite">{copied ? "Copied" : "Copy"}</button>
           </div>
-          <p className="meta">Paintings are offered with price on request. Enquiries and commissions are welcome.</p>
+          <p className="meta">Enquiries and commissions are welcome.</p>
         </div>
       </aside>
     </div>

@@ -1,101 +1,91 @@
 import Link from "next/link";
 import { BY_ID, workPath } from "@/lib/works";
-import { LINES, PULL, SERIES_PAGES, SMALL_PHOTO, labelLine, worksIn } from "@/lib/site";
+import { LOOK, SERIES_PAGES, worksIn, ON_EXHIBITIONS, ON_THE_WORK, PRESS, PULL, SHOWS, SMALL_PHOTO, labelLine } from "@/lib/site";
+import { dims, smSet } from "@/lib/images";
 import { thumb } from "./Card";
+import WallDrift from "./WallDrift";
 
 /**
  * The moving wall: columns drifting slowly up and down (alternately) while the
- * whole wall eases left and right. Framed paintings, title cards in the
- * Instagram manner, exhibition cards and short text cards. Each column holds
- * its list twice, so it loops without a seam.
+ * whole wall eases left and right. It is made of framed paintings and a few
+ * photographs from her exhibitions, nothing else, so the paintings stay the
+ * loudest colour on the screen. The wall never stops under the cursor: the
+ * painting under it turns over to show its label (the still tile holds the hover; only the card inside turns, so it can never stall edge-on), and an exhibition photograph
+ * lifts a little. Each column holds its list twice, so it loops without a seam.
+ * Every tile opens on a click or tap; the wall can be dragged by hand and picks
+ * up its slow motion again after a moment (WallDrift, lib/drift).
  */
 
 export type Item =
   | { k: "p"; id: string }
-  | { k: "c"; id: string; line: string }
   | { k: "x"; src: string; eyebrow: string; title: string; sub: string; alt: string; href: string }
-  | { k: "n"; title: string; sub: string; href: string; tone: "rust" | "dark" | "stone"; em?: string }
-  | { k: "s"; big: string; mid: string; small: string; href: string };
+  | { k: "n"; em: string; title: string; sub: string; href: string; tone: "rust" | "dark" | "stone" }
+  | { k: "s"; big: string; mid: string; small: string; href: string }
+  | { k: "q"; text: string; by: string; href: string; hers: boolean };
 
 export const P = (id: string): Item => ({ k: "p", id });
-export const C = (id: string): Item => ({ k: "c", id, line: PULL[id] ?? LINES[id] ?? "" });
 export const X = (src: string, eyebrow: string, title: string, sub: string, alt: string, href = "/exhibitions"): Item =>
   ({ k: "x", src, eyebrow, title, sub, alt, href });
-const S = (big: string, mid: string, small: string, href = "/exhibitions"): Item => ({ k: "s", big, mid, small, href });
 
-/** a series' own card: its name, its period and how many works */
-const N = (slug: string, tone: "rust" | "dark" | "stone"): Item => {
-  const s = SERIES_PAGES.find((x) => x.slug === slug)!;
-  return { k: "n", title: s.label, sub: `${s.period} · ${worksIn(s.label).length} works`, href: `/series/${slug}`, tone };
-};
-
-/** a venue she has shown at */
+/** a venue she has shown at (years from her own record, RECORD in lib/site) */
 const V = (title: string, sub: string, tone: "rust" | "dark" | "stone", href = "#record"): Item => ({ k: "n", em: "Exhibited at", title, sub, href, tone });
-
-const EIGHTEEN = S("18", "Exhibitions and art fairs", "2005–2018 · Delhi, Jaipur, Bombay");
-const WORLD = S("3", "Continents", "With private collectors in India, the USA and London");
+/** a number from her record */
+const S = (big: string, mid: string, small: string, href = "#record"): Item => ({ k: "s", big, mid, small, href });
+/** words: hers verbatim (in quote marks, with her name), or a short editorial line about a show */
+const Q = (text: string, by: string, href: string, hers: boolean): Item => ({ k: "q", text, by, href, hers });
+const lede = (id: string) => SHOWS.find((x) => x.id === id)?.lede.split(". ").slice(0, 2).join(". ").replace(/\.?$/, ".") ?? "";
 
 export const HOME: Item[][] = [
-  [P("bulls-and-wheel"), C("temple-bells"), P("red-turban-portrait"),
+  [P("bulls-and-wheel"), P("temple-bells"), P("red-turban-portrait"),
     X("/site/ex/ihc-01.jpg", "Exhibition · November 2010", "India Habitat Centre", "Open Palm Court, New Delhi", "Her paintings around the room at India Habitat Centre", "/exhibitions#india-habitat-centre-2010"),
     P("weathered-door-ring"), P("boy-and-kettle")],
-  [P("woman-with-poppies"), P("mother-india-and-kettles"), EIGHTEEN, P("offering-of-light"), C("coins-and-clay-bank"), P("milkman-on-bicycle")],
+  [P("woman-with-poppies"), P("mother-india-and-kettles"), P("priest-with-flame"), P("offering-of-light"), P("coins-and-clay-bank"), P("milkman-on-bicycle")],
   [X("/site/ex/iccr-sign.jpg", "Indian Council for Cultural Relations", "A Lifetime to Paint", "Azad Bhavan Art Gallery · June 2010", "The ICCR sign for A Lifetime to Paint", "/exhibitions#a-lifetime-to-paint"),
-    P("boy-with-bananas"), P("red-and-teal-door-lock"), P("rickshaw-puller-and-coin"), P("patterned-turban-portrait"), C("woman-with-bird")],
-  [P("three-veiled-women"), C("bulls-and-wheel"), P("monks-and-blue-buddha"),
+    P("boy-with-bananas"), P("red-and-teal-door-lock"), P("rickshaw-puller-and-coin"), P("patterned-turban-portrait"), P("woman-with-bird")],
+  [P("three-veiled-women"), P("bullock-cart-and-truck"), P("monks-and-blue-buddha"),
     X("/site/ex/kala-dolly.jpg", "Art fair · February 2018", "First International Kala Mela", "IGNCA, New Delhi", "Dr Dolly Prasad beside her painting at the First International Kala Mela", "/exhibitions#kala-mela-2018"),
     P("terracotta-pots"), P("man-among-metal-pans")],
   [P("child-among-flowers"), P("postbox-and-stamps"),
     X("/site/ex/ihc-03.jpg", "Opening night · 2010", "Lighting the lamp", "India Habitat Centre", "Dr Dolly Prasad lights the lamp at her exhibition", "/exhibitions#india-habitat-centre-2010"),
-    P("yellow-turban-portrait"), C("boy-with-bananas"), P("prayer-and-scripture")],
-  [P("shree-420-and-milk-cans"), P("teal-door-bolt"), C("woman-with-red-flower"), P("monk-and-green-buddha"),
+    P("yellow-turban-portrait"), P("rickshaw-rest-framed"), P("prayer-and-scripture")],
+  [P("shree-420-and-milk-cans"), P("teal-door-bolt"), P("woman-with-red-flower"), P("monk-and-green-buddha"),
     X("/site/ex/ihc-press-b.jpg", "In front of the cameras", "Beside The Bullocks", "India Habitat Centre · 2010", "Dr Dolly Prasad interviewed beside The Bullocks", "/exhibitions#india-habitat-centre-2010"),
     P("cycle-rickshaw")],
-  [P("sacred-tree"), WORLD, P("carriage-and-autorickshaw"), C("temple-bells"), P("woman-with-bird"), P("carved-door-knocker")],
+  [P("sacred-tree"), P("rickshaw-rest"), P("carriage-and-autorickshaw"), P("newspaper-reader"), P("mother-and-child"), P("carved-door-knocker")],
 ];
 
-/** the series wall: each series' card among its own paintings */
-export const SERIES_WALL: Item[][] = [
-  [N("gone-are-the-days", "rust"), P("bulls-and-wheel"), P("coins-and-clay-bank"), P("cycle-rickshaw"), C("terracotta-pots")],
-  [P("red-and-teal-door-lock"), N("bandh-darwaze", "dark"), P("weathered-door-ring"), P("teal-door-bolt"), P("carved-door-knocker")],
-  [P("offering-of-light"), P("monks-and-blue-buddha"), N("faith", "stone"), P("sacred-tree"), P("prayer-and-scripture")],
-  [N("portraits", "dark"), P("red-turban-portrait"), P("three-veiled-women"), P("boy-and-kettle"), P("yellow-turban-portrait")],
-  [P("boy-with-bananas"), C("woman-with-bird"), N("recent-work", "rust"), P("woman-with-poppies"), P("child-among-flowers")],
-  [P("shree-420-and-milk-cans"), N("faith", "stone"), P("monk-and-green-buddha"), P("patterned-turban-portrait"), P("postbox-and-stamps")],
-  [P("temple-bells"), P("mother-india-and-kettles"), N("gone-are-the-days", "dark"), P("man-among-metal-pans"), P("woman-with-red-flower")],
+/** the mixed wall (Works, About): her paintings only */
+export const MIXED_WALL: Item[][] = [
+  [P("bulls-and-wheel"), P("coins-and-clay-bank"), P("cycle-rickshaw"), P("terracotta-pots"), P("postbox-and-stamps")],
+  [P("red-and-teal-door-lock"), P("weathered-door-ring"), P("teal-door-bolt"), P("carved-door-knocker"), P("mother-india-and-kettles")],
+  [P("offering-of-light"), P("monks-and-blue-buddha"), P("sacred-tree"), P("prayer-and-scripture"), P("priest-with-flame")],
+  [P("red-turban-portrait"), P("three-veiled-women"), P("boy-and-kettle"), P("yellow-turban-portrait"), P("newspaper-reader")],
+  [P("boy-with-bananas"), P("woman-with-bird"), P("woman-with-poppies"), P("child-among-flowers"), P("temple-bells")],
+  [P("shree-420-and-milk-cans"), P("monk-and-green-buddha"), P("patterned-turban-portrait"), P("milkman-on-bicycle"), P("woman-with-red-flower")],
+  [P("mother-and-child"), P("man-among-metal-pans"), P("rickshaw-puller-and-coin"), P("bullock-cart-and-truck"), P("carriage-and-autorickshaw")],
 ];
 
-/** the exhibitions wall: the venues by name, the numbers, and the shows in photographs */
-export const SHOW_WALL: Item[][] = [
-  [V("India Habitat Centre", "New Delhi · 2008, 2009, 2010", "rust", "#india-habitat-centre-2010"),
-    X("/site/ex/ihc-03.jpg", "November 2010", "Lighting the lamp", "Open Palm Court, IHC", "Dr Dolly Prasad lights the lamp at the opening", "#india-habitat-centre-2010"),
-    V("Travancore Art Gallery", "New Delhi · 2006, 2007", "stone"),
-    X("/site/ex/ihc-room-c.jpg", "On the wall", "The Bullocks", "India Habitat Centre", "The Bullocks on the exhibition wall", "#india-habitat-centre-2010")],
-  [EIGHTEEN,
-    X("/site/ex/iccr-speech.jpg", "June 2010", "A Lifetime to Paint", "ICCR, Azad Bhavan Art Gallery", "Dr Dolly Prasad speaks at the opening at ICCR", "#a-lifetime-to-paint"),
-    V("Nehru Art Gallery", "Bombay · 2006", "dark"),
-    X("/site/ex/kala-selfie.jpg", "February 2018", "Kala Mela", "IGNCA, New Delhi", "A visitor takes a selfie with the paintings at the Kala Mela", "#kala-mela-2018")],
-  [V("Indian Council for Cultural Relations", "Azad Bhavan, New Delhi · 2010, 2011", "dark", "#a-lifetime-to-paint"),
-    X("/site/ex/ihc-press-a.jpg", "In front of the cameras", "The press", "India Habitat Centre · 2010", "Dr Dolly Prasad in conversation with a reporter", "#india-habitat-centre-2010"),
-    WORLD,
-    X("/site/ex/triveni-3.jpg", "May 2007", "Triveni Kala Sangam", "With Sangeeta Sharma", "The Triveni invitation", "#triveni-2007")],
-  [X("/site/ex/kala-dolly.jpg", "February 2018", "First International Kala Mela", "IGNCA, New Delhi", "Dr Dolly Prasad beside her painting at the Kala Mela", "#kala-mela-2018"),
-    V("Lalit Kala Akademi", "International Kala Mela · 2018", "rust", "#kala-mela-2018"),
-    X("/site/ex/ihc-05.jpg", "The evening", "Along the wall", "India Habitat Centre · 2010", "Visitors look along a wall of her paintings", "#india-habitat-centre-2010"),
-    V("Cabinet Secretariat Gallery", "Delhi · 2016", "stone")],
-  [V("Triveni Kala Sangam", "Mandi House, New Delhi · 2007", "stone", "#triveni-2007"),
-    X("/site/ex/iccr-02.jpg", "June 2010", "Beside The Blue Buddha", "ICCR, New Delhi", "Dr Dolly Prasad beside The Blue Buddha", "#a-lifetime-to-paint"),
-    X("/site/video/tv-archive-2.jpg", "12 June 2010", "On NCR television", "In the news", "A still from the NCR television report", "#on-screen"),
-    V("India Habitat Centre", "Visual Arts Gallery · 2026", "rust")],
-  [X("/site/ex/ihc-08.jpg", "November 2010", "The Blue Buddha", "India Habitat Centre", "Dr Dolly Prasad beside The Blue Buddha", "#india-habitat-centre-2010"),
-    V("International Art Fair", "Jaipur · 2018", "dark"),
-    X("/site/ex/delhi-times.jpg", "In the papers", "Delhi Times", "Art Today And Tomorrow", "A Delhi Times listing", "#on-screen"),
-    V("Epicenter", "Gurgaon · 2008", "stone")],
-  [V("Sriram Centre", "New Delhi · 2005", "stone"),
-    X("/site/ex/iccr-sign.jpg", "June 2010", "A Lifetime to Paint", "ICCR", "The ICCR sign for A Lifetime to Paint", "#a-lifetime-to-paint"),
-    V("Indraprastha Art Gallery", "New Delhi · 2005, 2007", "rust"),
-    X("/site/ex/ihc-02.jpg", "Opening night", "The lamp is lit", "India Habitat Centre · 2010", "Visitors gathered around the lit lamp", "#india-habitat-centre-2010")],
-];
+/** Collections (CR-007): one column per collection, led by its own label tile, then its paintings */
+const TONES = ["rust", "dark", "stone", "rust", "dark"] as const;
+export const SERIES_WALL: Item[][] = SERIES_PAGES.map((s, i) => [
+  { k: "n", em: "Collection", title: s.label, sub: `${worksIn(s.label).length} works · ${s.period}`, href: `/series/${s.slug}`, tone: TONES[i % TONES.length] } as Item,
+  ...worksIn(s.label).map((w) => P(w.id)),
+]);
+
+/** Works and About (CR-006): the same paintings, in another order, so every landing has its wall */
+export const WORKS_WALL: Item[][] = [...MIXED_WALL].reverse().map((c) => [...c].reverse());
+export const ABOUT_WALL: Item[][] = [...MIXED_WALL.slice(3), ...MIXED_WALL.slice(0, 3)].map((c, i) => (i % 2 ? [...c].reverse() : c));
+
+/**
+ * Exhibitions: the shows in photographs, the press, her words on exhibiting and
+ * short lines about each show, the venues by name and the numbers from her record.
+ * Everything here is from the site's own records (lib/site: SHOWS, PRESS, RECORD).
+ */
+export const SHOW_WALL: Item[][] = SHOWS.map((sh, i) => [
+  { k: "n", em: sh.when, title: sh.name ?? sh.title, sub: `${sh.venue}, ${sh.city}`, href: `#${sh.id}`, tone: TONES[i % TONES.length] } as Item,
+  ...sh.albums.flatMap((al) => al.photos.map((ph) => X(ph.src, al.title, sh.title, sh.venue, ph.alt, `#${sh.id}`))),
+  ...(sh.works ?? []).map((id) => P(id)),
+]);
 
 function Tile({ it }: { it: Item }) {
   if (it.k === "s") {
@@ -108,7 +98,15 @@ function Tile({ it }: { it: Item }) {
   if (it.k === "n") {
     return (
       <Link className={`tile ncard ${it.tone}`} href={it.href} tabIndex={-1}>
-        <em>{it.em ?? "Collection"}</em><b>{it.title}</b><small>{it.sub}</small>
+        <em>{it.em}</em><b>{it.title}</b><small>{it.sub}</small>
+      </Link>
+    );
+  }
+  if (it.k === "q") {
+    return (
+      <Link className={`tile qcard${it.hers ? " hers" : ""}`} href={it.href} tabIndex={-1}>
+        <p>{it.hers ? `“${it.text}”` : it.text}</p>
+        <small>{it.by}</small>
       </Link>
     );
   }
@@ -116,42 +114,49 @@ function Tile({ it }: { it: Item }) {
     return (
       <Link className="tile xcard" href={it.href} tabIndex={-1}>
         {/* eslint-disable-next-line @next/next/no-img-element */}
-        <img src={it.src} alt={it.alt} decoding="async" />
+        <img src={it.src} alt={it.alt} decoding="async" {...dims(it.src)} {...smSet(it.src)} />
         <div><em>{it.eyebrow}</em><b>{it.title}</b><small>{it.sub}</small></div>
       </Link>
     );
   }
   const w = BY_ID.get(it.id);
   if (!w || SMALL_PHOTO.has(w.id)) return null;
-  if (it.k === "c") {
-    return (
-      <Link className="tile tcard" href={workPath(w.id)} tabIndex={-1}>
-        {/* eslint-disable-next-line @next/next/no-img-element */}
-        <img src={thumb(w.id)} alt={w.title} loading="lazy" decoding="async" />
-        <b>{w.title}</b>
-        <small>{labelLine(w)}</small>
-        {it.line && <i>{PULL[w.id] ? `“${it.line}”` : it.line}</i>}
-      </Link>
-    );
-  }
+  // her words in quote marks; the observer's line without
+  const line = PULL[w.id] ? `“${PULL[w.id]}”` : LOOK[w.id];
   return (
-    <Link className="tile" href={workPath(w.id)} tabIndex={-1}>
-      {/* eslint-disable-next-line @next/next/no-img-element */}
-      <img className="framed" src={thumb(w.id)} alt={w.title} loading="lazy" decoding="async" />
+    <Link className="tile flip" href={workPath(w.id)} tabIndex={-1}>
+      <span className="flipper">
+        {/* eslint-disable-next-line @next/next/no-img-element */}
+        <img className="framed" src={thumb(w.id)} alt={w.title} loading="lazy" decoding="async" {...dims(thumb(w.id))} {...smSet(thumb(w.id))} />
+        <span className="back">
+          <em>{w.series}</em>
+          <b>{w.title}</b>
+          <small>{labelLine(w)}</small>
+          {line && <i>{line}</i>}
+          <span className="go">View the painting</span>
+        </span>
+      </span>
     </Link>
   );
 }
 
+/** every column holds its list REP times, so it is full at the start and loops without a seam, however tall the wall */
+const repFor = (items: Item[]) => (items.length >= 8 ? 2 : 4);
+
+/** every wall is seven columns wide, so a tile is the same size on every page (CR-008); a short wall repeats its columns, the repeats started half way down */
+const WALL_COLS = 7;
+const half = (items: Item[]) => [...items.slice(Math.ceil(items.length / 2)), ...items.slice(0, Math.ceil(items.length / 2))];
+
 export function Wall({ columns, speed = 95 }: { columns: Item[][]; speed?: number }) {
+  const all = Array.from({ length: Math.max(WALL_COLS, columns.length) }, (_, i) => (i < columns.length ? columns[i] : half(columns[i % columns.length])));
   return (
-    // the moving wall is decoration over real links elsewhere on the page; keyboard users skip it
-    <div className="cols" aria-hidden="true" style={{ ["--n" as string]: columns.length }}>
-      {columns.map((items, i) => (
-        <div key={i} className={`col${i % 2 ? " down" : ""}`} style={{ ["--dur" as string]: `${Math.round(speed * (1 + (i % 3) * 0.17))}s` }}>
-          {[...items, ...items].map((it, j) => <Tile key={j} it={it} />)}
+    <WallDrift n={all.length}>
+      {all.map((items, i) => (
+        <div key={i} data-rep={repFor(items)} className={`col${i % 2 ? " down" : ""}`} style={{ ["--dur" as string]: `${Math.round(speed * (1 + (i % 3) * 0.17))}s` }}>
+          {Array.from({ length: repFor(items) }, () => items).flat().map((it, j) => <Tile key={j} it={it} />)}
         </div>
       ))}
-    </div>
+    </WallDrift>
   );
 }
 

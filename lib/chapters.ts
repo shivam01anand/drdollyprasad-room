@@ -47,9 +47,8 @@ export type Chapter = {
   room?: string;
 };
 
-export const POEM = `They are not things,
-They are everything
-They come to me
+/** her poem, verbatim; its opening two lines were withdrawn (Shubham, with her agreement, 18 Oct 2026): do not restore */
+export const POEM = `They come to me
 They hold my hand
 They give me a brush
 Then sit quietly

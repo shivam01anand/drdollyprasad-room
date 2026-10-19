@@ -27,10 +27,17 @@ export class CloseLook {
     private reduce: boolean,
     /** called once, the first time the painting is looked at closely */
     private onFirstZoom: () => void,
+    /** also follow two fingers (pinch) and one finger (pan) on a touch screen */
+    private touch = false,
   ) {
     frame.addEventListener("click", this.onClick);
     frame.addEventListener("pointermove", this.onMove);
     frame.addEventListener("wheel", this.onWheel, { passive: false });
+    if (touch) {
+      frame.addEventListener("touchstart", this.onTouchStart, { passive: false });
+      frame.addEventListener("touchmove", this.onTouchMove, { passive: false });
+      frame.addEventListener("touchend", this.onTouchEnd);
+    }
   }
 
   get zoomed() { return this.s.scale > 1.01; }
@@ -58,6 +65,9 @@ export class CloseLook {
     this.frame.removeEventListener("click", this.onClick);
     this.frame.removeEventListener("pointermove", this.onMove);
     this.frame.removeEventListener("wheel", this.onWheel);
+    this.frame.removeEventListener("touchstart", this.onTouchStart);
+    this.frame.removeEventListener("touchmove", this.onTouchMove);
+    this.frame.removeEventListener("touchend", this.onTouchEnd);
   }
 
   private at(e: { clientX: number; clientY: number }) {
@@ -100,7 +110,7 @@ export class CloseLook {
   }
 
   private onClick = (e: MouseEvent) => {
-    if (!this.enabled) return;
+    if (!this.enabled || this.pinched) return;
     e.stopPropagation();
     const p = this.at(e);
     if (this.zoomed) this.to(1, this.s.ox, this.s.oy, 0.6);
@@ -108,7 +118,7 @@ export class CloseLook {
   };
 
   private onMove = (e: PointerEvent) => {
-    if (!this.enabled || !this.zoomed) return;
+    if (!this.enabled || !this.zoomed || e.pointerType === "touch") return;
     const p = this.at(e);
     // the origin glides after the pointer, so travel across the canvas is smooth
     this.pan?.kill();
@@ -127,4 +137,67 @@ export class CloseLook {
     const from1 = !this.zoomed;
     this.to(next < 1.03 ? 1 : next, from1 ? p.x : this.s.ox, from1 ? p.y : this.s.oy, 0.35);
   };
+
+  /* touch: two fingers set how close, about the point between them; one finger
+     drags the canvas while close; a tap still zooms or steps back (onClick) */
+  private pinch?: { d: number; scale: number };
+  private drag?: { x: number; y: number; ox: number; oy: number };
+  private pinched = false;
+
+  private onTouchStart = (e: TouchEvent) => {
+    if (!this.enabled) return;
+    if (e.touches.length === 2) {
+      e.preventDefault();
+      const [a, b] = [e.touches[0], e.touches[1]];
+      this.pinch = { d: Math.hypot(a.clientX - b.clientX, a.clientY - b.clientY), scale: this.s.scale };
+      this.drag = undefined;
+      this.pinched = true;
+      if (!this.zoomed) {
+        const p = this.at({ clientX: (a.clientX + b.clientX) / 2, clientY: (a.clientY + b.clientY) / 2 });
+        this.s.ox = p.x; this.s.oy = p.y;
+      }
+    } else if (e.touches.length === 1 && this.zoomed) {
+      const t = e.touches[0];
+      this.drag = { x: t.clientX, y: t.clientY, ox: this.s.ox, oy: this.s.oy };
+    }
+  };
+
+  private onTouchMove = (e: TouchEvent) => {
+    if (!this.enabled) return;
+    if (this.pinch && e.touches.length === 2) {
+      e.preventDefault();
+      const [a, b] = [e.touches[0], e.touches[1]];
+      const d = Math.hypot(a.clientX - b.clientX, a.clientY - b.clientY);
+      const next = Math.min(MAX, Math.max(1, this.pinch.scale * (d / this.pinch.d)));
+      if (next > 1.01 && this.wantHiRes) { this.wantHiRes = false; this.onFirstZoom(); }
+      this.live.forEach((t) => t.kill()); this.pan?.kill();
+      this.s.scale = next;
+      this.apply();
+      this.showBar();
+    } else if (this.drag && e.touches.length === 1 && this.zoomed) {
+      e.preventDefault();
+      const t = e.touches[0], r = this.frame.getBoundingClientRect(), k = this.s.scale - 1 || 1;
+      if (Math.abs(t.clientX - this.drag.x) + Math.abs(t.clientY - this.drag.y) > 8) this.pinched = true;
+      // the canvas follows the finger: moving right reveals what is to the left
+      this.s.ox = Math.min(100, Math.max(0, this.drag.ox - ((t.clientX - this.drag.x) / r.width) * 100 / k));
+      this.s.oy = Math.min(100, Math.max(0, this.drag.oy - ((t.clientY - this.drag.y) / r.height) * 100 / k));
+      this.apply();
+    }
+  };
+
+  private onTouchEnd = (e: TouchEvent) => {
+    if (e.touches.length < 2 && this.pinch) {
+      this.pinch = undefined;
+      if (this.s.scale < 1.03) this.to(1, this.s.ox, this.s.oy, 0.3);
+      // the lifted fingers must not count as a tap
+      window.setTimeout(() => { this.pinched = false; }, 350);
+    }
+    if (e.touches.length === 0) {
+      if (this.drag && this.pinched) window.setTimeout(() => { this.pinched = false; }, 350);
+      this.drag = undefined;
+    }
+  };
+
+  /** a drag is not a tap: true while a pinch has just ended */
+  get busy() { return this.pinched; }
 }

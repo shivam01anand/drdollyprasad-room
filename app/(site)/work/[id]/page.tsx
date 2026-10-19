@@ -2,10 +2,11 @@ import type { Metadata } from "next";
 import Link from "next/link";
 import { notFound } from "next/navigation";
 import { BY_ID, LARGE, SHOW, SITE, WORKS, inchDims, quoted, workPath, type Work } from "@/lib/works";
-import { INSTAGRAM, LOOK, PULL, SMALL_PHOTO, shownYear, STUDIO_PATH, WHATSAPP, WORDS, enquireHref, labelLine, seriesPath, whatsappHref, worksIn } from "@/lib/site";
+import { INSTAGRAM, LOOK, NOW_SHOWING_CONFIRMED, PULL, SMALL_PHOTO, shownYear, STUDIO_PATH, WHATSAPP, WORDS, enquireHref, labelLine, seriesPath, whatsappHref, worksIn } from "@/lib/site";
 import manifest from "@/public/art/manifest.json";
 import Card from "@/components/site/Card";
-import Viewer from "@/components/site/Viewer";
+import PaintingStage from "@/components/site/PaintingStage";
+import WpBar from "@/components/site/WpBar";
 import Tabs from "@/components/site/Tabs";
 import Share from "@/components/Share";
 import Until from "@/components/Until";
@@ -79,13 +80,10 @@ export default async function WorkPage({ params }: Props) {
   };
 
   const cm = size ? ` · ${Math.round(size.a * 2.54)} × ${Math.round(size.b * 2.54)} cm` : "";
+  // the label (medium, size, year, collection) is shown once, under the title; this adds only what it does not say
   const rows: [string, React.ReactNode][] = [
-    ["Title", w.title],
-    ["Medium", w.medium],
-    ["Size", w.size ? `${w.size}${cm}` : "On request"],
-    ["Year", shownYear(w) ?? "On request"],
-    ["Collection", <Link key="s" href={seriesPath(w.series)}>{w.series}</Link>],
-    ["Status", statusWord(w)],
+    ["Size", w.size ? `${w.size}${cm} (height × width)` : "On request"],
+    ["Status", sold ? "In a private collection" : statusWord(w)],
   ];
 
   const tabs = [
@@ -98,53 +96,41 @@ export default async function WorkPage({ params }: Props) {
     { label: "Delivery and framing", body: (
       <>
         <p>For availability, framing and delivery, write with the painting’s title and your city, and the options will be shared with you.</p>
-        <p>The room views on this page are illustrations, made to show the painting at its size.</p>
+        <p>The room views on this page are illustrations or virtual room studies, not photographs of a real room.</p>
       </>) },
   ];
 
   return (
-    <div className="wrap">
-      <nav className="crumb" aria-label="Breadcrumb">
-        <Link href="/works">Works</Link> / <Link href={seriesPath(w.series)}>{w.series}</Link> / {w.title}
-      </nav>
-
-      <section className="wp-grid">
-        <div className="wp-main">
-          <div className="wp-head">
-            <h1>{w.title}</h1>
-            <p className="meta">{labelLine(w)} · From the collection <Link href={seriesPath(w.series)}>{w.series}</Link></p>
-            {lead && <p className={`wp-lead${words ? " hers" : ""}`}>{words ? `“${lead}”` : lead}{words && <span>Dr Dolly Prasad</span>}</p>}
-          </div>
-          <Viewer w={w} src={src} thumb={`/site/thumbs/${id}.jpg`} dims={d ? { w: d.w, h: d.h } : undefined}
-                  small={!!d && Math.max(d.w, d.h) < 600} />
+    <div className="wp">
+      {/* CR-007: the big painting, the other views under it, then the text */}
+      <PaintingStage w={w} src={src} dims={d ? { w: d.w, h: d.h } : undefined}
+                     small={!!d && Math.max(d.w, d.h) < 600} sub={labelLine(w)}>
+        <div className="pp-text">
+          <h1 className="pp-title">{w.title}</h1>
+          <p className="pp-facts">{[w.medium, w.size, shownYear(w)].filter(Boolean).join(" · ")}</p>
+          <p className="pp-status"><span className={`status st-${sold ? "sold" : w.status === "Enquire" ? "enquire" : "free"}`}><i aria-hidden="true" />{sold ? "In a private collection" : statusWord(w)}</span>
+            <Link href={seriesPath(w.series)}>{w.series}</Link></p>
+          {lead && <p className="pp-story">{words ? `“${lead}”` : lead}{words && <span>Dr Dolly Prasad</span>}</p>}
         </div>
+      </PaintingStage>
 
-        <aside className="wp-side">
-          <div className="side-facts">
-            <span className="eyebrow">{w.series}</span>
-            <span>{w.medium}</span>
-            {w.size && <span>{w.size}{cm}</span>}
-            {w.year && <span>{shownYear(w)}</span>}
-            <span>From the collection <Link href={seriesPath(w.series)}>{w.series} →</Link></span>
-          </div>
-          <div className="side-status">
-            <span className={`status${sold ? " is-sold" : w.status === "Enquire" ? " is-enquire" : ""}`}>{statusWord(w)}</span>
-            <b>{sold ? "In a private collection" : "Price on request"}</b>
-          </div>
-          {SHOW.works.includes(id) && (
-            <Until until={SHOW.until}><p className="show-note">{SHOW.line}</p></Until>
-          )}
-          {WHATSAPP && <a className="btn btn-wa" href={whatsappHref(w)}><ChatIcon />{sold ? "Ask about her work" : "Ask on WhatsApp"}</a>}
-          <Link className={WHATSAPP ? "btn" : "btn btn-solid"} href={enquireHref(w)}>{sold ? "Ask about her work" : "Enquire about this painting"}</Link>
-          <div className="side-small">
-            <a href={INSTAGRAM.url} target="_blank" rel="noopener noreferrer"><InstagramIcon />Her paintings on Instagram {INSTAGRAM.handle}</a>
-            <a href={`${STUDIO_PATH}#work=${id}`}>See it on the wall in her studio →</a>
-            <Share title={`${quoted(w.title)} · Dr Dolly Prasad`} path={workPath(id)} className="link share-btn" />
-          </div>
-        </aside>
-      </section>
+      <div className="wrap">
+      <div className="pp-text pp-after">
+        {NOW_SHOWING_CONFIRMED && SHOW.works.includes(id) && (
+          <Until until={SHOW.until}><p className="show-note">{SHOW.line}</p></Until>
+        )}
+        <div className="pp-ctas">
+          <Link className="btn btn-solid" href={enquireHref(w)}>{sold ? "Ask about her work" : "Enquire about this painting"}</Link>
+          {WHATSAPP && <a className="btn" href={whatsappHref(w)}><ChatIcon />WhatsApp</a>}
+        </div>
+        <div className="side-small">
+          <a href={INSTAGRAM.url} target="_blank" rel="noopener noreferrer"><InstagramIcon />Instagram</a>
+          <a href={`${STUDIO_PATH}#work=${id}`}>In her studio →</a>
+          <Share title={`${quoted(w.title)} · Dr Dolly Prasad`} path={workPath(id)} className="link share-btn" />
+        </div>
+      </div>
 
-      <section style={{ paddingBottom: 40 }}>
+      <section className="wp-lower" style={{ paddingBottom: 28 }}>
         <Tabs tabs={tabs} />
       </section>
 
@@ -162,6 +148,14 @@ export default async function WorkPage({ params }: Props) {
         <Link href={workPath(prev.id)}><span>Previous</span><b>{prev.title}</b></Link>
         <Link href={workPath(next.id)} className="nx"><span>Next</span><b>{next.title}</b></Link>
       </nav>
+
+      </div>
+
+      {/* on a phone, the way to ask stays in reach under the thumb */}
+      <WpBar>
+        <span><b>{w.title}</b><small>{sold ? "In a private collection" : w.status === "Enquire" ? "Availability on enquiry" : "Available · Price on request"}</small></span>
+        <Link className="btn btn-solid" href={enquireHref(w)}>{sold ? "Ask" : "Enquire"}</Link>
+      </WpBar>
 
       <script type="application/ld+json" dangerouslySetInnerHTML={{ __html: JSON.stringify(ld) }} />
     </div>
