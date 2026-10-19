@@ -40,6 +40,8 @@ export default function Header() {
 
   return (
     <header className={`hdr${open ? " is-open" : ""}`}>
+      {/* the village line sketch rides with the bar: crisp at the top of the page, frosted with it once the page moves (CR-005) */}
+      <div className="band band-top" aria-hidden="true" />
       <div className="wrap hdr-in">
         <Link href="/" className="brand" aria-label="Dr Dolly Prasad, home">
           {/* eslint-disable-next-line @next/next/no-img-element */}

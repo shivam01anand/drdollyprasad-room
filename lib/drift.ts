@@ -223,7 +223,7 @@ export function driftWall(cols: HTMLElement, o: { swaySeconds?: number } = {}): 
   const st = columns.map((c) => ({ c, down: c.classList.contains("down"), dur: parseFloat(c.style.getPropertyValue("--dur")) || 95, h: 1, y: 0 }));
   let amp = 0; // px, negative
   let p = 0; // sway phase, 0..2 (0→1 out, 1→2 back)
-  let x = 0, scale = 1, holdUntil = 0, held = false;
+  let x = 0, scale = 1, holdUntil = 0, held = false, hover = false;
   let still = reducedMotion();
 
   const measure = () => {
@@ -248,6 +248,8 @@ export function driftWall(cols: HTMLElement, o: { swaySeconds?: number } = {}): 
 
   const stopClock = clock(cols, (dt, now) => {
     if (held || still) return;
+    // a painting under the mouse holds the wall still while it is lifted (CR-005), then it eases off again
+    if (hover) { scale = 0; return; }
     if (now < holdUntil) return;
     scale = Math.min(1, scale + dt / RAMP_S);
     const k = scale * scale * (3 - 2 * scale);
@@ -277,13 +279,23 @@ export function driftWall(cols: HTMLElement, o: { swaySeconds?: number } = {}): 
     },
   });
 
+  // the mouse resting on a tile pauses the wall (touch never does: a finger is either tapping or dragging)
+  const over = (e: PointerEvent) => { if (e.pointerType === "mouse") hover = !!(e.target as Element).closest?.(".tile"); };
+  const out = (e: PointerEvent) => { if (!cols.contains(e.relatedTarget as Node)) hover = false; };
+  cols.addEventListener("pointerover", over);
+  cols.addEventListener("pointerout", out);
+
   const mq = matchMedia("(prefers-reduced-motion: reduce)");
   const onMq = () => { still = mq.matches; };
   mq.addEventListener("change", onMq);
 
   cols.classList.add("is-live");
   paint();
-  return () => { stopClock(); stopGrab(); ro.disconnect(); mq.removeEventListener("change", onMq); cols.classList.remove("is-live"); };
+  return () => {
+    stopClock(); stopGrab(); ro.disconnect(); mq.removeEventListener("change", onMq);
+    cols.removeEventListener("pointerover", over); cols.removeEventListener("pointerout", out);
+    cols.classList.remove("is-live");
+  };
 }
 
 /** a sideways swipe or drag on `el` calls `step(+1)` (next) or `step(-1)` (previous); a plain tap is left alone */

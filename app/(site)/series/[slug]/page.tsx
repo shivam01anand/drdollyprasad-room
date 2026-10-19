@@ -10,7 +10,6 @@ import manifest from "@/public/art/manifest.json";
 const DIM = new Map(manifest.works.map((d) => [d.id, d]));
 const wh = (id: string) => { const d = DIM.get(id); return d ? { width: d.w, height: d.h } : {}; };
 import { ChatIcon } from "@/components/site/Icons";
-import Divider from "@/components/site/Divider";
 
 export const dynamicParams = false;
 export const generateStaticParams = () => SERIES_PAGES.map((s) => ({ slug: s.slug }));
@@ -137,7 +136,6 @@ export default async function SeriesStory({ params }: Props) {
         </section>
       )}
 
-      <Divider figure="reading" />
 
       <section className="sec-tight wrap">
         <div className="sec-head"><h2>The paintings in this collection</h2><Link className="link" href={`/works?series=${s.slug}`}>Filter in all works →</Link></div>

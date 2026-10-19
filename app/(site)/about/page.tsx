@@ -2,6 +2,8 @@ import type { Metadata } from "next";
 import Link from "next/link";
 import Roll, { type RollItem } from "@/components/site/Roll";
 import ThemeSlider, { type Theme } from "@/components/site/ThemeSlider";
+import Press from "@/components/site/Press";
+import { PRESS_SHORT } from "@/lib/press";
 import { LOOK, PULL, ON_THE_WORK, PORTRAIT_LARGE, STUDIO_PATH, shownYear } from "@/lib/site";
 import { BY_ID, workPath } from "@/lib/works";
 
@@ -73,6 +75,19 @@ export default function About() {
             <p className="ab-p">Her subject is the India around her as it changes: rickshaws giving way to autos, coins going out of use, old doors locked and left. She paints them with the warmth of someone who remembers, never as relics, always as parts of a life.</p>
           </div>
           <Roll label="Faces from her portraits" items={paint(["red-turban-portrait", "three-veiled-women", "boy-and-kettle", "yellow-turban-portrait", "mother-and-child"])} />
+        </div>
+      </section>
+
+      {/* In the press, short (CR-005): right after the second section, linking to the full set on Exhibitions */}
+      <section className="ab-band tone-stone ab-press" aria-labelledby="ab-press-h">
+        <div className="wrap">
+          <div className="sec-head">
+            <div>
+              <p className="eyebrow">From the archive</p>
+              <h2 id="ab-press-h">In the press</h2>
+            </div>
+          </div>
+          <Press items={PRESS_SHORT} more={{ href: "/exhibitions#press", label: "All the press, on Exhibitions" }} />
         </div>
       </section>
 

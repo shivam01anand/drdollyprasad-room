@@ -6,7 +6,6 @@ import { InstagramIcon } from "@/components/site/Icons";
 import Until from "@/components/Until";
 import HashRedirect from "@/components/site/HashRedirect";
 import Marquee from "@/components/site/Marquee";
-import Divider from "@/components/site/Divider";
 import IgRoll from "@/components/site/IgRoll";
 import {
   BIO_LINE, BIO_SUB, EMAIL, INSTAGRAM, NOW, NOW_SHOWING_CONFIRMED, PORTRAIT, SERIES_PAGES, SHOWS, SITE, STUDIO_PATH, worksIn,
@@ -75,7 +74,6 @@ export default function Home() {
         ))}
       </Marquee>
 
-      <Divider figure="reading" />
 
       <section className="hw-band">
         <div className="wrap hw-in">
@@ -113,7 +111,6 @@ export default function Home() {
         })}
       </Marquee>
 
-      <Divider figure="praying" />
 
       <section className="sec-tight wrap">
         <div className="sec-head">
@@ -128,7 +125,6 @@ export default function Home() {
         {AVAILABLE.map((id) => <Card key={id} w={BY_ID.get(id)!} />)}
       </Marquee>
 
-      <Divider figure="seated" />
 
       <section className="ig-band">
         <div className="wrap ig-in">

@@ -1,10 +1,12 @@
 import type { Metadata } from "next";
 import Link from "next/link";
 import Until from "@/components/Until";
-import Slideshow from "@/components/site/Slideshow";
+import ShowMedia from "@/components/site/ShowMedia";
+import Press from "@/components/site/Press";
+import { PRESS_ITEMS } from "@/lib/press";
 import WallHero from "@/components/site/WallHero";
 import { SHOW_WALL } from "@/components/site/Collage";
-import { NOW, NOW_SHOWING_CONFIRMED, PRESS, RECORD, RECORD_LINE, SHOWS } from "@/lib/site";
+import { NOW, NOW_SHOWING_CONFIRMED, RECORD, RECORD_LINE, SHOWS } from "@/lib/site";
 import { BY_ID, WORKS, workPath } from "@/lib/works";
 import { dims } from "@/lib/images";
 
@@ -25,8 +27,6 @@ export default function Exhibitions() {
       <a className="btn" href="#record">The full record</a>
     </WallHero>
     <div className="wrap">
-      <p className="ex-sum ex-intro">Her paintings have hung at India Habitat Centre, the Indian Council for Cultural Relations, Triveni Kala Sangam, Travancore Art Gallery and Nehru Art Gallery in Bombay, and at the First International Kala Mela organised by Lalit Kala Akademi. Her shows have been covered on television and in the papers.</p>
-
       {NOW_SHOWING_CONFIRMED && <Until until={NOW.until}>
         <section id={NOW.id} className="now-line" aria-label="Now showing">
           <span className="live"><i aria-hidden="true" />Now showing</span>
@@ -41,60 +41,58 @@ export default function Exhibitions() {
         </section>
       </Until>}
 
-      <nav className="ex-jump" aria-label="On this page">
-        {SHOWS.map((s) => <a key={s.id} href={`#${s.id}`}>{s.title} <span>{s.year}</span></a>)}
-        <a href="#on-screen">In the news</a>
-        <a href="#record">The record</a>
+      <nav className="ex-index" aria-label="On this page">
+        {SHOWS.map((s) => <a key={s.id} href={`#${s.id}`}><span>{s.year}</span>{s.name ?? s.title}</a>)}
+        <a href="#press"><span>Press</span>In the press</a>
+        <a href="#record"><span>2005–18</span>The record</a>
       </nav>
 
-      {SHOWS.map((s, k) => (
-        <section key={s.id} id={s.id} className={`ex-show${k % 2 ? " flip" : ""}`}>
-          <div className="ex-txt">
-            <p className="ex-kind">{s.kind} · {s.when}</p>
-            <h2>{s.title}</h2>
-            <p className="ex-where">{s.name && <><i>{s.name}</i><br /></>}{s.venue}, {s.city}</p>
-            <p className="ex-lede">{s.lede}</p>
-            {s.quote && (
-              <figure className="ex-quote">
-                <blockquote>“{s.quote}”</blockquote>
-                <figcaption className="eyebrow">Dr Dolly Prasad, on her exhibitions</figcaption>
-              </figure>
-            )}
-            {s.works && s.works.length > 0 && (
-              <p className="ex-works">
-                <span className="eyebrow">On the walls</span>
-                {s.works.map((id) => <Link key={id} href={workPath(id)}>{BY_ID.get(id)?.title}</Link>)}
-              </p>
-            )}
-            {s.note && <p className="meta">{s.note}</p>}
-          </div>
-          <Slideshow albums={s.albums} label={`Photographs: ${s.title}`} />
-        </section>
-      ))}
+      {/* each show a calm chapter: year, title, venue; a few lines; one photograph large and a strip under it (CR-005) */}
+      {SHOWS.map((s) => {
+        const photos = s.albums.flatMap((a) => a.photos);
+        return (
+          <section key={s.id} id={s.id} className="ex-ch" aria-labelledby={`${s.id}-h`}>
+            <header className="ex-ch-head">
+              <span className="ex-ch-year">{s.year}</span>
+              <div>
+                <h2 id={`${s.id}-h`}>{s.name ?? s.title}</h2>
+                <p className="ex-ch-where">{s.venue}, {s.city}</p>
+                <p className="ex-kind">{s.kind} · {s.when}</p>
+              </div>
+            </header>
+            <div className="ex-ch-body">
+              <div className="ex-ch-txt">
+                <p className="ex-lede">{s.lede}</p>
+                {s.quote && (
+                  <figure className="ex-quote">
+                    <blockquote>“{s.quote}”</blockquote>
+                    <figcaption>Dr Dolly Prasad, on her exhibitions</figcaption>
+                  </figure>
+                )}
+                {s.works && s.works.length > 0 && (
+                  <p className="ex-works">
+                    <span>On the walls</span>
+                    {s.works.map((id) => <Link key={id} href={workPath(id)}>{BY_ID.get(id)?.title}</Link>)}
+                  </p>
+                )}
+                {s.note && <p className="meta">{s.note}</p>}
+              </div>
+              <ShowMedia photos={photos} label={`Photographs: ${s.name ?? s.title}`} />
+            </div>
+          </section>
+        );
+      })}
 
-      <section id="on-screen" className="ex-screen">
+      <section id="press" className="ex-press" aria-labelledby="press-h">
+        <span id="on-screen" aria-hidden="true" />
         <div className="sec-head">
           <div>
             <p className="eyebrow">From the archive</p>
-            <h2>In the news</h2>
-            <p className="lede" style={{ marginTop: 10 }}>Her exhibitions have been covered on television and listed in the papers. Here are two television reports and a page from Delhi Times.</p>
+            <h2 id="press-h">In the press</h2>
+            <p className="sec-line">At India Habitat Centre in November 2010 she was interviewed beside the paintings themselves. Here too are two television excerpts and a listing from Delhi Times.</p>
           </div>
         </div>
-        <div className="ex-screen-grid">
-          {PRESS.clips.map((c) => (
-            <figure key={c.src} className="clip">
-              <video controls preload="none" playsInline poster={c.poster} aria-label={c.title}>
-                <source src={c.src} type="video/mp4" />
-              </video>
-              <figcaption><b>{c.title}</b><span>{c.line}</span></figcaption>
-            </figure>
-          ))}
-          <figure className="clip">
-            {/* eslint-disable-next-line @next/next/no-img-element */}
-            <img src={PRESS.clipping.src} alt={PRESS.clipping.alt} loading="lazy" />
-            <figcaption><b>Delhi Times · Art Today And Tomorrow</b><span>{PRESS.clippingLine}</span></figcaption>
-          </figure>
-        </div>
+        <Press items={PRESS_ITEMS} />
       </section>
 
       <section id="record" className="ex-record">

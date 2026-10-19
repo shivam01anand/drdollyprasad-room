@@ -10,15 +10,17 @@ import Header from "@/components/site/Header";
 import Footer from "@/components/site/Footer";
 import { Band, Rails } from "@/components/site/Borders";
 import Motion from "@/components/site/Motion";
+import Divider from "@/components/site/Divider";
 
-/** every page of the website: the quiet border, her name and the menu, and the ways to reach her */
+/** every page of the website: the quiet border, her name and the menu, the painting lady signing off, and the ways to reach her */
 export default function SiteLayout({ children }: { children: React.ReactNode }) {
   return (
     <div className="site">
       <Rails />
-      <Band at="top" />
       <Header />
       <main id="main">{children}</main>
+      {/* the painting lady, once, as the page's closing signature (CR-005: no dividers mid-page) */}
+      <Divider figure="painter" />
       <Footer />
       <Band at="bottom" />
       <Motion />

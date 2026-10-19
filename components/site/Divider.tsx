@@ -3,10 +3,11 @@ import path from "node:path";
 
 /**
  * The single divider (ChatGPT brief 005, Brand pick C): one small line-sketch
- * figure between two hairlines, marking a break between sections. Decorative
- * only (alt=""), brand ink, and always its own block between sections, never
- * inside a section that holds a painting, so it cannot touch or sit beside a
- * painting frame.
+ * figure between two hairlines. Decorative only (alt=""), brand ink.
+ *
+ * CR-005 (Shubham, 18 Oct): she no longer breaks pages in the middle. The site
+ * layout places her once, as the last thing above the footer on every page,
+ * like a closing signature; no page places a divider of its own.
  *
  * Today: the reading figure at 2x, a phone file (78x96, shown 39x48) and a
  * computer file (104x128, shown 52x64).

@@ -1474,3 +1474,248 @@ section.wrap:has(+ .marq) .sec-head{margin-bottom:0}
 }
 /* the venue cards on the Exhibitions wall: full-strength type on rust (contrast) */
 .ncard.rust em,.ncard.rust small{opacity:1}
+
+/* ==========================================================================
+   CR-005 (Shubham's iPhone review, 18 Oct 2026, night): nothing sits on top of
+   anything important; a frosted header once the page moves; tiles that lift
+   further; a calmer About; the painting lady once, at the end; Works status
+   the gallery way; Exhibitions as chapters; In the press.
+   ========================================================================== */
+
+/* ---- 2 · header: the village line and the bar are one strip. At the top it is the page's
+   own ground; once the page moves it turns to frosted glass (80% ground, blur, a hairline
+   and a soft shadow). Its height never changes, so nothing below it jumps: it sticks a
+   little above the top, so the upper part of the village line tucks away and its ground
+   line stays as the bar's top edge. ---- */
+:root{--hdr-tuck:28px}
+@media (max-width:640px){ :root{--hdr-tuck:22px} }
+.hdr{top:calc(-1 * var(--hdr-tuck));padding-top:4px;z-index:40;background-color:rgba(251,249,245,1);
+  -webkit-backdrop-filter:none;backdrop-filter:none;border-bottom:1px solid transparent;box-shadow:none;
+  transition:background-color .3s ease,border-color .3s ease,box-shadow .3s ease,-webkit-backdrop-filter .3s ease,backdrop-filter .3s ease}
+.hdr .band-top{margin:0;transition:opacity .3s ease}
+.is-scrolled .hdr{background-color:rgba(251,249,245,.8);-webkit-backdrop-filter:saturate(1.5) blur(16px);backdrop-filter:saturate(1.5) blur(16px);
+  border-bottom-color:rgba(38,33,29,.12);box-shadow:0 10px 28px -18px rgba(38,33,29,.45)}
+.is-scrolled .hdr .band-top{opacity:.6}
+/* the bar keeps its size when the page moves (the old slimming moved the page under it) */
+.is-scrolled .hdr-in{padding-block:14px}
+.is-scrolled .brand img{width:52px;height:52px}
+.is-scrolled .brand-t b{font-size:30px}
+.is-scrolled .brand-t i{opacity:0;max-height:20px}
+@media (max-width:999px){ .is-scrolled .brand img{width:40px;height:40px} }
+@media (max-width:640px){
+  .is-scrolled .hdr-in{padding-block:10px}
+  .is-scrolled .brand img{width:36px;height:36px}
+  .is-scrolled .brand-t b{font-size:24px}
+}
+@supports not ((backdrop-filter:blur(1px)) or (-webkit-backdrop-filter:blur(1px))){ .is-scrolled .hdr{background-color:rgba(251,249,245,.97)} }
+.hdr.is-open{background-color:var(--bg)}
+/* a sticky bar under the header covered the paintings on a phone: the Works filters scroll with the page */
+@media (max-width:640px){ .filters-line{position:static;margin-inline:0;padding:0;border-bottom:0;background:none;-webkit-backdrop-filter:none;backdrop-filter:none} }
+
+/* ---- 1 · page openings: the card beside the wall (computer) or under it (tablet, phone), never on it ---- */
+.wh{display:grid;grid-template-columns:minmax(330px,31%) minmax(0,1fr);background:var(--wall)}
+.wh .namecard{position:relative;left:auto;top:auto;bottom:auto;transform:none;width:auto;max-width:none;margin:0;z-index:auto;
+  background:var(--bg);box-shadow:none;align-items:flex-start;justify-content:center;text-align:left;gap:12px;
+  padding:clamp(28px,3.2vw,56px) clamp(24px,3vw,52px)}
+.wh .namecard .face{position:static;transform:none;width:88px;height:88px;margin:0 0 4px;border:3px solid var(--bg);outline:1px solid var(--ink)}
+.wh .namecard h1{font-size:clamp(44px,4.4vw,64px);line-height:1.02}
+.wh .namecard .sub{max-width:440px}
+.wh .namecard .ctas{max-width:420px}
+.wh .collage{position:relative;overflow:hidden;min-height:0;max-height:none;padding:0;display:block}
+.wh-home .collage{height:min(80vh,780px)}
+.wh-page .collage{height:min(62vh,580px)}
+.wh .collage .cols{position:static}
+@media (max-width:999px){
+  .wh{grid-template-columns:minmax(0,1fr)}
+  .wh .collage{order:-1}
+  .wh-home .collage{height:min(56svh,560px)}
+  .wh-page .collage{height:340px}
+  .wh .namecard{align-items:center;text-align:center;padding:24px var(--gut) 28px;gap:8px}
+  .wh .namecard .ctas{max-width:520px;margin-inline:auto}
+}
+@media (max-width:640px){
+  .wh-home .collage{height:min(52svh,460px)}
+  .wh-page .collage{height:300px}
+  .wh .namecard{padding:20px var(--gut) 24px;width:auto}
+  .wh .namecard .face{width:64px;height:64px}
+  .wh .namecard h1{font-size:38px}
+  .wh-home .namecard .sub{display:none}
+}
+
+/* ---- 6 · the Works band: sharp and in full colour, the title under it, nothing on top ---- */
+.tband.tband-open{height:auto;display:block;overflow:visible;background:transparent;margin:0 0 clamp(8px,1.6vw,16px)}
+.tband-open .tband-row{position:relative;inset:auto;height:clamp(196px,17vw,236px);display:flex;align-items:center;background:var(--wall);
+  margin-inline:calc(-1 * var(--gut));overflow-x:clip;overflow-y:visible}
+.tband-open .tband-track img,.tband-open .tband-track a:hover img{filter:none;opacity:1}
+.tband-open .tband-track img{height:clamp(150px,13vw,180px)}
+.tband-open .tband-card{background:none;box-shadow:none;max-width:none;padding:clamp(18px,2.4vw,28px) 0 0;
+  flex-direction:row;flex-wrap:wrap;align-items:baseline;justify-content:flex-start;gap:6px 24px;text-align:left}
+.tband-open .tband-card p{max-width:none}
+@media (max-width:640px){
+  .tband.tband-open{margin-inline:0}
+  .tband-open .tband-row{height:170px}
+  .tband-open .tband-track img{height:128px}
+  .tband-open .tband-card{padding-top:16px;flex-direction:column;gap:4px}
+}
+
+/* ---- 3 · a painting under the mouse lifts well clear of its neighbours, and the row or wall holds still ---- */
+.marq .card .mat,.marq .mat{overflow:visible}
+.marq,.ig-roll{overflow-x:clip;overflow-y:visible}
+@media (hover:hover) and (pointer:fine){
+  .collage .tile,.marq .card .mat img,.show-card img,.tband-track img,.ig-track a img{
+    transition:transform .28s cubic-bezier(.2,.7,.2,1),box-shadow .28s ease,filter .28s ease}
+  .collage .col:has(.tile:hover){position:relative;z-index:6}
+  .collage .tile:hover,.collage .xcard:hover{position:relative;z-index:6;transform:scale(1.2);filter:none}
+  .collage .tile.flip:hover .framed,.collage .tile.flip:hover .back,.collage .xcard:hover,.collage .tile.ncard:hover,.collage .tile.qcard:hover,.collage .tile.scard:hover{
+    box-shadow:0 2px 6px rgba(20,12,6,.2),0 22px 44px -10px rgba(20,12,6,.5)}
+  .marq .card:hover,.show-card:hover,.tband-track a:hover,.ig-track a:hover{position:relative;z-index:6}
+  .marq .card:hover .mat img{transform:scale(1.2);box-shadow:0 2px 6px rgba(20,12,6,.2),0 22px 44px -10px rgba(20,12,6,.5)}
+  .show-card:hover img{transform:scale(1.18);box-shadow:0 2px 6px rgba(20,12,6,.2),0 22px 44px -10px rgba(20,12,6,.5)}
+  .tband-track a:hover img,.ig-track a:hover img{transform:scale(1.2);box-shadow:0 2px 6px rgba(20,12,6,.2),0 22px 44px -10px rgba(20,12,6,.5)}
+}
+@media (prefers-reduced-motion:reduce){
+  .collage .tile:hover,.collage .xcard:hover,.marq .card:hover .mat img,.show-card:hover img,.tband-track a:hover img,.ig-track a:hover img{transform:none}
+  .collage .tile:hover .framed,.marq .card:hover .mat img,.show-card:hover img,.tband-track a:hover img,.ig-track a:hover img{outline:2px solid var(--rust);outline-offset:3px}
+}
+
+/* ---- 4 · About: a calm, compact rhythm ---- */
+.ab-band{padding-block:clamp(36px,4.6vw,64px)}
+.ab-hero-in,.ab-split,.theme{gap:clamp(24px,4vw,56px)}
+.ab-txt{gap:12px}
+.ab-statement{gap:14px}
+.ab-close{gap:10px}
+.ab-ctas{margin-top:10px}
+.roll{gap:10px}
+.roll-cap{min-height:0}
+.ab-press .sec-head{margin-bottom:20px}
+@media (max-width:640px){
+  .ab-band{padding-block:30px}
+  .ab-hero{padding-top:20px}
+  .ab-hero-in,.ab-split,.theme{gap:20px}
+  .ab-portrait{max-width:320px}
+  .themes{gap:12px}
+  .ab-press .sec-head{margin-bottom:14px}
+}
+
+/* ---- 5 · the painting lady signs off each page, once, just above the footer ---- */
+main + .divider{padding:clamp(36px,4vw,56px) var(--gut) clamp(28px,3vw,40px)}
+
+/* ---- 6 · status, the gallery way: some gone, some left ---- */
+.card .status{display:inline-flex;align-items:center;gap:8px;font-size:13px;font-weight:400;letter-spacing:.02em;color:var(--muted);line-height:1.4}
+.card .status::before{display:none}
+.card .status i{flex:none;width:7px;height:7px;border-radius:50%}
+.card .st-sold{font-family:var(--serif);font-style:italic;font-size:15px;letter-spacing:0;color:var(--soft)}
+.card .st-sold i{background:#C0261B}
+.card .st-free{color:var(--ink)}
+.card .st-free i{background:var(--green)}
+.card .st-enquire i{background:transparent;box-shadow:inset 0 0 0 1px var(--ink)}
+.card.is-sold .card-t{color:var(--muted)}
+.works-grid .status{font-size:13px}
+.works-grid .st-sold{font-size:15px}
+
+/* ---- 7 · Exhibitions: each show a clean chapter ---- */
+.ex-index{display:flex;flex-wrap:wrap;gap:0 28px;padding-block:clamp(14px,2vw,22px);border-bottom:1px solid var(--hair)}
+.ex-index a{display:inline-flex;align-items:baseline;gap:8px;min-height:44px;align-items:center;text-decoration:none;font-family:var(--serif);font-size:19px;font-weight:500}
+.ex-index a span{font-family:var(--sans);font-size:13px;letter-spacing:.06em;color:var(--rust)}
+.ex-index a:hover{color:var(--rust)}
+.ex-ch{padding-block:clamp(40px,5vw,72px);border-top:1px solid var(--hair);scroll-margin-top:100px}
+.ex-index + .ex-ch{border-top:0}
+.ex-ch-head{display:grid;grid-template-columns:clamp(84px,8vw,128px) minmax(0,1fr);gap:clamp(12px,2vw,28px);align-items:baseline;margin-bottom:clamp(18px,2.4vw,28px)}
+.ex-ch-year{font-family:var(--serif);font-size:clamp(40px,4.2vw,60px);font-weight:500;line-height:1;color:var(--rust)}
+.ex-ch-head h2{font-size:clamp(32px,3.4vw,46px);font-weight:500;line-height:1.08}
+.ex-ch-where{font-size:17px;color:var(--ink);margin-top:8px}
+.ex-ch .ex-kind{margin-top:2px;font-size:13px;color:var(--soft);letter-spacing:.04em}
+.ex-ch-body{display:grid;grid-template-columns:minmax(0,5fr) minmax(0,7fr);gap:clamp(24px,4vw,64px);align-items:start;
+  padding-left:calc(clamp(84px,8vw,128px) + clamp(12px,2vw,28px))}
+.ex-ch-txt{display:flex;flex-direction:column;gap:18px;min-width:0}
+.ex-ch .ex-lede{font-size:17px;line-height:1.7;color:#3A332D;max-width:520px}
+.ex-ch .ex-quote{margin:0}
+.ex-ch .ex-quote blockquote{font-size:24px}
+.ex-ch .ex-quote figcaption{font-size:13px;color:var(--muted)}
+.ex-ch .ex-works{gap:0 16px}
+.ex-ch .ex-works span{width:100%;font-size:13px;letter-spacing:.16em;text-transform:uppercase;color:var(--muted)}
+.sm-media{display:flex;flex-direction:column;gap:12px;min-width:0}
+.sm-hero{display:flex;align-items:center;justify-content:center;aspect-ratio:3/2;width:100%;padding:0;border:0;background:transparent;cursor:zoom-in}
+.sm-hero img{max-width:100%;max-height:100%;width:auto;height:auto;border:3px solid var(--frame);
+  box-shadow:0 1px 2px rgba(20,12,6,.16),0 6px 14px -4px rgba(20,12,6,.2),0 18px 36px -14px rgba(20,12,6,.3);animation:sm-in .5s ease}
+@keyframes sm-in{from{opacity:.25}to{opacity:1}}
+.sm-cap{font-size:15px;color:var(--muted);line-height:1.45}
+.sm-strip{display:flex;gap:10px;flex-wrap:wrap}
+.sm-strip button{flex:none;width:clamp(68px,6.4vw,92px);aspect-ratio:4/3;padding:0;border:0;background:var(--wall);cursor:pointer;opacity:.72;transition:opacity .2s ease,box-shadow .2s ease}
+.sm-strip button:hover{opacity:1}
+.sm-strip button[aria-current="true"]{opacity:1;box-shadow:0 0 0 2px var(--bg),0 0 0 3px var(--ink)}
+.sm-strip img{width:100%;height:100%;object-fit:cover;display:block}
+.sm-strip .sm-more{opacity:1;font-family:var(--serif);font-size:19px;color:var(--ink);display:grid;place-items:center}
+@media (prefers-reduced-motion:reduce){ .sm-hero img{animation:none} }
+@media (max-width:900px){ .ex-ch-body{grid-template-columns:minmax(0,1fr);padding-left:0} }
+@media (max-width:640px){
+  .ex-index{flex-wrap:nowrap;overflow-x:auto;scrollbar-width:none;margin-inline:calc(-1 * var(--gut));padding-inline:var(--gut);gap:0 22px}
+  .ex-index::-webkit-scrollbar{display:none}
+  .ex-index a{flex:none;white-space:nowrap;font-size:17px}
+  .ex-ch{padding-block:32px}
+  .ex-ch-head{grid-template-columns:minmax(0,1fr);gap:2px;margin-bottom:14px}
+  .ex-ch-year{font-size:28px}
+  .ex-ch-head h2{font-size:31px}
+  .ex-ch-where{margin-top:4px;font-size:15px}
+  .sm-hero{aspect-ratio:4/3}
+  .sm-strip{gap:8px}
+  .sm-strip button{width:calc((100% - 32px) / 5);min-width:44px}
+}
+
+/* ---- 8 · In the press: an editorial collage in thin black frames ---- */
+.ex-press{padding-block:clamp(40px,5vw,72px);border-top:1px solid var(--hair);scroll-margin-top:100px}
+.press{list-style:none;margin:0;padding:0;column-count:3;column-gap:clamp(20px,2.6vw,40px)}
+@media (max-width:1000px){ .press{column-count:2} }
+.press-item{break-inside:avoid;margin:0 0 clamp(24px,2.8vw,40px)}
+.press-item figure{margin:0;display:flex;flex-direction:column;gap:12px}
+.press-open{display:block;width:100%;padding:0;border:0;background:none;cursor:zoom-in;line-height:0}
+.press-open img,.press-clip{display:block;width:100%;height:auto;border:3px solid var(--frame);
+  box-shadow:0 1px 2px rgba(20,12,6,.16),0 6px 14px -4px rgba(20,12,6,.2),0 18px 36px -14px rgba(20,12,6,.3);
+  transition:transform .28s cubic-bezier(.2,.7,.2,1),box-shadow .28s ease}
+@media (hover:hover) and (pointer:fine){ .press-open:hover img{transform:translateY(-4px);box-shadow:0 2px 6px rgba(20,12,6,.2),0 22px 44px -10px rgba(20,12,6,.45)} }
+.press-clip{position:relative;aspect-ratio:4/3;background:#242625;overflow:hidden}
+.press-clip video{position:absolute;inset:0;width:100%;height:100%;object-fit:contain;background:#242625;display:block}
+.press-play{position:absolute;left:50%;top:50%;width:64px;height:64px;margin:-32px 0 0 -32px;border-radius:50%;
+  border:1px solid rgba(243,238,230,.75);background:rgba(20,18,16,.6);color:#F3EEE6;display:grid;place-items:center;cursor:pointer;transition:background-color .2s ease,transform .2s ease}
+.press-play svg{width:26px;height:26px;margin-left:3px}
+.press-play:hover{background:var(--rust);transform:scale(1.06)}
+.press figcaption{display:flex;flex-direction:column;gap:3px}
+.press figcaption em{font-style:normal;font-size:13px;letter-spacing:.14em;text-transform:uppercase;color:#8E3B1F}
+.press figcaption b{font-family:var(--serif);font-size:24px;font-weight:500;line-height:1.15}
+.press figcaption span{font-size:15px;color:var(--muted);line-height:1.5}
+.press figcaption small{font-size:13px;color:var(--soft)}
+.press-more{margin-top:4px}
+@media (max-width:640px){
+  .press{column-count:auto;display:flex;align-items:flex-start;gap:14px;overflow-x:auto;scroll-snap-type:x mandatory;
+    margin-inline:calc(-1 * var(--gut));padding:6px var(--gut) 14px;scroll-padding-inline:var(--gut);scrollbar-width:none;touch-action:pan-x pan-y}
+  .press::-webkit-scrollbar{display:none}
+  .press-item{flex:0 0 80%;scroll-snap-align:start;margin:0}
+  .press figcaption b{font-size:19px}
+}
+
+/* the full-screen look at photographs and clippings */
+.gal{position:fixed;inset:0;z-index:120;background:rgba(22,19,17,.97);color:#F3EEE6;display:flex;flex-direction:column;animation:zoom-in .25s ease}
+.gal-stage{position:relative;flex:1;min-height:0;display:flex;align-items:center;justify-content:center;
+  padding:clamp(64px,6vw,76px) clamp(12px,7vw,104px) 8px;touch-action:pan-y;-webkit-user-select:none;user-select:none}
+.gal-stage img{max-width:100%;max-height:100%;width:auto;height:auto;object-fit:contain;border:3px solid #0B0A09;box-shadow:0 24px 60px rgba(0,0,0,.55);
+  translate:var(--pull,0) 0;transition:translate .3s var(--ease)}
+.gal-bar{display:flex;justify-content:space-between;align-items:flex-end;gap:16px;padding:10px clamp(16px,7vw,104px) calc(18px + env(safe-area-inset-bottom))}
+.gal-cap{display:flex;flex-direction:column;gap:3px;max-width:760px}
+.gal-cap em{font-style:normal;font-size:13px;letter-spacing:.14em;text-transform:uppercase;color:#E0A07E}
+.gal-cap b{font-family:var(--serif);font-size:24px;font-weight:500;line-height:1.15}
+.gal-cap span{font-size:15px;color:#CBC1B4;line-height:1.5}
+.gal-n{font-size:13px;color:#CBC1B4;white-space:nowrap}
+.gal-arrow{position:absolute;top:50%;transform:translateY(-60%);width:48px;height:64px;border:0;background:rgba(243,238,230,.1);color:#F3EEE6;
+  font-size:34px;line-height:1;cursor:pointer;display:grid;place-items:center;transition:background-color .2s ease}
+.gal-arrow:hover{background:rgba(243,238,230,.22)}
+.gal-arrow.prev{left:clamp(4px,1.6vw,28px)}
+.gal-arrow.next{right:clamp(4px,1.6vw,28px)}
+.gal-x{position:absolute;top:calc(12px + env(safe-area-inset-top));right:12px;width:48px;height:48px;border-radius:50%;border:1px solid rgba(243,238,230,.4);
+  background:transparent;color:inherit;cursor:pointer;display:grid;place-items:center}
+.gal-x:hover{border-color:#F3EEE6}
+.gal-x svg{width:20px;height:20px}
+@media (max-width:640px){
+  .gal-arrow{width:44px;height:56px;font-size:28px;background:rgba(22,19,17,.55)}
+  .gal-cap b{font-size:19px}
+}
+@media (prefers-reduced-motion:reduce){ .gal{animation:none} .gal-stage img{transition:none} }
