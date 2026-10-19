@@ -16,6 +16,8 @@ import Divider from "@/components/site/Divider";
 export default function SiteLayout({ children }: { children: React.ReactNode }) {
   return (
     <div className="site">
+      {/* the studio is a full page load: have it fetched before the click, so the click never lands on a blank screen */}
+      <link rel="prefetch" href="/studio" as="document" />
       <Rails />
       <Header />
       <main id="main">{children}</main>

@@ -2260,3 +2260,20 @@ body *{font-style:normal !important}
 .ex-kind,.ex-ch small,.ex-ch-where small,small{font-size:15px !important}
 @media (max-width:640px){ .ex-lede,p.meta,.lede,.ig-in .txt p{font-size:16px !important} .pp-story{font-size:18px !important} }
 .wgroup .card .mat{overflow:visible}
+
+/* v5 · navigation never lands on blank: wall frames show a warm placeholder until their painting arrives; the page rises 6px, never fades from nothing */
+.collage .framed,.collage .tile img{background-color:#E6E1D6 !important}
+.page-in{animation-duration:.35s}
+@keyframes page-in{from{transform:translateY(6px)}to{transform:none}}
+
+/* v5 · museum placards: one label style on every wall (home, collections, about, exhibitions) */
+.xcard,.ncard,.ccard{background:#fff !important;color:#141210 !important;border:1px solid #D9D5CC;box-shadow:0 8px 20px -10px rgba(10,8,6,.35) !important}
+.ncard.rust,.ncard.dark,.ccard.indigo{background:#1C2746 !important;color:#fff !important;border-color:#1C2746}
+.xcard div{padding:12px 14px 14px;gap:2px;background:#fff}
+.xcard em,.ncard em,.ccard em{font:500 11.5px/1.3 var(--sans);letter-spacing:.18em;text-transform:uppercase;color:#6B6558 !important;opacity:1}
+.ncard.rust em,.ncard.dark em,.ccard.indigo em{color:#C9D0E6 !important}
+.xcard b,.ncard b,.ccard b{font-family:var(--serif);font-weight:500;font-size:22px;line-height:1.12;color:inherit}
+.xcard small,.ncard small,.ccard small{font:400 13px/1.35 var(--sans);color:#4E493F !important;opacity:1}
+.ncard.rust small,.ncard.dark small,.ccard.indigo small{color:#D9DEEE !important}
+.ccard{padding:22px 16px;text-align:center;display:flex;flex-direction:column;gap:6px;text-decoration:none;justify-content:center}
+@media (max-width:640px){ .xcard b,.ncard b,.ccard b{font-size:17px} .ccard{padding:14px 10px} .ccard small{display:block;font-size:12px} .xcard small{display:none} }

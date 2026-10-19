@@ -293,7 +293,7 @@ html[data-room="off"] .sec:not(.sec-featured){display:none}
              radial-gradient(120% 90% at 50% 120%,rgba(120,80,50,.10),rgba(120,80,50,0) 60%)}
 .pre-welcome{position:absolute;inset:0;display:flex;flex-direction:column;align-items:center;justify-content:center;
   text-align:center;padding:0 var(--gut);gap:0}
-.pre-welcome [data-in]{visibility:hidden}
+.pre-welcome [data-in]{visibility:visible}
 .pre-namaste{margin:0 0 clamp(10px,1.6vh,18px);font-family:"IBM Plex Sans Devanagari",var(--display);font-weight:500;
   font-size:clamp(14px,1.1vw,17px);letter-spacing:.06em;color:var(--dim)}
 .pre-hello{margin:0;font-family:"Cormorant Garamond",Georgia,serif;font-style:italic;font-weight:500;
