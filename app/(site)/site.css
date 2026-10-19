@@ -1719,3 +1719,11 @@ main + .divider{padding:clamp(36px,4vw,56px) var(--gut) clamp(28px,3vw,40px)}
   .gal-cap b{font-size:19px}
 }
 @media (prefers-reduced-motion:reduce){ .gal{animation:none} .gal-stage img{transition:none} }
+/* critique pass 1 */
+.wh .namecard .ctas{display:flex;flex-wrap:wrap;gap:10px}
+.wh .namecard .ctas .btn{flex:1 1 auto;padding:0 18px}
+@media (max-width:640px){
+  .press-open img{aspect-ratio:4/3;object-fit:cover}
+  .press-item figure{gap:10px}
+}
+.sm-strip button{min-height:46px}
