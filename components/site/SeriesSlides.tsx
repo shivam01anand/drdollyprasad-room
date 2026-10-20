@@ -1,6 +1,7 @@
 "use client";
 
 import Link from "next/link";
+import { motionPaused } from "@/lib/motion-rules";
 import { useEffect, useState } from "react";
 
 export type Slide = { slug: string; label: string; n: number; src: string; alt: string; w?: number; h?: number };
@@ -10,7 +11,7 @@ export default function SeriesSlides({ slides }: { slides: Slide[] }) {
   const [i, setI] = useState(0);
   useEffect(() => {
     if (matchMedia("(prefers-reduced-motion: reduce)").matches) return;
-    const t = setInterval(() => setI((x) => (x + 1) % slides.length), 2500);
+    const t = setInterval(() => { if (!motionPaused()) setI((x) => (x + 1) % slides.length); }, 2500);
     return () => clearInterval(t);
   }, [slides.length]);
   const s = slides[i];

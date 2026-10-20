@@ -27,3 +27,24 @@ export const PHOTO_HOLD_MS = 6000;
 export function prefersReducedMotion() {
   return typeof matchMedia !== "undefined" && matchMedia("(prefers-reduced-motion: reduce)").matches;
 }
+
+/**
+ * The footer's "Pause movement" link (4-REVIEW1-DECISION 4.4): one site-wide stop for every row, the
+ * Home wall, the exhibition photo roll and CSS animations. It sets html[data-motion="paused"],
+ * is remembered in localStorage ("ddp-motion"), and tells listeners with a "ddp-motion" event.
+ */
+export const MOTION_KEY = "ddp-motion";
+export const MOTION_EVENT = "ddp-motion";
+export function motionPaused() {
+  return typeof document !== "undefined" && document.documentElement.dataset.motion === "paused";
+}
+export function setMotionPaused(paused: boolean) {
+  if (typeof document === "undefined") return;
+  if (paused) document.documentElement.dataset.motion = "paused";
+  else delete document.documentElement.dataset.motion;
+  try { localStorage.setItem(MOTION_KEY, paused ? "paused" : "on"); } catch { /* storage unavailable: the choice lasts this page only */ }
+  window.dispatchEvent(new Event(MOTION_EVENT));
+}
+export function storedMotionPaused() {
+  try { return localStorage.getItem(MOTION_KEY) === "paused"; } catch { return false; }
+}

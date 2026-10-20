@@ -162,3 +162,9 @@ html:has(.five){scroll-behavior:auto}
 /* ---- B3 3.8 · a separator dot belongs to the part before it, so no wrapped line starts with "·" ---- */
 .meta-parts .mp + .mp::before{content:none !important}
 .meta-parts .mp:not(:last-child)::after{content:"·";margin-inline:.45em}
+
+/* ---- B4 · footer "Pause movement" (4.4): looks exactly like the footer links; stops every CSS animation too ---- */
+.ftr-motion{appearance:none;background:none;border:0;padding:0;margin:0;cursor:pointer;color:inherit;font:400 14px/1.45 var(--sans);text-align:inherit;
+  min-height:24px;text-decoration:none}
+.ftr-motion:hover{text-decoration:underline;text-underline-offset:4px}
+html[data-motion="paused"] *,html[data-motion="paused"] *::before,html[data-motion="paused"] *::after{animation-play-state:paused !important}

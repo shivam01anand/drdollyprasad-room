@@ -6,7 +6,7 @@ import { dims } from "@/lib/images";
 import { swipe } from "@/lib/drift";
 import type { Photo } from "@/lib/site";
 import {
-  PHOTO_FADE_MS_REDUCED, PHOTO_HOLD_MS, PHOTO_ROLL_MS, PHOTO_ROLL_MS_REDUCED, REDUCED_KEEPS_MOVING,
+  MOTION_EVENT, PHOTO_FADE_MS_REDUCED, PHOTO_HOLD_MS, PHOTO_ROLL_MS, PHOTO_ROLL_MS_REDUCED, REDUCED_KEEPS_MOVING, motionPaused,
 } from "@/lib/motion-rules";
 
 const sm = (src: string) => src.replace("/site/ex/", "/site/ex/sm/");
@@ -33,6 +33,7 @@ export default function ShowMedia({ photos, label }: { photos: Photo[]; label: s
   const [hidden, setHidden] = useState(false);
   const [focused, setFocused] = useState(false);
   const [held, setHeld] = useState(0);
+  const [paused, setPaused] = useState(false);
   const root = useRef<HTMLDivElement>(null);
   const hero = useRef<HTMLButtonElement>(null);
   const strip = useRef<HTMLDivElement>(null);
@@ -47,6 +48,13 @@ export default function ShowMedia({ photos, label }: { photos: Photo[]; label: s
     set();
     m.addEventListener("change", set);
     return () => m.removeEventListener("change", set);
+  }, []);
+
+  useEffect(() => {
+    const set = () => setPaused(motionPaused());
+    set();
+    window.addEventListener(MOTION_EVENT, set);
+    return () => window.removeEventListener(MOTION_EVENT, set);
   }, []);
 
   useEffect(() => {
@@ -97,7 +105,7 @@ export default function ShowMedia({ photos, label }: { photos: Photo[]; label: s
   }, []);
 
   // it rolls on by itself while it is on screen
-  const rolling = seen && !hidden && !focused && open === null && n > 1 && (!reduced || REDUCED_KEEPS_MOVING);
+  const rolling = seen && !hidden && !focused && !paused && open === null && n > 1 && (!reduced || REDUCED_KEEPS_MOVING);
   useEffect(() => {
     if (!rolling) return;
     const t = setTimeout(() => { setHeld(0); go(i + 1); }, held ? PHOTO_HOLD_MS : reduced ? PHOTO_ROLL_MS_REDUCED : PHOTO_ROLL_MS);

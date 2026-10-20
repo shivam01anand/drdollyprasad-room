@@ -13,7 +13,7 @@
  * hidden tab. Transforms only, so nothing on the page shifts.
  */
 
-import { REDUCED_KEEPS_MOVING, REDUCED_SPEED } from "./motion-rules";
+import { REDUCED_KEEPS_MOVING, REDUCED_SPEED, motionPaused } from "./motion-rules";
 
 const HOLD_MS = 1400; // how long a let-go row rests before it drifts again
 const RAMP_S = 1.6; // how long it takes to come back up to speed
@@ -39,7 +39,8 @@ function reducedMotion() {
   return typeof matchMedia !== "undefined" && matchMedia("(prefers-reduced-motion: reduce)").matches;
 }
 /** under reduced motion: does it still move by itself (at REDUCED_SPEED), or stand still? */
-const motionScale = (reduced: boolean) => (!reduced ? 1 : REDUCED_KEEPS_MOVING ? REDUCED_SPEED : 0);
+/** the footer's "Pause movement" stops all of it */
+const motionScale = (reduced: boolean) => (motionPaused() ? 0 : !reduced ? 1 : REDUCED_KEEPS_MOVING ? REDUCED_SPEED : 0);
 
 /** shared pointer handling: decides drag vs click, keeps clicks from firing after a drag */
 function grab(el: HTMLElement, h: {

@@ -1,6 +1,7 @@
 "use client";
 
 import { useEffect, useState } from "react";
+import { motionPaused } from "@/lib/motion-rules";
 
 export type Block = { slug: string; label: string; n: number; period: string; pics: { src: string; alt: string }[] };
 
@@ -9,7 +10,7 @@ export default function FiveBlocks({ blocks }: { blocks: Block[] }) {
   const [tick, setTick] = useState(0);
   useEffect(() => {
     if (matchMedia("(prefers-reduced-motion: reduce)").matches) return;
-    const t = setInterval(() => setTick((x) => x + 1), 2600);
+    const t = setInterval(() => { if (!motionPaused()) setTick((x) => x + 1); }, 2600);
     return () => clearInterval(t);
   }, []);
   return (
