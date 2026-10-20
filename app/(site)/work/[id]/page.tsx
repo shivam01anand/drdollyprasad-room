@@ -3,7 +3,7 @@ import Link from "next/link";
 import IndigoBand from "@/components/site/IndigoBand";
 import { notFound } from "next/navigation";
 import { BY_ID, LARGE, SHOW, SITE, WORKS, inchDims, quoted, workPath, type Work } from "@/lib/works";
-import { INSTAGRAM, LOOK, NOW_SHOWING_CONFIRMED, PULL, SERIES_BY_SLUG, SMALL_PHOTO, shownYear, statusText, STUDIO_PATH, WHATSAPP, WORDS, enquireHref, labelLine, neighbours, seriesPath, whatsappHref, worksIn } from "@/lib/site";
+import { INSTAGRAM, LOOK, NOW_SHOWING_CONFIRMED, PULL, SERIES_BY_SLUG, SHOWS, SMALL_PHOTO, shownYear, statusText, STUDIO_PATH, WHATSAPP, WORDS, enquireHref, labelLine, neighbours, seriesPath, whatsappHref, worksIn } from "@/lib/site";
 import PrevNext from "@/components/site/PrevNext";
 import manifest from "@/public/art/manifest.json";
 import Card from "@/components/site/Card";
@@ -23,6 +23,9 @@ import { ChatIcon, InstagramIcon } from "@/components/site/Icons";
 
 export const dynamicParams = false;
 
+/** R4 B2-5: built, not shipped. Turn on only when Chief Content locks the label (preview note: "Shown at: wording with Chief Content"). */
+const SHOW_SHOWN_AT = process.env.SHOW_SHOWN_AT === "1";
+const SHOWN_AT_LABEL = "[Content to write]";
 export const generateStaticParams = () => WORKS.map((w) => ({ id: w.id }));
 
 type Props = { params: Promise<{ id: string }> };
@@ -59,6 +62,8 @@ export default async function WorkPage({ params }: Props) {
   const end = (e: { id: string; crossesTo?: string }, dir: "Previous" | "Next") => e.crossesTo
     ? { href: `/series/${e.crossesTo}`, kicker: `${dir} collection`, label: SERIES_BY_SLUG.get(e.crossesTo)!.label }
     : { href: workPath(e.id), kicker: `${dir} painting`, label: BY_ID.get(e.id)!.title };
+  // R4 B2-5: "Shown at", only where SHOWS names this painting; held until Chief Content locks the label
+  const shownAt = SHOWS.filter((sh) => sh.works?.includes(id));
   const d = DIMS.get(id);
   const src = LARGE.has(id) ? `/art/large/${id}.jpg` : `/art/works/${id}.jpg`;
   const size = inchDims(w, d ? { w: d.w, h: d.h } : undefined);
@@ -89,6 +94,9 @@ export default async function WorkPage({ params }: Props) {
   const rows: [string, React.ReactNode][] = [
     ["Size", w.size ? `${w.size}${cm} (height × width)` : "On request"],
     ["Status", sold ? "In a private collection" : statusText(w)],
+    ...(SHOW_SHOWN_AT && shownAt.length ? [[SHOWN_AT_LABEL, shownAt.map((sh, i) => (
+      <span key={sh.id}>{i > 0 ? " · " : ""}<Link href={`/exhibitions#${sh.id}`}>{sh.name ?? sh.title}, {sh.year}</Link></span>
+    ))] as [string, React.ReactNode]] : []),
   ];
 
   const tabs = [
