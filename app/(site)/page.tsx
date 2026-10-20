@@ -132,7 +132,7 @@ export default function Home() {
         <div className="wrap ig-in">
           <div className="txt">
             <h2>Follow {INSTAGRAM.handle}, or ask about a painting</h2>
-            <p className="meta" style={{ fontSize: 16 }}>The paintings, the small stories behind them, and the shows they hung in.</p>
+            <p className="meta ig-sub">The paintings, the small stories behind them, and the shows they hung in.</p>
             <div className="ig-ctas">
               <a className="btn btn-solid" href={INSTAGRAM.url} target="_blank" rel="noopener noreferrer"><InstagramIcon />Open Instagram</a>
               <Link className="btn" href="/enquire">Enquire</Link>
