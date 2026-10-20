@@ -94,7 +94,8 @@
 .pp-text a.pp-back:hover{text-decoration:underline;text-underline-offset:4px}
 
 /* ==== R4 B3-1: /series = collage hero (450 at 1440x900) -> switcher -> five bands -> one Ask row ==== */
-@media (min-width:641px){ .wh.wh-dir .collage{height:clamp(420px,50svh,480px) !important} }
+/* R4 fix 4 (Brand P1-4): "heroes taller": 540 at 1440x900 (was 450, the shortest hero on the site); phones unchanged */
+@media (min-width:641px){ .wh.wh-dir .collage{height:clamp(500px,60svh,560px) !important} }
 .sband.band-white,.sband.band-indigo{padding-block:40px}
 .sband .srow.wrap{max-width:1360px;box-sizing:border-box}
 @media (min-width:761px){
@@ -261,3 +262,10 @@
 .chv-room figcaption{text-align:center;margin-top:12px;text-wrap:balance}
 @media (min-width:761px) and (max-width:1099px){ .chv-room img.room-img{width:min(100%,calc(clamp(320px,40vw,440px) * var(--ar)))} }
 @media (max-width:760px){ .chv-room img.room-img{width:100%} .so-pairs{gap:24px} }
+
+/* ==== R4 fix 4 (Brand P1-4, DC P2-2): hero label tiles. The wall starts with its label tiles whole (lib/drift settleHero);
+   as it drifts, a tile passing the header edge fades over 16 px and one passing the name box goes under a soft
+   halo in the wall's tone, so it reads as passing under the card, never as clipped. */
+.wh .collage{-webkit-mask-image:linear-gradient(180deg,transparent 0,#000 16px,#000 calc(100% - 48px),transparent) !important;
+                    mask-image:linear-gradient(180deg,transparent 0,#000 16px,#000 calc(100% - 48px),transparent) !important}
+.wh .wh-card.namecard{box-shadow:0 0 0 12px rgba(255,255,255,.72),0 0 28px 16px rgba(255,255,255,.55),var(--paper-shadow,0 0 0 transparent)}

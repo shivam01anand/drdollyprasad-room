@@ -7,7 +7,7 @@ import { LEAD, SERIES_PAGES, SMALL_PHOTO, worksIn } from "@/lib/site";
 import Marquee from "@/components/site/Marquee";
 import CollectionsSwitcher from "@/components/site/CollectionsSwitcher";
 import WallHero from "@/components/site/WallHero";
-import { SERIES_WALL } from "@/components/site/Collage";
+import { SERIES_HERO_WALL } from "@/components/site/Collage";
 
 export const metadata: Metadata = {
   title: "Collections",
@@ -23,7 +23,7 @@ export const metadata: Metadata = {
 export default function SeriesIndex() {
   return (
     <>
-      <WallHero size="dir" columns={SERIES_WALL} label="The five collections" eyebrow="Five collections" title="Her Collections" red="Collections"
+      <WallHero size="dir" columns={SERIES_HERO_WALL} label="The five collections" eyebrow="Five collections" title="Her Collections" red="Collections"
                 sub={<>The everyday, held <span className="red">sacred</span>, in five collections.</>}>
         <Link className="btn btn-solid" href="/series/recent-work">Start with the newest</Link>
       </WallHero>

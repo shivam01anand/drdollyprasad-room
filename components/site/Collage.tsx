@@ -81,6 +81,14 @@ export const SERIES_WALL: Item[][] = SERIES_PAGES.map((s) => [
   ...worksIn(s.label).map((w) => P(w.id)),
 ]);
 
+/**
+ * R4 fix 4 (Brand P1-4): the /series hero wall, seven columns. The two columns that drift behind the name box (3rd and
+ * 4th of 7) carry paintings only, so all five label tiles sit in the columns either side of the box. Same tiles,
+ * tones and labels; only the column order changes (newest first, left to right).
+ */
+const paintingsOnly = (col: Item[]) => { const p = col.filter((it) => it.k === "p"); const h = Math.ceil(p.length / 2); return [...p.slice(h), ...p.slice(0, h)]; };
+export const SERIES_HERO_WALL: Item[][] = [SERIES_WALL[0], SERIES_WALL[1], paintingsOnly(SERIES_WALL[2]), paintingsOnly(SERIES_WALL[3]), SERIES_WALL[2], SERIES_WALL[3], SERIES_WALL[4]];
+
 /** Works and About (CR-006): the same paintings, in another order, so every landing has its wall */
 export const WORKS_WALL: Item[][] = [...MIXED_WALL].reverse().map((c) => [...c].reverse());
 const ABOUT_BASE: Item[][] = [...MIXED_WALL.slice(3), ...MIXED_WALL.slice(0, 3)].map((c, i) => (i % 2 ? [...c].reverse() : c));
