@@ -6,7 +6,7 @@ import { dims } from "@/lib/images";
 import { swipe } from "@/lib/drift";
 import type { Photo } from "@/lib/site";
 import {
-  MOTION_EVENT, PHOTO_FADE_MS_REDUCED, PHOTO_HOLD_MS, PHOTO_ROLL_MS, PHOTO_ROLL_MS_REDUCED, REDUCED_KEEPS_MOVING, motionPaused,
+  MOTION_EVENT, PHOTO_FADE_MS_REDUCED, PHOTO_HOLD_MS, PHOTO_ROLL_MS, PHOTO_ROLL_MS_REDUCED, REDUCED_KEEPS_MOVING, STRIP_HOLD_MS, motionPaused,
 } from "@/lib/motion-rules";
 
 const sm = (src: string) => src.replace("/site/ex/", "/site/ex/sm/");
@@ -38,6 +38,7 @@ export default function ShowMedia({ photos, label }: { photos: Photo[]; label: s
   const hero = useRef<HTMLButtonElement>(null);
   const strip = useRef<HTMLDivElement>(null);
   const userAt = useRef(0); // when the visitor last touched or scrolled the strip
+  const ourScroll = useRef(0); // until when a scroll of the strip is our own (keep-in-view)
   const last = useRef(0);
   const n = photos.length;
   const p = photos[i];
@@ -94,13 +95,20 @@ export default function ShowMedia({ photos, label }: { photos: Photo[]; label: s
     const s = strip.current;
     if (!s) return;
     const mark = () => { userAt.current = performance.now(); setHeld((h) => h + 1); };
+    // any scroll we did not start ourselves is the visitor's (also covers scrollbars, keys and assistive tech)
+    const scrolled = () => {
+      const now = performance.now();
+      if (now < ourScroll.current) return;
+      if (now - userAt.current > 400) mark(); else userAt.current = now;
+    };
+    s.addEventListener("scroll", scrolled, { passive: true });
     s.addEventListener("pointerdown", mark);
     s.addEventListener("wheel", mark, { passive: true });
     s.addEventListener("touchstart", mark, { passive: true });
     s.addEventListener("keydown", mark);
     return () => {
       s.removeEventListener("pointerdown", mark); s.removeEventListener("wheel", mark);
-      s.removeEventListener("touchstart", mark); s.removeEventListener("keydown", mark);
+      s.removeEventListener("touchstart", mark); s.removeEventListener("keydown", mark); s.removeEventListener("scroll", scrolled);
     };
   }, []);
 
@@ -136,10 +144,11 @@ export default function ShowMedia({ photos, label }: { photos: Photo[]; label: s
     const s = strip.current;
     const b = s?.children[i] as HTMLElement | undefined;
     if (!s || !b) return;
-    if (performance.now() - userAt.current < PHOTO_HOLD_MS) return;
+    if (performance.now() - userAt.current < STRIP_HOLD_MS) return;
     const out = b.offsetLeft < s.scrollLeft || b.offsetLeft + b.offsetWidth > s.scrollLeft + s.clientWidth;
     if (!out) return;
     const left = b.offsetLeft - (s.clientWidth - b.offsetWidth) / 2;
+    ourScroll.current = performance.now() + 1000;
     s.scrollTo({ left: Math.max(0, left), behavior: reduced ? "auto" : "smooth" });
   }, [i, reduced]);
 

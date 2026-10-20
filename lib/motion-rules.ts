@@ -23,6 +23,8 @@ export const PHOTO_ROLL_MS_REDUCED = 5000;
 export const PHOTO_FADE_MS_REDUCED = 600;
 /** after a swipe, a tap or a scroll of the strip, the roll and the strip wait this long */
 export const PHOTO_HOLD_MS = 6000;
+/** after the visitor scrolls the strip by hand, the strip itself is left where they put it this long */
+export const STRIP_HOLD_MS = 12000;
 
 export function prefersReducedMotion() {
   return typeof matchMedia !== "undefined" && matchMedia("(prefers-reduced-motion: reduce)").matches;
