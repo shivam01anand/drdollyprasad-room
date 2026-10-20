@@ -128,6 +128,11 @@
   /* ---- R4 B2: switcher, Previous/Next pair, painting back link (type and colour) ---- */
   .csw-t,.csw-pn{font:500 14px/1.2 var(--sans) !important;color:var(--muted) !important;letter-spacing:0 !important;text-transform:none !important}
   .csw-i:hover .csw-t,.csw-i:focus-visible .csw-t,.csw-pn:hover,.csw-pn:focus-visible,.csw-i[aria-current="page"] .csw-t{color:var(--ink) !important}
+  .pnx-n,.pnx-k{font:400 14px/1.4 var(--sans) !important;color:var(--muted) !important;letter-spacing:0 !important;text-transform:none !important}
+  .pnx-t{font:500 36px/1.1 var(--serif) !important;color:var(--ink) !important}
+  .pnx-next .pnx-k{color:var(--muted-on-indigo) !important}
+  .pnx-next .pnx-t,.pnx-prev:hover .pnx-t,.pnx-prev:hover .pnx-k{color:#FFFFFF !important}
+  .pp-text a.pp-back{font:400 14px/1.45 var(--sans) !important;color:var(--muted) !important;letter-spacing:0 !important}
 
   @media (max-width:640px){
     .story-head h1{font-size:44px !important}
@@ -156,5 +161,8 @@
     .tl-year{font-size:16px !important}
     .sm-cap{height:calc(2em * 1.45) !important;-webkit-line-clamp:2 !important;line-clamp:2 !important}
     .fsel select,input,textarea,select{font-size:16px !important}
+  }
+  @media (max-width:760px){
+    .pnx-t{font-size:28px !important}
   }
 }

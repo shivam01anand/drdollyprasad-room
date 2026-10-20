@@ -3,7 +3,8 @@ import Link from "next/link";
 import IndigoBand from "@/components/site/IndigoBand";
 import { notFound } from "next/navigation";
 import { BY_ID, LARGE, SHOW, SITE, WORKS, inchDims, quoted, workPath, type Work } from "@/lib/works";
-import { INSTAGRAM, LOOK, NOW_SHOWING_CONFIRMED, PULL, SMALL_PHOTO, shownYear, statusText, STUDIO_PATH, WHATSAPP, WORDS, enquireHref, labelLine, seriesPath, whatsappHref, worksIn } from "@/lib/site";
+import { INSTAGRAM, LOOK, NOW_SHOWING_CONFIRMED, PULL, SERIES_BY_SLUG, SMALL_PHOTO, shownYear, statusText, STUDIO_PATH, WHATSAPP, WORDS, enquireHref, labelLine, neighbours, seriesPath, whatsappHref, worksIn } from "@/lib/site";
+import PrevNext from "@/components/site/PrevNext";
 import manifest from "@/public/art/manifest.json";
 import Card from "@/components/site/Card";
 import PaintingStage from "@/components/site/PaintingStage";
@@ -21,6 +22,7 @@ import { ChatIcon, InstagramIcon } from "@/components/site/Icons";
  */
 
 export const dynamicParams = false;
+
 export const generateStaticParams = () => WORKS.map((w) => ({ id: w.id }));
 
 type Props = { params: Promise<{ id: string }> };
@@ -51,9 +53,12 @@ export default async function WorkPage({ params }: Props) {
   const { id } = await params;
   const w = BY_ID.get(id);
   if (!w) notFound();
-  const at = WORKS.indexOf(w);
-  const prev = WORKS[(at - 1 + WORKS.length) % WORKS.length];
-  const next = WORKS[(at + 1) % WORKS.length];
+  // R4 B2-4: Previous/Next walk her chapter order inside the collection; at the ends they open the adjacent collection's story page
+  const nb = neighbours(id)!;
+  const coll = SERIES_BY_SLUG.get(nb.slug)!;
+  const end = (e: { id: string; crossesTo?: string }, dir: "Previous" | "Next") => e.crossesTo
+    ? { href: `/series/${e.crossesTo}`, kicker: `${dir} collection`, label: SERIES_BY_SLUG.get(e.crossesTo)!.label }
+    : { href: workPath(e.id), kicker: `${dir} painting`, label: BY_ID.get(e.id)!.title };
   const d = DIMS.get(id);
   const src = LARGE.has(id) ? `/art/large/${id}.jpg` : `/art/works/${id}.jpg`;
   const size = inchDims(w, d ? { w: d.w, h: d.h } : undefined);
@@ -106,7 +111,7 @@ export default async function WorkPage({ params }: Props) {
       <PaintingStage w={w} src={src} dims={d ? { w: d.w, h: d.h } : undefined}
                      small={!!d && Math.max(d.w, d.h) < 600} sub={labelLine(w)}>
         <div className="pp-text">
-          <Link className="pp-coll" href={seriesPath(w.series)}>{w.series}</Link>
+          <Link className="pp-back" href={`/series/${coll.slug}`}>‹ {coll.label}</Link>
           <h1 className="pp-title">{w.title}</h1>
           <p className="pp-facts">{[w.medium, w.size, shownYear(w)].filter(Boolean).join(" · ")}</p>
           {lead && <p className={words ? "pp-story" : "pp-story is-ours"}>{words ? `“${lead}”` : lead}</p>}
@@ -139,10 +144,8 @@ export default async function WorkPage({ params }: Props) {
         </IndigoBand>
       )}
 
-      <nav className="prevnext" aria-label="More of her work">
-        <Link href={workPath(prev.id)}><span>Previous</span><b>{prev.title}</b></Link>
-        <Link href={workPath(next.id)} className="nx"><span>Next</span><b>{next.title}</b></Link>
-      </nav>
+      <PrevNext label={`More from ${coll.label}`} count={`${nb.index + 1} of ${nb.total}`}
+                prev={end(nb.prev, "Previous")} next={end(nb.next, "Next")} />
 
       </div>
 

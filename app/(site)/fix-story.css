@@ -72,3 +72,22 @@
   .csw-in>.csw-pn:first-child{margin-right:0}
   .csw-in>.csw-pn:last-child{margin-left:0;padding-right:24px}
 }
+
+/* ---- R4 B2-3: Previous / Next pair (painting pager and story end) ---- */
+.pnx{margin:0;padding-block:28px}
+.pnx-n{text-align:center;margin:0 0 14px}
+.pnx-g{display:grid;grid-template-columns:1fr 1fr;gap:16px}
+.pnx-c{display:flex;flex-direction:column;justify-content:center;gap:8px;min-height:140px;padding:28px 32px;box-sizing:border-box;text-decoration:none}
+.pnx-prev{border:1px solid var(--ink);background:#FFFFFF}
+.pnx-next{background:#161E3A;border:1px solid #161E3A;text-align:right;align-items:flex-end}
+.pnx-prev:hover{background:var(--ink)}
+.pnx-next:hover{background:#1f2a52}
+@media (max-width:760px){
+  .pnx-g{grid-template-columns:1fr;gap:12px}
+  .pnx-next{order:-1}
+  .pnx-c{min-height:112px;padding:22px 20px}
+}
+
+/* ---- R4 B2-4: painting page back link to its collection ---- */
+.pp-text a.pp-back{display:inline-flex;align-items:center;min-height:44px;margin:-10px 0 -6px;text-decoration:none;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;max-width:100%}
+.pp-text a.pp-back:hover{text-decoration:underline;text-underline-offset:4px}
