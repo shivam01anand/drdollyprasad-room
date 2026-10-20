@@ -269,3 +269,7 @@
 .wh .collage{-webkit-mask-image:linear-gradient(180deg,transparent 0,#000 16px,#000 calc(100% - 48px),transparent) !important;
                     mask-image:linear-gradient(180deg,transparent 0,#000 16px,#000 calc(100% - 48px),transparent) !important}
 .wh .wh-card.namecard{box-shadow:0 0 0 12px rgba(255,255,255,.72),0 0 28px 16px rgba(255,255,255,.55),var(--paper-shadow,0 0 0 transparent)}
+
+/* R4 fix 7 (consultant P1-6): hero photograph tiles wait out of sight until their file arrives (components/site/WallDrift) */
+.wh .collage .xcard{transition:opacity .45s ease}
+.wh .collage .xcard.is-waiting{opacity:0}

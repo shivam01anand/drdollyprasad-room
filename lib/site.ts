@@ -400,7 +400,8 @@ export const NOW = {
   works: ["temple-bells", "boy-with-bananas"],
 };
 
-export const SHOWS: Show[] = [
+/** the shows as first recorded (the Exhibitions hero wall keeps this column order and its tones) */
+export const SHOWS_AS_RECORDED: Show[] = [
   {
     id: "india-habitat-centre-2010", title: "India Habitat Centre", kind: "Exhibition", where: "Open Palm Court, India Habitat Centre, New Delhi · November 2010",
     venue: "Open Palm Court, India Habitat Centre", city: "New Delhi", when: "November 2010", year: "2010",
@@ -473,6 +474,16 @@ export const SHOWS: Show[] = [
     ],
   },
 ];
+
+const MONTHS = ["january", "february", "march", "april", "may", "june", "july", "august", "september", "october", "november", "december"];
+/** a show's date as a number (year * 100 + the last month named in `when`), for newest-first order */
+export const showKey = (sh: { year: string; when: string }) => {
+  const m = sh.when.toLowerCase().match(new RegExp(MONTHS.join("|"), "g"));
+  return Number(sh.year) * 100 + (m ? MONTHS.indexOf(m[m.length - 1]) + 1 : 0);
+};
+/** R4 fix 7 (Brand P1-5, "latest first"): the one sorted source, newest first: Kala Mela 2018, India Habitat Centre
+ *  Nov 2010, A Lifetime to Paint June 2010, Triveni 2007. Every listing of the shows reads this. */
+export const SHOWS: Show[] = [...SHOWS_AS_RECORDED].sort((a, b) => showKey(b) - showKey(a));
 
 export const PRESS = {
   clipping: ph("delhi-times", "A Delhi Times clipping, Must See Must Do, listing Art Today And Tomorrow, a group show at Travancore Art Gallery."),

@@ -30,11 +30,12 @@ const PERSON = {
 const AVAILABLE = ["boy-with-bananas", "temple-bells", "bulls-and-wheel", "woman-with-poppies"];
 const IG = ["patterned-turban-portrait", "bulls-and-wheel", "temple-bells", "red-turban-portrait", "coins-and-clay-bank", "offering-of-light", "yellow-turban-portrait", "terracotta-pots", "boy-with-bananas", "red-and-teal-door-lock"];
 const now = NOW;
+// R4 fix 7 (Brand P1-5): "On the walls" reads newest first, in the one SHOWS order (Kala Mela first)
 const CARDS = [
   { id: "india-habitat-centre-2010", src: "/site/ex/ihc-03.jpg", alt: "Dr Dolly Prasad lights the lamp at the opening at India Habitat Centre" },
   { id: "a-lifetime-to-paint", src: "/site/ex/iccr-speech.jpg", alt: "Dr Dolly Prasad speaks at the opening of A Lifetime to Paint, ICCR" },
   { id: "kala-mela-2018", src: "/site/ex/kala-dolly.jpg", alt: "Dr Dolly Prasad beside her painting at the First International Kala Mela" },
-];
+].sort((a, b) => SHOWS.findIndex((x) => x.id === a.id) - SHOWS.findIndex((x) => x.id === b.id));
 
 export default function Home() {
   const total = SERIES_PAGES.reduce((n, s) => n + worksIn(s.label).length, 0);

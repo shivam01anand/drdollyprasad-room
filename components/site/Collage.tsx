@@ -1,6 +1,6 @@
 import Link from "next/link";
 import { BY_ID, workPath } from "@/lib/works";
-import { LOOK, SERIES_PAGES, worksIn, ON_EXHIBITIONS, ON_THE_WORK, PRESS, PULL, SHOWS, SMALL_PHOTO, labelLine } from "@/lib/site";
+import { LOOK, SERIES_PAGES, worksIn, ON_EXHIBITIONS, ON_THE_WORK, PRESS, PULL, SHOWS, SHOWS_AS_RECORDED, SMALL_PHOTO, labelLine } from "@/lib/site";
 import { dims, smSet } from "@/lib/images";
 import { thumb } from "./Card";
 import WallDrift from "./WallDrift";
@@ -109,7 +109,8 @@ export const ABOUT_WALL: Item[][] = ABOUT_BASE.map((col, i) => {
  * short lines about each show, the venues by name and the numbers from her record.
  * Everything here is from the site's own records (lib/site: SHOWS, PRESS, RECORD).
  */
-export const SHOW_WALL: Item[][] = SHOWS.map((sh, i) => [
+// the hero wall keeps its recorded column order and tones (R4 fix 7 sorts the page's listings, not the wall's art)
+export const SHOW_WALL: Item[][] = SHOWS_AS_RECORDED.map((sh, i) => [
   { k: "n", em: sh.when, title: sh.name ?? sh.title, sub: `${sh.venue}, ${sh.city}`, href: `#${sh.id}`, tone: TONE_CYCLE[i % TONE_CYCLE.length] } as Item,
   ...sh.albums.flatMap((al) => al.photos.map((ph) => X(ph.src, al.title, sh.title, sh.venue, ph.alt, `#${sh.id}`))),
   ...(sh.works ?? []).map((id) => P(id)),

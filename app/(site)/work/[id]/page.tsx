@@ -3,7 +3,7 @@ import Link from "next/link";
 import IndigoBand from "@/components/site/IndigoBand";
 import { notFound } from "next/navigation";
 import { BY_ID, LARGE, SHOW, SITE, WORKS, inchDims, quoted, workPath, type Work } from "@/lib/works";
-import { INSTAGRAM, LOOK, NOW_SHOWING_CONFIRMED, PULL, SERIES_BY_SLUG, SHOWS, SMALL_PHOTO, shownYear, statusText, STUDIO_PATH, WHATSAPP, WORDS, enquireHref, labelLine, neighbours, seriesPath, whatsappHref, worksIn } from "@/lib/site";
+import { INSTAGRAM, LOOK, NOW_SHOWING_CONFIRMED, PULL, SERIES_BY_SLUG, SHOWS, SMALL_PHOTO, showKey, shownYear, statusText, STUDIO_PATH, WHATSAPP, WORDS, enquireHref, labelLine, neighbours, seriesPath, whatsappHref, worksIn } from "@/lib/site";
 import PrevNext from "@/components/site/PrevNext";
 import manifest from "@/public/art/manifest.json";
 import Card from "@/components/site/Card";
@@ -30,12 +30,6 @@ const SHOWN_AT_LABEL = "Shown at";
 /** Chief Content 2c §1.5 FACT FLAG: these two are dated 2016 to 2018 but listed under IHC, November 2010.
  *  The row stays off for them until Mummy confirms (the data is not edited). */
 const SHOWN_AT_HOLD = new Set(["bulls-and-wheel", "coins-and-clay-bank"]);
-const MONTHS = ["january", "february", "march", "april", "may", "june", "july", "august", "september", "october", "november", "december"];
-/** newest first: year, then the last month named in `when` */
-const showKey = (sh: { year: string; when: string }) => {
-  const m = sh.when.toLowerCase().match(new RegExp(MONTHS.join("|"), "g"));
-  return Number(sh.year) * 100 + (m ? MONTHS.indexOf(m[m.length - 1]) + 1 : 0);
-};
 export const generateStaticParams = () => WORKS.map((w) => ({ id: w.id }));
 
 type Props = { params: Promise<{ id: string }> };

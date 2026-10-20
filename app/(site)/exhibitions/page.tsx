@@ -24,7 +24,7 @@ export default function Exhibitions() {
     <>
     <WallHero columns={SHOW_WALL} label="Her exhibitions" eyebrow="2005 to 2018" title="Her Exhibitions" red="Exhibitions"
               held="Eighteen exhibitions and art fairs, Delhi to Bombay: the things you walk past, hung where you stop.">
-      <a className="btn btn-solid" href="#india-habitat-centre-2010">See the shows</a>
+      <a className="btn btn-solid" href={`#${SHOWS[0].id}`}>See the shows</a>
       <a className="btn" href="#record">The full record</a>
     </WallHero>
     <div className="wrap">
@@ -43,9 +43,9 @@ export default function Exhibitions() {
       </Until>}
 
       <nav className="ex-index" aria-label="On this page">
-        {SHOWS.slice(0, 1).map((s) => <a key={s.id} href={`#${s.id}`}><span>{s.year}</span>{s.name ?? s.title}</a>)}
+        {/* R4 fix 7 (Brand P1-5): the shows newest first, then the press, then the record */}
+        {SHOWS.map((s) => <a key={s.id} href={`#${s.id}`}><span>{s.year}</span>{s.name ?? s.title}</a>)}
         <a href="#press"><span>Press</span>In the press</a>
-        {SHOWS.slice(1).map((s) => <a key={s.id} href={`#${s.id}`}><span>{s.year}</span>{s.name ?? s.title}</a>)}
         <a href="#record"><span>2005–18</span>The record</a>
       </nav>
 
@@ -81,9 +81,12 @@ export default function Exhibitions() {
                          )) : undefined} />
             </div>
           </section>
-          {/* In the press is the page's third section: right after India Habitat Centre, the show the interviews are from (QA P1-1) */}
-          {k === 0 && (
-            <section id="press" className="ex-press band-indigo" aria-labelledby="press-h">
+          </Fragment>
+        );
+      })}
+
+      {/* R4 fix 7 (Brand P1-5): In the press follows the four shows (it used to split them) */}
+      <section id="press" className="ex-press band-indigo" aria-labelledby="press-h">
         <span id="on-screen" aria-hidden="true" />
         <div className="sec-head">
           <div>
@@ -92,10 +95,6 @@ export default function Exhibitions() {
         </div>
         <PressRow items={PRESS_ALL} />
       </section>
-          )}
-          </Fragment>
-        );
-      })}
 
       <section id="record" className="ex-record">
         <div className="sec-head">
