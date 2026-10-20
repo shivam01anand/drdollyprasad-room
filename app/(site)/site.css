@@ -1,3 +1,4 @@
+/* Type, colour and case are owned by tokens.css (@layer final). Font-size, font-family, font-weight, letter-spacing, text-transform or text colour set here will NOT apply. */
 /* ==========================================================================
    Dr Dolly Prasad — the website (the studio lives at /studio with its own styles)
    Near-white ground, ink type, her paintings in thin black frames, line work
@@ -1646,7 +1647,6 @@ main + .divider{padding:clamp(36px,4vw,56px) var(--gut) clamp(28px,3vw,40px)}
   .ex-ch-year{font-size:28px}
   .ex-ch-head h2{font-size:31px}
   .ex-ch-where{margin-top:4px;font-size:15px}
-  .sm-hero{aspect-ratio:4/3}
   .sm-strip{gap:8px}
   .sm-strip button{width:calc((100% - 32px) / 5);min-width:44px}
 }
@@ -2002,7 +2002,6 @@ body *{font-style:normal !important}
 .ex-ch-body{padding-left:calc(clamp(64px,6vw,90px) + clamp(12px,2vw,28px));gap:clamp(20px,3vw,40px)}
 .ex-ch .ex-lede{font-size:16px;line-height:1.6}
 .ex-ch .ex-quote blockquote{font-size:20px}
-.sm-hero{aspect-ratio:16/10;max-height:380px}
 .sm-strip button{width:clamp(56px,5vw,72px)}
 @media (max-width:900px){ .ex-ch-body{padding-left:0} }
 .ex-press{padding-block:clamp(28px,3.4vw,44px)}
@@ -2022,7 +2021,6 @@ body *{font-style:normal !important}
   .press-open img{aspect-ratio:4/3;object-fit:cover;height:auto}
   .ex-ch-year{font-size:26px}
   .ex-ch-head h2{font-size:26px}
-  .sm-hero{aspect-ratio:4/3;max-height:280px}
 }
 @media (max-width:640px){
   .burger{width:44px;height:44px}

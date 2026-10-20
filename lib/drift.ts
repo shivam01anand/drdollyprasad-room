@@ -3,16 +3,27 @@
  * (Shubham, PR #11 review): every moving row or wall drifts gently on its own,
  * can be dragged with the mouse or swiped with a finger, lets a click or tap
  * open what is under it, and picks up its gentle motion again a moment after
- * it is let go. For anyone who has asked for reduced motion nothing moves by
- * itself, but dragging still works.
+ * it is let go. For anyone who has asked for reduced motion the rows and the
+ * wall drift at half speed and a drag stops where it is let go, with no
+ * coasting (lib/motion-rules; REDUCED_KEEPS_MOVING=false makes them still).
+ * The mouse wheel: a sideways wheel or trackpad swipe, or Shift + wheel, moves
+ * a row; a plain vertical wheel always scrolls the page.
  *
  * One clock per row (requestAnimationFrame), paused while off screen or in a
  * hidden tab. Transforms only, so nothing on the page shifts.
  */
 
+import { REDUCED_KEEPS_MOVING, REDUCED_SPEED, motionPaused } from "./motion-rules";
+
 const HOLD_MS = 1400; // how long a let-go row rests before it drifts again
 const RAMP_S = 1.6; // how long it takes to come back up to speed
 const SLOP = 6; // px a pointer must travel before a press becomes a drag
+const FLING = 1.6; // release velocity carried into the coast (Brand R1 #16: "fast scroll = fast")
+const COAST_K = 0.9; // how fast a fling slows (1/s); coast distance is about v0 / COAST_K
+const VMAX = 6000; // px/s
+const NOTCH = 8; // a mouse-wheel notch of d px adds d * NOTCH px/s of coast
+const VEL_WINDOW = 100; // ms of pointer samples the release velocity is measured over
+const clampV = (v: number) => Math.max(-VMAX, Math.min(VMAX, v));
 
 type Teardown = () => void;
 
@@ -27,6 +38,9 @@ function at(el: HTMLElement) {
 function reducedMotion() {
   return typeof matchMedia !== "undefined" && matchMedia("(prefers-reduced-motion: reduce)").matches;
 }
+/** under reduced motion: does it still move by itself (at REDUCED_SPEED), or stand still? */
+/** the footer's "Pause movement" stops all of it */
+const motionScale = (reduced: boolean) => (motionPaused() ? 0 : !reduced ? 1 : REDUCED_KEEPS_MOVING ? REDUCED_SPEED : 0);
 
 /** shared pointer handling: decides drag vs click, keeps clicks from firing after a drag */
 function grab(el: HTMLElement, h: {
@@ -38,7 +52,8 @@ function grab(el: HTMLElement, h: {
 }): Teardown {
   let id: number | null = null;
   let sx = 0, sy = 0, dragging = false, abandoned = false, isTouch = false;
-  let lastX = 0, lastT = 0, vx = 0;
+  let lastX = 0, lastT = 0;
+  let samples: [number, number][] = []; // [time, x] of the last VEL_WINDOW ms
   let swallow = false;
 
   el.dataset.grab = "";
@@ -48,7 +63,7 @@ function grab(el: HTMLElement, h: {
     if ((e.target as Element).closest?.("[data-grab]") !== el) return;
     id = e.pointerId; sx = e.clientX; sy = e.clientY; dragging = false; abandoned = false;
     isTouch = e.pointerType !== "mouse";
-    lastX = e.clientX; lastT = performance.now(); vx = 0;
+    lastX = e.clientX; lastT = e.timeStamp || performance.now(); samples = [[lastT, lastX]];
   };
   const move = (e: PointerEvent) => {
     if (e.pointerId !== id || abandoned) return;
@@ -63,10 +78,11 @@ function grab(el: HTMLElement, h: {
       el.classList.add("is-dragging");
       h.start();
     }
-    const now = performance.now();
-    const dt = Math.max(1, now - lastT);
-    vx = 0.75 * ((e.clientX - lastX) / dt) * 1000 + 0.25 * vx;
+    // the event's own time, not when it was delivered: a late pointermove must not look like a rest (review #2 R2-3)
+    const now = e.timeStamp || performance.now();
     lastX = e.clientX; lastT = now;
+    samples.push([now, lastX]);
+    while (samples.length > 2 && now - samples[0][0] > VEL_WINDOW) samples.shift();
     h.move(dx, h.twoAxis && !isTouch ? dy : 0, e);
   };
   const up = (e: PointerEvent) => {
@@ -77,7 +93,17 @@ function grab(el: HTMLElement, h: {
     el.classList.remove("is-dragging");
     swallow = true; // the click that follows a drag is not a click
     setTimeout(() => { swallow = false; }, 0);
-    h.end(performance.now() - lastT > 90 ? 0 : vx);
+    // a finger that rested before letting go does not fling; otherwise the speed over the last 100 ms
+    // (not a running average, so a quick flick with a slow first frame is read in full)
+    const [t0, x0] = samples[0];
+    const span = lastT - t0;
+    const vx = span >= 8 ? ((lastX - x0) / span) * 1000 : 0;
+    // a rest is a pointer that held still: time since the last move (both on event time) AND no travel since it.
+    // A fast drag (3+ samples, over 800 px/s) whose last move came in late always coasts.
+    const tUp = e.timeStamp || performance.now();
+    const still = Math.abs(e.clientX - lastX) < 2;
+    const rested = still && tUp - lastT > 120 && !(samples.length >= 3 && Math.abs(vx) > 800 && tUp - lastT < 200);
+    h.end(rested ? 0 : vx);
   };
   const click = (e: MouseEvent) => { if (swallow) { e.preventDefault(); e.stopPropagation(); swallow = false; } };
   const noDrag = (e: DragEvent) => e.preventDefault();
@@ -128,7 +154,8 @@ export function driftRow(view: HTMLElement, track: HTMLElement, o: { seconds: nu
   let loop = 1;
   let x = 0, v = 0, speed = 0;
   let holdUntil = 0, held = false, hover = false, focus = false;
-  let still = reducedMotion();
+  let reduced = reducedMotion();
+  let lastWheel = 0;
 
   const measure = () => {
     loop = Math.max(1, track.scrollWidth / o.copies);
@@ -148,10 +175,11 @@ export function driftRow(view: HTMLElement, track: HTMLElement, o: { seconds: nu
 
   const stopClock = clock(view, (dt, now) => {
     if (held) return;
-    const resting = now < holdUntil || hover || focus || still;
-    const target = resting ? 0 : dir * speed;
-    // a fling slows over about half a second; the drift returns over RAMP_S
-    const k = Math.abs(v) > speed * 1.2 ? 3.2 : 1 / RAMP_S * 2.2;
+    const scale = motionScale(reduced);
+    const resting = now < holdUntil || hover || focus || scale === 0;
+    const target = resting ? 0 : dir * speed * scale;
+    // a fling coasts and slows gently (COAST_K); the drift returns over RAMP_S
+    const k = Math.abs(v) > speed * 1.2 ? COAST_K : 1 / RAMP_S * 2.2;
     v += (target - v) * Math.min(1, dt * k);
     x += v * dt;
     wrap();
@@ -162,15 +190,30 @@ export function driftRow(view: HTMLElement, track: HTMLElement, o: { seconds: nu
   const stopGrab = grab(view, {
     start() { held = true; x0 = x; v = 0; },
     move(dx) { x = x0 + dx; wrap(); x0 = x - dx; paint(); },
-    end(vx) { held = false; v = Math.max(-2600, Math.min(2600, vx)); holdUntil = performance.now() + HOLD_MS; },
+    // under reduced motion a drag stops where it is let go
+    end(vx) { held = false; v = reduced ? 0 : clampV(vx * FLING); holdUntil = performance.now() + HOLD_MS; },
   });
 
-  // a trackpad's sideways swipe moves the row too
+  // the wheel: a trackpad's sideways swipe (or a sideways wheel) moves the row by exactly its own
+  // distance (the trackpad brings its own momentum); Shift + a mouse wheel moves it and a notch
+  // flings it, so turning the wheel fast goes fast. A plain vertical wheel is always the page's.
   const wheel = (e: WheelEvent) => {
-    if (Math.abs(e.deltaX) <= Math.abs(e.deltaY)) return;
+    const horiz = Math.abs(e.deltaX) > Math.abs(e.deltaY);
+    if (!horiz && !e.shiftKey) return;
+    let d = horiz ? e.deltaX : e.deltaY;
+    d *= e.deltaMode === 1 ? 16 : e.deltaMode === 2 ? view.clientWidth : 1;
+    if (!d) return;
     e.preventDefault();
-    x -= e.deltaX; wrap(); paint(); v = 0;
-    holdUntil = performance.now() + HOLD_MS;
+    x -= d; wrap(); paint();
+    const now = performance.now();
+    const notch = e.deltaMode !== 0 || Math.abs(d) >= 50; // a mouse-wheel notch, not a trackpad's stream
+    if (reduced || !notch) v = 0;
+    else {
+      const same = now - lastWheel < 300 && Math.sign(v) === Math.sign(-d);
+      v = clampV((same ? v : 0) - d * NOTCH);
+    }
+    lastWheel = now;
+    holdUntil = now + HOLD_MS;
   };
   view.addEventListener("wheel", wheel, { passive: false });
 
@@ -195,7 +238,7 @@ export function driftRow(view: HTMLElement, track: HTMLElement, o: { seconds: nu
   view.addEventListener("focusout", fout);
 
   const mq = matchMedia("(prefers-reduced-motion: reduce)");
-  const onMq = () => { still = mq.matches; };
+  const onMq = () => { reduced = mq.matches; };
   mq.addEventListener("change", onMq);
 
   view.classList.add("is-live");
@@ -224,7 +267,7 @@ export function driftWall(cols: HTMLElement, o: { swaySeconds?: number } = {}): 
   let amp = 0; // px, negative
   let p = 0; // sway phase, 0..2 (0→1 out, 1→2 back)
   let x = 0, scale = 1, holdUntil = 0, held = false, hover = false;
-  let still = reducedMotion();
+  let reduced = reducedMotion();
 
   const measure = () => {
     const d = parseFloat(getComputedStyle(cols).getPropertyValue("--drift")) || 0;
@@ -247,11 +290,12 @@ export function driftWall(cols: HTMLElement, o: { swaySeconds?: number } = {}): 
   };
 
   const stopClock = clock(cols, (dt, now) => {
-    if (held || still) return;
+    const m = motionScale(reduced);
+    if (held || m === 0) return;
     // a painting under the mouse holds the wall still while it is lifted (CR-005), then it eases off again
     if (now < holdUntil) return;
     scale = Math.min(1, scale + dt / RAMP_S);
-    const k = scale * scale * (3 - 2 * scale);
+    const k = scale * scale * (3 - 2 * scale) * m;
     p = (p + (dt * k) / sway) % 2;
     x = amp * ease(p < 1 ? p : 2 - p);
     for (const s of st) { s.y += (s.down ? 1 : -1) * (s.h / s.dur) * dt * k; wrapY(s); }
@@ -285,7 +329,7 @@ export function driftWall(cols: HTMLElement, o: { swaySeconds?: number } = {}): 
   cols.addEventListener("pointerout", out);
 
   const mq = matchMedia("(prefers-reduced-motion: reduce)");
-  const onMq = () => { still = mq.matches; };
+  const onMq = () => { reduced = mq.matches; };
   mq.addEventListener("change", onMq);
 
   cols.classList.add("is-live");

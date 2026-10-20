@@ -1,3 +1,4 @@
+/* Type, colour and case are owned by tokens.css (@layer final). Font-size, font-family, font-weight, letter-spacing, text-transform or text colour set here will NOT apply. */
 /* Tech team: about (20 Oct night). Only this team edits this file. */
 
 /* 1 · About, first block: a balanced two-column block, portrait left, text centred beside it, no dead area (laptop) */
@@ -27,12 +28,6 @@
 .timeline>li{grid-template-columns:96px 1fr}
 .tl-year{padding-top:11px}
 
-/* 5 · Exhibitions chapters: text centred against the photograph; the photo is as tall as it is, so caption gaps are even */
-@media (min-width:901px){
-  .ex-ch-body{align-items:center}
-}
-.sm-hero{aspect-ratio:auto !important;height:auto;max-height:none !important}
-.sm-hero img{max-height:380px;max-width:100%;width:auto;height:auto}
 .sm-media{gap:14px}
 .sm-cap{margin:0}
 

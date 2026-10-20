@@ -1,0 +1,29 @@
+/* Type, colour and case are owned by tokens.css (@layer final). Font-size, font-family, font-weight, letter-spacing, text-transform or text colour set here will NOT apply. */
+/* Night polish, 20 Oct 2026 (COO, for Shubham's morning review). Loaded last. One consistent type + alignment layer. */
+
+/* numerals: lining everywhere, so a year never shows a tall old-style 6 or 0 */
+html,body,*{font-variant-numeric:lining-nums;font-feature-settings:"lnum" 1,"kern" 1}
+
+/* exhibitions: the photograph rolls, the strip scrolls by hand */
+/* the stage has one fixed height (Brand R1 #3; Tech T2): its width is the column (container units), so a
+   portrait after a landscape never changes the block and nothing below it moves. The frame hugs the photograph. */
+.sm-media{container-type:inline-size}
+.sm-hero{aspect-ratio:auto !important;width:100%;height:min(clamp(320px,32vw,440px),66.667cqw) !important;min-height:0 !important;max-height:none !important;
+  display:grid !important;grid-template:minmax(0,1fr) / minmax(0,1fr);place-items:center;background:transparent;touch-action:pan-y}
+.sm-hero img{grid-area:1/1;max-height:100% !important;max-width:100% !important;width:auto;height:auto;object-fit:contain;animation:smIn .5s ease both}
+@media (max-width:640px){ .sm-hero{height:min(66vw,280px) !important} }
+/* the caption keeps a two-line box (longer sentences are clamped; the full sentence is the photograph's alt) */
+.sm-cap{display:-webkit-box;-webkit-box-orient:vertical;-webkit-line-clamp:2;line-clamp:2;overflow:hidden;height:calc(2em * 1.6);margin:0}
+@media (max-width:640px){ .sm-cap{height:calc(2em * 1.55)} }
+@keyframes smIn{from{opacity:.0}to{opacity:1}}
+.sm-strip{flex-wrap:nowrap !important;overflow-x:auto;overscroll-behavior-x:contain;-webkit-overflow-scrolling:touch;scrollbar-width:none;scroll-behavior:auto;padding:3px 3px 6px;margin-inline:-3px;touch-action:pan-x pan-y}
+.sm-strip::-webkit-scrollbar{display:none}
+.sm-strip button{flex:none !important;width:clamp(64px,6vw,84px) !important;aspect-ratio:4/3;min-height:0 !important}
+@media (max-width:640px){ .sm-strip button{width:68px !important;min-width:0 !important} }
+/* "Reduce motion" (lib/motion-rules, Brand R1 #2): no slide or zoom; the old photograph crossfades into the new one */
+.sm-hero img.sm-out{pointer-events:none}
+@keyframes smOut{from{opacity:1}to{opacity:0}}
+@media (prefers-reduced-motion:reduce){
+  .sm-hero img{animation:smIn var(--sm-fade,600ms) linear both}
+  .sm-hero img.sm-out{animation:smOut var(--sm-fade,600ms) linear both}
+}

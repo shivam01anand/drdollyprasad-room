@@ -50,7 +50,7 @@ export default function SeriesIndex() {
               <div className="s-txt">
                 <span className="s-n">{String(i + 1).padStart(2, "0")}</span>
                 <h2><Link href={`/series/${s.slug}`}>{s.label}</Link></h2>
-                <span className="eyebrow">{s.period} · {works.length} works</span>
+                <span className="eyebrow">{works.length} works · {s.period}</span>
                 <p className="s-line">{s.line}</p>
                 <Link className={i % 2 ? "btn btn-light" : "btn"} href={`/series/${s.slug}`}>Read the story</Link>
               </div>

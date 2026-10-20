@@ -40,10 +40,10 @@ export default function Home() {
   const total = SERIES_PAGES.reduce((n, s) => n + worksIn(s.label).length, 0);
   return (
     <>
-      <WallHero columns={HOME} label="Dr Dolly Prasad" size="home" face={PORTRAIT} eyebrow="Oil on canvas · New Delhi"
+      <WallHero columns={HOME} label="Dr Dolly Prasad" size="home" face={PORTRAIT} eyebrow="Paintings in oil · New Delhi"
                 title="Dr Dolly Prasad" red="Dolly" sub={<>The everyday, held <span className="red">sacred</span>.</>}>
         <Link className="btn btn-solid" href="/works">See all {total} works</Link>
-        <a className="btn" href={STUDIO_PATH}>Walk through the studio</a>
+        <a className="btn" href={STUDIO_PATH}><span className="lbl-wide">Walk through the studio</span><span className="lbl-phone">Enter the studio</span></a>
       </WallHero>
 
       {NOW_SHOWING_CONFIRMED && <Until until={now.until}>
@@ -57,7 +57,6 @@ export default function Home() {
         <div className="sec-head">
           <div>
             <h2>Key collections</h2>
-            <p className="sec-line">The ordinary days were the good ones. Five collections of a changing India, looked at twice.</p>
           </div>
           <Link className="link" href="/series">All collections →</Link>
         </div>
@@ -72,7 +71,6 @@ export default function Home() {
             </div>
             <span className="card-t">{s.label}</span>
             <span className="meta">{worksIn(s.label).length} works · {s.period}</span>
-            <span className="meta">{s.line}</span>
           </Link>
         ))}
       </Marquee>
@@ -95,7 +93,7 @@ export default function Home() {
         <div className="sec-head">
           <div>
             <h2>On the walls</h2>
-            <p className="sec-line">Eighteen exhibitions and art fairs, 2005 to 2018: India Habitat Centre, ICCR, the First International Kala Mela, and the people who came to look.</p>
+            <p className="sec-line">Eighteen exhibitions and art fairs, 2005 to 2018.</p>
           </div>
           <Link className="link" href="/exhibitions">All exhibitions →</Link>
         </div>
@@ -120,7 +118,7 @@ export default function Home() {
         <div className="sec-head">
           <div>
             <h2>Available now</h2>
-            <p className="sec-line">Originals still with the artist. Prices on request.</p>
+            <p className="sec-line">Originals still with the artist.</p>
           </div>
           <Link className="link" href="/works?status=available">All available →</Link>
         </div>
@@ -134,7 +132,7 @@ export default function Home() {
         <div className="wrap ig-in">
           <div className="txt">
             <h2>Follow {INSTAGRAM.handle}, or ask about a painting</h2>
-            <p className="meta" style={{ fontSize: 16 }}>The paintings, the small stories behind them, and the shows they hung in.</p>
+            <p className="meta ig-sub">The paintings, the small stories behind them, and the shows they hung in.</p>
             <div className="ig-ctas">
               <a className="btn btn-solid" href={INSTAGRAM.url} target="_blank" rel="noopener noreferrer"><InstagramIcon />Open Instagram</a>
               <Link className="btn" href="/enquire">Enquire</Link>

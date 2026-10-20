@@ -1,7 +1,7 @@
 "use client";
 
 import dynamic from "next/dynamic";
-import { useCallback, useRef, useState } from "react";
+import { useCallback, useEffect, useRef, useState } from "react";
 import { roomsFor, type RoomView } from "@/lib/rooms";
 import { inchDims, type Work } from "@/lib/works";
 import { paintingProperties, track } from "@/lib/analytics";
@@ -25,6 +25,10 @@ export default function PaintingStage({ w, src, dims, small, sub, children }: {
   const rooms: RoomView[] = dims ? roomsFor(w, dims.w / dims.h, { pilot: true }) : [];
   const [view, setView] = useState<View>({ k: "full" });
   const [zoom, setZoom] = useState(false);
+  // the frame stays invisible until the picture is there, so no empty black box shows first
+  const art = useRef<HTMLImageElement>(null);
+  const [ready, setReady] = useState(false);
+  useEffect(() => { const im = art.current; setReady(!im || (im.complete && im.naturalWidth > 0)); }, [view.k, src]);
   const strip = useRef<HTMLDivElement>(null);
   const open = useCallback(() => { track("painting_zoomed", paintingProperties(w)); setZoom(true); }, [w]);
   const name = nameOf(w);
@@ -53,7 +57,11 @@ export default function PaintingStage({ w, src, dims, small, sub, children }: {
         {view.k === "full" && (
           <button type="button" className="pp-art" onClick={open} aria-label={`Zoom ${w.title}`}>
             {/* eslint-disable-next-line @next/next/no-img-element */}
-            <img src={src} alt={name} width={dims?.w} height={dims?.h} fetchPriority="high" className={small ? "is-small" : undefined} />
+            {/* --ar reserves the picture's box before it loads (no blip, CLS): see fix-tech.css */}
+            <img ref={art} src={src} alt={name} width={dims?.w} height={dims?.h} loading="eager" fetchPriority="high" decoding="async"
+                 onLoad={() => setReady(true)}
+                 className={[small ? "is-small" : "", ready ? "" : "is-loading"].filter(Boolean).join(" ") || undefined}
+                 style={dims ? { ["--ar" as string]: `${dims.w} / ${dims.h}` } : undefined} />
           </button>
         )}
         {view.k === "detail" && (

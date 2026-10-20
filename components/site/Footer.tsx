@@ -2,6 +2,7 @@ import Link from "next/link";
 import { EMAIL, INSTAGRAM, PORTRAIT, STUDIO_PATH, WHATSAPP, whatsappHref } from "@/lib/site";
 import { InstagramIcon } from "./Icons";
 import FloatAsk from "./FloatAsk";
+import MotionToggle from "./MotionToggle";
 
 export default function Footer() {
   return (
@@ -16,13 +17,14 @@ export default function Footer() {
           </div>
         </div>
         <nav className="ftr-links" aria-label="Contact">
-          <Link className="btn btn-solid" href="/enquire">Enquire</Link>
+          <Link href="/enquire">Enquire</Link>
           {WHATSAPP && <a href={whatsappHref()}>WhatsApp</a>}
           <a href={`mailto:${EMAIL}`}>{EMAIL}</a>
           <a className="ftr-ig" href={INSTAGRAM.url} target="_blank" rel="noopener noreferrer" aria-label={`Instagram ${INSTAGRAM.handle}`}>
             <InstagramIcon /><span>{INSTAGRAM.handle}</span>
           </a>
           <a href={STUDIO_PATH}>Walk through the studio</a>
+          <MotionToggle />
         </nav>
       </div>
       <div className="wrap" style={{ paddingBottom: 18 }}>

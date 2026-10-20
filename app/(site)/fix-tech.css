@@ -1,0 +1,212 @@
+/* Type, colour and case are owned by tokens.css (@layer final). Font-size, font-family, font-weight, letter-spacing, text-transform or text colour set here will NOT apply. */
+/* Technical team, website review #1 builds (B1 stability, B2 rows and motion), 20-21 Oct 2026.
+   Loaded last. Only the Technical team edits this file; it folds into tokens.css / site.css in B3 (T21, T24). */
+
+/* ---- B1 · painting page: the picture's box is reserved before it loads (T3; Brand R1 #7) ----
+   The <img> carries --ar (its width / height) from PaintingStage. A definite width from the same height caps
+   as before gives the same final size (±1 px), so nothing jumps when it decodes. --fp = frame + mat, both sides. */
+.pp-art{width:max-content;max-width:100%}
+.pp-art img{--fp:36px;aspect-ratio:auto var(--ar);height:auto !important;max-height:none !important;max-width:100% !important;
+  width:min(1100px,calc((min(72svh,780px) - var(--fp)) * var(--ar) + var(--fp))) !important}
+.pp-art img.is-small{width:min(1100px,calc((min(360px,60svh) - var(--fp)) * var(--ar) + var(--fp))) !important}
+@media (max-width:640px){
+  .pp-art img{--fp:20px;width:min(calc(100vw - 40px),calc((min(46svh,430px) - var(--fp)) * var(--ar) + var(--fp))) !important}
+  .pp-art img.is-small{width:min(calc(100vw - 40px),calc((min(300px,40svh) - var(--fp)) * var(--ar) + var(--fp))) !important}
+}
+/* until the picture is there its frame, mat and shadow are not drawn (no empty black square first) */
+.pp-art img.is-loading{border-color:transparent !important;background:transparent !important;box-shadow:none !important}
+
+/* ---- B1 · shadows are never cut by a box edge (T5; Brand R1 #6) ----
+   .card .mat clipped its own picture's shadow (More from…, grids); the only reason was the hover lift, which reads better unclipped. */
+.card .mat{overflow:visible}
+/* Collections bands: the row's window edge sat on the column line and cut the shadow of the first card with a hard
+   vertical line. The window now starts --fade into the gutter and fades over it, so the shadow dissolves instead. */
+@media (min-width:761px){
+  .sband .band-marq{--fade:24px;padding-left:var(--fade) !important;margin-left:calc(-1 * var(--fade)) !important;
+    -webkit-mask-image:linear-gradient(90deg,transparent 0,#000 var(--fade),#000 calc(100% - var(--fade)),transparent);
+            mask-image:linear-gradient(90deg,transparent 0,#000 var(--fade),#000 calc(100% - var(--fade)),transparent)}
+  /* review #2 R2-2: the track starts a further --fade in, so the first painting is clear of the fade at rest and only fades while passing the edge */
+  .sband .band-marq .marq-track{padding-left:var(--fade) !important}
+}
+
+/* ---- B2 · rows share one straight line (T4; Brand R1 #1, Shubham's #1 ask "pictures in a straight line") ----
+   Each card stretches to the row's height; its mat takes the free space and sits the picture on the bottom,
+   so every picture bottom and every title top in a row line up. At <=1000 px a title may wrap, so the title
+   keeps a two-line box there (on desktop titles fit one line and the tight look stays). */
+.marq-set{align-items:stretch}
+.marq-set>.card,#more-from .grid>.card,.grid-5>.card{align-self:stretch}
+.marq-set>.card>.mat,#more-from .grid>.card>.mat,.grid-5>.card>.mat{flex:1 1 auto !important;display:flex !important;align-items:flex-end !important;justify-content:center;height:auto !important}
+@media (max-width:1000px){ .marq-set>.card>.card-t,#more-from .card-t,.grid-5 .card-t{min-height:2.3em !important;text-wrap:balance}
+  .grid-5 .card-t{min-height:2.4em !important} /* two title lines at line-height 1.2 are 2.4em: a wrapped title no longer drops its row by 2 px (review #2 R2-4) */ }
+/* Home, Key collections: one count line under each title, one line box (the 2-line description is cut, C17) */
+.series-tiles .m-card .meta{display:-webkit-box !important;-webkit-box-orient:vertical;-webkit-line-clamp:1;line-clamp:1;overflow:hidden;min-height:1.4em}
+/* collection pages, chapter pictures: picture and caption share rows across the chapter (subgrid),
+   pictures on one bottom line whatever the caption length */
+.chap-works:not(.n1){align-items:stretch}
+.chap-works>figure{display:grid;grid-row:span 2;grid-template-rows:subgrid;row-gap:8px}
+.chap-works>figure>a{align-self:end}
+@media (max-width:760px){ .chap-works.n3>figure,.chap-works.n4>figure{display:flex;justify-content:flex-end} }
+
+/* ---- B2 · Works grid: one bottom line per row, no fixed tall box (T6 option A; Brand R1 #20) ----
+   Each card spans four subgrid rows (picture, title, meta, status), so a row's picture track is as tall as
+   its tallest picture and every title in the row starts on one line. The explicit width (from --ar) keeps
+   lazy pictures from collapsing to 0 x 0 before they load, and reserves their space. */
+.pf-grid.works-grid{row-gap:32px !important}
+.pf-grid.works-grid .card{display:grid !important;grid-row:span 4;grid-template-rows:subgrid;row-gap:4px;align-self:stretch !important}
+.pf-grid.works-grid .mat{aspect-ratio:auto !important;align-items:flex-end !important}
+.pf-grid.works-grid .mat img{width:min(calc(100cqw - 24px),calc((125cqw - 34px) * var(--ar))) !important;height:auto !important;max-width:none !important;max-height:none !important;aspect-ratio:var(--ar)}
+@media (max-width:640px){
+  .pf-grid.works-grid .mat img{width:min(calc(100cqw - 12px),calc((125cqw - 22px) * var(--ar))) !important}
+}
+
+/* ---- B2 · phone cards: "36 × 48 in · 2018" on one line, status under it (T12; Brand R1 #23) ---- */
+.card .meta-parts{flex-direction:row !important}
+.card-t{hyphens:none;-webkit-hyphens:none}
+
+/* Home Instagram roll (Design Control, extends T5): its clip box cut the frames' shadow with a hard left and bottom edge.
+   More room below and above, and the two ends fade over 24 px instead of cutting. */
+.ig-roll{padding-block:24px 40px !important;margin-block:-24px -40px !important;
+  -webkit-mask-image:linear-gradient(90deg,transparent 0,#000 24px,#000 calc(100% - 24px),transparent) !important;
+          mask-image:linear-gradient(90deg,transparent 0,#000 24px,#000 calc(100% - 24px),transparent) !important}
+
+/* ---- B3 · header (4-REVIEW1-DECISION 3.7): 92 px on >=768 (28 band + 64 bar); no compacting on scroll.
+   The ornament band scrolls away with the page (sticky top is minus the band), so only the 64 px bar stays. ---- */
+:root{--hdr-h:63px;--hdr-bar:63px}
+@media (min-width:768px){
+  :root{--band:28px;--hdr-h:92px;--hdr-bar:64px}
+  .band-top{margin-top:0 !important}
+  .hdr{top:calc(-1 * var(--band)) !important}
+  .hdr-in,.is-scrolled .hdr-in{min-height:64px !important;padding-block:6px !important;box-sizing:border-box;transition:none !important}
+  .brand img,.is-scrolled .brand img{width:48px !important;height:48px !important;transition:none !important}
+  .brand-t i,.is-scrolled .brand-t i{opacity:1 !important;max-height:20px !important;transition:none !important}
+  .brand-t b{transition:none !important}
+}
+.hdr{background:rgba(255,255,255,.96) !important}
+.ex-ch,.sband,[id]{scroll-margin-top:calc(var(--hdr-bar) + 16px)}
+
+/* ---- B4 · painting page (4-REVIEW1-DECISION 4.1; T7). The text, the Enquire button and the links now sit inside
+   PaintingStage, so on a laptop they can stand beside the picture. ---- */
+.pp-text a.pp-coll,.pp-text p.pp-attr,.pp-text p.pp-price{font:400 14px/1.45 var(--sans) !important;color:var(--muted) !important;letter-spacing:0;margin:0}
+.pp-text a.pp-coll{text-decoration:none}
+.pp-text a.pp-coll:hover{text-decoration:underline;text-underline-offset:4px}
+.pp-text p.pp-story{display:-webkit-box !important;-webkit-box-orient:vertical;-webkit-line-clamp:4 !important;line-clamp:4;overflow:hidden;margin:4px 0 0 !important}
+.pp-text p.pp-status{margin:0}
+.pp-ctas .btn-solid{flex:1 1 100%;justify-content:center}
+@media (min-width:1100px){
+  .pp{display:grid !important;grid-template-columns:auto minmax(0,1fr) 380px;grid-template-areas:"stage stage text" "strip bar text";
+    column-gap:24px;row-gap:12px;max-width:1320px;margin-inline:auto;align-items:center;padding-inline:var(--gut)}
+  .pp-stage{grid-area:stage;min-height:0 !important;justify-content:center}
+  .pp-strip{grid-area:strip;margin:0 !important;padding:2px !important;justify-self:start}
+  .pp-bar{grid-area:bar;margin:0 !important;justify-content:flex-end;justify-self:end}
+  .pp>.pp-text{grid-area:text;align-self:center;margin:0 0 0 32px !important;max-width:none;text-align:left;align-items:flex-start;gap:10px}
+  .pp-text .side-small{justify-content:flex-start}
+  .pp-chip{width:56px !important;height:56px !important}
+  /* no min(100%, …) here: a percentage inside the width of a max-content box is cyclic and reads as 0 on first layout
+     (the picture painted 36 px square, then jumped: CLS 0.21-0.25). max-width:100% caps it instead. */
+  .pp-art img{width:calc((min(calc(100svh - var(--hdr-h,92px) - 140px),760px) - var(--fp)) * var(--ar) + var(--fp)) !important;max-width:100% !important}
+  .pp-art img.is-small{width:calc((420px - var(--fp)) * var(--ar) + var(--fp)) !important}
+  .pp-room{width:min(100%,900px,calc((100svh - var(--hdr-h,92px) - 140px) * 1.5)) !important}
+  .pp-detail-in{width:min(100%,760px) !important;max-height:calc(100svh - var(--hdr-h,92px) - 140px) !important}
+}
+@media (max-width:640px){
+  .pp-strip{order:1;justify-content:center}
+  .pp-bar{order:2;display:grid !important;grid-template-columns:1fr 1fr;gap:8px;width:100%}
+  .pp-bar>button{width:100%}
+  .pp-bar>button:only-child{grid-column:1 / -1}
+  .pp>.pp-text{order:3}
+  .pp-chip{width:44px !important;height:44px !important}
+  .pp-art img{border-width:4px !important;padding:3px !important;--fp:14px}
+  .pp-text a.pp-coll,.pp-text p.pp-attr,.pp-text p.pp-price{font-size:13px !important}
+}
+
+/* ---- B4 copy (C12): the Exhibitions end band is title + buttons on one row ---- */
+.next-series .ask:not(:has(.meta)){display:flex !important;flex-direction:row !important;flex-wrap:wrap;align-items:center;justify-content:space-between;gap:16px 24px}
+@media (max-width:640px){ .next-series .ask:not(:has(.meta)){flex-direction:column !important;align-items:flex-start} }
+
+/* ---- B2 follow-up: at 641-1000 px the card meta can wrap to two lines ("Oil on canvas · 36 × 48 in · 2018"),
+   which pushed one picture up by a line in More from (768: 20 px). The meta keeps a two-line box there;
+   phone chapter swipes keep a two-line caption box so their pictures share a bottom line. ---- */
+@media (min-width:641px) and (max-width:1000px){ .marq-set>.card>.meta,#more-from .card .meta,.grid-5 .card .meta{min-height:2.8em} }
+@media (max-width:760px){ .chap-works.n3 figcaption,.chap-works.n4 figcaption{min-height:2.8em} }
+
+/* C23: the Home hero pair on a phone says "Enter the studio" (desktop keeps "Walk through the studio") */
+.lbl-phone{display:none}
+@media (max-width:640px){ .lbl-wide{display:none} .lbl-phone{display:inline} }
+
+/* ---- B4 · Collections tile row (4-REVIEW1-DECISION 4.2): kept, smaller, styled like every other card, and each tile
+   jumps to its band on the page (instant, no smooth-scroll). ---- */
+.five-stage{aspect-ratio:auto !important;height:200px;background:#FFFFFF !important;align-self:stretch}
+.five-stage img{border:4px solid var(--frame);box-shadow:0 10px 24px -10px rgba(0,0,0,.28)}
+.five-b{align-items:center;text-align:center}
+.five-b:hover .five-t{color:inherit !important;text-decoration:underline;text-underline-offset:4px;text-decoration-thickness:1px}
+html:has(.five){scroll-behavior:auto}
+.sband{scroll-margin-top:calc(var(--hdr-bar,64px) + 16px)}
+@media (max-width:760px){
+  .five-stage{height:132px}
+  .five{scroll-snap-type:x proximity !important;margin-inline:calc(-1 * var(--gut)) !important;padding-inline:var(--gut) !important;scroll-padding-inline:var(--gut)}
+  .five>li{flex:0 0 40vw !important}
+}
+
+/* ---- B4 · hero heights and hero buttons (4-REVIEW1-DECISION 4.3) ---- */
+/* Works on a laptop: a short hero, so the filter bar and the top of the first row show at 1440 x 900 */
+@media (min-width:641px){ body:has(.pf-grid.works-grid) .wh .collage{height:clamp(280px,36vh,340px) !important;min-height:0 !important} }
+@media (max-width:640px){
+  .wh-home .collage{height:min(68svh,520px) !important;min-height:0 !important}
+  .wh-page .collage,body:has(.pf-grid.works-grid) .wh .collage{height:min(58svh,440px) !important;min-height:0 !important}
+  .wh .namecard,.wh .namecard.has-face{min-height:0 !important}
+  .wh .namecard .ctas{display:grid !important;grid-template-columns:1fr 1fr;gap:8px;width:100%}
+  .wh .namecard .ctas .btn{width:100% !important;min-height:44px !important;padding-inline:10px !important;white-space:nowrap}
+  .wh .namecard .ctas .btn:only-child{grid-column:1 / -1}
+}
+
+/* ---- B4 · Exhibitions on the same container as every other page (4.5; T17): no narrower column, no blank left ---- */
+.ex-index,.ex-ch,.ex-press,.ex-record,.now-line{max-width:calc(var(--max) + 2 * var(--gut)) !important}
+@media (min-width:901px){
+  .ex-ch-body{grid-template-columns:minmax(0,1fr) minmax(0,1.15fr) !important;column-gap:48px !important;padding-left:0 !important;align-items:center !important}
+  /* review #2: with the lede gone the text column is short; centre it on the photo so the space reads as intended */
+}
+
+/* ---- B3 3.8 · a separator dot belongs to the part before it, so no wrapped line starts with "·" ---- */
+.meta-parts .mp + .mp::before{content:none !important}
+.meta-parts .mp:not(:last-child)::after{content:"·";margin-inline:.45em}
+
+/* ---- B4 · footer "Pause movement" (4.4): looks exactly like the footer links; stops every CSS animation too ---- */
+.ftr-motion{appearance:none;background:none;border:0;padding:0;margin:0;cursor:pointer;color:inherit;font:400 14px/1.45 var(--sans);text-align:inherit;
+  min-height:24px;text-decoration:none}
+.ftr-motion:hover{text-decoration:underline;text-underline-offset:4px}
+html[data-motion="paused"] *,html[data-motion="paused"] *::before,html[data-motion="paused"] *::after{animation-play-state:paused !important}
+.card .meta-parts{column-gap:0 !important}
+/* QC follow-ups: header exactly 28 + 64 (+1 px rule); the footer motion link is a 44 px tap target on phones;
+   phone chapter swipes keep the picture centred over its caption */
+@media (min-width:768px){ .hdr{padding-top:0 !important} }
+@media (max-width:640px){ .ftr-motion{min-height:44px;display:inline-flex;align-items:center} }
+@media (max-width:760px){ .chap-works.n3>figure>a,.chap-works.n4>figure>a{align-self:auto} }
+/* Exhibitions: less empty page between the record and the end band (QC G4: 142 px) */
+.ex-record{padding-bottom:clamp(16px,2vw,28px) !important}
+.ex-record + .sec-tight{padding-top:clamp(12px,1.6vw,20px) !important}
+
+/* review #2 (Brand P2-4 / COO #10): the hero wall drifts, so a tile is always crossing its bottom edge; a hard cut read as a
+   clipped caption ("Lighting the lamp"). The last 48 px of the wall now fade out, so a passing tile dissolves instead of being cut. */
+.wh .collage{-webkit-mask-image:linear-gradient(180deg,#000 calc(100% - 48px),transparent) !important;
+                    mask-image:linear-gradient(180deg,#000 calc(100% - 48px),transparent) !important}
+
+/* DC review #2 P1-3: phone press row, every card the same 4:3 picture box; the Delhi Times clipping sits whole (contain) on
+   the cream it already has on desktop, so it no longer runs 40 px taller and leaves a blank under the others */
+@media (max-width:640px){
+  .press-open img,.press-clip{aspect-ratio:4/3 !important;height:auto !important;max-height:none !important;object-fit:cover !important}
+  .press-item.is-clipping .press-open img{object-fit:contain !important;background:#F6F3EE !important}
+}
+
+/* review #2 R2-7: a disabled pager button is not a box */
+.pf-pager .btn:disabled,.pf-pager .btn[aria-disabled="true"]{opacity:.4 !important;border-color:transparent !important;background:transparent !important}
+
+/* COO stage 7: Exhibitions chapter (>900px) as one two-column grid. The LEFT column holds the whole text group (year + title,
+   venue line, quote, On the walls), kept together and centred against the photo column on the right; the header no longer spans
+   above. Spacer rows 1 and 4 (1fr each) do the centring. <=900px is unchanged. */
+@media (min-width:901px){
+  .ex-ch{display:grid !important;grid-template-columns:minmax(0,1fr) minmax(0,1.15fr);grid-template-rows:1fr auto auto 1fr;column-gap:48px}
+  .ex-ch>.ex-ch-body{display:contents !important}
+  .ex-ch>.ex-ch-head{grid-column:1;grid-row:2;margin-bottom:24px !important}
+  .ex-ch .ex-ch-txt{grid-column:1;grid-row:3;padding:0 !important;margin:0 !important}
+  .ex-ch .ex-ch-body>.sm-media{grid-column:2;grid-row:1 / -1;align-self:center;margin:0 !important}
+}

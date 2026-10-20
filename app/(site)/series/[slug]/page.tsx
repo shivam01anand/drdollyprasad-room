@@ -78,7 +78,7 @@ function ChapterView({ c, n }: { c: Chapter; n: number }) {
               {/* eslint-disable-next-line @next/next/no-img-element */}
               <img className="framed" src={works.length > 2 ? `/site/thumbs/${w.id}.jpg` : img(w.id)} alt={alt(w)} loading="lazy" {...wh(w.id)} />
             </Link>
-            <figcaption>{w.title} · {w.medium}{w.status === "Sold" ? " · Sold" : ""}</figcaption>
+            <figcaption>{w.title} · {w.medium}{w.status === "Sold" ? " · In a private collection" : ""}</figcaption>
           </figure>
         ))}
       </div>
@@ -101,7 +101,7 @@ export default async function SeriesStory({ params }: Props) {
   return (
     <>
       <section className="story-head wrap">
-        <p className="eyebrow">Collection {at + 1} of {SERIES_PAGES.length} · {s.period} · {works.length} works</p>
+        <p className="eyebrow">Collection {at + 1} of {SERIES_PAGES.length} · {works.length} works · {s.period}</p>
         <h1>{s.label}</h1>
         <p className="lede">{s.line}</p>
       </section>

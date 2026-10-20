@@ -7,7 +7,8 @@
     "start": "next start",
     "check:rooms": "node scripts/check-rooms.cjs",
     "check:motion": "node scripts/check-motion.cjs",
-    "check:analytics": "node scripts/check-analytics.cjs"
+    "check:analytics": "node scripts/check-analytics.cjs",
+    "check:type": "node scripts/check-tokens.mjs"
   },
   "dependencies": {
     "@fontsource/cormorant-garamond": "5.3.0",

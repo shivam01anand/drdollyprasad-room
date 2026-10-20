@@ -1,6 +1,7 @@
 "use client";
 
 import Link from "next/link";
+import { motionPaused } from "@/lib/motion-rules";
 import { useEffect, useState } from "react";
 
 export type Reel = { id: string; title: string; src: string };
@@ -10,7 +11,7 @@ export default function FadeReel({ items }: { items: Reel[] }) {
   const [i, setI] = useState(0);
   useEffect(() => {
     if (matchMedia("(prefers-reduced-motion: reduce)").matches) return;
-    const t = setInterval(() => setI((x) => (x + 1) % items.length), 2200);
+    const t = setInterval(() => { if (!motionPaused()) setI((x) => (x + 1) % items.length); }, 2200);
     return () => clearInterval(t);
   }, [items.length]);
   const w = items[i];
