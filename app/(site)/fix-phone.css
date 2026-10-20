@@ -80,3 +80,19 @@
   .story-end .pnx-c{min-height:84px;padding:16px 18px}
   .story-end .pnx-g{gap:10px}
 }
+/* R4 B3 CLS on phones: the same reserved boxes (frame 4 + mat 4, both sides) */
+@media (max-width:760px){
+  .story-open .framed,.chv .framed,.sband .card .mat img,.also-row .card .mat img{--fp:16px}
+  .story-open .so-art figure img.framed,.chap .chv-art img.framed{width:min(100%,calc((min(64svh,420px) - var(--fp)) * var(--ar) + var(--fp))) !important;height:auto !important;max-height:none !important;aspect-ratio:auto var(--ar) !important}
+  .story-open .so-grid img.framed{width:100% !important;height:auto !important;max-height:none !important;aspect-ratio:auto var(--ar) !important}
+  .chap .chv-row img.framed{width:calc((var(--ph) - var(--fp)) * var(--ar) + var(--fp)) !important}
+  .sband .card .mat img{width:calc((170px - var(--fp)) * var(--ar) + var(--fp)) !important}
+  .also-row .card .mat img{width:min(100%,calc((150px - var(--fp)) * var(--ar) + var(--fp))) !important;height:auto !important;max-height:none !important;aspect-ratio:auto var(--ar) !important}
+}
+/* R4 B3 phones: "Also in" pictures sit on one bottom line in a 150 px box, so captions share a line (G2) */
+@media (max-width:760px){
+  .also-row .card .mat{height:150px !important;display:flex !important;align-items:flex-end !important;justify-content:center !important;width:100% !important}
+}
+/* R4 B3 G9b: the cover caption keeps a two-line box on phones, so the font swap (fallback 2 lines -> Jost 1 line)
+   does not pull the epigraph and intro up (slow-link CLS 0.053 on recent-work) */
+@media (max-width:760px){ .story-open .so-art figcaption{min-height:calc(2 * 1.45em)} }

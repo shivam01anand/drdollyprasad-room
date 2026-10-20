@@ -130,7 +130,9 @@
 
 /* ==== R4 B3-2: story opening, two columns (words left, cover right); one column on phones (fix-phone.css) ==== */
 .story-open.wrap,.chv .chv-in.wrap,.story-end.wrap{max-width:1360px;box-sizing:border-box}
-.story-open{display:grid;grid-template-columns:minmax(0,6fr) minmax(0,6fr);gap:56px;align-items:center;padding-block:32px 40px}
+/* the words sit at the top of the row (not centred): when the web fonts swap in, the text reflows from its own
+   top instead of re-centring the whole block (G9 CLS 0.065 -> see BUILD-R4-B3) */
+.story-open{display:grid;grid-template-columns:minmax(0,6fr) minmax(0,6fr);gap:56px;align-items:start;padding-block:32px 40px}
 .so-txt>*{margin:0}
 .so-txt .eyebrow{margin-bottom:10px}
 .so-txt h1{margin-bottom:12px}
@@ -220,3 +222,16 @@
 .se-ask{text-align:center;margin:0 0 20px}
 .se-ask a{text-decoration:underline;text-underline-offset:4px;white-space:nowrap}
 .story-end .pnx{padding-block:0}
+
+/* ==== R4 B3 CLS: every painting's box is reserved at its own shape before the file arrives ====
+   width:auto on a not-yet-loaded <img> is 0 (the width/height attributes only give a ratio), so each fixed-height
+   picture gets its width from --ar (width / height) and the frame (--fp = border + mat, both sides). */
+.story-open .framed,.chv .framed,.sband .card .mat img,.also-row .card .mat img{--fp:24px}
+.so-art figure img.framed{width:min(100%,calc((min(72svh,600px) - var(--fp)) * var(--ar) + var(--fp)));height:auto;max-height:none;aspect-ratio:auto var(--ar)}
+.so-grid img.framed{width:calc((clamp(180px,17vw,260px) - var(--fp)) * var(--ar) + var(--fp))}
+.chv-art img.framed{width:min(100%,calc((clamp(380px,38vw,540px) - var(--fp)) * var(--ar) + var(--fp)));height:auto;max-height:none;aspect-ratio:auto var(--ar)}
+@media (min-width:761px) and (max-width:1099px){ .chv-art img.framed{width:min(100%,calc((clamp(320px,40vw,440px) - var(--fp)) * var(--ar) + var(--fp)))} }
+.chv-row img.framed{width:calc((var(--rh) - var(--fp)) * var(--ar) + var(--fp))}
+.sband .card .mat img{width:calc((240px - var(--fp)) * var(--ar) + var(--fp)) !important}
+@media (min-width:761px) and (max-width:1099px){ .sband .card .mat img{width:calc((210px - var(--fp)) * var(--ar) + var(--fp)) !important} }
+.also-row .card .mat img{width:calc((200px - var(--fp)) * var(--ar) + var(--fp)) !important}
