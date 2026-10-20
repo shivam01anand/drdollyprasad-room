@@ -65,7 +65,6 @@ export default function Exhibitions() {
             </header>
             <div className="ex-ch-body">
               <div className="ex-ch-txt">
-                <p className="ex-lede">{s.lede}</p>
                 {s.quote && (
                   <figure className="ex-quote">
                     <blockquote>“{s.quote}”</blockquote>
@@ -91,7 +90,6 @@ export default function Exhibitions() {
           <div>
             <p className="eyebrow">From the archive</p>
             <h2 id="press-h">In the press</h2>
-            <p className="sec-line">At India Habitat Centre in November 2010 she was interviewed beside the paintings themselves. Alongside are two television excerpts and a listing from Delhi Times: the shows, as the cameras and the papers saw them.</p>
           </div>
         </div>
         <Press items={PRESS_ITEMS} />

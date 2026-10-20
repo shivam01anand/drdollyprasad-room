@@ -1,0 +1,14 @@
+/* Night polish, 20 Oct 2026 (COO, for Shubham's morning review). Loaded last. One consistent type + alignment layer. */
+
+/* numerals: lining everywhere, so a year never shows a tall old-style 6 or 0 */
+html,body,*{font-variant-numeric:lining-nums;font-feature-settings:"lnum" 1,"kern" 1}
+
+/* exhibitions: the photograph rolls, the strip scrolls by hand */
+.sm-hero{aspect-ratio:3/2 !important;max-height:none !important;height:auto;width:100%}
+.sm-hero img{max-height:100% !important;max-width:100% !important;object-fit:contain;animation:smIn .5s ease both}
+@keyframes smIn{from{opacity:.0}to{opacity:1}}
+.sm-strip{flex-wrap:nowrap !important;overflow-x:auto;overscroll-behavior-x:contain;-webkit-overflow-scrolling:touch;scrollbar-width:none;scroll-behavior:auto;padding:3px 3px 6px;margin-inline:-3px;touch-action:pan-x pan-y}
+.sm-strip::-webkit-scrollbar{display:none}
+.sm-strip button{flex:none !important;width:clamp(64px,6vw,84px) !important;aspect-ratio:4/3;min-height:0 !important}
+@media (max-width:640px){ .sm-strip button{width:68px !important;min-width:0 !important} }
+@media (prefers-reduced-motion:reduce){ .sm-hero img{animation:none} }

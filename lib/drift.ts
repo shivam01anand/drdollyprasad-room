@@ -151,7 +151,7 @@ export function driftRow(view: HTMLElement, track: HTMLElement, o: { seconds: nu
     const resting = now < holdUntil || hover || focus || still;
     const target = resting ? 0 : dir * speed;
     // a fling slows over about half a second; the drift returns over RAMP_S
-    const k = Math.abs(v) > speed * 1.2 ? 3.2 : 1 / RAMP_S * 2.2;
+    const k = Math.abs(v) > speed * 1.2 ? 1.5 : 1 / RAMP_S * 2.2; // a hard flick coasts for a good while
     v += (target - v) * Math.min(1, dt * k);
     x += v * dt;
     wrap();
@@ -162,7 +162,7 @@ export function driftRow(view: HTMLElement, track: HTMLElement, o: { seconds: nu
   const stopGrab = grab(view, {
     start() { held = true; x0 = x; v = 0; },
     move(dx) { x = x0 + dx; wrap(); x0 = x - dx; paint(); },
-    end(vx) { held = false; v = Math.max(-2600, Math.min(2600, vx)); holdUntil = performance.now() + HOLD_MS; },
+    end(vx) { held = false; v = Math.max(-6000, Math.min(6000, vx * 1.15)); holdUntil = performance.now() + HOLD_MS; },
   });
 
   // a trackpad's sideways swipe moves the row too
