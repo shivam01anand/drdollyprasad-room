@@ -79,3 +79,36 @@
 }
 .hdr{background:rgba(255,255,255,.96) !important}
 .ex-ch,.sband,[id]{scroll-margin-top:calc(var(--hdr-bar) + 16px)}
+
+/* ---- B4 · painting page (4-REVIEW1-DECISION 4.1; T7). The text, the Enquire button and the links now sit inside
+   PaintingStage, so on a laptop they can stand beside the picture. ---- */
+.pp-text a.pp-coll,.pp-text p.pp-attr,.pp-text p.pp-price{font:400 14px/1.45 var(--sans) !important;color:var(--muted) !important;letter-spacing:0;margin:0}
+.pp-text a.pp-coll{text-decoration:none}
+.pp-text a.pp-coll:hover{text-decoration:underline;text-underline-offset:4px}
+.pp-text p.pp-story{display:-webkit-box !important;-webkit-box-orient:vertical;-webkit-line-clamp:4 !important;line-clamp:4;overflow:hidden;margin:4px 0 0 !important}
+.pp-text p.pp-status{margin:0}
+.pp-ctas .btn-solid{flex:1 1 100%;justify-content:center}
+@media (min-width:1100px){
+  .pp{display:grid !important;grid-template-columns:auto minmax(0,1fr) 380px;grid-template-areas:"stage stage text" "strip bar text";
+    column-gap:24px;row-gap:12px;max-width:1320px;margin-inline:auto;align-items:center;padding-inline:var(--gut)}
+  .pp-stage{grid-area:stage;min-height:0 !important;justify-content:center}
+  .pp-strip{grid-area:strip;margin:0 !important;padding:2px !important;justify-self:start}
+  .pp-bar{grid-area:bar;margin:0 !important;justify-content:flex-end;justify-self:end}
+  .pp>.pp-text{grid-area:text;align-self:center;margin:0 0 0 32px !important;max-width:none;text-align:left;align-items:flex-start;gap:10px}
+  .pp-text .side-small{justify-content:flex-start}
+  .pp-chip{width:56px !important;height:56px !important}
+  .pp-art img{width:min(100%,calc((min(calc(100svh - var(--hdr-h,92px) - 64px),820px) - var(--fp)) * var(--ar) + var(--fp))) !important}
+  .pp-art img.is-small{width:min(100%,calc((420px - var(--fp)) * var(--ar) + var(--fp))) !important}
+  .pp-room{width:min(100%,900px,calc((100svh - var(--hdr-h,92px) - 64px) * 1.5)) !important}
+  .pp-detail-in{width:min(100%,820px) !important;max-height:calc(100svh - var(--hdr-h,92px) - 64px) !important}
+}
+@media (max-width:640px){
+  .pp-strip{order:1;justify-content:center}
+  .pp-bar{order:2;display:grid !important;grid-template-columns:1fr 1fr;gap:8px;width:100%}
+  .pp-bar>button{width:100%}
+  .pp-bar>button:only-child{grid-column:1 / -1}
+  .pp>.pp-text{order:3}
+  .pp-chip{width:44px !important;height:44px !important}
+  .pp-art img{border-width:4px !important;padding:3px !important;--fp:14px}
+  .pp-text a.pp-coll,.pp-text p.pp-attr,.pp-text p.pp-price{font-size:13px !important}
+}

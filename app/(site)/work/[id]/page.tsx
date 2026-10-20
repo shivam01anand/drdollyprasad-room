@@ -106,30 +106,29 @@ export default async function WorkPage({ params }: Props) {
       <PaintingStage w={w} src={src} dims={d ? { w: d.w, h: d.h } : undefined}
                      small={!!d && Math.max(d.w, d.h) < 600} sub={labelLine(w)}>
         <div className="pp-text">
+          <Link className="pp-coll" href={seriesPath(w.series)}>{w.series}</Link>
           <h1 className="pp-title">{w.title}</h1>
           <p className="pp-facts">{[w.medium, w.size, shownYear(w)].filter(Boolean).join(" · ")}</p>
-          {lead && <p className="pp-story">{words ? `“${lead}”` : lead}{words && <span>Dr Dolly Prasad</span>}</p>}
-          <p className="pp-status"><span className={`status st-${sold ? "sold" : w.status === "Enquire" ? "enquire" : "free"}`}><i aria-hidden="true" />{sold ? "In a private collection" : statusText(w)}</span>
-            <Link href={seriesPath(w.series)}>{w.series}</Link></p>
+          {lead && <p className="pp-story">{words ? `“${lead}”` : lead}</p>}
+          {lead && words && <p className="pp-attr">Dr Dolly Prasad</p>}
+          <p className="pp-status"><span className={`status st-${sold ? "sold" : w.status === "Enquire" ? "enquire" : "free"}`}><i aria-hidden="true" />{sold ? "In a private collection" : statusText(w)}</span></p>
+          {!sold && <p className="pp-price">Prices on request.</p>}
+          {NOW_SHOWING_CONFIRMED && SHOW.works.includes(id) && (
+            <Until until={SHOW.until}><p className="show-note">{SHOW.line}</p></Until>
+          )}
+          <div className="pp-ctas">
+            <Link className="btn btn-solid" href={enquireHref(w)}>{sold ? "Ask about her work" : "Enquire about this painting"}</Link>
+            {WHATSAPP && <a className="btn" href={whatsappHref(w)}><ChatIcon />WhatsApp</a>}
+          </div>
+          <div className="side-small">
+            <a href={INSTAGRAM.url} target="_blank" rel="noopener noreferrer"><InstagramIcon />Instagram</a>
+            <a href={`${STUDIO_PATH}#work=${id}`}>In her studio →</a>
+            <Share title={`${quoted(w.title)} · Dr Dolly Prasad`} path={workPath(id)} className="link share-btn" />
+          </div>
         </div>
       </PaintingStage>
 
       <div className="wrap">
-      <div className="pp-text pp-after">
-        {NOW_SHOWING_CONFIRMED && SHOW.works.includes(id) && (
-          <Until until={SHOW.until}><p className="show-note">{SHOW.line}</p></Until>
-        )}
-        <div className="pp-ctas">
-          <Link className="btn btn-solid" href={enquireHref(w)}>{sold ? "Ask about her work" : "Enquire about this painting"}</Link>
-          {WHATSAPP && <a className="btn" href={whatsappHref(w)}><ChatIcon />WhatsApp</a>}
-        </div>
-        <div className="side-small">
-          <a href={INSTAGRAM.url} target="_blank" rel="noopener noreferrer"><InstagramIcon />Instagram</a>
-          <a href={`${STUDIO_PATH}#work=${id}`}>In her studio →</a>
-          <Share title={`${quoted(w.title)} · Dr Dolly Prasad`} path={workPath(id)} className="link share-btn" />
-        </div>
-      </div>
-
       <section className="wp-lower" style={{ paddingBottom: 28 }}>
         <Tabs tabs={tabs} />
       </section>
