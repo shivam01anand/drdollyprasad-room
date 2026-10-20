@@ -1,6 +1,5 @@
 "use client";
 
-import Link from "next/link";
 import { useEffect, useState } from "react";
 
 export type Block = { slug: string; label: string; n: number; period: string; pics: { src: string; alt: string }[] };
@@ -20,7 +19,7 @@ export default function FiveBlocks({ blocks }: { blocks: Block[] }) {
         const on = tick === 0 ? 0 : Math.floor(tick + k * 0.6) % b.pics.length; // every block opens on its lead painting
         return (
           <li key={b.slug}>
-            <Link className="five-b" href={`/series/${b.slug}`}>
+            <a className="five-b" href={`#${b.slug}`}>
               <span className="five-stage">
                 {b.pics.map((p, i) => (
                   // eslint-disable-next-line @next/next/no-img-element
@@ -31,7 +30,7 @@ export default function FiveBlocks({ blocks }: { blocks: Block[] }) {
               <span className="five-n">{String(k + 1).padStart(2, "0")}</span>
               <span className="five-t">{b.label}</span>
               <span className="five-m">{b.n} works · {b.period}</span>
-            </Link>
+            </a>
           </li>
         );
       })}
