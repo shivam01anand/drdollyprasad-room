@@ -32,9 +32,8 @@ export default function Press({ items, more }: { items: PressItem[]; more?: { hr
             <figure>
               <Clip p={p} />
               <figcaption>
-                <em>{p.source}</em>
                 <b>{p.title}</b>
-                <span>{p.line}</span>
+                <span>{p.card ?? p.source}</span>
                 {p.credit && <small>{p.credit}</small>}
               </figcaption>
             </figure>
@@ -48,9 +47,8 @@ export default function Press({ items, more }: { items: PressItem[]; more?: { hr
                 <img src={p.sm ?? p.src} alt={p.alt} loading="eager" decoding="async" {...dims(p.sm ?? p.src)} style={{ objectPosition: FOCUS[p.id] ?? "50% 30%" }} />
               </button>
               <figcaption>
-                <em>{p.source}</em>
                 <b>{p.title}</b>
-                <span>{p.line}</span>
+                <span>{p.card ?? p.source}</span>
                 {p.credit && <small>{p.credit}</small>}
               </figcaption>
             </figure>

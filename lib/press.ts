@@ -32,6 +32,8 @@ export type PressItem = {
   source: string;
   /** a one-line credit, only where a record names the channel */
   credit?: string;
+  /** the one line under the card's title, where it is not the source (Chief Content 2c, C10) */
+  card?: string;
 };
 
 const IHC = "India Habitat Centre · November 2010";
@@ -48,7 +50,7 @@ const RAW: PressItem[] = [
     alt: "A television excerpt: the camera moves from her paintings to Dr Dolly Prasad, speaking in the exhibition.",
     title: "On screen · June 2010",
     line: "The recording carries a 12 June 2010 date display. The camera turns from the paintings to her, speaking within the exhibition.",
-    source: "Television archive", credit: "NCR television. Original broadcast sound.",
+    source: "Television archive", credit: "NCR television. Original broadcast sound.", card: "NCR television · 12 June 2010",
   },
   {
     id: "tv-archive", kind: "video", src: "/site/press/tv-archive.mp4", poster: "/site/press/tv-archive.jpg",
@@ -86,7 +88,7 @@ const RAW: PressItem[] = [
 /** one mosaic, stills and the two television clips mixed and spread out (Shubham, 19 Oct 2026):
  *  the India Habitat Centre interview first, top left; a clip never sits next to the other */
 const ORDER = ["ihc-press-01", "tv-ncr-2010", "ihc-press-06", "ihc-press-03", "delhi-times", "ihc-press-02",
-  "tv-archive", "ihc-press-04", "ihc-press-b", "ihc-press-05"];
+  "tv-archive", "ihc-press-04", "ihc-press-05"]; // "Listening" (ihc-press-b) dropped: near-duplicate (Chief Content 2c, C11); the photo stays in the IHC album
 export const PRESS_ITEMS: PressItem[] = ORDER.map((id) => RAW.find((p) => p.id === id)!);
 
 /** the shorter set for About: four photographs and the NCR excerpt */
