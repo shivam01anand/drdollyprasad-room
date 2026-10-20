@@ -69,9 +69,14 @@ function pairFacts(ws: Work[]) {
   return [titles, same((w) => w.medium), same((w) => w.size ?? "") && `${ws[0].size} each`, st].filter(Boolean).join(" · ");
 }
 
-function Room({ c, works }: { c: Chapter; works: Work[] }) {
+/** Chief Content lock (20 Oct): the caption for a cover painting's room view, shown in place of a second large showing */
+const roomCap = (title: string) => `${title}, in an imagined room. A virtual room study, not a photograph.`;
+const roomOf = (id: string) => TAILORED.find((r) => r.work === id && r.inPhoto);
+
+function Room({ c, works, cover }: { c: Chapter; works: Work[]; cover: string }) {
   if (!c.room) return null;
-  const w = works.find((x) => TAILORED.some((r) => r.work === x.id && r.inPhoto));
+  // the cover's room is already shown large in its slot; the thumbnail is for another painting's room, or none
+  const w = works.find((x) => x.id !== cover && TAILORED.some((r) => r.work === x.id && r.inPhoto));
   const room = w && TAILORED.find((r) => r.work === w.id && r.inPhoto);
   if (!w || !room) return null;
   const where = room.label.replace(/^An? /, (a) => a.toLowerCase());
@@ -84,16 +89,22 @@ function Room({ c, works }: { c: Chapter; works: Work[] }) {
  * A (single painting): painting 7/5 beside the text, flipping sides on every other single chapter.
  * B (several): the text left-aligned above one row of one height (a swipe strip on phones).
  */
-function ChapterView({ c, n, flip }: { c: Chapter; n: number; flip: boolean }) {
+/**
+ * R4 stage-7 (COO, Brand "one big showing per two screens"): the opening already shows the cover painting large, so
+ * wherever the cover comes back in a chapter its slot shows its ROOM VIEW instead (a new view, not a repeat); a cover
+ * with no room view is shown small, at the row height, beside its chapter text.
+ */
+function ChapterView({ c, n, flip, cover }: { c: Chapter; n: number; flip: boolean; cover: string }) {
   const works = c.works.map((id) => BY_ID.get(id)!).filter(Boolean);
   const head = (<><span className="chv-n">{ROMAN[n]}</span><h2 className="chv-t">{c.title}</h2></>);
   if (works.length === 1) {
     const w = works[0];
     const facts = [w.title !== c.title ? w.title : "", w.medium, w.size, w.status === "Sold" ? "In a private collection" : statusText(w)].filter(Boolean).join(" · ");
-    // R4 fix 3 (Brand P1-3): GATD "Roads" shows The Bullocks in its room, large, since the cover just showed the painting
-    const room = c.roomLarge ? TAILORED.find((r) => r.work === w.id && r.inPhoto) : undefined;
+    const isCover = w.id === cover;
+    const room = isCover ? roomOf(w.id) : undefined;
+    const small = isCover && !room;
     return (
-      <section className={`chap chv single${flip ? " flip" : ""}${room ? " room-big" : ""}`} data-chapter>
+      <section className={`chap chv single${flip ? " flip" : ""}${room ? " room-big" : ""}${small ? " cover-small" : ""}`} data-chapter>
         <div className="wrap chv-in">
           <div className="chv-art">
             {room ? (
@@ -103,8 +114,7 @@ function ChapterView({ c, n, flip }: { c: Chapter; n: number; flip: boolean }) {
                   <img className="room-img" src={room.src} alt={`${w.title} in ${room.label.replace(/^An? /, (a) => a.toLowerCase())}, a room study`} loading="lazy" decoding="async"
                        width={room.w} height={room.h} style={{ ["--ar" as string]: (room.w / room.h).toFixed(4) } as CSSProperties} />
                 </Link>
-                {/* Brand R4-2 P1-3 caption [Our suggestion], plus the room line already on the site; Chief Content to lock */}
-                <figcaption>{w.title}, in a room. A room study, not a photograph.</figcaption>
+                <figcaption>{roomCap(w.title)}</figcaption>
               </figure>
             ) : (
             <Link href={workPath(w.id)}>
@@ -118,7 +128,7 @@ function ChapterView({ c, n, flip }: { c: Chapter; n: number; flip: boolean }) {
             <div className="chv-words"><Words c={c} /></div>
             <p className="chv-facts">{facts}</p>
             <Link className="link" href={workPath(w.id)}>See the painting →</Link>
-            {!room && <Room c={c} works={works} />}
+            {!room && <Room c={c} works={works} cover={cover} />}
           </div>
         </div>
       </section>
@@ -126,7 +136,10 @@ function ChapterView({ c, n, flip }: { c: Chapter; n: number; flip: boolean }) {
   }
   // one height for the row: the row fits the content width on one line (cqw), never above 340 px;
   // --rs is the sum of the paintings' shapes, --rmax the widest (phones: the strip never runs wider than the screen)
-  const rs = works.reduce((t, w) => t + ar(w.id), 0), rmax = Math.max(...works.map((w) => ar(w.id)));
+  // the cover, if it is in this row, is shown by its room view (its own shape, 3:2) at the row height
+  const coverRoom = works.some((w) => w.id === cover) ? roomOf(cover) : undefined;
+  const arOf = (id: string) => (coverRoom && id === cover ? coverRoom.w / coverRoom.h : ar(id));
+  const rs = works.reduce((t, w) => t + arOf(w.id), 0), rmax = Math.max(...works.map((w) => arOf(w.id)));
   // a short row (two paintings: at 340 px it fills under 60 % of the 1,274 px content width) stands beside its text
   // instead of under it, so the chapter is not a half-empty band (S3 fill); phones are unchanged (the strip)
   // Brand R4-2 D1: beside is for rows of two only; rows of 3+ fill the width under the text (R4 fix 2)
@@ -137,11 +150,22 @@ function ChapterView({ c, n, flip }: { c: Chapter; n: number; flip: boolean }) {
         <div className="chv-txt">
           {head}
           <div className="chv-words"><Words c={c} /></div>
-          <Room c={c} works={works} />
+          <Room c={c} works={works} cover={cover} />
         </div>
         <div className="chv-rowbox">
-        <div className="chv-row" style={{ ["--n" as string]: works.length, ["--rs" as string]: rs.toFixed(4), ["--rmax" as string]: rmax.toFixed(4) } as CSSProperties}>
+        <div className="chv-row" style={{ ["--n" as string]: works.length, ["--rs" as string]: rs.toFixed(4), ["--rmax" as string]: rmax.toFixed(4),
+          ...(coverRoom ? { ["--rx" as string]: `${(24 * (coverRoom.w / coverRoom.h - 1)).toFixed(1)}px` } : {}) } as CSSProperties}>
           {works.map((w) => (
+            coverRoom && w.id === cover ? (
+              <figure key={w.id} className="row-room">
+                <Link href={workPath(w.id)}>
+                  {/* eslint-disable-next-line @next/next/no-img-element */}
+                  <img className="room-img" src={coverRoom.src} alt={`${w.title}, in an imagined room, a virtual room study`} loading="lazy" decoding="async"
+                       width={coverRoom.w} height={coverRoom.h} style={{ ["--ar" as string]: (coverRoom.w / coverRoom.h).toFixed(4) } as CSSProperties} />
+                </Link>
+                <figcaption>{roomCap(w.title)}</figcaption>
+              </figure>
+            ) : (
             <figure key={w.id}>
               <Link href={workPath(w.id)}>
                 {/* eslint-disable-next-line @next/next/no-img-element */}
@@ -149,6 +173,7 @@ function ChapterView({ c, n, flip }: { c: Chapter; n: number; flip: boolean }) {
               </Link>
               <figcaption>{w.title}</figcaption>
             </figure>
+            )
           ))}
         </div>
         </div>
@@ -240,7 +265,7 @@ export default async function SeriesStory({ params }: Props) {
       {!doors.length && s.chapters.map((c, i) => {
         const single = c.works.length === 1;
         const flip = single && singles++ % 2 === 1;
-        return <ChapterView key={c.title} c={c} n={i} flip={flip} />;
+        return <ChapterView key={c.title} c={c} n={i} flip={flip} cover={cover.id} />;
       })}
 
       {also.length > 0 && (

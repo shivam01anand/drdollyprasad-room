@@ -187,7 +187,7 @@
   .chv.multi.beside .chv-row{justify-content:center}
 }
 .chv.multi .chv-txt{max-width:640px;margin-bottom:28px}
-.chv-row{--F:24px;--rh:min(clamp(260px,24vw,340px),calc((100cqw - var(--n) * var(--F) - (var(--n) - 1) * 24px) / var(--rs) + var(--F)));
+.chv-row{--F:24px;--rh:min(clamp(260px,24vw,340px),calc((100cqw - var(--n) * var(--F) - (var(--n) - 1) * 24px - var(--rx, 0px)) / var(--rs) + var(--F)));
   display:flex;gap:24px;align-items:flex-start}
 .chv-row figure{margin:0;flex:none;display:flex;flex-direction:column}
 .chv-row a{display:block}
@@ -197,8 +197,8 @@
    shared height (the cqw fit term), capped at 440 px (D) / 360 px (T), never cropped or wrapped; whatever is still short
    is centred. Captions sit centred under each painting, as everywhere else on the site. */
 .chv-row figcaption{text-align:center}
-@media (min-width:1100px){ .chv.multi:not(.beside) .chv-row{--rh:min(440px,calc((100cqw - var(--n) * var(--F) - (var(--n) - 1) * 24px) / var(--rs) + var(--F)))} }
-@media (min-width:761px) and (max-width:1099px){ .chv.multi:not(.beside) .chv-row{--rh:min(360px,calc((100cqw - var(--n) * var(--F) - (var(--n) - 1) * 24px) / var(--rs) + var(--F)))} }
+@media (min-width:1100px){ .chv.multi:not(.beside) .chv-row{--rh:min(440px,calc((100cqw - var(--n) * var(--F) - (var(--n) - 1) * 24px - var(--rx, 0px)) / var(--rs) + var(--F)))} }
+@media (min-width:761px) and (max-width:1099px){ .chv.multi:not(.beside) .chv-row{--rh:min(360px,calc((100cqw - var(--n) * var(--F) - (var(--n) - 1) * 24px - var(--rx, 0px)) / var(--rs) + var(--F)))} }
 @media (min-width:761px){ .chv.multi:not(.beside) .chv-row{justify-content:center} }
 @media (min-width:761px) and (max-width:1099px){
   .chv.single .chv-in{gap:40px}
@@ -280,3 +280,17 @@
 /* R4 P2 (consultant P2, COO P2): /series bands and story pages start on the site's own edge (the gutter, 43 px at 1440,
    where the header and hero sit), not 40 px further in: the 1360 px content cap now excludes the gutters */
 .sband .srow.wrap,.story-open.wrap,.chv .chv-in.wrap,.story-end.wrap{max-width:calc(1360px + 2 * var(--gut))}
+
+/* ==== R4 stage-7 (COO): the cover's room view in its chapter row, at the row height ====
+   The room view has no frame, so it is exactly --rh tall and --rh x 3:2 wide (never cropped); --rx (set on the row) is the
+   extra width that takes over a framed picture's, so the row's fit-to-width term stays exact. Bottoms and captions
+   line up with the paintings (G2). */
+.chv-row .row-room img.room-img{display:block;max-width:none;height:var(--rh);width:calc(var(--rh) * var(--ar))}
+@media (max-width:760px){
+  .chap .chv-row .row-room img.room-img{height:var(--ph) !important;width:calc(var(--ph) * var(--ar)) !important}
+}
+/* a cover with no room view comes back small, at the row height, beside its text (none today: every cover has a room) */
+@media (min-width:761px){
+  .chv.single.cover-small .chv-in{grid-template-columns:auto minmax(0,1fr)}
+  .chv.single.cover-small .chv-art img.framed{width:calc((340px - var(--fp)) * var(--ar) + var(--fp))}
+}
