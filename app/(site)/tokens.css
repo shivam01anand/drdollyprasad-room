@@ -18,7 +18,8 @@
     --rule:#CFC8BE !important;
   }
 
-  html{font-variant-numeric:lining-nums !important}
+  /* lining figures everywhere: the font: shorthand resets font-variant-numeric, so pin it on every node (review #2 P1, Shubham's "odd digits") */
+  html,body,*,*::before,*::after{font-variant-numeric:lining-nums !important;font-feature-settings:"lnum" 1,"kern" 1 !important}
 
   /* ---- 3.2 type, one value per role ---- */
   /* H1s */
