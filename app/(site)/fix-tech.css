@@ -256,7 +256,8 @@ html[data-motion="paused"] *,html[data-motion="paused"] *::before,html[data-moti
   .ex-ch .sm-hero{height:min(60vw,440px) !important}
   .ex-ch .sm-cap{min-height:2.9em}
 }
-@media (max-width:640px){ .ex-ch .sm-cap{min-height:calc(3 * 1.45em)} }
+/* R4 polish 3 (DC P2-3): the 3-line IHC caption ran 11 px past its reserved height to 2 px above the strip */
+@media (max-width:640px){ .ex-ch .sm-cap{min-height:auto;margin-bottom:8px} }
 
 /* R4 B2-2: where the collections switcher is sticky (>=761), anchors land below header bar + switcher (44 px) */
 @media (min-width:761px){
