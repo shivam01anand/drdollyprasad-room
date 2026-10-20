@@ -25,3 +25,20 @@
     -webkit-mask-image:linear-gradient(90deg,transparent 0,#000 var(--fade),#000 calc(100% - var(--fade)),transparent);
             mask-image:linear-gradient(90deg,transparent 0,#000 var(--fade),#000 calc(100% - var(--fade)),transparent)}
 }
+
+/* ---- B2 · rows share one straight line (T4; Brand R1 #1, Shubham's #1 ask "pictures in a straight line") ----
+   Each card stretches to the row's height; its mat takes the free space and sits the picture on the bottom,
+   so every picture bottom and every title top in a row line up. At <=1000 px a title may wrap, so the title
+   keeps a two-line box there (on desktop titles fit one line and the tight look stays). */
+.marq-set{align-items:stretch}
+.marq-set>.card,#more-from .grid>.card,.grid-5>.card{align-self:stretch}
+.marq-set>.card>.mat,#more-from .grid>.card>.mat,.grid-5>.card>.mat{flex:1 1 auto !important;display:flex !important;align-items:flex-end !important;justify-content:center;height:auto !important}
+@media (max-width:1000px){ .marq-set>.card>.card-t,#more-from .card-t,.grid-5 .card-t{min-height:2.3em !important;text-wrap:balance} }
+/* Home, Key collections: the line under each title keeps a two-line box (it was 1 or 2 lines, so pictures rode up) */
+.series-tiles .m-card .meta{display:-webkit-box !important;-webkit-box-orient:vertical;-webkit-line-clamp:2;line-clamp:2;overflow:hidden;min-height:2.9em}
+/* collection pages, chapter pictures: picture and caption share rows across the chapter (subgrid),
+   pictures on one bottom line whatever the caption length */
+.chap-works:not(.n1){align-items:stretch}
+.chap-works>figure{display:grid;grid-row:span 2;grid-template-rows:subgrid;row-gap:8px}
+.chap-works>figure>a{align-self:end}
+@media (max-width:760px){ .chap-works.n3>figure,.chap-works.n4>figure{display:flex;justify-content:flex-end} }
