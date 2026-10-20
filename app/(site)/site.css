@@ -2329,3 +2329,25 @@ body *{font-style:normal !important}
 .series-tiles .m-card .mat{width:100%;align-self:stretch}
 /* "sacred" is always red (Shubham, 19 Oct 2026): same red as "Dolly"; colour only */
 .wh .namecard .wh-line .red,.brand-t .red{color:var(--red);font:inherit}
+
+/* Collections (20 Oct): the five collections in one line, each a small slideshow; a tap opens it */
+.five-head{padding-top:clamp(28px,4vw,56px)}
+.five-head h2{font-family:var(--serif);font-weight:500;font-size:clamp(32px,3.4vw,46px);line-height:1.06;margin:6px 0 20px;color:var(--black)}
+.five{list-style:none;margin:0 0 clamp(20px,3vw,40px);padding:0;display:grid;grid-template-columns:repeat(5,minmax(0,1fr));gap:clamp(12px,1.6vw,24px)}
+.five-b{display:flex;flex-direction:column;gap:4px;text-decoration:none;color:var(--black)}
+.five-stage{position:relative;display:block;aspect-ratio:4/5;background:#F4F1EC;overflow:hidden}
+.five-stage img{position:absolute;inset:0;margin:auto;max-width:calc(100% - 24px);max-height:calc(100% - 24px);width:auto;height:auto;
+  border:5px solid #141210;box-shadow:0 0 0 3px #fff inset,0 10px 22px -10px rgba(0,0,0,.45);opacity:0;transition:opacity .9s ease}
+.five-stage img.is-on{opacity:1}
+.five-n{font-family:var(--serif);font-size:20px;font-weight:600;color:var(--red);margin-top:8px}
+.five-t{font-family:var(--serif);font-size:clamp(19px,1.6vw,23px);font-weight:600;line-height:1.15}
+.five-m{font-size:13px;letter-spacing:.04em;color:var(--muted)}
+.five-b:hover .five-t{color:var(--red)}
+.five-b:focus-visible{outline:2px solid var(--ink);outline-offset:4px}
+/* phone: still one line; swipe sideways, about two and a half blocks in view */
+@media (max-width:760px){
+  .five{display:flex;overflow-x:auto;scroll-snap-type:x mandatory;gap:12px;margin-inline:0;padding:0;scrollbar-width:none}
+  .five::-webkit-scrollbar{display:none}
+  .five>li{flex:0 0 42vw;scroll-snap-align:start}
+}
+@media (prefers-reduced-motion:reduce){ .five-stage img{transition:none} }

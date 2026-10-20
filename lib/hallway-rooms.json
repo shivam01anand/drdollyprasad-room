@@ -249,6 +249,116 @@
       "pxPerCm": 3.99,
       "floor": 984,
       "cx": 869
+    },
+    {
+      "id": "woman-with-poppies",
+      "work": "woman-with-poppies",
+      "room": "console",
+      "cm": 104.4,
+      "w": 1920,
+      "h": 1080,
+      "pxPerCm": 5.956,
+      "floor": 1004,
+      "cx": 960
+    },
+    {
+      "id": "bulls-and-wheel",
+      "work": "bulls-and-wheel",
+      "room": "console",
+      "cm": 74.5,
+      "w": 1920,
+      "h": 1080,
+      "pxPerCm": 5.956,
+      "floor": 1004,
+      "cx": 960
+    },
+    {
+      "id": "monk-and-green-buddha",
+      "work": "monk-and-green-buddha",
+      "room": "console",
+      "cm": 74.5,
+      "w": 1920,
+      "h": 1080,
+      "pxPerCm": 5.956,
+      "floor": 1004,
+      "cx": 960
+    },
+    {
+      "id": "woman-with-bird",
+      "work": "woman-with-bird",
+      "room": "console",
+      "cm": 60.9,
+      "w": 1920,
+      "h": 1080,
+      "pxPerCm": 5.956,
+      "floor": 1004,
+      "cx": 960
+    },
+    {
+      "id": "three-veiled-women",
+      "work": "three-veiled-women",
+      "room": "console",
+      "cm": 76.2,
+      "w": 1920,
+      "h": 1080,
+      "pxPerCm": 5.956,
+      "floor": 1004,
+      "cx": 960
+    },
+    {
+      "id": "child-among-flowers",
+      "work": "child-among-flowers",
+      "room": "console",
+      "cm": 94.4,
+      "w": 1920,
+      "h": 1080,
+      "pxPerCm": 5.956,
+      "floor": 1004,
+      "cx": 960
+    },
+    {
+      "id": "shree-420-and-milk-cans",
+      "work": "shree-420-and-milk-cans",
+      "room": "console",
+      "cm": 74.5,
+      "w": 1920,
+      "h": 1080,
+      "pxPerCm": 5.956,
+      "floor": 1004,
+      "cx": 960
+    },
+    {
+      "id": "monks-and-blue-buddha",
+      "work": "monks-and-blue-buddha",
+      "room": "console",
+      "cm": 93.9,
+      "w": 1920,
+      "h": 1080,
+      "pxPerCm": 5.956,
+      "floor": 1004,
+      "cx": 960
+    },
+    {
+      "id": "offering-of-light",
+      "work": "offering-of-light",
+      "room": "console",
+      "cm": 74.5,
+      "w": 1920,
+      "h": 1080,
+      "pxPerCm": 5.956,
+      "floor": 1004,
+      "cx": 960
+    },
+    {
+      "id": "prayer-and-scripture",
+      "work": "prayer-and-scripture",
+      "room": "console",
+      "cm": 74.5,
+      "w": 1920,
+      "h": 1080,
+      "pxPerCm": 5.956,
+      "floor": 1004,
+      "cx": 960
     }
   ]
 }

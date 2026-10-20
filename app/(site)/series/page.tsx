@@ -7,10 +7,8 @@ import { ON_THE_WORK, SERIES_PAGES, SMALL_PHOTO, worksIn } from "@/lib/site";
 import { BY_ID } from "@/lib/works";
 import { dims } from "@/lib/images";
 import Marquee from "@/components/site/Marquee";
-import SeriesSlides from "@/components/site/SeriesSlides";
+import FiveBlocks from "@/components/site/FiveBlocks";
 import WallHero from "@/components/site/WallHero";
-import FadeReel from "@/components/site/FadeReel";
-import { WORKS } from "@/lib/works";
 import { SERIES_WALL } from "@/components/site/Collage";
 
 export const metadata: Metadata = {
@@ -30,21 +28,13 @@ export default function SeriesIndex() {
       </WallHero>
 
       <section className="wrap" style={{ paddingBottom: 8 }}>
-        <div className="ss-intro">
-          <div className="ss-txt">
-            <p className="eyebrow">Five collections</p>
-            <h2>One painter, looking twice</h2>
-            <ol className="ss-list">
-              {SERIES_PAGES.map((s, i) => (
-                <li key={s.slug}><span>{String(i + 1).padStart(2, "0")}</span>
-                  <div><Link href={`/series/${s.slug}`}>{s.label}</Link><small>{s.line}</small></div></li>
-              ))}
-            </ol>
-            <FadeReel items={WORKS.filter((w) => !SMALL_PHOTO.has(w.id)).map((w) => ({ id: w.id, title: w.title, src: thumb(w.id) }))} />
-          </div>
-          <SeriesSlides slides={SERIES_PAGES.map((s) => ({ slug: s.slug, label: s.label, n: worksIn(s.label).length, src: thumb(s.hero),
-            alt: `${BY_ID.get(s.hero)?.title}, from ${s.label}`, ...dims(thumb(s.hero)) }))} />
+        <div className="five-head">
+          <p className="eyebrow">Five collections</p>
+          <h2>One painter, looking twice</h2>
         </div>
+        <FiveBlocks blocks={SERIES_PAGES.map((s) => ({ slug: s.slug, label: s.label, n: worksIn(s.label).length, period: s.period,
+          pics: [s.hero, ...worksIn(s.label).map((w) => w.id).filter((id) => id !== s.hero && !SMALL_PHOTO.has(id))]
+            .map((id) => ({ src: thumb(id), alt: `${BY_ID.get(id)?.title}, from ${s.label}` })) }))} />
         <p className="quote series-sum-q">“{ON_THE_WORK}”<span className="eyebrow">Dr Dolly Prasad, on her work</span></p>
       </section>
 

@@ -201,13 +201,10 @@ export function roomsFor(work: Work, aspect: number, opts: { pilot?: boolean } =
   const pilot = opts.pilot ? PILOT.find((r) => r.work === work.id) : undefined;
   const own = TAILORED.find((r) => r.work === work.id);
   const stated = work.inches ? work.inches * 2.54 : 0;
-  // the room made for this painting comes first; the shared study scene is the second view
-  if (own && pilot) return [
-    { room: own, at: hang(own, stated || own.cm, aspect), trueSize: !!stated },
-    { room: pilot, at: hang(pilot, pilot.cm, aspect), trueSize: false },
-  ];
-  if (pilot) return [{ room: pilot, at: hang(pilot, pilot.cm, aspect), trueSize: false }];
-  if (own) return [{ room: own, at: hang(own, stated || own.cm, aspect), trueSize: !!stated }];
+  const ownView = own ? { room: own, at: hang(own, stated || own.cm, aspect), trueSize: !!stated } : undefined;
+  // the new photographic room first; a work's earlier 3D room stays as a second view
+  if (pilot) return [{ room: pilot, at: hang(pilot, pilot.cm, aspect), trueSize: false }, ...(ownView ? [ownView] : [])];
+  if (ownView) return [ownView];
   if (!stated) return [];
   return GENERIC.map((room) => ({ room, at: hang(room, stated, aspect), trueSize: true }));
 }

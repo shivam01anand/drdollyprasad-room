@@ -41,8 +41,10 @@ export default function PaintingStage({ w, src, dims, small, sub, children }: {
 
   const items: { v: View; label: string; thumb: React.ReactNode }[] = [
     { v: { k: "full" }, label: "The painting", thumb: <img src={src} alt="" loading="lazy" /> },
+    // order (Shubham, 20 Oct): the painting, then the room, then the close views
+    ...rooms.slice(0, 1).map((r) => ({ v: { k: "room", id: r.room.id } as View, label: r.room.label, thumb: <img src={r.room.thumb} alt="" loading="lazy" /> })),
     ...DETAILS.map(([pos, label], i) => ({ v: { k: "detail", i } as View, label, thumb: <span className="pp-crop" style={{ backgroundImage: `url(${src})`, backgroundPosition: pos }} /> })),
-    ...rooms.map((r) => ({ v: { k: "room", id: r.room.id } as View, label: r.room.label, thumb: <img src={r.room.thumb} alt="" loading="lazy" /> })),
+    ...rooms.slice(1).map((r) => ({ v: { k: "room", id: r.room.id } as View, label: r.room.label, thumb: <img src={r.room.thumb} alt="" loading="lazy" /> })),
   ];
 
   return (
