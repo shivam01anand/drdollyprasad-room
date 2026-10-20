@@ -36,7 +36,8 @@
 .marq-set{align-items:stretch}
 .marq-set>.card,#more-from .grid>.card,.grid-5>.card{align-self:stretch}
 .marq-set>.card>.mat,#more-from .grid>.card>.mat,.grid-5>.card>.mat{flex:1 1 auto !important;display:flex !important;align-items:flex-end !important;justify-content:center;height:auto !important}
-@media (max-width:1000px){ .marq-set>.card>.card-t,#more-from .card-t,.grid-5 .card-t{min-height:2.3em !important;text-wrap:balance} }
+@media (max-width:1000px){ .marq-set>.card>.card-t,#more-from .card-t,.grid-5 .card-t{min-height:2.3em !important;text-wrap:balance}
+  .grid-5 .card-t{min-height:2.4em !important} /* two title lines at line-height 1.2 are 2.4em: a wrapped title no longer drops its row by 2 px (review #2 R2-4) */ }
 /* Home, Key collections: one count line under each title, one line box (the 2-line description is cut, C17) */
 .series-tiles .m-card .meta{display:-webkit-box !important;-webkit-box-orient:vertical;-webkit-line-clamp:1;line-clamp:1;overflow:hidden;min-height:1.4em}
 /* collection pages, chapter pictures: picture and caption share rows across the chapter (subgrid),
