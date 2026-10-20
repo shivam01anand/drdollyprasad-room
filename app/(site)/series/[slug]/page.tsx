@@ -111,7 +111,10 @@ export default async function SeriesStory({ params }: Props) {
           {/* eslint-disable-next-line @next/next/no-img-element */}
           <img className="framed" src={img(hero.id)} alt={alt(hero)} fetchPriority="high" {...wh(hero.id)} />
         </Link>
-        <p className="meta">{hero.title} · {hero.medium}{hero.size ? ` · ${hero.size}` : ""}{shownYear(hero) ? ` · ${shownYear(hero)}` : ""}</p>
+        <p className="meta">{[hero.title, hero.medium, hero.size, shownYear(hero)].filter(Boolean).map((x, i, a) => (
+          // each part stays whole; a dot only ever ends a line, never starts one
+          <span key={i} style={{ whiteSpace: "nowrap" }}>{String(x)}{i < a.length - 1 ? " ·" : ""}{i < a.length - 1 ? " " : ""}</span>
+        ))}</p>
       </section>
 
       {s.quote && (

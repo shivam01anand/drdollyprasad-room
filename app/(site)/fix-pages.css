@@ -32,3 +32,39 @@
   #more-from .sec-head>.link{grid-column:1;grid-row:2;justify-self:start}
   #more-from .card-t{min-height:2.3em}
 }
+
+/* Desktop final QA */
+@media (min-width:761px){
+  /* #1 small painting stage */
+  .viewer .paper:has(img.is-small){min-height:0 !important;padding-block:28px 20px !important}
+  .viewer .paper img.is-small{height:auto !important;max-height:420px !important;width:auto !important;max-width:100% !important}
+  /* #3 works grid */
+  .pf-grid.works-grid .card-t{min-height:0 !important}
+  .pf-grid.works-grid .mat img{margin-bottom:12px !important}
+  .pf-grid.works-grid,.pf-grid{row-gap:28px !important}
+  .pf-grid.works-grid{max-width:none !important}
+  /* #5 orphan rows */
+  .grid.grid-5{display:flex !important;flex-wrap:wrap;justify-content:center;gap:40px 22px}
+  .grid.grid-5>.card{flex:0 0 calc(25% - 17px);max-width:calc(25% - 17px)}
+  #more-from .grid{display:flex !important;flex-wrap:wrap;justify-content:center;gap:26px 22px}
+  #more-from .grid>.card{flex:0 0 calc(25% - 17px);max-width:calc(25% - 17px)}
+  /* #7 */
+  .next-series:has(>.ask:only-child){grid-template-columns:minmax(0,1fr) !important}
+  .next-series:has(>.ask:only-child) .ask{flex-direction:row !important;flex-wrap:wrap;align-items:center;gap:12px 28px}
+  .next-series:has(>.ask:only-child) .ask>div{margin-left:auto}
+  /* #8 */
+  .next-series .go{background:#161E3A !important}
+  .next-series .go:hover{background:#1f2a52 !important}
+  /* #13 */
+  #more-from>.wrap,#more-from .sec-head,#more-from .grid{padding-inline:0 !important}
+  .wp-lower{padding-bottom:0 !important}
+  /* #15 */
+  .press-item:last-child:nth-child(3n+1){grid-column:auto !important}
+}
+@media (min-width:1200px){
+  .grid.grid-5>.card{flex-basis:calc(20% - 18px);max-width:calc(20% - 18px)}
+}
+@media (min-width:901px){
+  .ex-ch-body{align-items:start !important}
+  .ab-split{align-items:start !important}
+}

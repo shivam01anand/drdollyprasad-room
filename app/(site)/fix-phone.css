@@ -1,1 +1,35 @@
 /* Tech team: phones (20 Oct, final QA). Only this team edits this file. */
+
+/* F1 */
+@media (max-width:760px){
+  .story-hero>.meta,.story-hero>p.meta{padding-inline:18px !important;text-align:center !important;text-wrap:balance}
+}
+/* F3 */
+@media (max-width:760px){
+  .card .status{white-space:nowrap !important;font-size:12.5px !important}
+}
+/* F4 */
+@media (max-width:420px){
+  .sec-head>div{flex:1 1 100% !important}
+  .sec-head h2{font-size:28px;line-height:1.15}
+  .sec-head .link{margin-right:auto}
+}
+/* F7 */
+@media (max-width:760px){
+  .press{align-items:flex-start !important}
+}
+/* F8 */
+@media (pointer:coarse),(max-width:900px){
+  main p a,.meta a{display:inline !important;min-height:0 !important;padding-block:12px !important;margin-block:-12px !important}
+}
+/* F9 */
+@media (max-width:760px){
+  .sm-strip{flex-wrap:nowrap !important}
+  .sm-strip button{flex:1 1 0 !important;width:auto !important;min-width:0 !important;white-space:nowrap}
+}
+/* F11 */
+.band-indigo .card .st-enquire i,.ibnd .card .st-enquire i{box-shadow:inset 0 0 0 1px #D3D8E8 !important}
+/* F6 */
+@media (max-width:760px){
+  .chap-works .framed{max-height:52vw !important}
+}
