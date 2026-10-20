@@ -220,3 +220,15 @@ html[data-motion="paused"] *,html[data-motion="paused"] *::before,html[data-moti
   .wh-home .collage{height:min(calc(100svh - var(--hdr-h) - var(--hint)),600px) !important;min-height:0 !important}
   .wh-page .collage,body:has(.pf-grid.works-grid) .wh .collage{height:min(64svh,520px) !important;min-height:0 !important}
 }
+/* §3 name box: less padding round the same type (no font changes; type stays in tokens.css) */
+.wh .namecard{width:fit-content !important;max-width:min(440px,calc(100% - 48px)) !important;min-width:min(360px,calc(100% - 48px));padding:28px 36px 26px !important}
+.wh .namecard .eyebrow{margin:0 0 8px !important}
+.wh .namecard h1{margin:0 0 6px !important}
+.wh .namecard .wh-line{margin:0 0 18px !important}
+.wh .namecard .ctas{margin-top:0 !important;gap:10px}
+.wh .namecard .face{margin-bottom:8px !important}
+@media (max-width:640px){
+  .wh .namecard{padding:20px 20px 18px !important;max-width:calc(100% - 40px) !important;min-width:0}
+  .wh .namecard .wh-line{margin-bottom:14px !important}
+  .wh .namecard .ctas{gap:8px}
+}
