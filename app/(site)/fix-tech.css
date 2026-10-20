@@ -206,7 +206,7 @@ html[data-motion="paused"] *,html[data-motion="paused"] *::before,html[data-moti
   .wh-page .collage,body:has(.pf-grid.works-grid) .wh .collage{height:min(64svh,520px) !important;min-height:0 !important}
 }
 /* §3 name box: less padding round the same type (no font changes; type stays in tokens.css) */
-.wh .namecard{width:fit-content !important;max-width:min(440px,calc(100% - 48px)) !important;min-width:min(360px,calc(100% - 48px));padding:28px 36px 26px !important}
+.wh .namecard{width:fit-content !important;max-width:min(440px,calc(100% - 48px)) !important;min-width:min(360px,calc(100% - 48px));padding:28px 36px 26px !important;gap:0 !important}
 .wh .namecard .eyebrow{margin:0 0 8px !important}
 .wh .namecard h1{margin:0 0 6px !important}
 .wh .namecard .wh-line{margin:0 0 18px !important}
@@ -236,7 +236,7 @@ html[data-motion="paused"] *,html[data-motion="paused"] *::before,html[data-moti
 .press-marq figcaption{width:0;min-width:100%;display:flex;flex-direction:column;gap:3px}
 .press-marq figcaption b{display:-webkit-box;-webkit-line-clamp:2;-webkit-box-orient:vertical;overflow:hidden;min-height:2lh;text-wrap:balance}
 .press-marq figcaption span{display:block}
-@media (max-width:640px){ .press-marq .press-item{min-width:180px} }
+@media (max-width:640px){ .press-marq .press-item{min-width:180px} .press-marq figcaption span{min-height:2lh} }
 .press-row .press-more{margin-top:0}
 /* §1 Exhibitions chapters: head across; photo left, quote + six tiles right; caption (with "On the walls") under the photo */
 @media (min-width:1100px){
@@ -254,7 +254,7 @@ html[data-motion="paused"] *,html[data-motion="paused"] *::before,html[data-moti
   .ex-ch .sm-strip:has(.sm-more) button:not(.sm-more):nth-child(n+6){display:none !important}
   .ex-ch .sm-more{display:flex !important;align-items:center;justify-content:center;background:var(--paper,#F6F3EE);border:1px solid var(--rule)}
 }
-.sm-more{display:none}
+.sm-more,.sm-strip .sm-more{display:none}
 /* the caption now carries "On the walls": never clamped (fix-night's 2-line clamp would cut it); its height is reserved below */
 .ex-ch .sm-cap{display:block !important;-webkit-line-clamp:unset !important;line-clamp:none !important;height:auto !important;overflow:visible !important}
 .sm-walls a{text-decoration:underline;text-underline-offset:4px}
