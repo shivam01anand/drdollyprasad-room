@@ -259,6 +259,38 @@ export const SERIES_BY_SLUG = new Map(SERIES_PAGES.map((s) => [s.slug, s]));
 export const seriesPath = (label: string) => `/series/${SERIES_BY_LABEL.get(label)?.slug ?? ""}`;
 export const worksIn = (label: string) => WORKS.filter((w) => w.series === label);
 
+/* ---- R4 B2-1: one order, so the switcher, the pager, the story page and the bands cannot disagree ---- */
+/** a collection's paintings in her chapter order (flattened), then any not featured in a chapter, in register order */
+export function collectionOrder(slug: string): string[] {
+  const s = SERIES_BY_SLUG.get(slug);
+  if (!s) return [];
+  const featured = [...featuredIds(s)];
+  return [...featured, ...worksIn(s.label).map((w) => w.id).filter((id) => !featured.includes(id))];
+}
+/** every painting a story page shows in its chapters, in chapter order */
+export const featuredIds = (s: SeriesPage) => new Set(s.chapters.flatMap((c) => c.works));
+/** the collections either side, wrapping round (Faith -> Onset of Spring; Onset of Spring <- Faith) */
+export function seriesNeighbours(slug: string) {
+  const i = SERIES_PAGES.findIndex((s) => s.slug === slug), n = SERIES_PAGES.length;
+  return { prev: SERIES_PAGES[(i - 1 + n) % n], next: SERIES_PAGES[(i + 1) % n] };
+}
+/**
+ * a painting's neighbours inside its collection. At the ends, prev/next are the last/first painting of the
+ * adjacent collection, flagged with `crossesTo` (that collection's slug); the painting page then links to
+ * that collection's story page.
+ */
+export function neighbours(id: string) {
+  const w = WORKS.find((x) => x.id === id);
+  const s = w ? SERIES_BY_LABEL.get(w.series) : undefined;
+  if (!w || !s) return undefined;
+  const order = collectionOrder(s.slug), index = order.indexOf(id), total = order.length;
+  const { prev: ps, next: ns } = seriesNeighbours(s.slug);
+  const prev = index > 0 ? { id: order[index - 1] } : { id: collectionOrder(ps.slug).at(-1)!, crossesTo: ps.slug };
+  const next = index < total - 1 ? { id: order[index + 1] } : { id: collectionOrder(ns.slug)[0], crossesTo: ns.slug };
+  return { prev, next, index, total, slug: s.slug } as {
+    prev: { id: string; crossesTo?: string }; next: { id: string; crossesTo?: string }; index: number; total: number; slug: string };
+}
+
 /** these photographs are too small to enlarge; they stay in the catalogue but out of showcases */
 export const SMALL_PHOTO = new Set(["elder-woman-portrait", "horse-cart-and-autorickshaw", "rickshaw-and-autorickshaw", "riverside-figures"]);
 
