@@ -95,6 +95,10 @@
   /* widows */
   h1,h2,h3,.chap-big,.card-t{text-wrap:balance !important}
   .lede,.quote{text-wrap:pretty !important}
+  /* story chapters on indigo: quiet numeral, white heading, no retired peach/cream (review #2 P1) */
+  .chap-dark .chap-h span,.band-indigo .chap-h span{color:var(--muted-on-indigo) !important}
+  .chap-dark .chap-h h2,.band-indigo .chap-h h2{color:#FFFFFF !important}
+  .chap-dark .chap-big.hers,.chap-dark .chap-big{color:#FFFFFF !important}
   /* one red: the 'In a private collection' dot is muted grey, not a second red (review #2 P1) */
   .st-sold i,.pp-text .st-sold i,.card .st-sold i{background:#5F564D !important}
   .band-indigo .st-sold i,.chap-dark .st-sold i{background:var(--muted-on-indigo) !important}
