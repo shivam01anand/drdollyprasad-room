@@ -159,7 +159,8 @@ html:has(.five){scroll-behavior:auto}
 /* ---- B4 · Exhibitions on the same container as every other page (4.5; T17): no narrower column, no blank left ---- */
 .ex-index,.ex-ch,.ex-press,.ex-record,.now-line{max-width:calc(var(--max) + 2 * var(--gut)) !important}
 @media (min-width:901px){
-  .ex-ch-body{grid-template-columns:minmax(0,1fr) minmax(0,1.15fr) !important;column-gap:48px !important;padding-left:0 !important;align-items:start !important}
+  .ex-ch-body{grid-template-columns:minmax(0,1fr) minmax(0,1.15fr) !important;column-gap:48px !important;padding-left:0 !important;align-items:center !important}
+  /* review #2: with the lede gone the text column is short; centre it on the photo so the space reads as intended */
 }
 
 /* ---- B3 3.8 · a separator dot belongs to the part before it, so no wrapped line starts with "·" ---- */
