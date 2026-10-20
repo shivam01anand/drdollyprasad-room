@@ -2339,3 +2339,18 @@ body *{font-style:normal !important}
 .band-marq .card{align-items:center;text-align:center}
 .band-marq .card .card-t{text-align:center}
 .band-marq .card .status{justify-content:center}
+/* QA 20 Oct (screenshot pass, Windows + iPhone) */
+/* titles and status sit centred under the centred painting, in every grid and carousel */
+.card{text-align:center}
+.card .card-t,.card .meta{text-align:center}
+.card .status{justify-content:center}
+/* "On enquiry" ring shows on dark bands too */
+.card .st-enquire i,.pp-text .st-enquire i{box-shadow:inset 0 0 0 1.5px currentColor}
+/* phone: the collection hero caption keeps the page margin */
+@media (max-width:760px){ .story-hero .meta{padding-inline:18px;text-align:center} .chap-works{column-gap:18px} }
+/* single paintings with her words: the quote and credit share the painting's column */
+.chap-works.n1 ~ .chap-big.hers,.chap-works.n1 ~ .chap-sig{max-width:640px}
+/* exhibition photo on collection pages fills its box, no grey bars */
+.story-photo img{display:block;background:none;padding:0;border:0;object-fit:cover}
+/* a closing box on its own spans the row */
+.next-series>.ask:only-child{grid-column:1 / -1}

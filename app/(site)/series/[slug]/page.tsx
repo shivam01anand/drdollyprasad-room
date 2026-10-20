@@ -3,7 +3,7 @@ import Link from "next/link";
 import IndigoBand from "@/components/site/IndigoBand";
 import { notFound } from "next/navigation";
 import Card from "@/components/site/Card";
-import { SERIES_BY_SLUG, SERIES_PAGES, WHATSAPP, shownYear, enquireHref, whatsappHref, worksIn, type Chapter } from "@/lib/site";
+import { SERIES_BY_SLUG, SERIES_PAGES, WHATSAPP, shownYear, nb, enquireHref, whatsappHref, worksIn, type Chapter } from "@/lib/site";
 import { TAILORED } from "@/lib/rooms";
 import { BY_ID, LARGE, workPath, type Work } from "@/lib/works";
 import manifest from "@/public/art/manifest.json";
@@ -65,7 +65,7 @@ function ChapterView({ c, n }: { c: Chapter; n: number }) {
       </Link>
       <div className="txt">
         <Words c={c} />
-        <p className={c.dark ? "chap-sig" : "meta"}>{works[0].title} · {works[0].medium}{works[0].size ? ` · ${works[0].size}` : ""}</p>
+        <p className={c.dark ? "chap-sig" : "meta"}>{works[0].title} · {works[0].medium}{works[0].size ? ` · ${nb(works[0].size)}` : ""}</p>
         <Link className="link" href={workPath(works[0].id)}>See the painting →</Link>
       </div>
     </div>
@@ -111,7 +111,7 @@ export default async function SeriesStory({ params }: Props) {
           {/* eslint-disable-next-line @next/next/no-img-element */}
           <img className="framed" src={img(hero.id)} alt={alt(hero)} fetchPriority="high" {...wh(hero.id)} />
         </Link>
-        <p className="meta">{hero.title} · {hero.medium}{hero.size ? ` · ${hero.size}` : ""}{shownYear(hero) ? ` · ${shownYear(hero)}` : ""}</p>
+        <p className="meta">{hero.title} · {hero.medium}{hero.size ? ` · ${nb(hero.size)}` : ""}{shownYear(hero) ? ` · ${shownYear(hero)}` : ""}</p>
       </section>
 
       {s.quote && (
@@ -134,7 +134,7 @@ export default async function SeriesStory({ params }: Props) {
       {s.chapters.map((c, i) => <ChapterView key={c.title} c={c} n={i} />)}
 
       {photo && (
-        <section className="sec-tight wrap">
+        <section className="sec-tight wrap story-photo">
           <figure style={{ margin: 0, display: "flex", flexDirection: "column", gap: 10 }}>
             {/* eslint-disable-next-line @next/next/no-img-element */}
             <img src={photo.src} alt={photo.alt} loading="lazy" style={{ width: "100%", maxHeight: 560, objectFit: "cover" }} />
@@ -160,7 +160,7 @@ export default async function SeriesStory({ params }: Props) {
           </div>
           <Link className="go" href={`/series/${next.slug}`}>
             <span className="eyebrow" style={{ color: "inherit" }}>Next collection</span>
-            <b>{next.label} →</b>
+            <b>{next.label}{"\u00a0"}→</b>
           </Link>
         </div>
       </section>
