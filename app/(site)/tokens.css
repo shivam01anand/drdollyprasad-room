@@ -1,0 +1,113 @@
+/* =============================================================================
+   tokens.css: the ONE place for type, colour, case and button shape on the site
+   (website review #1, 4-REVIEW1-DECISION B3 §3.1 to §3.6; Technical T21). Owner: Technical.
+   Imported last. Every rule lives in @layer final and every declaration is !important:
+   a layered !important beats every unlayered !important in site.css and the fix-*.css files,
+   whatever their specificity, so these values win without editing six files.
+   C = Cormorant Garamond (var(--serif)), J = Jost (var(--sans)). Phone = max-width 640px.
+   ========================================================================== */
+@layer final;
+
+@layer final {
+  /* ---- 3.3 colour tokens: one ink, one muted, one red; rust retired ---- */
+  :root{
+    --ink:#141210 !important; --black:#141210 !important;
+    --muted:#5F564D !important; --rust:#5F564D !important;
+    --on-indigo:#FFFFFF !important; --muted-on-indigo:#D3D8E8 !important;
+    --red:#D4202A !important; --red-on-indigo:#EF4B53 !important; --red-tint:#FBEAEA !important;
+    --rule:#CFC8BE !important;
+  }
+
+  html{font-variant-numeric:lining-nums !important}
+
+  /* ---- 3.2 type, one value per role ---- */
+  /* H1s */
+  .story-head h1{font:500 88px/1 var(--serif) !important;letter-spacing:-.02em !important}
+  .wh-card h1{font-family:var(--serif) !important;font-weight:500 !important;font-size:52px !important}
+  .page-title{font-family:var(--serif) !important;font-weight:500 !important;font-size:56px !important;line-height:1.05 !important}
+  .pp-title{font-family:var(--serif) !important;font-weight:500 !important;font-size:44px !important;line-height:1.1 !important}
+  /* section H2 */
+  .sec-head h2,#more-from h2,.ab-txt h2,.ab-statement h2,.five-head h2,.ig-band h2,.txt>h2{font-family:var(--serif) !important;font-weight:500 !important;font-size:44px !important;line-height:1.12 !important}
+  /* H3 role: exhibition chapter, Collections band, series chapter title */
+  .ex-ch-head h2,.sband h2,.chap-h h2{font-family:var(--serif) !important;font-weight:500 !important;font-size:36px !important;line-height:1.12 !important}
+  /* feature quote (one per page) */
+  .hw-q blockquote,.story-quote .quote{font:500 40px/1.25 var(--serif) !important;font-style:normal !important}
+  /* inline quote: her words inside a block */
+  .pp-story,.pp-text p.pp-story,.ex-quote blockquote,.tabpanel .quote,.series-sum-q,.ab-quote,.chap-big.hers,.qcard blockquote{font:500 24px/1.4 var(--serif) !important;font-style:normal !important;color:var(--ink) !important}
+  /* chapter big line (ours) */
+  .chap-big:not(.hers){font:500 32px/1.25 var(--serif) !important}
+  .chap-dark .chap-big:not(.hers){color:inherit !important}
+  /* hero line in the collage card */
+  .wh-line{font:500 19px/1.35 var(--serif) !important;letter-spacing:0 !important}
+  /* card titles, every card */
+  .card-t,.card .card-t,.series-tiles .m-card b,.five-t,.press figcaption b{font:500 20px/1.2 var(--serif) !important;letter-spacing:0 !important}
+  /* CTA band title */
+  .next-series .ask b{font:500 28px/1.2 var(--serif) !important}
+  /* header brand name */
+  .brand-t b,.is-scrolled .brand-t b{font-family:var(--serif) !important;font-weight:600 !important;font-size:24px !important}
+  /* body: 18 desktop / 16 phone (Shubham's poll value) */
+  .ab-p,.lede,.sec-line,.ex-sum,.page-head .lede,.tband-card p{font:400 18px/1.6 var(--sans) !important}
+  /* small: one size, sentence case, muted */
+  .eyebrow,.card .meta,.card .meta-parts,.card .meta-parts .mp,.card .status,.pp-status,.pp-status .status,.pp-text .status,.pp-facts,.pp-text p.pp-facts,
+  .sm-cap,.ex-ch-where,.ex-kind,.ex-works span,.fsel span,.five-m,.series-tiles .meta,.chap-works figcaption,.chap-sig,
+  .press figcaption span,.press figcaption em,.press-videos figcaption em,.pp-cap,.pp-story span,.ftr p.meta,.ftr .meta,
+  .ftr-links a:not(.btn),.ftr-ig,.prevnext a span,.gal-cap em,.zoom-cap small,.ss-cap small,.tile.flip .back em,.flip-back em,.flip-back u,
+  .xcard em,.ncard em,.ccard em,.scard em,.qcard small,.nowstrip .live,.now-line .live,.wh .namecard .eyebrow,.ex-index span,.five-n,.sband .s-n,.s-n,label{
+    font-family:var(--sans) !important;font-size:14px !important;font-weight:400 !important;letter-spacing:0 !important;text-transform:none !important;font-style:normal !important}
+  .card .meta,.card .meta-parts,.card .status{line-height:1.4 !important}
+  .eyebrow,.card .meta,.card .meta-parts,.pp-facts,.pp-text p.pp-facts,.sm-cap,.ex-ch-where,.ex-kind,.ex-works span,.five-m,.series-tiles .meta,
+  .chap-works figcaption,.chap-sig,.pp-cap,.ftr p.meta,.ex-index span,.five-n,.sband .s-n,.s-n,.tile.flip .back em,.flip-back em,.qcard small,.prevnext a span{color:var(--muted) !important}
+  .sm-cap{line-height:1.45 !important;height:calc(2em * 1.45) !important}
+  /* on indigo: white text, one muted */
+  .band-indigo .eyebrow,.band-indigo .card .meta,.band-indigo .card .meta-parts,.band-indigo .card .status,.band-indigo .five-m,.band-indigo .s-n,
+  .band-indigo .press figcaption span,.band-indigo .press figcaption em,.press figcaption em,.band-indigo .fsel span{color:var(--muted-on-indigo) !important}
+  /* exhibition years, record years: quiet, ink */
+  .ex-ch-year{font:500 24px/1.2 var(--serif) !important;color:var(--ink) !important}
+  .tl-year{font:500 16px/1.3 var(--sans) !important;font-variant-numeric:lining-nums tabular-nums !important;color:var(--ink) !important;letter-spacing:0 !important}
+  .ex-quote{border-left-color:var(--rule) !important}
+  /* text link */
+  a.link,span.link,button.link{font-family:var(--sans) !important;font-size:14px !important;font-weight:500 !important;letter-spacing:0 !important;text-transform:none !important;
+    text-decoration:underline !important;text-underline-offset:4px !important;text-decoration-thickness:1px !important}
+  /* ---- 3.5 one button family: 44 px, radius 0, J 500 14 ---- */
+  .btn,.btn-solid,.btn-light,.chip,.pp-toggle,.pp-zoom,.pf-pager .btn{min-height:44px !important;padding-inline:20px !important;border-radius:0 !important;
+    font-family:var(--sans) !important;font-size:14px !important;font-weight:500 !important;letter-spacing:0 !important;text-transform:none !important;line-height:1 !important}
+  .pp-toggle,.pp-zoom{border:1px solid var(--ink) !important;color:var(--ink) !important}
+  .sband .s-txt .btn{min-height:44px !important;padding-inline:0 !important}
+  .ftr-links .btn{min-height:44px !important}
+  /* 3.8 footer: links J 14/400 */
+  .ftr-links a:not(.btn),.ftr-ig{font-weight:400 !important}
+
+  /* ---- 3.6 no uppercase labels anywhere ---- */
+  .wh .namecard .ctas .btn,.pp-toggle,.pp-zoom,.ex-index a,.pager span{text-transform:none !important;letter-spacing:0 !important}
+
+  /* ---- 3.4 red discipline: numbers, years, labels quiet ---- */
+  .five-n,.s-n,.ex-index span,.tile.flip .back em,.flip-back em,.qcard small,.tile.flip .back .go{color:var(--muted) !important}
+
+  /* widows */
+  h1,h2,h3,.chap-big,.card-t{text-wrap:balance !important}
+  .lede,.quote{text-wrap:pretty !important}
+
+  @media (max-width:640px){
+    .story-head h1{font-size:44px !important}
+    .wh-card h1{font-size:36px !important}
+    .page-title{font-size:32px !important}
+    .pp-title{font-size:30px !important}
+    .sec-head h2,#more-from h2,#more-from .sec-head>div>h2,.ab-txt h2,.ab-statement h2,.five-head h2,.ig-band h2,.txt>h2{font-size:28px !important}
+    .ex-ch-head h2,.sband h2,.chap-h h2{font-size:26px !important}
+    .hw-q blockquote,.story-quote .quote{font-size:26px !important}
+    .pp-story,.pp-text p.pp-story,.ex-quote blockquote,.tabpanel .quote,.series-sum-q,.ab-quote,.chap-big.hers,.qcard blockquote{font-size:20px !important}
+    .chap-big:not(.hers){font-size:24px !important}
+    .wh-line{font-size:17px !important}
+    .card-t,.card .card-t,.series-tiles .m-card b,.five-t,.press figcaption b{font-size:17px !important}
+    .next-series .ask b{font-size:24px !important}
+    .brand-t b,.is-scrolled .brand-t b{font-size:20px !important}
+    .ab-p,.lede,.sec-line,.ex-sum,.page-head .lede,.tband-card p{font-size:16px !important;line-height:1.55 !important}
+    .eyebrow,.card .meta,.card .meta-parts,.card .meta-parts .mp,.card .status,.pp-status,.pp-status .status,.pp-text .status,.pp-facts,.pp-text p.pp-facts,
+    .sm-cap,.ex-ch-where,.ex-kind,.ex-works span,.fsel span,.five-m,.series-tiles .meta,.chap-works figcaption,.chap-sig,
+    .press figcaption span,.press figcaption em,.press-videos figcaption em,.pp-cap,.pp-story span,.ftr p.meta,.ftr .meta,
+    .prevnext a span,.gal-cap em,.zoom-cap small,.ss-cap small,.tile.flip .back em,.flip-back em,.flip-back u,
+    .xcard em,.ncard em,.ccard em,.scard em,.qcard small,.nowstrip .live,.now-line .live,.wh .namecard .eyebrow,.ex-index span,.five-n,.sband .s-n,.s-n,label{font-size:13px !important}
+    .ex-ch-year{font-size:20px !important}
+    .fsel select,input,textarea,select{font-size:16px !important}
+  }
+}

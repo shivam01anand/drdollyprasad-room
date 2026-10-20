@@ -13,6 +13,7 @@ import "./fix-phone.css";
 import "./fix-type.css";
 import "./fix-night.css";
 import "./fix-tech.css";
+import "./tokens.css";
 import Header from "@/components/site/Header";
 import Footer from "@/components/site/Footer";
 import { Band, Rails } from "@/components/site/Borders";
