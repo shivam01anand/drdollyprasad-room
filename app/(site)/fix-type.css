@@ -46,3 +46,9 @@ body,.pp-text p,.sband .s-line,.pp-story{font-size:18px !important;line-height:1
 /* Home, Key collections: the box fits the painting (it was a fixed tall box), title close under it */
 .series-tiles .mat{height:auto !important;padding:0 !important;align-items:flex-end}
 .series-tiles .mat img{max-height:var(--mh) !important}
+
+/* COO final pass: painting info wraps cleanly at the separators (it overflowed into the next card on iPad) */
+.card .meta.meta-parts,.card .meta-parts{display:flex !important;flex-wrap:wrap;justify-content:center;width:100%}
+/* small labels stay readable on indigo bands (the type style's grey is for white grounds only) */
+.band-indigo .card .meta,.band-indigo .card .status,.band-indigo .five-m,.band-indigo .eyebrow,.band-indigo .fsel span,.ibnd .meta{color:#D3D8E8 !important}
+.band-indigo .card .st-sold,.band-indigo .card .meta-parts{color:#D3D8E8 !important}
