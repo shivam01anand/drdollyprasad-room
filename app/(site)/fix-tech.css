@@ -168,3 +168,4 @@ html:has(.five){scroll-behavior:auto}
   min-height:24px;text-decoration:none}
 .ftr-motion:hover{text-decoration:underline;text-underline-offset:4px}
 html[data-motion="paused"] *,html[data-motion="paused"] *::before,html[data-motion="paused"] *::after{animation-play-state:paused !important}
+.card .meta-parts{column-gap:0 !important}
