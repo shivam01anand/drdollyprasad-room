@@ -66,7 +66,7 @@ export default function Home() {
           <Link key={s.slug} className="card m-card" href={`/series/${s.slug}`}>
             <div className="mat">
               {/* eslint-disable-next-line @next/next/no-img-element */}
-              <img className="framed thin" src={thumb(s.hero)} alt={`${BY_ID.get(s.hero)?.title}, from ${s.label}`} loading="lazy" {...dims(thumb(s.hero))}
+              <img className="framed thin" src={thumb(s.hero)} alt={`${BY_ID.get(s.hero)?.title}, from ${s.label}`} loading="eager" {...dims(thumb(s.hero))}
                    style={{ ["--ar" as string]: `${dims(thumb(s.hero)).width} / ${dims(thumb(s.hero)).height}` }} />
             </div>
             <span className="card-t">{s.label}</span>
@@ -105,7 +105,7 @@ export default function Home() {
           return (
             <Link key={c.id} className="show-card" href={`/exhibitions#${c.id}`}>
               {/* eslint-disable-next-line @next/next/no-img-element */}
-              <img className="framed" src={c.src} alt={c.alt} loading="lazy" {...dims(c.src)} />
+              <img className="framed" src={c.src} alt={c.alt} loading="eager" {...dims(c.src)} />
               <span className="meta">{e.when.replace(/^Opened 11 /, "").replace(/ · on view.*$/, "")}</span>
               <b>{e.name ?? e.title}</b>
               <span className="meta">{e.venue}, {e.city}</span>
@@ -125,7 +125,7 @@ export default function Home() {
         </div>
       </section>
       <Marquee seconds={50} label="Available paintings" className="avail">
-        {AVAILABLE.map((id) => <Card key={id} w={BY_ID.get(id)!} />)}
+        {AVAILABLE.map((id) => <Card key={id} w={BY_ID.get(id)!} eager />)}
       </Marquee>
 
 

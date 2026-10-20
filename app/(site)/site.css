@@ -2351,3 +2351,23 @@ body *{font-style:normal !important}
   .five>li{flex:0 0 42vw;scroll-snap-align:start}
 }
 @media (prefers-reduced-motion:reduce){ .five-stage img{transition:none} }
+
+/* Palette (Shubham, 20 Oct): white and indigo, with the one pale cream only where a box needs a ground.
+   One indigo everywhere (the site's deeper indigo); one cream (--pale); no beige or off-white variants. */
+.wh .namecard{background:#fff}
+.collage .framed,.collage .tile img{background-color:var(--pale) !important}
+.xcard,.ncard,.ccard{background:#fff}
+.ncard.rust,.ncard.dark,.ccard.indigo{background:var(--indigo) !important;border-color:var(--indigo)}
+.five-stage{background:var(--pale)}
+/* carousels: no cream box while a picture arrives; the frame waits on white */
+.marq .framed{background-color:#fff}
+
+/* In the press (20 Oct): a neat grid, not a collage. Every item the same shape, captions on one line-up.
+   Photos fill their frame; the newspaper clipping and the television stills sit whole on cream. */
+@media (min-width:761px){
+  .press{column-count:auto !important;display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:clamp(20px,2.4vw,36px);align-items:start}
+  .press-item{margin:0 !important}
+  .press-open img,.press-clip{aspect-ratio:3/2 !important;height:auto;object-fit:cover}
+  .press-item.is-clipping .press-open img{object-fit:contain;background:var(--pale)}
+  .press-item figcaption{min-height:7.5em}
+}

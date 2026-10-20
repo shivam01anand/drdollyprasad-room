@@ -30,7 +30,7 @@ export default function SeriesIndex() {
       <section className="wrap" style={{ paddingBottom: 8 }}>
         <div className="five-head">
           <p className="eyebrow">Five collections</p>
-          <h2>One painter, looking twice</h2>
+          <h2>A doctor’s eye, looking deeper into the everyday</h2>
         </div>
         <FiveBlocks blocks={SERIES_PAGES.map((s) => ({ slug: s.slug, label: s.label, n: worksIn(s.label).length, period: s.period,
           pics: [s.hero, ...worksIn(s.label).map((w) => w.id).filter((id) => id !== s.hero && !SMALL_PHOTO.has(id))]
@@ -55,7 +55,7 @@ export default function SeriesIndex() {
               </div>
               <div className="s-works">
                 <Marquee seconds={Math.max(36, row.length * 9)} copies={row.length < 6 ? 6 : 4} reverse={i % 2 === 1} label={`Paintings from ${s.label}`} className="band-marq">
-                  {row.map((w) => <Card key={w.id} w={w} label={false} />)}
+                  {row.map((w) => <Card key={w.id} w={w} label={false} eager />)}
                 </Marquee>
               </div>
             </div>

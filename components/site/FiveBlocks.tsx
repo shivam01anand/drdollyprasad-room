@@ -25,7 +25,7 @@ export default function FiveBlocks({ blocks }: { blocks: Block[] }) {
                 {b.pics.map((p, i) => (
                   // eslint-disable-next-line @next/next/no-img-element
                   <img key={p.src} className={i === on ? "is-on" : ""} src={p.src} alt={i === 0 ? p.alt : ""}
-                       loading={i < 2 ? "eager" : "lazy"} />
+                       loading="eager" />
                 ))}
               </span>
               <span className="five-n">{String(k + 1).padStart(2, "0")}</span>
