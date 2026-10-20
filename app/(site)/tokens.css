@@ -81,6 +81,8 @@
   .btn,.btn-solid,.btn-light,.chip,.pp-toggle,.pp-zoom,.pf-pager .btn{min-height:44px !important;padding-inline:20px !important;border-radius:0 !important;
     font-family:var(--sans) !important;font-size:14px !important;font-weight:500 !important;letter-spacing:0 !important;text-transform:none !important;line-height:1 !important}
   .pp-toggle,.pp-zoom{border:1px solid var(--ink) !important;color:var(--ink) !important}
+  /* DC review #2 P0-1: pressed/hover keeps its label: white on ink (the line above had made it ink on ink) */
+  .pp-toggle:hover,.pp-toggle[aria-pressed="true"],.pp-zoom:hover{background:var(--ink) !important;color:#FFFFFF !important}
   .sband .s-txt .btn{min-height:44px !important;padding-inline:0 !important}
   .ftr-links .btn{min-height:44px !important}
   /* 3.8 footer: links J 14/400 */
