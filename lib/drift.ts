@@ -63,7 +63,7 @@ function grab(el: HTMLElement, h: {
     if ((e.target as Element).closest?.("[data-grab]") !== el) return;
     id = e.pointerId; sx = e.clientX; sy = e.clientY; dragging = false; abandoned = false;
     isTouch = e.pointerType !== "mouse";
-    lastX = e.clientX; lastT = performance.now(); samples = [[lastT, lastX]];
+    lastX = e.clientX; lastT = e.timeStamp || performance.now(); samples = [[lastT, lastX]];
   };
   const move = (e: PointerEvent) => {
     if (e.pointerId !== id || abandoned) return;
@@ -78,7 +78,8 @@ function grab(el: HTMLElement, h: {
       el.classList.add("is-dragging");
       h.start();
     }
-    const now = performance.now();
+    // the event's own time, not when it was delivered: a late pointermove must not look like a rest (review #2 R2-3)
+    const now = e.timeStamp || performance.now();
     lastX = e.clientX; lastT = now;
     samples.push([now, lastX]);
     while (samples.length > 2 && now - samples[0][0] > VEL_WINDOW) samples.shift();
@@ -97,7 +98,12 @@ function grab(el: HTMLElement, h: {
     const [t0, x0] = samples[0];
     const span = lastT - t0;
     const vx = span >= 8 ? ((lastX - x0) / span) * 1000 : 0;
-    h.end(performance.now() - lastT > 90 ? 0 : vx);
+    // a rest is a pointer that held still: time since the last move (both on event time) AND no travel since it.
+    // A fast drag (3+ samples, over 800 px/s) whose last move came in late always coasts.
+    const tUp = e.timeStamp || performance.now();
+    const still = Math.abs(e.clientX - lastX) < 2;
+    const rested = still && tUp - lastT > 120 && !(samples.length >= 3 && Math.abs(vx) > 800 && tUp - lastT < 200);
+    h.end(rested ? 0 : vx);
   };
   const click = (e: MouseEvent) => { if (swallow) { e.preventDefault(); e.stopPropagation(); swallow = false; } };
   const noDrag = (e: DragEvent) => e.preventDefault();
