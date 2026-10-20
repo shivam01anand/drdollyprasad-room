@@ -2327,6 +2327,5 @@ body *{font-style:normal !important}
 .series-tiles .m-card .card-t,.series-tiles .m-card .meta{text-align:center}
 .sband .eyebrow,.sband .btn{font-size:13px}
 .series-tiles .m-card .mat{width:100%;align-self:stretch}
-=======
 /* "sacred" is always red (Shubham, 19 Oct 2026): same red as "Dolly"; colour only */
 .wh .namecard .wh-line .red,.brand-t .red{color:var(--red);font:inherit}
