@@ -94,8 +94,8 @@
 .pp-text a.pp-back:hover{text-decoration:underline;text-underline-offset:4px}
 
 /* ==== R4 B3-1: /series = collage hero (450 at 1440x900) -> switcher -> five bands -> one Ask row ==== */
-/* R4 fix 4 (Brand P1-4): "heroes taller": 540 at 1440x900 (was 450, the shortest hero on the site); phones unchanged */
-@media (min-width:641px){ .wh.wh-dir .collage{height:clamp(500px,60svh,560px) !important} }
+/* R4 fix 4 (Brand P1-4): "heroes taller": 540 at 1440x900 (was 450, the shortest hero on the site); capped at 553 (Brand 560) so the first band stays <= 690 on 1080-tall screens (S2); phones unchanged */
+@media (min-width:641px){ .wh.wh-dir .collage{height:clamp(500px,60svh,553px) !important} }
 .sband.band-white,.sband.band-indigo{padding-block:40px}
 .sband .srow.wrap{max-width:1360px;box-sizing:border-box}
 @media (min-width:761px){
