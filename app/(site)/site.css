@@ -2329,13 +2329,3 @@ body *{font-style:normal !important}
 .series-tiles .m-card .mat{width:100%;align-self:stretch}
 /* "sacred" is always red (Shubham, 19 Oct 2026): same red as "Dolly"; colour only */
 .wh .namecard .wh-line .red,.brand-t .red{color:var(--red);font:inherit}
-
-/* QA 20 Oct: Collections intro, the slideshow lines up with the list (top of the list to the last rule), no stray reel under the list */
-@media (min-width:861px){
-  .ss-intro{align-items:end}
-  .ss-intro .ss{padding-bottom:0}
-}
-/* QA 20 Oct: Collections bands, the title and status sit centred under each framed painting (they started at the card's left edge, off the picture) */
-.band-marq .card{align-items:center;text-align:center}
-.band-marq .card .card-t{text-align:center}
-.band-marq .card .status{justify-content:center}
