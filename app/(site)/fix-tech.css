@@ -184,3 +184,8 @@ html[data-motion="paused"] *,html[data-motion="paused"] *::before,html[data-moti
 /* Exhibitions: less empty page between the record and the end band (QC G4: 142 px) */
 .ex-record{padding-bottom:clamp(16px,2vw,28px) !important}
 .ex-record + .sec-tight{padding-top:clamp(12px,1.6vw,20px) !important}
+
+/* review #2 (Brand P2-4 / COO #10): the hero wall drifts, so a tile is always crossing its bottom edge; a hard cut read as a
+   clipped caption ("Lighting the lamp"). The last 48 px of the wall now fade out, so a passing tile dissolves instead of being cut. */
+.wh .collage{-webkit-mask-image:linear-gradient(180deg,#000 calc(100% - 48px),transparent) !important;
+                    mask-image:linear-gradient(180deg,#000 calc(100% - 48px),transparent) !important}
