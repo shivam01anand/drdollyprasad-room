@@ -63,22 +63,22 @@ export default function Exhibitions() {
               </div>
             </header>
             <div className="ex-ch-body">
-              <div className="ex-ch-txt">
-                {s.quote && (
-                  <figure className="ex-quote">
-                    <blockquote>“{s.quote}”</blockquote>
-                    <figcaption>Dr Dolly Prasad, on her exhibitions</figcaption>
-                  </figure>
-                )}
-                {s.works && s.works.length > 0 && (
-                  <p className="ex-works">
-                    <span>On the walls</span>
-                    {s.works.map((id) => <Link key={id} href={workPath(id)}>{BY_ID.get(id)?.title}</Link>)}
-                  </p>
-                )}
-                {s.note && <p className="meta">{s.note}</p>}
-              </div>
-              <ShowMedia photos={photos} label={`Photographs: ${s.name ?? s.title}`} />
+              {(s.quote || s.note) && (
+                <div className="ex-ch-txt">
+                  {s.quote && (
+                    <figure className="ex-quote">
+                      <blockquote>“{s.quote}”</blockquote>
+                      <figcaption>Dr Dolly Prasad, on her exhibitions</figcaption>
+                    </figure>
+                  )}
+                  {s.note && <p className="meta">{s.note}</p>}
+                </div>
+              )}
+              {/* "On the walls" now sits in the photograph's caption (R3 §1, Shubham 20 Oct) */}
+              <ShowMedia photos={photos} label={`Photographs: ${s.name ?? s.title}`}
+                         walls={s.works?.length ? s.works.map((id, j) => (
+                           <Fragment key={id}>{j > 0 && ", "}<Link href={workPath(id)}>{BY_ID.get(id)?.title}</Link></Fragment>
+                         )) : undefined} />
             </div>
           </section>
           {/* In the press is the page's third section: right after India Habitat Centre, the show the interviews are from (QA P1-1) */}

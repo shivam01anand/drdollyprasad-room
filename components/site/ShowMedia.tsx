@@ -1,6 +1,6 @@
 "use client";
 
-import { useCallback, useEffect, useRef, useState } from "react";
+import { useCallback, useEffect, useRef, useState, type ReactNode } from "react";
 import Gallery from "./Gallery";
 import { dims } from "@/lib/images";
 import { swipe } from "@/lib/drift";
@@ -24,7 +24,7 @@ const sm = (src: string) => src.replace("/site/ex/", "/site/ex/sm/");
  * photograph has gone out of its view, and never within 6 s of their own touch.
  * Under "Reduce motion" (lib/motion-rules) it changes every 5 s as a crossfade.
  */
-export default function ShowMedia({ photos, label }: { photos: Photo[]; label: string }) {
+export default function ShowMedia({ photos, label, walls }: { photos: Photo[]; label: string; walls?: ReactNode }) {
   const [i, setI] = useState(0);
   const [prev, setPrev] = useState<number | null>(null);
   const [open, setOpen] = useState<number | null>(null);
@@ -172,7 +172,7 @@ export default function ShowMedia({ photos, label }: { photos: Photo[]; label: s
         {/* eslint-disable-next-line @next/next/no-img-element */}
         <img key={p.src} src={p.src} alt={p.alt} loading="eager" decoding="async" draggable={false} {...dims(p.src)} />
       </button>
-      <p className="sm-cap" aria-live="off">{p.cap ?? p.alt}</p>
+      <p className="sm-cap"><span aria-live="off">{p.cap ?? p.alt}</span>{walls && <span className="sm-walls"> · On the walls: {walls}</span>}</p>
       {n > 1 && (
         <div className="sm-strip" ref={strip} role="group" aria-label={`${label}: photographs`}>
           {photos.map((x, k) => (
@@ -183,6 +183,8 @@ export default function ShowMedia({ photos, label }: { photos: Photo[]; label: s
               <img src={sm(x.src)} alt="" loading="lazy" decoding="async" draggable={false} {...dims(sm(x.src))} />
             </button>
           ))}
+          {/* a computer shows six tiles at most; the rest are a click away in the full-screen look (R3 §1) */}
+          {n > 6 && <button type="button" className="sm-more" onClick={() => setOpen(5)}>+{n - 5} more</button>}
         </div>
       )}
       {open !== null && (

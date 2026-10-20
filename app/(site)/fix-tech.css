@@ -253,3 +253,27 @@ html[data-motion="paused"] *,html[data-motion="paused"] *::before,html[data-moti
 .press-marq figcaption span{display:block}
 @media (max-width:640px){ .press-marq .press-item{min-width:180px} }
 .press-row .press-more{margin-top:0}
+/* §1 Exhibitions chapters: head across; photo left, quote + six tiles right; caption (with "On the walls") under the photo */
+@media (min-width:1100px){
+  .ex-ch{display:grid !important;grid-template-columns:minmax(0,7fr) minmax(0,5fr) !important;column-gap:40px !important;
+         grid-template-rows:auto auto 1fr auto !important;grid-template-areas:"head head" "photo txt" "photo strip" "cap strip";
+         padding-block:48px !important}
+  .ex-ch>.ex-ch-body,.ex-ch .sm-media{display:contents !important}
+  .ex-ch>.ex-ch-head{grid-area:head !important;grid-column:auto !important;grid-row:auto !important;margin-bottom:24px !important;align-items:baseline}
+  .ex-ch .ex-ch-txt{grid-area:txt !important;grid-column:auto !important;grid-row:auto !important;margin:0 0 20px !important;padding:0 !important}
+  .ex-ch .sm-hero{grid-area:photo;height:clamp(340px,28vw,420px) !important;align-self:start}
+  .ex-ch .sm-cap{grid-area:cap;margin-top:12px !important;min-height:2.9em}
+  .ex-ch .sm-strip{grid-area:strip;align-self:start;display:grid !important;grid-template-columns:repeat(3,minmax(0,1fr));gap:10px;overflow:visible !important}
+  .ex-ch .sm-strip button{width:100% !important;height:auto !important;aspect-ratio:3/2}
+  .ex-ch .sm-strip button img{width:100%;height:100%;object-fit:cover}
+  .ex-ch .sm-strip:has(.sm-more) button:not(.sm-more):nth-child(n+6){display:none !important}
+  .ex-ch .sm-more{display:flex !important;align-items:center;justify-content:center;background:var(--paper,#F6F3EE);border:1px solid var(--rule)}
+}
+.sm-more{display:none}
+.sm-walls a{text-decoration:underline;text-underline-offset:4px}
+@media (min-width:641px) and (max-width:1099px){
+  .ex-ch-body{display:flex !important;flex-direction:column;gap:16px;padding-left:0 !important}
+  .ex-ch .sm-hero{height:min(60vw,440px) !important}
+  .ex-ch .sm-cap{min-height:2.9em}
+}
+@media (max-width:640px){ .ex-ch .sm-cap{min-height:calc(3 * 1.45em)} }
