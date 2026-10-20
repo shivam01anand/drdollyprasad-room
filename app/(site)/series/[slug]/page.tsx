@@ -104,7 +104,8 @@ function ChapterView({ c, n, flip }: { c: Chapter; n: number; flip: boolean }) {
   const rs = works.reduce((t, w) => t + ar(w.id), 0), rmax = Math.max(...works.map((w) => ar(w.id)));
   // a short row (two paintings: at 340 px it fills under 60 % of the 1,274 px content width) stands beside its text
   // instead of under it, so the chapter is not a half-empty band (S3 fill); phones are unchanged (the strip)
-  const beside = (340 - 24) * rs + 48 * works.length - 24 <= 0.6 * 1274;
+  // Brand R4-2 D1: beside is for rows of two only; rows of 3+ fill the width under the text (R4 fix 2)
+  const beside = works.length === 2 && (340 - 24) * rs + 48 * works.length - 24 <= 0.6 * 1274;
   return (
     <section className={`chap chv multi${beside ? " beside" : ""}`} data-chapter>
       <div className="wrap chv-in">

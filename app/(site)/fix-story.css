@@ -192,6 +192,13 @@
 .chv-row a{display:block}
 .chv-row img.framed{display:block;height:var(--rh);width:auto;max-width:none;max-height:none}
 .chv-row figcaption{width:0;min-width:100%;margin-top:8px;text-wrap:balance}
+/* R4 fix 2 (Brand P1-2, COO 2, consultant P1-2/P1-3): a row of 3+ paintings under its text fills the content width at one
+   shared height (the cqw fit term), capped at 440 px (D) / 360 px (T), never cropped or wrapped; whatever is still short
+   is centred. Captions sit centred under each painting, as everywhere else on the site. */
+.chv-row figcaption{text-align:center}
+@media (min-width:1100px){ .chv.multi:not(.beside) .chv-row{--rh:min(440px,calc((100cqw - var(--n) * var(--F) - (var(--n) - 1) * 24px) / var(--rs) + var(--F)))} }
+@media (min-width:761px) and (max-width:1099px){ .chv.multi:not(.beside) .chv-row{--rh:min(360px,calc((100cqw - var(--n) * var(--F) - (var(--n) - 1) * 24px) / var(--rs) + var(--F)))} }
+@media (min-width:761px){ .chv.multi:not(.beside) .chv-row{justify-content:center} }
 @media (min-width:761px) and (max-width:1099px){
   .chv.single .chv-in{gap:40px}
   .chv-art img.framed{max-height:clamp(320px,40vw,440px)}
