@@ -31,8 +31,6 @@
 @media (min-width:901px){
   .ex-ch-body{align-items:center}
 }
-.sm-hero{aspect-ratio:auto !important;height:auto;max-height:none !important}
-.sm-hero img{max-height:380px;max-width:100%;width:auto;height:auto}
 .sm-media{gap:14px}
 .sm-cap{margin:0}
 

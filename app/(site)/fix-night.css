@@ -4,8 +4,16 @@
 html,body,*{font-variant-numeric:lining-nums;font-feature-settings:"lnum" 1,"kern" 1}
 
 /* exhibitions: the photograph rolls, the strip scrolls by hand */
-.sm-hero{aspect-ratio:3/2 !important;max-height:none !important;height:auto;width:100%}
-.sm-hero img{max-height:100% !important;max-width:100% !important;object-fit:contain;animation:smIn .5s ease both}
+/* the stage has one fixed height (Brand R1 #3; Tech T2): its width is the column (container units), so a
+   portrait after a landscape never changes the block and nothing below it moves. The frame hugs the photograph. */
+.sm-media{container-type:inline-size}
+.sm-hero{aspect-ratio:auto !important;width:100%;height:min(clamp(320px,32vw,440px),66.667cqw) !important;min-height:0 !important;max-height:none !important;
+  display:grid !important;grid-template:minmax(0,1fr) / minmax(0,1fr);place-items:center;background:transparent;touch-action:pan-y}
+.sm-hero img{grid-area:1/1;max-height:100% !important;max-width:100% !important;width:auto;height:auto;object-fit:contain;animation:smIn .5s ease both}
+@media (max-width:640px){ .sm-hero{height:min(66vw,280px) !important} }
+/* the caption keeps a two-line box (longer sentences are clamped; the full sentence is the photograph's alt) */
+.sm-cap{display:-webkit-box;-webkit-box-orient:vertical;-webkit-line-clamp:2;line-clamp:2;overflow:hidden;height:calc(2em * 1.6);margin:0}
+@media (max-width:640px){ .sm-cap{height:calc(2em * 1.55)} }
 @keyframes smIn{from{opacity:.0}to{opacity:1}}
 .sm-strip{flex-wrap:nowrap !important;overflow-x:auto;overscroll-behavior-x:contain;-webkit-overflow-scrolling:touch;scrollbar-width:none;scroll-behavior:auto;padding:3px 3px 6px;margin-inline:-3px;touch-action:pan-x pan-y}
 .sm-strip::-webkit-scrollbar{display:none}
