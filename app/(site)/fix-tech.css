@@ -265,3 +265,8 @@ html[data-motion="paused"] *,html[data-motion="paused"] *::before,html[data-moti
   .ex-ch .sm-cap{min-height:2.9em}
 }
 @media (max-width:640px){ .ex-ch .sm-cap{min-height:calc(3 * 1.45em)} }
+
+/* R4 B2-2: where the collections switcher is sticky (>=761), anchors land below header bar + switcher (44 px) */
+@media (min-width:761px){
+  html:has(.csw) :is(.ex-ch,.sband,[id]){scroll-margin-top:calc(var(--hdr-bar) + 1px + 44px + 16px)}
+}

@@ -2,6 +2,7 @@ import type { Metadata } from "next";
 import Link from "next/link";
 import { Fragment } from "react";
 import IndigoBand from "@/components/site/IndigoBand";
+import CollectionsSwitcher from "@/components/site/CollectionsSwitcher";
 import { notFound } from "next/navigation";
 import Card from "@/components/site/Card";
 import { SERIES_BY_SLUG, SERIES_PAGES, WHATSAPP, shownYear, enquireHref, whatsappHref, worksIn, type Chapter } from "@/lib/site";
@@ -101,6 +102,7 @@ export default async function SeriesStory({ params }: Props) {
   const photo = PHOTO[s.slug];
   return (
     <>
+      <CollectionsSwitcher current={s.slug} />
       <section className="story-head wrap">
         <p className="eyebrow">{s.period} · {works.length} works</p>
         <h1>{s.label}</h1>

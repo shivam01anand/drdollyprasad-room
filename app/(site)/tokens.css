@@ -125,6 +125,10 @@
   .st-sold i,.pp-text .st-sold i,.card .st-sold i{background:#5F564D !important}
   .band-indigo .st-sold i,.chap-dark .st-sold i{background:var(--muted-on-indigo) !important}
 
+  /* ---- R4 B2: switcher, Previous/Next pair, painting back link (type and colour) ---- */
+  .csw-t,.csw-pn{font:500 14px/1.2 var(--sans) !important;color:var(--muted) !important;letter-spacing:0 !important;text-transform:none !important}
+  .csw-i:hover .csw-t,.csw-i:focus-visible .csw-t,.csw-pn:hover,.csw-pn:focus-visible,.csw-i[aria-current="page"] .csw-t{color:var(--ink) !important}
+
   @media (max-width:640px){
     .story-head h1{font-size:44px !important}
     .wh-card h1{font-size:36px !important}
