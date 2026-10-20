@@ -14,3 +14,14 @@
 }
 /* until the picture is there its frame, mat and shadow are not drawn (no empty black square first) */
 .pp-art img.is-loading{border-color:transparent !important;background:transparent !important;box-shadow:none !important}
+
+/* ---- B1 · shadows are never cut by a box edge (T5; Brand R1 #6) ----
+   .card .mat clipped its own picture's shadow (More from…, grids); the only reason was the hover lift, which reads better unclipped. */
+.card .mat{overflow:visible}
+/* Collections bands: the row's window edge sat on the column line and cut the shadow of the first card with a hard
+   vertical line. The window now starts --fade into the gutter and fades over it, so the shadow dissolves instead. */
+@media (min-width:761px){
+  .sband .band-marq{--fade:24px;padding-left:var(--fade) !important;margin-left:calc(-1 * var(--fade)) !important;
+    -webkit-mask-image:linear-gradient(90deg,transparent 0,#000 var(--fade),#000 calc(100% - var(--fade)),transparent);
+            mask-image:linear-gradient(90deg,transparent 0,#000 var(--fade),#000 calc(100% - var(--fade)),transparent)}
+}
