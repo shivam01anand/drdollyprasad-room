@@ -5,6 +5,10 @@
 @media (max-width:760px){
   .story-hero>.meta,.story-hero>p.meta{padding-inline:18px !important;text-align:center !important;text-wrap:balance}
 }
+/* F12 (R4 B1-1): the story caption always wraps, never pushes the page sideways */
+@media (max-width:760px){
+  .story-hero .meta,.so-art figcaption{white-space:normal;overflow-wrap:anywhere}
+}
 /* F3 */
 @media (max-width:760px){
   .card .status{white-space:nowrap !important;font-size:12.5px !important}

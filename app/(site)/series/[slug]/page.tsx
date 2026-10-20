@@ -1,5 +1,6 @@
 import type { Metadata } from "next";
 import Link from "next/link";
+import { Fragment } from "react";
 import IndigoBand from "@/components/site/IndigoBand";
 import { notFound } from "next/navigation";
 import Card from "@/components/site/Card";
@@ -112,8 +113,9 @@ export default async function SeriesStory({ params }: Props) {
           <img className="framed" src={img(hero.id)} alt={alt(hero)} fetchPriority="high" {...wh(hero.id)} />
         </Link>
         <p className="meta">{[hero.title, hero.medium, hero.size, shownYear(hero)].filter(Boolean).map((x, i, a) => (
-          // each part stays whole; a dot only ever ends a line, never starts one
-          <span key={i} style={{ whiteSpace: "nowrap" }}>{String(x)}{i < a.length - 1 ? " ·" : ""}{i < a.length - 1 ? " " : ""}</span>
+          // each part stays whole; a dot only ever ends a line, never starts one. The space sits
+          // between the spans (R4 B1-1), so the caption can wrap instead of pushing the page sideways.
+          <Fragment key={i}><span style={{ whiteSpace: "nowrap" }}>{String(x)}{i < a.length - 1 ? " ·" : ""}</span>{i < a.length - 1 ? " " : ""}</Fragment>
         ))}</p>
       </section>
 
