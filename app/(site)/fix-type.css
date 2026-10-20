@@ -22,3 +22,10 @@ body,.pp-text p,.sband .s-line,.pp-story{font-size:18px !important;line-height:1
 .sband .band-marq .card{gap:10px}
 .sband .band-marq .card .card-t{margin-top:0 !important}
 @media (max-width:760px){ .sband{padding-block:18px !important} .sband .srow{gap:8px !important} }
+
+/* COO 20 Oct 01:53 (Shubham): on phones "Read the story" sits on the dates line, right-aligned; the title gets the full width */
+@media (max-width:760px){
+  .sband .s-txt{grid-template-columns:auto minmax(0,1fr) auto !important;grid-template-areas:"n t t" "e e b" "l l l" !important;row-gap:6px !important}
+  .sband .s-txt .btn{grid-area:b !important;justify-self:end;align-self:center;min-height:32px;white-space:nowrap}
+  .sband .s-txt .eyebrow{align-self:center}
+}
