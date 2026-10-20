@@ -258,9 +258,7 @@ export const statusText = (w: Work) =>
   w.status === "Sold" ? "In a private collection" : w.status === "Enquire" ? "On enquiry" : "Available";
 
 /** the label line: medium · size · year */
-/** sizes never break across lines ("36 × 36 in" stays together) */
-export const nb = (s?: string) => s?.replace(/ /g, "\u00a0");
-export const labelLine = (w: Work) => [w.medium, nb(w.size), shownYear(w)].filter(Boolean).join(" · ");
+export const labelLine = (w: Work) => [w.medium, w.size, shownYear(w)].filter(Boolean).join(" · ");
 
 /** a painting shows one year: the year recorded, or the latest year of the series' range */
 export const shownYear = (w: Work) => w.year?.match(/\d{4}(?!.*\d{4})/)?.[0];
