@@ -58,3 +58,9 @@
 /* ---- B2 · phone cards: "36 × 48 in · 2018" on one line, status under it (T12; Brand R1 #23) ---- */
 .card .meta-parts{flex-direction:row !important}
 .card-t{hyphens:none;-webkit-hyphens:none}
+
+/* Home Instagram roll (Design Control, extends T5): its clip box cut the frames' shadow with a hard left and bottom edge.
+   More room below and above, and the two ends fade over 24 px instead of cutting. */
+.ig-roll{padding-block:24px 40px !important;margin-block:-24px -40px !important;
+  -webkit-mask-image:linear-gradient(90deg,transparent 0,#000 24px,#000 calc(100% - 24px),transparent) !important;
+          mask-image:linear-gradient(90deg,transparent 0,#000 24px,#000 calc(100% - 24px),transparent) !important}
