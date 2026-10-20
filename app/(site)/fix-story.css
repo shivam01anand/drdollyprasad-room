@@ -1,1 +1,49 @@
 /* Tech team: story (20 Oct night). Only this team edits this file. */
+
+/* 6. no side frame lines: hero and bands run edge to edge on every page */
+:root{--rail:0px}
+.rail{display:none}
+.site{padding-inline:0}
+
+/* 1. painting captions under the chapter paintings: centred, 14px, muted */
+.chap-works figcaption{text-align:center;font-size:14px;line-height:1.4;color:var(--muted)}
+.chap-dark .chap-works figcaption{color:var(--dark-muted)}
+
+/* 2. "Next collection": the last word and its arrow never part */
+.next-series .go b .nw{white-space:nowrap}
+
+/* 3. collections page: readable small print, room between text and the first painting */
+.series-sum-q .eyebrow{font-family:var(--sans);font-size:12px;letter-spacing:.16em}
+.sband .eyebrow{font-size:13px}
+@media (min-width:761px){
+  .sband .srow{column-gap:clamp(28px,3vw,44px)}
+  .sband .s-works .band-marq{margin-left:0;padding-left:clamp(8px,1.5vw,24px)}
+}
+
+/* 4. phones: pairs of buttons sit side by side when they fit */
+@media (max-width:640px){
+  .site .wh-card.namecard .ctas,.site .ibnd-chips{display:flex;flex-direction:row;flex-wrap:wrap;gap:10px;justify-content:center}
+  .site .wh-card.namecard .ctas .btn,.site .ibnd-chips .btn{flex:1 1 calc(50% - 5px);min-width:max-content;white-space:nowrap;text-align:center;justify-content:center;padding-inline:10px;letter-spacing:.12em;font-size:12px;margin:0}
+
+  /* 5. footer: one tidy centred block, no empty white under the skyline */
+  .site,.site:has(.wp-bar){padding-bottom:0}
+  .ftr-in{align-items:center;text-align:center;gap:16px;padding-block:26px 12px}
+  .ftr-id{justify-content:center;text-align:left}
+  .ftr-links{flex-direction:row;flex-wrap:wrap;justify-content:center;align-items:center;gap:0 18px;width:100%;font-size:14px}
+  .ftr-links>a[href='/enquire']{order:1}
+  .ftr-links>a:last-child{order:2}
+  .ftr-links>a[href^='mailto']{order:3}
+  .ftr-links>.ftr-ig{order:4}
+  .ftr-links .btn{background:none;border:0;color:inherit;min-height:44px;padding:0;letter-spacing:0;text-transform:none;font-size:14px;font-weight:400;box-shadow:none;text-decoration:underline;text-underline-offset:4px}
+  .ftr-links .btn:hover{background:none;color:var(--red)}
+  .ftr-links a{display:inline-flex;align-items:center;min-height:44px}
+  .ftr .wrap:last-of-type{text-align:center;padding-bottom:10px !important}
+  .band-bottom{margin-bottom:0}
+}
+
+/* 7. home "Key collections" row: starts on the page margin; both ends fade out instead of cutting a caption mid-word */
+@media (min-width:761px){
+  .marq.series-tiles{padding-left:var(--gut);
+    -webkit-mask-image:linear-gradient(90deg,transparent 0,#000 calc(var(--gut) * .8),#000 calc(100% - var(--gut) * .8),transparent 100%);
+    mask-image:linear-gradient(90deg,transparent 0,#000 calc(var(--gut) * .8),#000 calc(100% - var(--gut) * .8),transparent 100%)}
+}
