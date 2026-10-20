@@ -53,6 +53,7 @@
 .csw{position:sticky;top:calc(var(--hdr-bar) + 1px);z-index:19;height:44px;background:rgba(255,255,255,.96);border-bottom:1px solid var(--rule)}
 .csw-in{display:flex;gap:28px;justify-content:center;align-items:center;max-width:1360px;height:100%;margin-inline:auto;padding-inline:var(--gut);box-sizing:border-box;overflow-x:auto;overflow-y:hidden;scrollbar-width:none}
 .csw-in::-webkit-scrollbar{display:none}
+.csw-nav{flex:none}
 .csw-l{display:flex;gap:28px;align-items:center;list-style:none;margin:0;padding:0}
 .csw-l li{margin:0;padding:0}
 .csw-i,.csw-pn{display:inline-flex;align-items:center;gap:8px;min-height:44px;text-decoration:none;white-space:nowrap}
