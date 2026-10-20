@@ -61,3 +61,7 @@ body,.pp-text p,.sband .s-line,.pp-story{font-size:18px !important;line-height:1
 /* Home Key collections: the lines under each title are centred under the painting (they sat 52px left on laptop) */
 .series-tiles .m-card .meta{margin-inline:auto !important;text-align:center}
 @media (max-width:640px){ .card .meta-parts{flex-direction:column !important;align-items:center;row-gap:0} }
+/* COO (Shubham 02:34): the painting page's medium · size · year line, as calm as everywhere else */
+.pp-text p.pp-facts,.pp-facts{font-size:14px !important;line-height:1.5 !important;color:#4a5066 !important;letter-spacing:0 !important}
+@media (max-width:640px){ .pp-text p.pp-facts,.pp-facts{font-size:13px !important} }
+.pp-story,.pp-text p.pp-story{font-size:17px !important}
