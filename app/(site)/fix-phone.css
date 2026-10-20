@@ -34,7 +34,9 @@
 }
 /* F11 */
 .band-indigo .card .st-enquire i,.ibnd .card .st-enquire i{box-shadow:inset 0 0 0 1px #D3D8E8 !important}
-/* F6 */
+/* F6 removed (R4 B1-2): max-height:52vw on a 100%-wide frame letterboxed the paintings (up to 1.93x).
+   F13 (R4 B1-2): on phones, chapter and story-opening frames follow the painting's own shape.
+   The global .framed rule (site.css) is left alone: tiles, slides, About and the IG track use it. */
 @media (max-width:760px){
-  .chap-works .framed{max-height:52vw !important}
+  .chap .framed,.story-open .framed{width:auto !important;max-width:100% !important;height:auto !important;max-height:min(64svh,420px) !important;aspect-ratio:var(--ar,auto);display:block;margin-inline:auto}
 }
