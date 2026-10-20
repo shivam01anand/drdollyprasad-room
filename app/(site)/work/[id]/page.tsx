@@ -3,7 +3,7 @@ import Link from "next/link";
 import IndigoBand from "@/components/site/IndigoBand";
 import { notFound } from "next/navigation";
 import { BY_ID, LARGE, SHOW, SITE, WORKS, inchDims, quoted, workPath, type Work } from "@/lib/works";
-import { INSTAGRAM, LOOK, NOW_SHOWING_CONFIRMED, PULL, SMALL_PHOTO, shownYear, STUDIO_PATH, WHATSAPP, WORDS, enquireHref, labelLine, seriesPath, whatsappHref, worksIn } from "@/lib/site";
+import { INSTAGRAM, LOOK, NOW_SHOWING_CONFIRMED, PULL, SMALL_PHOTO, shownYear, statusText, STUDIO_PATH, WHATSAPP, WORDS, enquireHref, labelLine, seriesPath, whatsappHref, worksIn } from "@/lib/site";
 import manifest from "@/public/art/manifest.json";
 import Card from "@/components/site/Card";
 import PaintingStage from "@/components/site/PaintingStage";
@@ -28,14 +28,13 @@ type Props = { params: Promise<{ id: string }> };
 const DIMS = new Map(manifest.works.map((d) => [d.id, d]));
 
 const facts = (w: Work) => [w.medium, w.size, shownYear(w), w.series].filter(Boolean).join(" · ");
-const statusWord = (w: Work) => (w.status === "Sold" ? "Sold" : w.status === "Enquire" ? "On enquiry" : "Available");
 
 export async function generateMetadata({ params }: Props): Promise<Metadata> {
   const { id } = await params;
   const w = BY_ID.get(id);
   if (!w) return {};
   const title = quoted(w.title);
-  const description = `${quoted(w.title)}, by Dr Dolly Prasad. ${facts(w)}. ${statusWord(w)}.`;
+  const description = `${quoted(w.title)}, by Dr Dolly Prasad. ${facts(w)}. ${statusText(w)}.`;
   return {
     title,
     description,
@@ -84,7 +83,7 @@ export default async function WorkPage({ params }: Props) {
   // the label (medium, size, year, collection) is shown once, under the title; this adds only what it does not say
   const rows: [string, React.ReactNode][] = [
     ["Size", w.size ? `${w.size}${cm} (height × width)` : "On request"],
-    ["Status", sold ? "In a private collection" : statusWord(w)],
+    ["Status", sold ? "In a private collection" : statusText(w)],
   ];
 
   const tabs = [
@@ -110,7 +109,7 @@ export default async function WorkPage({ params }: Props) {
           <h1 className="pp-title">{w.title}</h1>
           <p className="pp-facts">{[w.medium, w.size, shownYear(w)].filter(Boolean).join(" · ")}</p>
           {lead && <p className="pp-story">{words ? `“${lead}”` : lead}{words && <span>Dr Dolly Prasad</span>}</p>}
-          <p className="pp-status"><span className={`status st-${sold ? "sold" : w.status === "Enquire" ? "enquire" : "free"}`}><i aria-hidden="true" />{sold ? "In a private collection" : statusWord(w)}</span>
+          <p className="pp-status"><span className={`status st-${sold ? "sold" : w.status === "Enquire" ? "enquire" : "free"}`}><i aria-hidden="true" />{sold ? "In a private collection" : statusText(w)}</span>
             <Link href={seriesPath(w.series)}>{w.series}</Link></p>
         </div>
       </PaintingStage>
