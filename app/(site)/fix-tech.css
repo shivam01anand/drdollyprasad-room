@@ -148,11 +148,8 @@ html:has(.five){scroll-behavior:auto}
 }
 
 /* ---- B4 · hero heights and hero buttons (4-REVIEW1-DECISION 4.3) ---- */
-/* Works on a laptop: a short hero, so the filter bar and the top of the first row show at 1440 x 900 */
-@media (min-width:641px){ body:has(.pf-grid.works-grid) .wh .collage{height:clamp(280px,36vh,340px) !important;min-height:0 !important} }
+/* R3 (4-R3-DECISION §3): the heroes are a little taller, leaving a hint of the page below; heights now live in the R3 block */
 @media (max-width:640px){
-  .wh-home .collage{height:min(68svh,520px) !important;min-height:0 !important}
-  .wh-page .collage,body:has(.pf-grid.works-grid) .wh .collage{height:min(58svh,440px) !important;min-height:0 !important}
   .wh .namecard,.wh .namecard.has-face{min-height:0 !important}
   .wh .namecard .ctas{display:grid !important;grid-template-columns:1fr 1fr;gap:8px;width:100%}
   .wh .namecard .ctas .btn{width:100% !important;min-height:44px !important;padding-inline:10px !important;white-space:nowrap}
@@ -209,4 +206,17 @@ html[data-motion="paused"] *,html[data-motion="paused"] *::before,html[data-moti
   .ex-ch>.ex-ch-head{grid-column:1;grid-row:2;margin-bottom:24px !important}
   .ex-ch .ex-ch-txt{grid-column:1;grid-row:3;padding:0 !important;margin:0 !important}
   .ex-ch .ex-ch-body>.sm-media{grid-column:2;grid-row:1 / -1;align-self:center;margin:0 !important}
+}
+
+/* ---- R3 ---- */
+/* §3 heroes: a little taller, a hint of the next section still showing (Shubham 20 Oct) */
+:root{--hint:64px}
+@media (min-width:641px){
+  .wh-home .collage,.wh-page .collage{height:min(calc(100svh - var(--hdr-h) - var(--hint)),780px) !important;min-height:0 !important}
+  body:has(.pf-grid.works-grid) .wh .collage{height:clamp(380px,46svh,440px) !important;min-height:0 !important}
+}
+@media (max-width:640px){
+  :root{--hint:72px}
+  .wh-home .collage{height:min(calc(100svh - var(--hdr-h) - var(--hint)),600px) !important;min-height:0 !important}
+  .wh-page .collage,body:has(.pf-grid.works-grid) .wh .collage{height:min(64svh,520px) !important;min-height:0 !important}
 }
