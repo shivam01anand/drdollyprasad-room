@@ -419,3 +419,11 @@ that has paintings.
 A thumbnail (`hallway-<id>-thumb.webp`) is not needed: with one room per painting
 the picker is not shown. A hallway entry replaces that painting's own tailored
 room on the website (as 40 does).
+
+**Second scene, "see it in your room" (019 Part 4, 20 Oct 2026):** the sunlit
+console room, 1920 x 1080, image `public/art/rooms/console-<id>.webp` (+ `-thumb`),
+entry `{ "id": "<id>", "work": "...", "room": "console", "cm": ..., "w": 1920, "h": 1080, "pxPerCm": ..., "floor": ..., "cx": ... }`.
+Labelled "A sunlit living room", captioned "Virtual room study". Its sizes are the
+Painting Master placeholders (unconfirmed). Source, crop and scale for each image:
+`Team Handoffs/019-last-call-plates/outputs/see-in-room/MANIFEST.json` in the project folder.
+Hallway images 03, 14, 15-18, 27, 38, 41 are round 3 (tighter camera); 05 and 40 stay round 2.

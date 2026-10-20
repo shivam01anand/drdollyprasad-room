@@ -119,20 +119,33 @@ export const TAILORED: Tailored[] = [
  * (ROOM_SCALE_NOTES.json: 4.25 px/cm on the 1536 px scene), so it is a relative
  * size study and is labelled so, never "to scale".
  */
-type HallwayEntry = { id: string; work: string; cm?: number; w?: number; h?: number; pxPerCm?: number; floor?: number; cx?: number };
+type HallwayEntry = { id: string; work: string; room?: "hallway" | "console"; cm?: number; w?: number; h?: number; pxPerCm?: number; floor?: number; cx?: number };
+
+/**
+ * The two virtual scenes. "hallway" is brief 004 (round 3, 20 Oct 2026); "console" is
+ * 019 Part 4, "see it in your room": a sunlit living-room wall over a low credenza
+ * (plate E, 1920 x 1080), one per painting that had no room of its own.
+ */
+const SCENE = {
+  hallway: { label: "A calm hallway", assumed: "120 cm console" },
+  console: { label: "A sunlit living room", assumed: "218 cm low credenza" },
+} as const;
 
 /**
  * A hallway room is data only: an entry in lib/hallway-rooms.json and the image
- * public/art/rooms/hallway-<id>.webp (a thumbnail, hallway-<id>-thumb.webp, is
+ * public/art/rooms/hallway-<id>.webp (or console-<id>.webp for `"room": "console"`) (a thumbnail, hallway-<id>-thumb.webp, is
  * used if present; with one room per painting none is needed). Defaults are the
  * pilot scene's calibration.
  */
-export const PILOT: Tailored[] = (hallway.rooms as HallwayEntry[]).map((e) => ({
-  id: `hallway-${e.id}`, work: e.work, label: "A calm hallway", study: true, assumed: "120 cm console",
-  src: `/art/rooms/hallway-${e.id}.webp`, thumb: `/art/rooms/hallway-${e.id}-thumb.webp`,
+export const PILOT: Tailored[] = (hallway.rooms as HallwayEntry[]).map((e) => {
+  const scene = e.room ?? "hallway";
+  return {
+  id: `${scene}-${e.id}`, work: e.work, label: SCENE[scene].label, study: true, assumed: SCENE[scene].assumed,
+  src: `/art/rooms/${scene}-${e.id}.webp`, thumb: `/art/rooms/${scene}-${e.id}-thumb.webp`,
   w: e.w ?? 1536, h: e.h ?? 1024, pxPerCm: e.pxPerCm ?? 4.25, floor: e.floor ?? 790, cx: e.cx ?? 768, sill: 0,
   cm: e.cm ?? 91.4, inPhoto: true,
-}));
+  };
+});
 
 /** the fallback rooms, for works with a stated size and no room of their own */
 export const GENERIC: Room[] = [
