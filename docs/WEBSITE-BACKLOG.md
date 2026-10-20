@@ -4,7 +4,7 @@ The live list of what is still wrong or missing on drdollyprasad.com. It is
 not an instruction to build anything today. Every team reads it, adds to it,
 and works from it in the next website run.
 
-Last updated 18 October 2026 (night, PR #11 review fixes; earlier: evening): backlog sprint on branch
+Last updated 19 October 2026 (evening, B-0119-1 and the "sacred is red" rule added; earlier: 18 October night, PR #11 review fixes; earlier: evening): backlog sprint on branch
 `backlog-2026-10-18`, which builds on PR #7 (`content-round-2`). Critique pass 1
 is below; items marked **Built** are on the sprint preview and leave this file
 when Shubham makes them live.
@@ -25,6 +25,19 @@ when Shubham makes them live.
   looks like, and an owner (a team, not a person).
 
 Content and structure first; aesthetics once those settle.
+
+## Added 19 October 2026 (Shubham)
+
+- **B-0119-1. "sacred" in red on the home page.** Home landing page, the line
+  under the name card: "The everyday, held sacred." Set the word **sacred** in
+  the same red as "Dolly" in the name (`var(--red)`, #D4202A, the `.red` span
+  the name card already uses). No other change: same words, size, font,
+  weight and position. Done when the home opening shows "sacred" in red on
+  phone and computer, nothing else on the page moves, and the preview passes
+  the web-test before it reaches Shubham. Owner: Brand (spec), Tech (build).
+  Rule check while there: any other place "sacred" appears in the tagline
+  (header brand line, Collections and About openings) follows the standing
+  rule below; list them in the preview note rather than changing them silently.
 
 ## Backlog sprint, 18 October 2026: critique pass 1
 
@@ -347,6 +360,9 @@ These are not new from this review but are still open.
 - No em dashes in our own copy; ranges read "2016 to 2018"; no "c.".
 - Never write "18 solo exhibitions": the record is exhibitions and art fairs.
 - Nothing goes live until Shubham says "make it live".
+- **"sacred" is always red** (19 Oct 2026, Shubham): wherever the tagline
+  word "sacred" appears on the site, it is set in the brand red (`var(--red)`,
+  the same red as "Dolly"). Only the colour changes; the words stay as they are.
 
 ## PR #11 review fixes (18 Oct 2026, night): P2 left open
 
