@@ -2278,8 +2278,7 @@ body *{font-style:normal !important}
 .ccard{padding:22px 16px;text-align:center;display:flex;flex-direction:column;gap:6px;text-decoration:none;justify-content:center}
 @media (max-width:640px){ .xcard b,.ncard b,.ccard b{font-size:17px} .ccard{padding:14px 10px} .ccard small{display:block;font-size:12px} .xcard small{display:none} }
 
-/* ======================================================================
-   v6 · batch 19 Oct
+/* ===============================================================   v6 · batch 19 Oct
    ====================================================================== */
 
 /* painting page: the views sit right under the two buttons, as small icons on ONE line (a 48 px tap area each) */
@@ -2328,3 +2327,6 @@ body *{font-style:normal !important}
 .series-tiles .m-card .card-t,.series-tiles .m-card .meta{text-align:center}
 .sband .eyebrow,.sband .btn{font-size:13px}
 .series-tiles .m-card .mat{width:100%;align-self:stretch}
+=======
+/* "sacred" is always red (Shubham, 19 Oct 2026): same red as "Dolly"; colour only */
+.wh .namecard .wh-line .red,.brand-t .red{color:var(--red);font:inherit}
