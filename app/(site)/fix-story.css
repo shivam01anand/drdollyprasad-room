@@ -273,3 +273,7 @@
 /* R4 fix 7 (consultant P1-6): hero photograph tiles wait out of sight until their file arrives (components/site/WallDrift) */
 .wh .collage .xcard{transition:opacity .45s ease}
 .wh .collage .xcard.is-waiting{opacity:0}
+
+/* R4 P2 (consultant P2, COO P2): /series bands and story pages start on the site's own edge (the gutter, 43 px at 1440,
+   where the header and hero sit), not 40 px further in: the 1360 px content cap now excludes the gutters */
+.sband .srow.wrap,.story-open.wrap,.chv .chv-in.wrap,.story-end.wrap{max-width:calc(1360px + 2 * var(--gut))}
