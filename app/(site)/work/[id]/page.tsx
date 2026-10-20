@@ -136,8 +136,8 @@ export default async function WorkPage({ params }: Props) {
       </section>
 
       {more.length > 0 && (
-        <IndigoBand title={`More from ${w.series}`} href={seriesPath(w.series)} label="The collection’s story">
-          <div className="grid">{more.map((x) => <Card key={x.id} w={x} />)}</div>
+        <IndigoBand id="more-from" title={`More from ${w.series}`} href={seriesPath(w.series)} label="The collection’s story">
+          <div className="grid">{more.map((x) => <Card key={x.id} w={x} eager />)}</div>
         </IndigoBand>
       )}
 
