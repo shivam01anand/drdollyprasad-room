@@ -92,10 +92,6 @@ const ORDER = ["ihc-press-01", "tv-ncr-2010", "ihc-press-06", "ihc-press-03", "d
 // "The artist and her audience" dropped as near-duplicate interview photos; they stay in the IHC album // "Listening" (ihc-press-b) dropped: near-duplicate (Chief Content 2c, C11); the photo stays in the IHC album
 export const PRESS_ITEMS: PressItem[] = ORDER.map((id) => RAW.find((p) => p.id === id)!);
 
-/** the shorter set for About: four photographs and the NCR excerpt */
-export const PRESS_SHORT = ["ihc-press-01", "tv-ncr-2010", "ihc-press-06", "ihc-press-03", "tv-archive", "delhi-times"]
-  .map((id) => PRESS_ITEMS.find((p) => p.id === id)!);
-
 /** every item, for the moving press row on Exhibitions and About (R3, Shubham 20 Oct: all the press, all the accolades):
  *  the six above first, in their order (the two clips apart), then the four that had been left out */
 export const PRESS_ALL: PressItem[] = [...PRESS_ITEMS, ...RAW.filter((p) => !ORDER.includes(p.id))];
