@@ -259,7 +259,8 @@ html[data-motion="paused"] *,html[data-motion="paused"] *::before,html[data-moti
 .ex-ch .sm-cap{display:block !important;-webkit-line-clamp:unset !important;line-clamp:none !important;height:auto !important;overflow:visible !important}
 .sm-walls a{text-decoration:underline;text-underline-offset:4px}
 @media (min-width:641px) and (max-width:1099px){
-  .ex-ch-body{display:flex !important;flex-direction:column;gap:16px;padding-left:0 !important}
+  .ex-ch-body{display:flex !important;flex-direction:column;align-items:stretch !important;gap:16px;padding-left:0 !important}
+  .ex-ch .sm-media{width:100%}
   .ex-ch .sm-hero{height:min(60vw,440px) !important}
   .ex-ch .sm-cap{min-height:2.9em}
 }
