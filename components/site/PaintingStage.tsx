@@ -41,8 +41,10 @@ export default function PaintingStage({ w, src, dims, small, sub, children }: {
 
   const items: { v: View; label: string; thumb: React.ReactNode }[] = [
     { v: { k: "full" }, label: "The painting", thumb: <img src={src} alt="" loading="lazy" /> },
+    // order (Shubham, 20 Oct): the painting, then the room, then the close views
+    ...rooms.slice(0, 1).map((r) => ({ v: { k: "room", id: r.room.id } as View, label: r.room.label, thumb: <img src={r.room.thumb} alt="" loading="lazy" /> })),
     ...DETAILS.map(([pos, label], i) => ({ v: { k: "detail", i } as View, label, thumb: <span className="pp-crop" style={{ backgroundImage: `url(${src})`, backgroundPosition: pos }} /> })),
-    ...rooms.map((r) => ({ v: { k: "room", id: r.room.id } as View, label: r.room.label, thumb: <img src={r.room.thumb} alt="" loading="lazy" /> })),
+    ...rooms.slice(1).map((r) => ({ v: { k: "room", id: r.room.id } as View, label: r.room.label, thumb: <img src={r.room.thumb} alt="" loading="lazy" /> })),
   ];
 
   return (
@@ -96,8 +98,6 @@ export default function PaintingStage({ w, src, dims, small, sub, children }: {
         )}
       </div>
 
-      {children}
-
       <div className="pp-strip" ref={strip} role="group" aria-label="Other views">
         {items.map((it) => (
           <button key={it.label + (it.v.k === "detail" ? it.v.i : "")} type="button" className="pp-chip" aria-pressed={same(it.v)} aria-label={it.label} title={it.label} onClick={() => setView(it.v)}>
@@ -105,6 +105,8 @@ export default function PaintingStage({ w, src, dims, small, sub, children }: {
           </button>
         ))}
       </div>
+      {children}
+
       {zoom && <Zoom id={w.id} src={src} alt={name} title={w.title} sub={sub} onClose={() => setZoom(false)} />}
     </section>
   );

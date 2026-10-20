@@ -1,5 +1,5 @@
 import Link from "next/link";
-import { labelLine, statusText } from "@/lib/site";
+import { shownYear, statusText } from "@/lib/site";
 import { quoted, workPath, type Work } from "@/lib/works";
 import { dims } from "@/lib/images";
 
@@ -26,7 +26,13 @@ export default function Card({ w, label = true, eager = false }: { w: Work; labe
              loading={eager ? "eager" : "lazy"} decoding="async" {...d} style={ar} />
       </div>
       <span className="card-t">{w.title}</span>
-      {label && <span className="meta">{labelLine(w)}</span>}
+      {label && (
+        <span className="meta meta-parts">
+          {w.medium && <span className="mp mp-med">{w.medium}</span>}
+          {w.size && <span className="mp mp-size">{w.size}</span>}
+          {shownYear(w) && <span className="mp mp-yr">{shownYear(w)}</span>}
+        </span>
+      )}
       {KIND[w.status] && <span className={`status st-${KIND[w.status]}`}><i aria-hidden="true" />{statusText(w)}</span>}
     </Link>
   );

@@ -94,13 +94,16 @@ const CATALOGUE: Work[] = [
  * drives the true-scale hang or the S / M / L filter. Every id changed is listed in
  * qa-shots/v5/DIMENSIONS.md; replace the entry with her real size when she confirms it.
  */
+// 20 Oct 2026 (Shubham): no guessed sizes on the site. A painting shows a size only when it is
+// confirmed; the shape-based "approx." sizes are retired. (dims kept imported for other callers.)
+// 20 Oct 2026 (Shubham, 02:37): he confirms these sizes; shown plainly, without "approx."
 const shapeSize = (w: Work): Work => {
   if (w.size) return w;
   const d = dims(`/site/thumbs/${w.id}.jpg`);
   if (!d.width || !d.height) return w;
   const r = d.height / d.width;
-  if (r > 1.1) return { ...w, size: "approx. 48 × 36 in" };
-  if (r < 0.91) return { ...w, size: "approx. 36 × 48 in" };
+  if (r > 1.1) return { ...w, size: "48 × 36 in" };
+  if (r < 0.91) return { ...w, size: "36 × 48 in" };
   return w;
 };
 

@@ -1,16 +1,364 @@
 {
-  "_how": "To add a calm-hallway room for a painting: drop public/art/rooms/hallway-<id>.webp (1536 x 1024) and add one line below. Optional per-room overrides: cm (painting's longest side, default 91.4), w, h, pxPerCm, floor, cx. No code change. See docs/WEBSITE-BACKLOG.md, 'Adding a hallway room'.",
+  "_how": "To add a calm-hallway room for a painting: drop public/art/rooms/hallway-<id>.webp (1536 x 1024) and add one line below. Optional per-room overrides: cm (painting's longest side, default 91.4), w, h, pxPerCm, floor, cx. No code change. See docs/WEBSITE-BACKLOG.md, 'Adding a hallway room'. A second scene, the sunlit console room (019 plate E, 1920 x 1080), uses \"room\": \"console\" and the image public/art/rooms/console-<id>.webp.",
   "rooms": [
-    { "id": "05", "work": "coins-and-clay-bank", "cm": 91.4 },
-    { "id": "40", "work": "woman-with-red-flower", "cm": 61 },
-    { "id": "03", "work": "bullock-cart-and-truck", "cm": 61 },
-    { "id": "14", "work": "terracotta-pots", "cm": 91.4 },
-    { "id": "15", "work": "weathered-door-ring", "cm": 30.5 },
-    { "id": "16", "work": "red-and-teal-door-lock", "cm": 30.5 },
-    { "id": "17", "work": "teal-door-bolt", "cm": 30.5 },
-    { "id": "18", "work": "carved-door-knocker", "cm": 30.5 },
-    { "id": "27", "work": "red-turban-portrait", "cm": 76.2 },
-    { "id": "38", "work": "temple-bells", "cm": 91.4 },
-    { "id": "41", "work": "boy-with-bananas", "cm": 91.4 }
+    {
+      "id": "05",
+      "work": "coins-and-clay-bank",
+      "cm": 91.4
+    },
+    {
+      "id": "40",
+      "work": "woman-with-red-flower",
+      "cm": 61
+    },
+    {
+      "id": "03",
+      "work": "bullock-cart-and-truck",
+      "cm": 61,
+      "pxPerCm": 8.648,
+      "cx": 724
+    },
+    {
+      "id": "14",
+      "work": "terracotta-pots",
+      "cm": 91.4,
+      "pxPerCm": 6.334,
+      "cx": 732
+    },
+    {
+      "id": "15",
+      "work": "weathered-door-ring",
+      "cm": 30.5,
+      "pxPerCm": 11.992,
+      "cx": 600
+    },
+    {
+      "id": "16",
+      "work": "red-and-teal-door-lock",
+      "cm": 30.5,
+      "pxPerCm": 11.992,
+      "cx": 601
+    },
+    {
+      "id": "17",
+      "work": "teal-door-bolt",
+      "cm": 30.5,
+      "pxPerCm": 11.992,
+      "cx": 601
+    },
+    {
+      "id": "18",
+      "work": "carved-door-knocker",
+      "cm": 30.5,
+      "pxPerCm": 11.992,
+      "cx": 601
+    },
+    {
+      "id": "27",
+      "work": "red-turban-portrait",
+      "cm": 76.2,
+      "pxPerCm": 8.648,
+      "cx": 724
+    },
+    {
+      "id": "38",
+      "work": "temple-bells",
+      "cm": 91.4,
+      "pxPerCm": 6.334,
+      "cx": 733
+    },
+    {
+      "id": "41",
+      "work": "boy-with-bananas",
+      "cm": 91.4,
+      "pxPerCm": 6.334,
+      "cx": 732
+    },
+    {
+      "id": "02",
+      "work": "carriage-and-autorickshaw",
+      "room": "console",
+      "cm": 61.0,
+      "w": 1920,
+      "h": 1080,
+      "pxPerCm": 5.956,
+      "floor": 1004,
+      "cx": 960
+    },
+    {
+      "id": "28",
+      "work": "yellow-turban-portrait",
+      "room": "console",
+      "cm": 76.2,
+      "w": 1920,
+      "h": 1080,
+      "pxPerCm": 5.953,
+      "floor": 1004,
+      "cx": 960
+    },
+    {
+      "id": "29",
+      "work": "patterned-turban-portrait",
+      "room": "console",
+      "cm": 76.2,
+      "w": 1920,
+      "h": 1080,
+      "pxPerCm": 5.953,
+      "floor": 1004,
+      "cx": 960
+    },
+    {
+      "id": "11",
+      "work": "rickshaw-rest",
+      "room": "console",
+      "cm": 91.4,
+      "w": 1920,
+      "h": 1080,
+      "pxPerCm": 4.961,
+      "floor": 1004,
+      "cx": 960
+    },
+    {
+      "id": "25",
+      "work": "newspaper-reader",
+      "room": "console",
+      "cm": 91.4,
+      "w": 1920,
+      "h": 1080,
+      "pxPerCm": 4.961,
+      "floor": 1004,
+      "cx": 960
+    },
+    {
+      "id": "01",
+      "work": "rickshaw-puller-and-coin",
+      "room": "console",
+      "cm": 121.9,
+      "w": 1920,
+      "h": 1080,
+      "pxPerCm": 3.84,
+      "floor": 947,
+      "cx": 974
+    },
+    {
+      "id": "04",
+      "work": "rickshaw-rest-framed",
+      "room": "console",
+      "cm": 121.9,
+      "w": 1920,
+      "h": 1080,
+      "pxPerCm": 3.84,
+      "floor": 947,
+      "cx": 974
+    },
+    {
+      "id": "06",
+      "work": "postbox-and-stamps",
+      "room": "console",
+      "cm": 121.9,
+      "w": 1920,
+      "h": 1080,
+      "pxPerCm": 3.84,
+      "floor": 947,
+      "cx": 974
+    },
+    {
+      "id": "07",
+      "work": "mother-india-and-kettles",
+      "room": "console",
+      "cm": 121.9,
+      "w": 1920,
+      "h": 1080,
+      "pxPerCm": 3.84,
+      "floor": 947,
+      "cx": 974
+    },
+    {
+      "id": "23",
+      "work": "priest-with-flame",
+      "room": "console",
+      "cm": 121.9,
+      "w": 1920,
+      "h": 1080,
+      "pxPerCm": 3.84,
+      "floor": 947,
+      "cx": 974
+    },
+    {
+      "id": "24",
+      "work": "sacred-tree",
+      "room": "console",
+      "cm": 121.9,
+      "w": 1920,
+      "h": 1080,
+      "pxPerCm": 3.84,
+      "floor": 947,
+      "cx": 945
+    },
+    {
+      "id": "30",
+      "work": "mother-and-child",
+      "room": "console",
+      "cm": 121.9,
+      "w": 1920,
+      "h": 1080,
+      "pxPerCm": 3.84,
+      "floor": 947,
+      "cx": 974
+    },
+    {
+      "id": "31",
+      "work": "boy-and-kettle",
+      "room": "console",
+      "cm": 121.9,
+      "w": 1920,
+      "h": 1080,
+      "pxPerCm": 3.84,
+      "floor": 947,
+      "cx": 960
+    },
+    {
+      "id": "32",
+      "work": "man-among-metal-pans",
+      "room": "console",
+      "cm": 121.9,
+      "w": 1920,
+      "h": 1080,
+      "pxPerCm": 4.933,
+      "floor": 1004,
+      "cx": 922
+    },
+    {
+      "id": "34",
+      "work": "milkman-on-bicycle",
+      "room": "console",
+      "cm": 121.9,
+      "w": 1920,
+      "h": 1080,
+      "pxPerCm": 3.84,
+      "floor": 947,
+      "cx": 974
+    },
+    {
+      "id": "10",
+      "work": "cycle-rickshaw",
+      "room": "console",
+      "cm": 152.4,
+      "w": 1920,
+      "h": 1080,
+      "pxPerCm": 3.99,
+      "floor": 984,
+      "cx": 869
+    },
+    {
+      "id": "woman-with-poppies",
+      "work": "woman-with-poppies",
+      "room": "console",
+      "cm": 104.4,
+      "w": 1920,
+      "h": 1080,
+      "pxPerCm": 5.956,
+      "floor": 1004,
+      "cx": 960
+    },
+    {
+      "id": "bulls-and-wheel",
+      "work": "bulls-and-wheel",
+      "room": "console",
+      "cm": 74.5,
+      "w": 1920,
+      "h": 1080,
+      "pxPerCm": 5.956,
+      "floor": 1004,
+      "cx": 960
+    },
+    {
+      "id": "monk-and-green-buddha",
+      "work": "monk-and-green-buddha",
+      "room": "console",
+      "cm": 74.5,
+      "w": 1920,
+      "h": 1080,
+      "pxPerCm": 5.956,
+      "floor": 1004,
+      "cx": 960
+    },
+    {
+      "id": "woman-with-bird",
+      "work": "woman-with-bird",
+      "room": "console",
+      "cm": 60.9,
+      "w": 1920,
+      "h": 1080,
+      "pxPerCm": 5.956,
+      "floor": 1004,
+      "cx": 960
+    },
+    {
+      "id": "three-veiled-women",
+      "work": "three-veiled-women",
+      "room": "console",
+      "cm": 76.2,
+      "w": 1920,
+      "h": 1080,
+      "pxPerCm": 5.956,
+      "floor": 1004,
+      "cx": 960
+    },
+    {
+      "id": "child-among-flowers",
+      "work": "child-among-flowers",
+      "room": "console",
+      "cm": 94.4,
+      "w": 1920,
+      "h": 1080,
+      "pxPerCm": 5.956,
+      "floor": 1004,
+      "cx": 960
+    },
+    {
+      "id": "shree-420-and-milk-cans",
+      "work": "shree-420-and-milk-cans",
+      "room": "console",
+      "cm": 74.5,
+      "w": 1920,
+      "h": 1080,
+      "pxPerCm": 5.956,
+      "floor": 1004,
+      "cx": 960
+    },
+    {
+      "id": "monks-and-blue-buddha",
+      "work": "monks-and-blue-buddha",
+      "room": "console",
+      "cm": 93.9,
+      "w": 1920,
+      "h": 1080,
+      "pxPerCm": 5.956,
+      "floor": 1004,
+      "cx": 960
+    },
+    {
+      "id": "offering-of-light",
+      "work": "offering-of-light",
+      "room": "console",
+      "cm": 74.5,
+      "w": 1920,
+      "h": 1080,
+      "pxPerCm": 5.956,
+      "floor": 1004,
+      "cx": 960
+    },
+    {
+      "id": "prayer-and-scripture",
+      "work": "prayer-and-scripture",
+      "room": "console",
+      "cm": 74.5,
+      "w": 1920,
+      "h": 1080,
+      "pxPerCm": 5.956,
+      "floor": 1004,
+      "cx": 960
+    }
   ]
 }

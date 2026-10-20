@@ -9,6 +9,7 @@ import Marquee from "@/components/site/Marquee";
 import IgRoll from "@/components/site/IgRoll";
 import {
   BIO_LINE, BIO_SUB, EMAIL, INSTAGRAM, NOW, NOW_SHOWING_CONFIRMED, PORTRAIT, SERIES_PAGES, SHOWS, SITE, STUDIO_PATH, worksIn,
+  LEAD,
 } from "@/lib/site";
 import { BY_ID } from "@/lib/works";
 import { dims } from "@/lib/images";
@@ -40,7 +41,7 @@ export default function Home() {
   return (
     <>
       <WallHero columns={HOME} label="Dr Dolly Prasad" size="home" face={PORTRAIT} eyebrow="Oil on canvas · New Delhi"
-                title="Dr Dolly Prasad" red="Dolly" sub="The everyday, held sacred.">
+                title="Dr Dolly Prasad" red="Dolly" sub={<>The everyday, held <span className="red">sacred</span>.</>}>
         <Link className="btn btn-solid" href="/works">See all {total} works</Link>
         <a className="btn" href={STUDIO_PATH}>Walk through the studio</a>
       </WallHero>
@@ -66,7 +67,8 @@ export default function Home() {
           <Link key={s.slug} className="card m-card" href={`/series/${s.slug}`}>
             <div className="mat">
               {/* eslint-disable-next-line @next/next/no-img-element */}
-              <img className="framed thin" src={thumb(s.hero)} alt={`${BY_ID.get(s.hero)?.title}, from ${s.label}`} loading="lazy" {...dims(thumb(s.hero))} />
+              <img className="framed thin" src={thumb(LEAD[s.slug] ?? s.hero)} alt={`${BY_ID.get(LEAD[s.slug] ?? s.hero)?.title}, from ${s.label}`} loading="eager" {...dims(thumb(LEAD[s.slug] ?? s.hero))}
+                   style={{ ["--ar" as string]: `${dims(thumb(LEAD[s.slug] ?? s.hero)).width} / ${dims(thumb(LEAD[s.slug] ?? s.hero)).height}` }} />
             </div>
             <span className="card-t">{s.label}</span>
             <span className="meta">{worksIn(s.label).length} works · {s.period}</span>
@@ -104,7 +106,7 @@ export default function Home() {
           return (
             <Link key={c.id} className="show-card" href={`/exhibitions#${c.id}`}>
               {/* eslint-disable-next-line @next/next/no-img-element */}
-              <img className="framed" src={c.src} alt={c.alt} loading="lazy" {...dims(c.src)} />
+              <img className="framed" src={c.src} alt={c.alt} loading="eager" {...dims(c.src)} />
               <span className="meta">{e.when.replace(/^Opened 11 /, "").replace(/ · on view.*$/, "")}</span>
               <b>{e.name ?? e.title}</b>
               <span className="meta">{e.venue}, {e.city}</span>
@@ -124,7 +126,7 @@ export default function Home() {
         </div>
       </section>
       <Marquee seconds={50} label="Available paintings" className="avail">
-        {AVAILABLE.map((id) => <Card key={id} w={BY_ID.get(id)!} />)}
+        {AVAILABLE.map((id) => <Card key={id} w={BY_ID.get(id)!} eager />)}
       </Marquee>
 
 

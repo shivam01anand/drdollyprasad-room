@@ -111,7 +111,10 @@ export default async function SeriesStory({ params }: Props) {
           {/* eslint-disable-next-line @next/next/no-img-element */}
           <img className="framed" src={img(hero.id)} alt={alt(hero)} fetchPriority="high" {...wh(hero.id)} />
         </Link>
-        <p className="meta">{hero.title} · {hero.medium}{hero.size ? ` · ${hero.size}` : ""}{shownYear(hero) ? ` · ${shownYear(hero)}` : ""}</p>
+        <p className="meta">{[hero.title, hero.medium, hero.size, shownYear(hero)].filter(Boolean).map((x, i, a) => (
+          // each part stays whole; a dot only ever ends a line, never starts one
+          <span key={i} style={{ whiteSpace: "nowrap" }}>{String(x)}{i < a.length - 1 ? " ·" : ""}{i < a.length - 1 ? " " : ""}</span>
+        ))}</p>
       </section>
 
       {s.quote && (
@@ -121,7 +124,13 @@ export default async function SeriesStory({ params }: Props) {
         </section>
       )}
 
-      <section className="story-intro wrap" style={s.quote ? undefined : { paddingTop: 48 }}>
+      {!s.quote && s.held && (
+        <section className="story-quote wrap">
+          <p className="quote">{s.held}</p>
+        </section>
+      )}
+
+      <section className="story-intro wrap" style={s.quote || s.held ? undefined : { paddingTop: 48 }}>
         {s.intro.map((p, i) => <p key={i}>{p}</p>)}
       </section>
 
@@ -154,7 +163,7 @@ export default async function SeriesStory({ params }: Props) {
           </div>
           <Link className="go" href={`/series/${next.slug}`}>
             <span className="eyebrow" style={{ color: "inherit" }}>Next collection</span>
-            <b>{next.label} →</b>
+            <b>{next.label.includes(" ") ? <>{next.label.slice(0, next.label.lastIndexOf(" ") + 1)}<span className="nw">{next.label.slice(next.label.lastIndexOf(" ") + 1)} →</span></> : <span className="nw">{next.label} →</span>}</b>
           </Link>
         </div>
       </section>

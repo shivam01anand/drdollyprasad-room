@@ -1,0 +1,70 @@
+/* Tech team: pages (20 Oct night). Only this team edits this file. */
+
+/* ---- card meta: parts never break mid-part; the separator belongs to the part after it ---- */
+.meta-parts{display:flex;flex-wrap:wrap;column-gap:0}
+.meta-parts .mp{white-space:nowrap}
+.meta-parts .mp + .mp::before{content:"·";margin-inline:.45em}
+@media (max-width:1000px){ .card .meta-parts{font-size:13px} }
+/* phones: grids show size and year only; the medium is on the painting's own page */
+@media (max-width:640px){
+  .card .meta-parts{font-size:12.5px;line-height:1.35}
+  .card .meta-parts .mp-med{display:none}
+  .card .meta-parts .mp-med + .mp::before{display:none}
+}
+
+/* ---- Works grid: every picture sits in a box of one height, painting bottom-aligned,
+   so all captions in a row (and across rows) share one baseline ---- */
+.pf-grid.works-grid .card{align-self:start}
+.pf-grid.works-grid .mat{flex:none;box-sizing:border-box;aspect-ratio:4 / 5;align-items:flex-end;justify-content:center;padding:0}
+.pf-grid.works-grid .mat img{width:auto;height:auto;max-width:calc(100cqw - 24px);max-height:calc(125cqw - 34px);margin-bottom:20px;aspect-ratio:var(--ar,1)}
+.pf-grid.works-grid .card-t{min-height:2.3em}
+@media (max-width:640px){ .pf-grid.works-grid .mat img{max-width:calc(100cqw - 12px);max-height:calc(125cqw - 22px);margin-bottom:14px} .pf-grid.works-grid .card-t{min-height:0} }
+
+/* wide screens: the works grid uses the full content width, five across */
+@media (min-width:1600px){
+  .pf-grid.works-grid{max-width:none;grid-template-columns:repeat(5,minmax(0,1fr)) !important}
+}
+
+/* ---- painting page, "More from …" on phones: heading smaller, the link under it ---- */
+@media (max-width:640px){
+  #more-from .sec-head{grid-template-columns:minmax(0,1fr);row-gap:10px}
+  #more-from .sec-head>div>h2{font-size:26px !important;line-height:1.15}
+  #more-from .sec-head>.link{grid-column:1;grid-row:2;justify-self:start}
+  #more-from .card-t{min-height:2.3em}
+}
+
+/* Desktop final QA */
+@media (min-width:761px){
+  /* #1 small painting stage */
+  .viewer .paper:has(img.is-small){min-height:0 !important;padding-block:28px 20px !important}
+  .viewer .paper img.is-small{height:auto !important;max-height:420px !important;width:auto !important;max-width:100% !important}
+  /* #3 works grid */
+  .pf-grid.works-grid .card-t{min-height:0 !important}
+  .pf-grid.works-grid .mat img{margin-bottom:12px !important}
+  .pf-grid.works-grid,.pf-grid{row-gap:28px !important}
+  .pf-grid.works-grid{max-width:none !important}
+  /* #5 orphan rows */
+  .grid.grid-5{display:flex !important;flex-wrap:wrap;justify-content:center;gap:40px 22px}
+  .grid.grid-5>.card{flex:0 0 calc(25% - 17px);max-width:calc(25% - 17px)}
+  #more-from .grid{display:flex !important;flex-wrap:wrap;justify-content:center;gap:26px 22px}
+  #more-from .grid>.card{flex:0 0 calc(25% - 17px);max-width:calc(25% - 17px)}
+  /* #7 */
+  .next-series:has(>.ask:only-child){grid-template-columns:minmax(0,1fr) !important}
+  .next-series:has(>.ask:only-child) .ask{flex-direction:row !important;flex-wrap:wrap;align-items:center;gap:12px 28px}
+  .next-series:has(>.ask:only-child) .ask>div{margin-left:auto}
+  /* #8 */
+  .next-series .go{background:#161E3A !important}
+  .next-series .go:hover{background:#1f2a52 !important}
+  /* #13 */
+  #more-from>.wrap,#more-from .sec-head,#more-from .grid{padding-inline:0 !important}
+  .wp-lower{padding-bottom:0 !important}
+  /* #15 */
+  .press-item:last-child:nth-child(3n+1){grid-column:auto !important}
+}
+@media (min-width:1200px){
+  .grid.grid-5>.card{flex-basis:calc(20% - 18px);max-width:calc(20% - 18px)}
+}
+@media (min-width:901px){
+  .ex-ch-body{align-items:start !important}
+  .ab-split{align-items:start !important}
+}

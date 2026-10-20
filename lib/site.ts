@@ -142,6 +142,8 @@ export type SeriesPage = {
   hero: string;
   /** her words on the series, verbatim, where she has written them */
   quote?: string;
+  /** where she has not yet written a line: one short editorial line in the site's own voice (never in quotes, never hers) */
+  held?: string;
   intro: string[];
   chapters: Chapter[];
 };
@@ -175,12 +177,13 @@ export const SERIES_PAGES: SeriesPage[] = [
     slug: "bandh-darwaze", label: "Bandh Darwaze", period: "2018",
     line: "Four shut doors: a ring, a lock, a bolt, a knocker. A closed door is a door someone cared for.",
     hero: "red-and-teal-door-lock",
+    held: "A closed door keeps one world inside, and turns you toward another.",
     intro: [
       "Bandh darwaze: closed doors. Four small square canvases, each a close look at the hardware of an old door, painted over worn, colour-washed wood.",
       "No people, no rooms. Only what a hand reaches for at a threshold. Shut, but kept: the layered paint is proof of care.",
     ],
     chapters: [
-      { title: "The ring and the lock", works: ["weathered-door-ring", "red-and-teal-door-lock"],
+      { title: "The ring and the lock", works: ["weathered-door-ring", "red-and-teal-door-lock"], dark: true,
         big: "A ring to knock with. A lock to keep the rest unseen." },
       { title: "The bolt and the knocker", works: ["teal-door-bolt", "carved-door-knocker"],
         small: "A foot square each, the four are made to be seen together, on one wall." },
@@ -190,6 +193,7 @@ export const SERIES_PAGES: SeriesPage[] = [
     slug: "faith", label: "Faith", period: "2005 to 2015",
     line: "A lamp, a thread, a page of scripture, the morning paper. Devotion as attention, given daily.",
     hero: "offering-of-light",
+    held: "Faith is rarely loud. Most days, it is a small light kept burning.",
     intro: [
       "Not spectacle, but habit. A lamp is raised to a wall of scripture. A devotee sits before it. A priest lifts the aarti flame. A peepal is wound in red thread.",
       "And a man opens his morning paper. In these paintings, that too is a kind of faith.",
@@ -207,6 +211,7 @@ export const SERIES_PAGES: SeriesPage[] = [
     slug: "portraits", label: "Portraits", period: "2005 to 2015",
     line: "A turban, a kettle, a stack of kadhais. The people who carry our days, given a long, unhurried look.",
     hero: "three-veiled-women",
+    held: "Every face you meet holds a story. Here, there is time to find it.",
     intro: [
       "The play of emotion on a face has always held her. These portraits stay close: elders in turbans, a chai boy between orders, a kadhai seller among his pans, a doodhwala on his round.",
       "Each figure is painted with the things of their work beside them. The face is where you meet them; the rest is theirs to keep. The people who carry our days are given the time the street did not.",
@@ -214,9 +219,9 @@ export const SERIES_PAGES: SeriesPage[] = [
     chapters: [
       { title: "Turbans", works: ["red-turban-portrait", "yellow-turban-portrait", "patterned-turban-portrait"],
         big: "Red, yellow, a lattice of cloth.", small: "The colour draws you in. The faces keep you there." },
-      { title: "Working lives", works: ["boy-and-kettle", "man-among-metal-pans", "milkman-on-bicycle"],
+      { title: "Working lives", works: ["boy-and-kettle", "man-among-metal-pans", "milkman-on-bicycle"], dark: true,
         small: "A kettle, a stack of kadhais, milk cans on a bicycle: each figure is painted with the things of their day." },
-      { title: "Together", works: ["three-veiled-women", "mother-and-child"], room: true, dark: true,
+      { title: "Together", works: ["three-veiled-women", "mother-and-child"], room: true,
         big: "Red veils, gathered close." },
     ],
   },
@@ -224,6 +229,7 @@ export const SERIES_PAGES: SeriesPage[] = [
     slug: "recent-work", label: "Onset of Spring", period: "2024 to 2026",
     line: "Flowers, leaves, a bird and a pause, in her own words. Beauty, found even among the thorns.",
     hero: "boy-with-bananas",
+    held: "The smallest moments bloom, if you stop long enough to see them.",
     intro: [
       "Her spring work turns inward, and looks up. A child beneath banana leaves. A woman beside a bird. Bells hung with red thread. Beauty, noticed anyway.",
       "Five of the six paintings come with her own words. They are given here in full.",
@@ -238,6 +244,12 @@ export const SERIES_PAGES: SeriesPage[] = [
     ],
   },
 ];
+
+/** the one painting that stands for each collection where only one is shown (Shubham, 20 Oct): the strongest image */
+export const LEAD: Record<string, string> = {
+  "gone-are-the-days": "bulls-and-wheel", "bandh-darwaze": "red-and-teal-door-lock", faith: "monks-and-blue-buddha",
+  portraits: "red-turban-portrait", "recent-work": "woman-with-poppies",
+};
 
 export const SERIES_BY_LABEL = new Map(SERIES_PAGES.map((s) => [s.label, s]));
 export const SERIES_BY_SLUG = new Map(SERIES_PAGES.map((s) => [s.slug, s]));
