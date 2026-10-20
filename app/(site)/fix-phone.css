@@ -96,3 +96,14 @@
 /* R4 B3 G9b: the cover caption keeps a two-line box on phones, so the font swap (fallback 2 lines -> Jost 1 line)
    does not pull the epigraph and intro up (slow-link CLS 0.053 on recent-work) */
 @media (max-width:760px){ .story-open .so-art figcaption{min-height:calc(2 * 1.45em)} }
+/* R4 fix 5 (COO 5, consultant P1-4, DC P2-3): on phones every chapter reads the same way: title -> painting(s) -> words.
+   The desktop zigzag (.flip puts the art second) out-ranked the phone order on alternate single chapters, and multi
+   chapters put their words before the row. */
+@media (max-width:760px){
+  .chv.single.flip .chv-art{order:-1}
+  .chv.multi .chv-in{display:flex;flex-direction:column;align-items:stretch}
+  .chv.multi .chv-txt{display:contents}
+  .chv.multi .chv-n{order:-4}
+  .chv.multi .chv-t{order:-3}
+  .chv.multi .chv-rowbox{order:-2;margin-bottom:18px}
+}
