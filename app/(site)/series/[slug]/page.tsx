@@ -62,7 +62,11 @@ function Words({ c }: { c: Chapter }) {
 function pairFacts(ws: Work[]) {
   const same = (f: (w: Work) => string) => (ws.every((w) => f(w) === f(ws[0])) ? f(ws[0]) : "");
   const st = same((w) => (w.status === "Sold" ? "In a private collection" : statusText(w)));
-  return [ws.map((w) => w.title).join(" and "), same((w) => w.medium), same((w) => w.size ?? "") && `${ws[0].size} each`, st].filter(Boolean).join(" · ");
+  // titles that share their opening words read once: "Bandh Darwaze I and II" (keeps the line short, G5b)
+  const words = ws.map((w) => w.title.split(" "));
+  let k = 0; while (words.every((t) => t.length > k + 1 && t[k] === words[0][k])) k++;
+  const titles = k ? `${words[0].slice(0, k).join(" ")} ${words.map((t) => t.slice(k).join(" ")).join(" and ")}` : ws.map((w) => w.title).join(" and ");
+  return [titles, same((w) => w.medium), same((w) => w.size ?? "") && `${ws[0].size} each`, st].filter(Boolean).join(" · ");
 }
 
 function Room({ c, works }: { c: Chapter; works: Work[] }) {
