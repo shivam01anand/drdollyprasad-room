@@ -199,9 +199,14 @@ export type RoomView = { room: Room; at: Hang; trueSize: boolean };
 export function roomsFor(work: Work, aspect: number, opts: { pilot?: boolean } = {}): RoomView[] {
   // the hallway pilot is shown on the website's painting pages only (not in the studio)
   const pilot = opts.pilot ? PILOT.find((r) => r.work === work.id) : undefined;
-  if (pilot) return [{ room: pilot, at: hang(pilot, pilot.cm, aspect), trueSize: false }];
   const own = TAILORED.find((r) => r.work === work.id);
   const stated = work.inches ? work.inches * 2.54 : 0;
+  // the room made for this painting comes first; the shared study scene is the second view
+  if (own && pilot) return [
+    { room: own, at: hang(own, stated || own.cm, aspect), trueSize: !!stated },
+    { room: pilot, at: hang(pilot, pilot.cm, aspect), trueSize: false },
+  ];
+  if (pilot) return [{ room: pilot, at: hang(pilot, pilot.cm, aspect), trueSize: false }];
   if (own) return [{ room: own, at: hang(own, stated || own.cm, aspect), trueSize: !!stated }];
   if (!stated) return [];
   return GENERIC.map((room) => ({ room, at: hang(room, stated, aspect), trueSize: true }));
