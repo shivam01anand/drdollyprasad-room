@@ -300,11 +300,11 @@
 
 /* R4 polish 4 (DC P2-4/P2-5, 1920 soft misses). (a) /series: past the 1,360 px cap each band's row of paintings runs on
    to the right edge of the screen, as the hero does, instead of stopping with ~280 px blank (the text column stays on
-   the site edge). (b) Home .hw-band: on large screens the portrait and her line grow so the band is not a thin strip. */
+   the site edge). (b) Home .hw-band: on large screens the portrait grows and her line takes a wider measure, so the band is not a thin strip. */
 @media (min-width:1600px){
   .sband{overflow-x:clip}
   .sband .srow .s-works{margin-right:calc(-1 * max(0px, (100vw - 1360px - 2 * var(--gut)) / 2) - var(--gut));min-width:0}
   .hw-in .round{width:300px;height:300px}
   .hw-q{flex-basis:880px}
-  .hw-q blockquote{font-size:clamp(46px,2.8vw,56px)}
+  .hw-q blockquote{text-wrap:pretty} /* the type token keeps her line at 40 px; no one-word last line on the wider measure */
 }
