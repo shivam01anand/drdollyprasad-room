@@ -153,6 +153,11 @@
   .chv-t{font:500 36px/1.12 var(--serif) !important;color:var(--ink) !important}
   .chv-row figcaption{font:400 13px/1.4 var(--sans) !important;color:var(--muted) !important;letter-spacing:0 !important}
   .se-ask{font:400 16px/1.5 var(--sans) !important;color:var(--ink) !important}
+  /* R4 fix 3: Bandh caption blocks (H3 C 24, line, facts J 14) and the GATD room caption */
+  .so-pt{font:500 24px/1.2 var(--serif) !important;color:var(--ink) !important}
+  .so-pcap .chap-big:not(.hers){font:500 20px/1.35 var(--serif) !important;color:var(--ink) !important}
+  .so-pcap .chap-small{font:400 16px/1.5 var(--sans) !important;color:var(--ink) !important}
+  .chv-room figcaption{font:400 14px/1.45 var(--sans) !important;color:var(--muted) !important;letter-spacing:0 !important}
   .se-ask a,.se-ask b{color:var(--ink) !important;font-weight:500 !important}
   @media (min-width:761px) and (max-width:1099px){ .story-open h1{font-size:64px !important} }
   @media (max-width:760px){

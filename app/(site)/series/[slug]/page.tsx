@@ -58,6 +58,13 @@ function Words({ c }: { c: Chapter }) {
   );
 }
 
+/** facts for a pair shown together: both titles, then what they share (medium, size each, status) */
+function pairFacts(ws: Work[]) {
+  const same = (f: (w: Work) => string) => (ws.every((w) => f(w) === f(ws[0])) ? f(ws[0]) : "");
+  const st = same((w) => (w.status === "Sold" ? "In a private collection" : statusText(w)));
+  return [ws.map((w) => w.title).join(" and "), same((w) => w.medium), same((w) => w.size ?? "") && `${ws[0].size} each`, st].filter(Boolean).join(" · ");
+}
+
 function Room({ c, works }: { c: Chapter; works: Work[] }) {
   if (!c.room) return null;
   const w = works.find((x) => TAILORED.some((r) => r.work === x.id && r.inPhoto));
@@ -79,21 +86,35 @@ function ChapterView({ c, n, flip }: { c: Chapter; n: number; flip: boolean }) {
   if (works.length === 1) {
     const w = works[0];
     const facts = [w.title !== c.title ? w.title : "", w.medium, w.size, w.status === "Sold" ? "In a private collection" : statusText(w)].filter(Boolean).join(" · ");
+    // R4 fix 3 (Brand P1-3): GATD "Roads" shows The Bullocks in its room, large, since the cover just showed the painting
+    const room = c.roomLarge ? TAILORED.find((r) => r.work === w.id && r.inPhoto) : undefined;
     return (
-      <section className={`chap chv single${flip ? " flip" : ""}`} data-chapter>
+      <section className={`chap chv single${flip ? " flip" : ""}${room ? " room-big" : ""}`} data-chapter>
         <div className="wrap chv-in">
           <div className="chv-art">
+            {room ? (
+              <figure className="chv-room">
+                <Link href={workPath(w.id)}>
+                  {/* eslint-disable-next-line @next/next/no-img-element */}
+                  <img className="room-img" src={room.src} alt={`${w.title} in ${room.label.replace(/^An? /, (a) => a.toLowerCase())}, a room study`} loading="lazy" decoding="async"
+                       width={room.w} height={room.h} style={{ ["--ar" as string]: (room.w / room.h).toFixed(4) } as CSSProperties} />
+                </Link>
+                {/* Brand R4-2 P1-3 caption [Our suggestion], plus the room line already on the site; Chief Content to lock */}
+                <figcaption>{w.title}, in a room. A room study, not a photograph.</figcaption>
+              </figure>
+            ) : (
             <Link href={workPath(w.id)}>
               {/* eslint-disable-next-line @next/next/no-img-element */}
               <img className="framed" src={img(w.id)} alt={alt(w)} loading="lazy" decoding="async" {...wh(w.id)} style={arStyle(w.id)} />
             </Link>
+            )}
           </div>
           <div className="chv-txt">
             {head}
             <div className="chv-words"><Words c={c} /></div>
             <p className="chv-facts">{facts}</p>
             <Link className="link" href={workPath(w.id)}>See the painting →</Link>
-            <Room c={c} works={works} />
+            {!room && <Room c={c} works={works} />}
           </div>
         </div>
       </section>
@@ -137,14 +158,16 @@ export default async function SeriesStory({ params }: Props) {
   if (!s) notFound();
   const nb = seriesNeighbours(s.slug);
   // Brand pick (R4 B3 rough, 4): Onset of Spring opens on its LEAD, so its one allowed repeat sits six chapters apart
-  const cover = BY_ID.get(s.slug === "recent-work" ? (LEAD[s.slug] ?? s.hero) : s.hero)!;
+  // R4 fix 3 (Brand P1-3): Faith opens on The Blue Buddha (its LEAD, beside the ICCR photo), so Vakratunda is not repeated on the next screen
+  const cover = BY_ID.get(s.slug === "recent-work" || s.slug === "faith" ? (LEAD[s.slug] ?? s.hero) : s.hero)!;
   const works = worksIn(s.label);
   const photo = PHOTO[s.slug];
   const feat = featuredIds(s);
   // B3-4: only the paintings the chapters have not shown; no section at all when there are none
   const also = works.filter((w) => !feat.has(w.id));
   // Bandh Darwaze: the four doors together, as her note says they are made to be seen ("on one wall")
-  const doors = s.slug === "bandh-darwaze" ? s.chapters.flatMap((c) => c.works).map((id) => BY_ID.get(id)!).filter(Boolean) : [];
+  // R4 fix 3 (Brand P1-3): each door once on the page: the chapters become caption blocks under their pair in the 2x2
+  const doors = s.slug === "bandh-darwaze" ? s.chapters.map((c) => ({ c, works: c.works.map((id) => BY_ID.get(id)!).filter(Boolean) })) : [];
   let singles = 0;
   return (
     <>
@@ -175,12 +198,24 @@ export default async function SeriesStory({ params }: Props) {
         </div>
         <div className="so-art">
           {doors.length ? (
-            <div className="so-grid">
-              {doors.map((w) => (
-                <Link key={w.id} href={workPath(w.id)}>
-                  {/* eslint-disable-next-line @next/next/no-img-element */}
-                  <img className="framed" src={img(w.id)} alt={alt(w)} fetchPriority="high" {...wh(w.id)} style={arStyle(w.id)} />
-                </Link>
+            <div className="so-pairs">
+              {doors.map(({ c, works: ws }, i) => (
+                <div className="so-pair" key={c.title}>
+                  <div className="so-grid">
+                    {ws.map((w) => (
+                      <Link key={w.id} href={workPath(w.id)}>
+                        {/* eslint-disable-next-line @next/next/no-img-element */}
+                        <img className="framed" src={img(w.id)} alt={alt(w)} fetchPriority="high" {...wh(w.id)} style={arStyle(w.id)} />
+                      </Link>
+                    ))}
+                  </div>
+                  <div className="so-pcap" data-chapter>
+                    <span className="chv-n">{ROMAN[i]}</span>
+                    <h2 className="so-pt">{c.title}</h2>
+                    <div className="chv-words"><Words c={c} /></div>
+                    <p className="chv-facts">{pairFacts(ws)}</p>
+                  </div>
+                </div>
               ))}
             </div>
           ) : (
@@ -198,7 +233,7 @@ export default async function SeriesStory({ params }: Props) {
         </div>
       </section>
 
-      {s.chapters.map((c, i) => {
+      {!doors.length && s.chapters.map((c, i) => {
         const single = c.works.length === 1;
         const flip = single && singles++ % 2 === 1;
         return <ChapterView key={c.title} c={c} n={i} flip={flip} />;

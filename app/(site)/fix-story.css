@@ -242,3 +242,22 @@
 .sband .card .mat img{width:calc((240px - var(--fp)) * var(--ar) + var(--fp)) !important}
 @media (min-width:761px) and (max-width:1099px){ .sband .card .mat img{width:calc((210px - var(--fp)) * var(--ar) + var(--fp)) !important} }
 .also-row .card .mat img{width:calc((200px - var(--fp)) * var(--ar) + var(--fp)) !important}
+
+/* ==== R4 fix 3 (Brand P1-3): one big showing per painting ==== */
+/* Bandh Darwaze: the 2x2 opening carries its two chapters; under each pair, its caption block; each door once */
+.so-pairs{display:flex;flex-direction:column;gap:28px}
+.so-doors .so-grid img.framed{height:clamp(200px,18vw,280px);width:calc((clamp(200px,18vw,280px) - var(--fp)) * var(--ar) + var(--fp))}
+.so-pcap{text-align:center;margin:14px auto 0;max-width:540px}
+.so-pcap>*{margin:0}
+.so-pcap .chv-n{margin-bottom:4px}
+.so-pcap .so-pt{margin:0 0 8px}
+.so-pcap .chv-words{gap:6px;align-items:center}
+.so-pcap .chap-big,.so-pcap .chap-small{text-align:center;margin:0 !important;max-width:none}
+.so-pcap .chv-facts{margin-top:8px !important}
+/* GATD "Roads": the room view takes the painting slot at the chapter painting's height */
+.chv-room{margin:0}
+.chv-room a{display:block}
+.chv-room img.room-img{display:block;margin-inline:auto;width:min(100%,calc(clamp(380px,38vw,540px) * var(--ar)));height:auto;aspect-ratio:auto var(--ar)}
+.chv-room figcaption{text-align:center;margin-top:12px;text-wrap:balance}
+@media (min-width:761px) and (max-width:1099px){ .chv-room img.room-img{width:min(100%,calc(clamp(320px,40vw,440px) * var(--ar)))} }
+@media (max-width:760px){ .chv-room img.room-img{width:100%} .so-pairs{gap:24px} }

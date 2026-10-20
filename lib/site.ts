@@ -129,6 +129,8 @@ export type Chapter = {
   hers?: boolean;
   /** show the first work in its room photograph */
   room?: boolean;
+  /** R4 fix 3 (Brand P1-3): the room view takes the painting slot, large (the cover already shows the painting) */
+  roomLarge?: boolean;
   dark?: boolean;
 };
 
@@ -197,7 +199,7 @@ export const SERIES_PAGES: SeriesPage[] = [
       { title: "Coins and clay", works: ["rickshaw-puller-and-coin", "coins-and-clay-bank", "terracotta-pots"],
         big: "A clay gullak, and the coins it was made to hold: 20 paise, 5 naye paise, 4 annas.",
         small: "The coins have moved on. The gullak is still here, still holding." },
-      { title: "Roads", works: ["bulls-and-wheel"], room: true, dark: true,
+      { title: "Roads", works: ["bulls-and-wheel"], room: true, roomLarge: true, dark: true,
         setup: "Before engines, there were these two. Shoulder to shoulder under one yoke, pulling the wheel that carried a village’s harvest, its weddings, its markets.",
         big: "The wheel still stands. The road has moved on." },
       { title: "Then and now", works: ["carriage-and-autorickshaw", "bullock-cart-and-truck", "cycle-rickshaw", "rickshaw-rest"],
