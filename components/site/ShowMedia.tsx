@@ -39,6 +39,8 @@ export default function ShowMedia({ photos, label }: { photos: Photo[]; label: s
   const strip = useRef<HTMLDivElement>(null);
   const userAt = useRef(0); // when the visitor last touched or scrolled the strip
   const ourScroll = useRef(0); // until when a scroll of the strip is our own (keep-in-view)
+  const ourTarget = useRef(0); // where our own scroll is heading
+  const lastLeft = useRef(0);
   const last = useRef(0);
   const n = photos.length;
   const p = photos[i];
@@ -98,7 +100,11 @@ export default function ShowMedia({ photos, label }: { photos: Photo[]; label: s
     // any scroll we did not start ourselves is the visitor's (also covers scrollbars, keys and assistive tech)
     const scrolled = () => {
       const now = performance.now();
-      if (now < ourScroll.current) return;
+      const left = s.scrollLeft, was = lastLeft.current;
+      lastLeft.current = left;
+      // during our own smooth scroll, only a move away from our target is the visitor's
+      if (now < ourScroll.current && Math.abs(left - ourTarget.current) <= Math.abs(was - ourTarget.current) + 2) return;
+      ourScroll.current = 0;
       if (now - userAt.current > 400) mark(); else userAt.current = now;
     };
     s.addEventListener("scroll", scrolled, { passive: true });
@@ -149,6 +155,8 @@ export default function ShowMedia({ photos, label }: { photos: Photo[]; label: s
     if (!out) return;
     const left = b.offsetLeft - (s.clientWidth - b.offsetWidth) / 2;
     ourScroll.current = performance.now() + 1000;
+    ourTarget.current = Math.min(Math.max(0, left), s.scrollWidth - s.clientWidth);
+    lastLeft.current = s.scrollLeft;
     s.scrollTo({ left: Math.max(0, left), behavior: reduced ? "auto" : "smooth" });
   }, [i, reduced]);
 
