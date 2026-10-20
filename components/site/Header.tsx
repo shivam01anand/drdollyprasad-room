@@ -47,7 +47,7 @@ export default function Header() {
         <Link href="/" className="brand" aria-label="Dr Dolly Prasad, home">
           {/* eslint-disable-next-line @next/next/no-img-element */}
           <img src={PORTRAIT} alt="" width={52} height={52} />
-          <span className="brand-t"><b>Dr Dolly Prasad</b><i>The everyday, held sacred.</i></span>
+          <span className="brand-t"><b>Dr Dolly Prasad</b><i>The everyday, held <span className="red">sacred</span>.</i></span>
         </Link>
         <nav className="nav" aria-label="Main">
           {NAV.map((n) => link(n))}

@@ -40,7 +40,7 @@ export default function Home() {
   return (
     <>
       <WallHero columns={HOME} label="Dr Dolly Prasad" size="home" face={PORTRAIT} eyebrow="Oil on canvas · New Delhi"
-                title="Dr Dolly Prasad" red="Dolly" sub="The everyday, held sacred.">
+                title="Dr Dolly Prasad" red="Dolly" sub={<>The everyday, held <span className="red">sacred</span>.</>}>
         <Link className="btn btn-solid" href="/works">See all {total} works</Link>
         <a className="btn" href={STUDIO_PATH}>Walk through the studio</a>
       </WallHero>
