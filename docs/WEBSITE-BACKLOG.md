@@ -27,6 +27,24 @@ branch `batch-2026-10-19` as a preview and leaves this file when made live.
 
 Content and structure first; aesthetics once those settle.
 
+## Preview 20 October 2026 (branch `preview-2026-10-20`)
+
+One preview for Shubham with everything except the studio: batch 19 Oct
+(PR #15), "sacred" in red (PR #16, B-0119-1), rooms 20 Oct (PR #17: round-3
+hallway rooms and a room view for 16 more paintings), and four new collection
+lines in the site's own voice (`held` in `lib/site.ts`, chosen by the COO after
+two Content / Chief Content / Brand rounds and Shubham's feedback on 19 Oct).
+Items below leave this file when it goes live.
+
+Learning (Shubham, 19 Oct): a collection line must stop the visitor, give a
+feeling, speak to "you" and define the theme in one breath. Lists of what is in
+the paintings, meta talk ("these four are worth...") and the bare word
+"everyday" miss the job. Rules (say it once, checked facts, observer voice) are
+guardrails, not the goal.
+
+Still without a room: Small Panel I, Small Panel II, The Boatmen (photos about
+250 px wide; need a re-shoot from Mummy).
+
 ## Open: batch of 19 October 2026
 
 - **See it in your room, for every painting.** Every painting page should offer

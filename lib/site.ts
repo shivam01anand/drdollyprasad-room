@@ -177,7 +177,7 @@ export const SERIES_PAGES: SeriesPage[] = [
     slug: "bandh-darwaze", label: "Bandh Darwaze", period: "2018",
     line: "Four shut doors: a ring, a lock, a bolt, a knocker. A closed door is a door someone cared for.",
     hero: "red-and-teal-door-lock",
-    held: "Four shut doors, and the care that kept them: the everyday, seen with affection.",
+    held: "A closed door keeps one world inside, and turns you toward another.",
     intro: [
       "Bandh darwaze: closed doors. Four small square canvases, each a close look at the hardware of an old door, painted over worn, colour-washed wood.",
       "No people, no rooms. Only what a hand reaches for at a threshold. Shut, but kept: the layered paint is proof of care.",
@@ -193,7 +193,7 @@ export const SERIES_PAGES: SeriesPage[] = [
     slug: "faith", label: "Faith", period: "2005 to 2015",
     line: "A lamp, a thread, a page of scripture, the morning paper. Devotion as attention, given daily.",
     hero: "offering-of-light",
-    held: "Devotion as attention, given daily: the everyday, held sacred.",
+    held: "Faith is rarely loud. Most days, it is a small light kept burning.",
     intro: [
       "Not spectacle, but habit. A lamp is raised to a wall of scripture. A devotee sits before it. A priest lifts the aarti flame. A peepal is wound in red thread.",
       "And a man opens his morning paper. In these paintings, that too is a kind of faith.",
@@ -211,7 +211,7 @@ export const SERIES_PAGES: SeriesPage[] = [
     slug: "portraits", label: "Portraits", period: "2005 to 2015",
     line: "A turban, a kettle, a stack of kadhais. The people who carry our days, given a long, unhurried look.",
     hero: "three-veiled-women",
-    held: "A face is where we meet them: the everyday, seen with affection.",
+    held: "Every face you meet holds a story. Here, there is time to find it.",
     intro: [
       "The play of emotion on a face has always held her. These portraits stay close: elders in turbans, a chai boy between orders, a kadhai seller among his pans, a doodhwala on his round.",
       "Each figure is painted with the things of their work beside them. The face is where you meet them; the rest is theirs to keep. The people who carry our days are given the time the street did not.",
@@ -229,7 +229,7 @@ export const SERIES_PAGES: SeriesPage[] = [
     slug: "recent-work", label: "Onset of Spring", period: "2024 to 2026",
     line: "Flowers, leaves, a bird and a pause, in her own words. Beauty, found even among the thorns.",
     hero: "boy-with-bananas",
-    held: "A pause, a bloom, a bird: the everyday, still held sacred.",
+    held: "The smallest moments bloom, if you stop long enough to see them.",
     intro: [
       "Her spring work turns inward, and looks up. A child beneath banana leaves. A woman beside a bird. Bells hung with red thread. Beauty, noticed anyway.",
       "Five of the six paintings come with her own words. They are given here in full.",
