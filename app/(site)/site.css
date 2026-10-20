@@ -2440,3 +2440,7 @@ body *{font-style:normal !important}
   .card .card-t{font-size:18px}
 }
 .card .card-t,.card .meta{align-self:stretch;width:100%;display:block}
+/* audit 20 Oct: no text under 12 px; the collection link on painting pages is a full tap target */
+.sband .eyebrow{font-size:12px}
+@media (max-width:640px){ .pf-pager .btn{font-size:12px} }
+.pp-text a,.pp-status a{display:inline-flex;align-items:center;min-height:32px}
