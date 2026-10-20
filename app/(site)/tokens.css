@@ -97,6 +97,8 @@
   /* widows */
   h1,h2,h3,.chap-big,.card-t{text-wrap:balance !important}
   .lede,.quote{text-wrap:pretty !important}
+  /* DC review #2 P1-1: small text on indigo uses muted-on-indigo (#5F564D was 2.28:1) */
+  .tone-dark .eyebrow,.band-indigo .eyebrow,.chap-dark .chap-sig,.chap-dark .eyebrow,.next-series .eyebrow,.ab-press .eyebrow{color:var(--muted-on-indigo) !important}
   /* retired grey #6E645A gone: intro ledes in muted; About and story body on the one body role, in ink (review #2 P1) */
   .lede,.page-head .lede,.story-head .lede{color:var(--muted) !important}
   .ab-p{color:var(--ink) !important}
