@@ -23,7 +23,6 @@ export default function WorksPage() {
     <WallHero columns={WORKS_WALL} label="Her paintings" eyebrow="Oil on canvas" title="Her Works" red="Works"
               held={`All ${WORKS.length} paintings, in five collections.`}>
       <a className="btn btn-solid" href="#all">See the paintings</a>
-      <Link className="btn" href="/enquire">Enquire</Link>
     </WallHero>
     <section id="all" style={{ scrollMarginTop: 110 }}>
       <WorksBrowser />
@@ -38,7 +37,7 @@ export default function WorksPage() {
         <p className="meta" style={{ marginTop: 18 }}>Looking for something in particular? <Link href="/enquire">Ask about a painting</Link>, or see <Link href="/series">the five collections</Link>.</p>
       </section>
     </div>
-    <IndigoBand title="Key collections" line="Five collections, one habit: look at an ordinary thing twice." href="/series" label="All collections">
+    <IndigoBand title="Key collections" line="Five collections of a changing India, and the everyday you grew up with." href="/series" label="All collections">
       <div className="ibnd-chips">{SERIES_PAGES.map((s) => <Link key={s.slug} className="btn btn-light" href={`/series/${s.slug}`}>{s.label}</Link>)}</div>
     </IndigoBand>
     </>

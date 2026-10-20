@@ -101,7 +101,7 @@ export default async function SeriesStory({ params }: Props) {
   return (
     <>
       <section className="story-head wrap">
-        <p className="eyebrow">Collection {at + 1} of {SERIES_PAGES.length} · {s.period} · {works.length} works</p>
+        <p className="eyebrow">Collection {at + 1} of {SERIES_PAGES.length} · {works.length} works · {s.period}</p>
         <h1>{s.label}</h1>
         <p className="lede">{s.line}</p>
       </section>

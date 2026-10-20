@@ -34,8 +34,8 @@
 .marq-set>.card,#more-from .grid>.card,.grid-5>.card{align-self:stretch}
 .marq-set>.card>.mat,#more-from .grid>.card>.mat,.grid-5>.card>.mat{flex:1 1 auto !important;display:flex !important;align-items:flex-end !important;justify-content:center;height:auto !important}
 @media (max-width:1000px){ .marq-set>.card>.card-t,#more-from .card-t,.grid-5 .card-t{min-height:2.3em !important;text-wrap:balance} }
-/* Home, Key collections: the line under each title keeps a two-line box (it was 1 or 2 lines, so pictures rode up) */
-.series-tiles .m-card .meta{display:-webkit-box !important;-webkit-box-orient:vertical;-webkit-line-clamp:2;line-clamp:2;overflow:hidden;min-height:2.9em}
+/* Home, Key collections: one count line under each title, one line box (the 2-line description is cut, C17) */
+.series-tiles .m-card .meta{display:-webkit-box !important;-webkit-box-orient:vertical;-webkit-line-clamp:1;line-clamp:1;overflow:hidden;min-height:1.4em}
 /* collection pages, chapter pictures: picture and caption share rows across the chapter (subgrid),
    pictures on one bottom line whatever the caption length */
 .chap-works:not(.n1){align-items:stretch}
@@ -122,3 +122,7 @@
    phone chapter swipes keep a two-line caption box so their pictures share a bottom line. ---- */
 @media (min-width:641px) and (max-width:1000px){ .marq-set>.card>.meta,#more-from .card .meta,.grid-5 .card .meta{min-height:2.8em} }
 @media (max-width:760px){ .chap-works.n3 figcaption,.chap-works.n4 figcaption{min-height:2.8em} }
+
+/* C23: the Home hero pair on a phone says "Enter the studio" (desktop keeps "Walk through the studio") */
+.lbl-phone{display:none}
+@media (max-width:640px){ .lbl-wide{display:none} .lbl-phone{display:inline} }

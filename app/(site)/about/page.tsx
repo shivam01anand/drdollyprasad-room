@@ -75,16 +75,16 @@ export default function About() {
           <p className="eyebrow">The work</p>
           <h2>She captures the everyday: its waiting and wishing, its worship and whispers.</h2>
           <p className="ab-p">A clay gullak and the coins it was made to hold. A door nobody opens any more. A lamp raised to a wall of scripture. She gives these ordinary things the scale, the colour and the stillness we usually keep for the sacred.</p>
-          <p className="ab-p">Why these things? Because they are what made it home, and they are the first a changing country overlooks. Each painting is a way of saying they matter, and that looking twice is how we keep them.</p>
+          <p className="ab-p">Why these things? Because they are what made it home, and they are the first a changing country overlooks. Each painting is a way of saying they matter.</p>
         </div>
       </section>
 
       <section className="ab-band tone-light">
         <div className="wrap ab-split">
           <div className="ab-txt">
-            <p className="eyebrow">Looking twice</p>
+            <p className="eyebrow">A doctor’s eye</p>
             <h2>From a bullock cart to a child beneath banana leaves</h2>
-            <p className="ab-p">One habit runs through all of it: look at an ordinary thing a second time, and it opens. A lamp, a thread, a pause. In her words: “Sometimes, I paint not to show, but to pause.”</p>
+            <p className="ab-p">A doctor is taught to look beneath the surface. She turns that eye on the everyday, a lamp, a thread, a pause, until the thing you walk past is the thing you stop for. In her words: “Sometimes, I paint not to show, but to pause.”</p>
             <Link className="btn btn-solid" href="/series">The five collections</Link>
           </div>
           <Roll label="A few of her paintings" items={paint(["bulls-and-wheel", "offering-of-light", "boy-with-bananas", "temple-bells", "woman-with-bird"])} />
