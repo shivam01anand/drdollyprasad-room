@@ -25,6 +25,8 @@
   .sband .band-marq{--fade:24px;padding-left:var(--fade) !important;margin-left:calc(-1 * var(--fade)) !important;
     -webkit-mask-image:linear-gradient(90deg,transparent 0,#000 var(--fade),#000 calc(100% - var(--fade)),transparent);
             mask-image:linear-gradient(90deg,transparent 0,#000 var(--fade),#000 calc(100% - var(--fade)),transparent)}
+  /* review #2 R2-2: the track starts a further --fade in, so the first painting is clear of the fade at rest and only fades while passing the edge */
+  .sband .band-marq .marq-track{padding-left:var(--fade) !important}
 }
 
 /* ---- B2 · rows share one straight line (T4; Brand R1 #1, Shubham's #1 ask "pictures in a straight line") ----
