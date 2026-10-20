@@ -58,8 +58,6 @@
   /* #13 */
   #more-from>.wrap,#more-from .sec-head,#more-from .grid{padding-inline:0 !important}
   .wp-lower{padding-bottom:0 !important}
-  /* #15 */
-  .press-item:last-child:nth-child(3n+1){grid-column:auto !important}
 }
 @media (min-width:1200px){
   .grid.grid-5>.card{flex-basis:calc(20% - 18px);max-width:calc(20% - 18px)}
