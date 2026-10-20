@@ -158,10 +158,6 @@ html:has(.five){scroll-behavior:auto}
 
 /* ---- B4 · Exhibitions on the same container as every other page (4.5; T17): no narrower column, no blank left ---- */
 .ex-index,.ex-ch,.ex-press,.ex-record,.now-line{max-width:calc(var(--max) + 2 * var(--gut)) !important}
-@media (min-width:901px){
-  .ex-ch-body{grid-template-columns:minmax(0,1fr) minmax(0,1.15fr) !important;column-gap:48px !important;padding-left:0 !important;align-items:center !important}
-  /* review #2: with the lede gone the text column is short; centre it on the photo so the space reads as intended */
-}
 
 /* ---- B3 3.8 · a separator dot belongs to the part before it, so no wrapped line starts with "·" ---- */
 .meta-parts .mp + .mp::before{content:none !important}
@@ -196,17 +192,6 @@ html[data-motion="paused"] *,html[data-motion="paused"] *::before,html[data-moti
 
 /* review #2 R2-7: a disabled pager button is not a box */
 .pf-pager .btn:disabled,.pf-pager .btn[aria-disabled="true"]{opacity:.4 !important;border-color:transparent !important;background:transparent !important}
-
-/* COO stage 7: Exhibitions chapter (>900px) as one two-column grid. The LEFT column holds the whole text group (year + title,
-   venue line, quote, On the walls), kept together and centred against the photo column on the right; the header no longer spans
-   above. Spacer rows 1 and 4 (1fr each) do the centring. <=900px is unchanged. */
-@media (min-width:901px){
-  .ex-ch{display:grid !important;grid-template-columns:minmax(0,1fr) minmax(0,1.15fr);grid-template-rows:1fr auto auto 1fr;column-gap:48px}
-  .ex-ch>.ex-ch-body{display:contents !important}
-  .ex-ch>.ex-ch-head{grid-column:1;grid-row:2;margin-bottom:24px !important}
-  .ex-ch .ex-ch-txt{grid-column:1;grid-row:3;padding:0 !important;margin:0 !important}
-  .ex-ch .ex-ch-body>.sm-media{grid-column:2;grid-row:1 / -1;align-self:center;margin:0 !important}
-}
 
 /* ---- R3 ---- */
 /* §3 heroes: a little taller, a hint of the next section still showing (Shubham 20 Oct) */
