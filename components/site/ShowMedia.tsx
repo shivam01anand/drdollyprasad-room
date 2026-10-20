@@ -13,7 +13,7 @@ const sm = (src: string) => src.replace("/site/ex/", "/site/ex/sm/");
 
 /**
  * One exhibition's photographs: one large in its thin black frame that rolls on
- * by itself every 4 s, swipes or drags by hand, and a strip of every photograph
+ * by itself every 3.5 s, swipes or drags by hand, and a strip of every photograph
  * under it that scrolls by hand with normal momentum (a fast flick goes fast).
  * The large photograph sits in a stage of one fixed height, so nothing below it
  * moves when a portrait follows a landscape. Click it to open the show full screen.

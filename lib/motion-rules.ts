@@ -16,8 +16,8 @@ export const REDUCED_KEEPS_MOVING = true;
 /** rows and the wall under "Reduce motion": this share of the normal speed */
 export const REDUCED_SPEED = 0.5;
 
-/** the exhibition photograph roll (Brand: 3.2 s was too quick to read a photograph) */
-export const PHOTO_ROLL_MS = 4000;
+/** the exhibition photograph roll (Brand: 3.2 s too quick; COO tie-break after the consultant debate, 21 Oct: 3.5 s) */
+export const PHOTO_ROLL_MS = 3500;
 export const PHOTO_ROLL_MS_REDUCED = 5000;
 /** under "Reduce motion" the photographs crossfade over this long (no slide, no zoom) */
 export const PHOTO_FADE_MS_REDUCED = 600;
