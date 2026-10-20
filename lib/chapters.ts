@@ -1,6 +1,7 @@
 import { aim, type Pose } from "./room/rig";
 import type { HouseInfo, V3 } from "./room/house";
 import { phoneGroupView } from "./room/phone-framing";
+import { NOW } from "./site";
 
 /**
  * One chapter model owns the copy and the camera, so the two can never drift
@@ -19,6 +20,8 @@ export type Chapter = {
   eyebrow: string;
   /** rendered as a paragraph; omit for a beat the house carries alone */
   body?: string;
+  /** YYYY-MM-DD (New Delhi): the body line is shown only until the end of this day (components/Until) */
+  bodyUntil?: string;
   /** her own words, set as a quotation */
   quote?: string;
   /** rendered as verse, one line per line */
@@ -92,6 +95,8 @@ export const CHAPTERS: Chapter[] = [
     // her own words for the painting, then where it is showing
     quote: "Every thread representing a hope, desire, promise, or prayer.",
     body: "Showing at Sacred Fragments: A Journey Home, New Delhi, 18–21 October 2026.",
+    // gone by itself after 21 Oct 2026 23:59 IST, the same date as the Now showing line (NOW.until)
+    bodyUntil: NOW.until,
     view: "faith",
     dusk: 0.28,
     labels: ["monks-and-blue-buddha", "temple-bells"],
