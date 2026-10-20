@@ -42,3 +42,15 @@
 .chap-works>figure{display:grid;grid-row:span 2;grid-template-rows:subgrid;row-gap:8px}
 .chap-works>figure>a{align-self:end}
 @media (max-width:760px){ .chap-works.n3>figure,.chap-works.n4>figure{display:flex;justify-content:flex-end} }
+
+/* ---- B2 · Works grid: one bottom line per row, no fixed tall box (T6 option A; Brand R1 #20) ----
+   Each card spans four subgrid rows (picture, title, meta, status), so a row's picture track is as tall as
+   its tallest picture and every title in the row starts on one line. The explicit width (from --ar) keeps
+   lazy pictures from collapsing to 0 x 0 before they load, and reserves their space. */
+.pf-grid.works-grid{row-gap:32px !important}
+.pf-grid.works-grid .card{display:grid !important;grid-row:span 4;grid-template-rows:subgrid;row-gap:4px;align-self:stretch !important}
+.pf-grid.works-grid .mat{aspect-ratio:auto !important;align-items:flex-end !important}
+.pf-grid.works-grid .mat img{width:min(calc(100cqw - 24px),calc((125cqw - 34px) * var(--ar))) !important;height:auto !important;max-width:none !important;max-height:none !important;aspect-ratio:var(--ar)}
+@media (max-width:640px){
+  .pf-grid.works-grid .mat img{width:min(calc(100cqw - 12px),calc((125cqw - 22px) * var(--ar))) !important}
+}
