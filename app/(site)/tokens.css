@@ -97,6 +97,8 @@
   /* widows */
   h1,h2,h3,.chap-big,.card-t{text-wrap:balance !important}
   .lede,.quote{text-wrap:pretty !important}
+  /* her words verbatim, ours flagged: our description (no quote of hers) is plain body, not the inline-quote role */
+  .pp-story.is-ours,.pp-text p.pp-story.is-ours{font:400 18px/1.6 var(--sans) !important;color:var(--ink) !important}
   /* DC review #2 P1-1: small text on indigo uses muted-on-indigo (#5F564D was 2.28:1) */
   .tone-dark .eyebrow,.band-indigo .eyebrow,.chap-dark .chap-sig,.chap-dark .eyebrow,.next-series .eyebrow,.ab-press .eyebrow{color:var(--muted-on-indigo) !important}
   /* retired grey #6E645A gone: intro ledes in muted; About and story body on the one body role, in ink (review #2 P1) */
@@ -136,6 +138,7 @@
     .xcard em,.ncard em,.ccard em,.scard em,.qcard small,.nowstrip .live,.now-line .live,.wh .namecard .eyebrow,.ex-index span,.five-n,.sband .s-n,.s-n,label{font-size:13px !important}
     .ex-ch-year{font-size:20px !important}
     .chap-small{font-size:16px !important;line-height:1.55 !important}
+    .pp-story.is-ours,.pp-text p.pp-story.is-ours{font-size:16px !important;line-height:1.55 !important}
     .timeline small,.tl-photos{font-size:13px !important}
     .tl-year{font-size:16px !important}
     .sm-cap{height:calc(2em * 1.45) !important;-webkit-line-clamp:2 !important;line-clamp:2 !important}
