@@ -200,6 +200,9 @@
 @media (min-width:1100px){ .chv.multi:not(.beside) .chv-row{--rh:min(440px,calc((100cqw - var(--n) * var(--F) - (var(--n) - 1) * 24px - var(--rx, 0px)) / var(--rs) + var(--F)))} }
 @media (min-width:761px) and (max-width:1099px){ .chv.multi:not(.beside) .chv-row{--rh:min(360px,calc((100cqw - var(--n) * var(--F) - (var(--n) - 1) * 24px - var(--rx, 0px)) / var(--rs) + var(--F)))} }
 @media (min-width:761px){ .chv.multi:not(.beside) .chv-row{justify-content:center} }
+/* R4 polish 2 (DC P2-1): at >=1440 a two-painting row beside its text grows to 400 px (from 340), so "Light and
+   scripture" is not a sparse band on large screens; the cqw fit term still keeps the row inside its column */
+@media (min-width:1440px){ .chv.multi.beside .chv-row{--rh:min(400px,calc((100cqw - var(--n) * var(--F) - (var(--n) - 1) * 24px - var(--rx, 0px)) / var(--rs) + var(--F)))} }
 @media (min-width:761px) and (max-width:1099px){
   .chv.single .chv-in{gap:40px}
   .chv-art img.framed{max-height:clamp(320px,40vw,440px)}
