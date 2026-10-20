@@ -8,7 +8,7 @@ import { PRESS_ITEMS } from "@/lib/press";
 import WallHero from "@/components/site/WallHero";
 import { SHOW_WALL } from "@/components/site/Collage";
 import { NOW, NOW_SHOWING_CONFIRMED, RECORD, RECORD_LINE, SHOWS } from "@/lib/site";
-import { BY_ID, WORKS, workPath } from "@/lib/works";
+import { BY_ID, workPath } from "@/lib/works";
 import { dims } from "@/lib/images";
 
 export const metadata: Metadata = {
@@ -23,7 +23,7 @@ export default function Exhibitions() {
   return (
     <>
     <WallHero columns={SHOW_WALL} label="Her exhibitions" eyebrow="2005 to 2018" title="Her Exhibitions" red="Exhibitions"
-              held="Eighteen shows, Delhi to Bombay: the everyday, hung on a wall.">
+              held="Eighteen exhibitions, Delhi to Bombay: the things you walk past, hung where you stop.">
       <a className="btn btn-solid" href="#india-habitat-centre-2010">See the shows</a>
       <a className="btn" href="#record">The full record</a>
     </WallHero>
@@ -59,8 +59,7 @@ export default function Exhibitions() {
               <span className="ex-ch-year">{s.year}</span>
               <div>
                 <h2 id={`${s.id}-h`}>{s.name ?? s.title}</h2>
-                <p className="ex-ch-where">{s.venue}, {s.city}</p>
-                <p className="ex-kind">{s.kind} · {s.when}</p>
+                <p className="ex-ch-where">{s.where ?? `${s.venue}, ${s.city} · ${s.when}`}</p>
               </div>
             </header>
             <div className="ex-ch-body">
@@ -88,7 +87,6 @@ export default function Exhibitions() {
         <span id="on-screen" aria-hidden="true" />
         <div className="sec-head">
           <div>
-            <p className="eyebrow">From the archive</p>
             <h2 id="press-h">In the press</h2>
           </div>
         </div>
@@ -128,7 +126,6 @@ export default function Exhibitions() {
         <div className="next-series">
           <div className="ask">
             <b>See the paintings that hung on these walls</b>
-            <p className="meta">All {WORKS.length} works, with the ones still available. Prices on request.</p>
             <div style={{ display: "flex", gap: 10, flexWrap: "wrap" }}>
               <Link className="btn btn-solid" href="/works">See the works</Link>
               <Link className="btn" href="/enquire">Enquire about an exhibition</Link>

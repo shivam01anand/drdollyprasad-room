@@ -289,7 +289,7 @@ export const enquireHref = (w?: Work) => (w ? `/enquire?work=${w.id}` : "/enquir
  * record gives them.
  */
 
-export type Photo = { src: string; alt: string };
+export type Photo = { src: string; alt: string; /** the one-line caption under the photograph (Chief Content 2c, C7); alt stays the full sentence */ cap?: string };
 export type Album = { title: string; line: string; photos: Photo[] };
 export type Clip = { src: string; poster: string; title: string; line: string };
 
@@ -300,6 +300,8 @@ export type Show = {
   /** the show's own title, where it had one */
   name?: string;
   kind: string;
+  /** the one line under the show's title: venue · dates (Chief Content 2c, C3 to C6) */
+  where?: string;
   venue: string;
   city: string;
   when: string;
@@ -314,7 +316,37 @@ export type Show = {
   works?: string[];
 };
 
-const ph = (n: string, alt: string): Photo => ({ src: `/site/ex/${n}.jpg`, alt });
+/** one-line captions, Chief Content 2c (C7), applied verbatim [Ours] */
+const CAP: Record<string, string> = {
+  "ihc-02": "Visitors around the lit lamp, India Habitat Centre",
+  "ihc-03": "Dr Dolly Prasad lights the lamp, India Habitat Centre",
+  "ihc-04": "Dr Dolly Prasad with visitors, India Habitat Centre",
+  "ihc-05": "Dr Dolly Prasad and visitors, India Habitat Centre",
+  "ihc-06": "Photographers at the rickshaw painting, India Habitat Centre",
+  "ihc-08": "Dr Dolly Prasad beside The Blue Buddha, India Habitat Centre",
+  "ihc-press-a": "Dr Dolly Prasad with a reporter, India Habitat Centre",
+  "ihc-press-b": "Dr Dolly Prasad in an interview, India Habitat Centre",
+  "ihc-01": "The room, a lamp at its centre, India Habitat Centre",
+  "ihc-07": "Three paintings on the walls, India Habitat Centre",
+  "ihc-room-a": "Paintings along a partition, India Habitat Centre",
+  "ihc-room-b": "Two paintings above the lamp, India Habitat Centre",
+  "ihc-room-c": "The Bullocks on the wall, India Habitat Centre",
+  "ihc-room-e": "The Matka and the Coins, India Habitat Centre",
+  "ihc-room-d": "A painting of a working figure, India Habitat Centre",
+  "ihc-room-f": "The rickshaw puller painting, India Habitat Centre",
+  "ihc-room-g": "A painting of a seated reader, India Habitat Centre",
+  "iccr-speech": "Dr Dolly Prasad speaks at the opening, ICCR",
+  "iccr-02": "Dr Dolly Prasad beside The Blue Buddha, ICCR",
+  "iccr-sign": "The ICCR sign for A Lifetime to Paint",
+  "kala-dolly": "Dr Dolly Prasad beside her painting, Kala Mela",
+  "kala-painting": "The Cart-Man and the Rupaya, Kala Mela",
+  "kala-selfie": "A visitor’s selfie with the paintings, Kala Mela",
+  "kala-booklet": "The First International Kala Mela booklet",
+  "triveni-1": "The invitation, Triveni Kala Sangam, May 2007",
+  "triveni-2": "The back of the invitation, Triveni Kala Sangam",
+  "triveni-3": "The artist sheet, Triveni Kala Sangam",
+};
+const ph = (n: string, alt: string): Photo => ({ src: `/site/ex/${n}.jpg`, alt, ...(CAP[n] ? { cap: CAP[n] } : {}) });
 
 /**
  * The one switch for "Now showing": the home strip, the Exhibitions panel, the note on a
@@ -333,7 +365,7 @@ export const NOW = {
 
 export const SHOWS: Show[] = [
   {
-    id: "india-habitat-centre-2010", title: "India Habitat Centre", kind: "Exhibition",
+    id: "india-habitat-centre-2010", title: "India Habitat Centre", kind: "Exhibition", where: "Open Palm Court, India Habitat Centre, New Delhi · November 2010",
     venue: "Open Palm Court, India Habitat Centre", city: "New Delhi", when: "November 2010", year: "2010",
     lede: "A lamp lit at the opening. The Bullocks, the gullak and the rickshaw-walas on red-brick walls. Visitors stopping to talk, to look, to take a photograph. And the press, with their questions, beside the paintings.",
     works: ["bulls-and-wheel", "coins-and-clay-bank", "monks-and-blue-buddha"],
@@ -364,7 +396,7 @@ export const SHOWS: Show[] = [
     ],
   },
   {
-    id: "a-lifetime-to-paint", title: "ICCR", name: "A Lifetime to Paint", kind: "Exhibition, presented by the Indian Council for Cultural Relations",
+    id: "a-lifetime-to-paint", title: "ICCR", name: "A Lifetime to Paint", kind: "Exhibition, presented by the Indian Council for Cultural Relations", where: "Azad Bhavan Art Gallery, ICCR, I.P. Estate, New Delhi · 11 to 16 June 2010",
     venue: "Azad Bhavan Art Gallery, ICCR, I.P. Estate", city: "New Delhi", when: "Opened 11 June 2010 · on view 12 to 16 June", year: "2010",
     lede: "She spoke at the opening beside a marigold-decked lamp, The Blue Buddha behind her. The title looks past the walls, to the paintings still to come.",
     quote: "I hope it would be a life-long unraveling with these tinges, an affair to last a lifetime…",
@@ -378,7 +410,7 @@ export const SHOWS: Show[] = [
     ],
   },
   {
-    id: "kala-mela-2018", title: "First International Kala Mela", kind: "Art fair, organised by Lalit Kala Akademi",
+    id: "kala-mela-2018", title: "First International Kala Mela", kind: "Art fair, organised by Lalit Kala Akademi", where: "Art fair · Indira Gandhi National Centre for the Arts, New Delhi · 4 to 18 February 2018",
     venue: "Indira Gandhi National Centre for the Arts", city: "New Delhi", when: "4 to 18 February 2018", year: "2018",
     lede: "Artists from India and abroad, and the people who came to meet them. She stood beside The Cart-Man and the Rupaya, a working man at rest against a giant coin; nearby, a visitor raised her phone for a selfie with the paintings.",
     works: ["rickshaw-rest-framed"],
@@ -392,7 +424,7 @@ export const SHOWS: Show[] = [
     ],
   },
   {
-    id: "triveni-2007", title: "Triveni Kala Sangam", name: "Recent paintings, with Sangeeta Sharma", kind: "Two-artist exhibition",
+    id: "triveni-2007", title: "Triveni Kala Sangam", name: "Recent paintings, with Sangeeta Sharma", kind: "Two-artist exhibition", where: "Two-artist exhibition · Triveni Kala Sangam, Mandi House, New Delhi · 10 to 20 May 2007",
     venue: "Triveni Kala Sangam, Mandi House", city: "New Delhi", when: "10 to 20 May 2007", year: "2007",
     lede: "The invitation keeps what no photograph did: two names, ten days in May, and the paintings chosen to introduce them, among them Lajja, Intezar and Mannat.",
     albums: [

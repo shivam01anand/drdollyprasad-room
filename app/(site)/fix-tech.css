@@ -112,3 +112,7 @@
   .pp-art img{border-width:4px !important;padding:3px !important;--fp:14px}
   .pp-text a.pp-coll,.pp-text p.pp-attr,.pp-text p.pp-price{font-size:13px !important}
 }
+
+/* ---- B4 copy (C12): the Exhibitions end band is title + buttons on one row ---- */
+.next-series .ask:not(:has(.meta)){display:flex !important;flex-direction:row !important;flex-wrap:wrap;align-items:center;justify-content:space-between;gap:16px 24px}
+@media (max-width:640px){ .next-series .ask:not(:has(.meta)){flex-direction:column !important;align-items:flex-start} }

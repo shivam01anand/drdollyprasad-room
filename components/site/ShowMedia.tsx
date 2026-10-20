@@ -147,7 +147,7 @@ export default function ShowMedia({ photos, label }: { photos: Photo[]; label: s
         {/* eslint-disable-next-line @next/next/no-img-element */}
         <img key={p.src} src={p.src} alt={p.alt} loading="eager" decoding="async" draggable={false} {...dims(p.src)} />
       </button>
-      <p className="sm-cap" aria-live="off">{p.alt}</p>
+      <p className="sm-cap" aria-live="off">{p.cap ?? p.alt}</p>
       {n > 1 && (
         <div className="sm-strip" ref={strip} role="group" aria-label={`${label}: photographs`}>
           {photos.map((x, k) => (
