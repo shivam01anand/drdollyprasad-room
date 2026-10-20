@@ -98,8 +98,10 @@
   .pp>.pp-text{grid-area:text;align-self:center;margin:0 0 0 32px !important;max-width:none;text-align:left;align-items:flex-start;gap:10px}
   .pp-text .side-small{justify-content:flex-start}
   .pp-chip{width:56px !important;height:56px !important}
-  .pp-art img{width:min(100%,calc((min(calc(100svh - var(--hdr-h,92px) - 64px),820px) - var(--fp)) * var(--ar) + var(--fp))) !important}
-  .pp-art img.is-small{width:min(100%,calc((420px - var(--fp)) * var(--ar) + var(--fp))) !important}
+  /* no min(100%, …) here: a percentage inside the width of a max-content box is cyclic and reads as 0 on first layout
+     (the picture painted 36 px square, then jumped: CLS 0.21-0.25). max-width:100% caps it instead. */
+  .pp-art img{width:calc((min(calc(100svh - var(--hdr-h,92px) - 64px),820px) - var(--fp)) * var(--ar) + var(--fp)) !important;max-width:100% !important}
+  .pp-art img.is-small{width:calc((420px - var(--fp)) * var(--ar) + var(--fp)) !important}
   .pp-room{width:min(100%,900px,calc((100svh - var(--hdr-h,92px) - 64px) * 1.5)) !important}
   .pp-detail-in{width:min(100%,820px) !important;max-height:calc(100svh - var(--hdr-h,92px) - 64px) !important}
 }
