@@ -40,12 +40,6 @@
   .grid-5 .card-t{min-height:2.4em !important} /* two title lines at line-height 1.2 are 2.4em: a wrapped title no longer drops its row by 2 px (review #2 R2-4) */ }
 /* Home, Key collections: one count line under each title, one line box (the 2-line description is cut, C17) */
 .series-tiles .m-card .meta{display:-webkit-box !important;-webkit-box-orient:vertical;-webkit-line-clamp:1;line-clamp:1;overflow:hidden;min-height:1.4em}
-/* collection pages, chapter pictures: picture and caption share rows across the chapter (subgrid),
-   pictures on one bottom line whatever the caption length */
-.chap-works:not(.n1){align-items:stretch}
-.chap-works>figure{display:grid;grid-row:span 2;grid-template-rows:subgrid;row-gap:8px}
-.chap-works>figure>a{align-self:end}
-@media (max-width:760px){ .chap-works.n3>figure,.chap-works.n4>figure{display:flex;justify-content:flex-end} }
 
 /* ---- B2 · Works grid: one bottom line per row, no fixed tall box (T6 option A; Brand R1 #20) ----
    Each card spans four subgrid rows (picture, title, meta, status), so a row's picture track is as tall as
@@ -127,7 +121,6 @@
    which pushed one picture up by a line in More from (768: 20 px). The meta keeps a two-line box there;
    phone chapter swipes keep a two-line caption box so their pictures share a bottom line. ---- */
 @media (min-width:641px) and (max-width:1000px){ .marq-set>.card>.meta,#more-from .card .meta,.grid-5 .card .meta{min-height:2.8em} }
-@media (max-width:760px){ .chap-works.n3 figcaption,.chap-works.n4 figcaption{min-height:2.8em} }
 
 /* C23: the Home hero pair on a phone says "Enter the studio" (desktop keeps "Walk through the studio") */
 .lbl-phone{display:none}
@@ -173,7 +166,6 @@ html[data-motion="paused"] *,html[data-motion="paused"] *::before,html[data-moti
    phone chapter swipes keep the picture centred over its caption */
 @media (min-width:768px){ .hdr{padding-top:0 !important} }
 @media (max-width:640px){ .ftr-motion{min-height:44px;display:inline-flex;align-items:center} }
-@media (max-width:760px){ .chap-works.n3>figure>a,.chap-works.n4>figure>a{align-self:auto} }
 /* Exhibitions: less empty page between the record and the end band (QC G4: 142 px) */
 .ex-record{padding-bottom:clamp(16px,2vw,28px) !important}
 .ex-record + .sec-tight{padding-top:clamp(12px,1.6vw,20px) !important}
