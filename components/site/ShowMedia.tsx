@@ -71,7 +71,9 @@ export default function ShowMedia({ photos, label, walls }: { photos: Photo[]; l
     const el = root.current;
     if (!el) return;
     const io = new IntersectionObserver(([e]) => setSeen(e.isIntersecting), { threshold: 0.3 });
-    io.observe(el);
+    // at >=1100 the Exhibitions grid sets .sm-media to display:contents (no box, never "intersecting"),
+    // so the large photograph is what is watched
+    io.observe(el.querySelector<HTMLElement>(".sm-hero") ?? el);
     // a keyboard visitor inside the block holds the roll (a mouse click does not)
     const fin = (e: FocusEvent) => { if ((e.target as HTMLElement).matches?.(":focus-visible")) setFocused(true); };
     const fout = (e: FocusEvent) => { if (!el.contains(e.relatedTarget as Node)) { setFocused(false); setHeld((h) => h + 1); } };
