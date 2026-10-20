@@ -150,7 +150,8 @@ function ChapterView({ c, n, flip, cover }: { c: Chapter; n: number; flip: boole
         <div className="chv-txt">
           {head}
           <div className="chv-words"><Words c={c} /></div>
-          <Room c={c} works={works} cover={cover} />
+          {/* Brand P2-1 (R4): a chapter that already shows a room view large drops the small "See it in a room" thumb */}
+          {!coverRoom && <Room c={c} works={works} cover={cover} />}
         </div>
         <div className="chv-rowbox">
         <div className="chv-row" style={{ ["--n" as string]: works.length, ["--rs" as string]: rs.toFixed(4), ["--rmax" as string]: rmax.toFixed(4),
