@@ -6,7 +6,15 @@
    whatever their specificity, so these values win without editing six files.
    C = Cormorant Garamond (var(--serif)), J = Jost (var(--sans)). Phone = max-width 640px.
    ========================================================================== */
-@layer final;
+@layer numerals, final;
+
+/* Lining figures everywhere (review #2 P1, Shubham's "odd digits"). Every font: shorthand in @layer final resets
+   font-variant-numeric and font-feature-settings, and class selectors there out-rank "*". An !important declaration in an
+   EARLIER layer beats one in a later layer whatever the specificity, so this layer sits before final and always wins. */
+@layer numerals {
+  html,body,*,*::before,*::after{font-variant-numeric:lining-nums !important;font-feature-settings:"lnum" 1,"kern" 1 !important}
+  .tl-year{font-variant-numeric:lining-nums tabular-nums !important;font-feature-settings:"lnum" 1,"tnum" 1,"kern" 1 !important}
+}
 
 @layer final {
   /* ---- 3.3 colour tokens: one ink, one muted, one red; rust retired ---- */
@@ -18,8 +26,6 @@
     --rule:#CFC8BE !important;
   }
 
-  /* lining figures everywhere: the font: shorthand resets font-variant-numeric, so pin it on every node (review #2 P1, Shubham's "odd digits") */
-  html,body,*,*::before,*::after{font-variant-numeric:lining-nums !important;font-feature-settings:"lnum" 1,"kern" 1 !important}
 
   /* ---- 3.2 type, one value per role ---- */
   /* H1s */
