@@ -1,0 +1,16 @@
+/* Technical team, website review #1 builds (B1 stability, B2 rows and motion), 20-21 Oct 2026.
+   Loaded last. Only the Technical team edits this file; it folds into tokens.css / site.css in B3 (T21, T24). */
+
+/* ---- B1 · painting page: the picture's box is reserved before it loads (T3; Brand R1 #7) ----
+   The <img> carries --ar (its width / height) from PaintingStage. A definite width from the same height caps
+   as before gives the same final size (±1 px), so nothing jumps when it decodes. --fp = frame + mat, both sides. */
+.pp-art{width:max-content;max-width:100%}
+.pp-art img{--fp:36px;aspect-ratio:auto var(--ar);height:auto !important;max-height:none !important;max-width:100% !important;
+  width:min(1100px,calc((min(72svh,780px) - var(--fp)) * var(--ar) + var(--fp))) !important}
+.pp-art img.is-small{width:min(1100px,calc((min(360px,60svh) - var(--fp)) * var(--ar) + var(--fp))) !important}
+@media (max-width:640px){
+  .pp-art img{--fp:20px;width:min(calc(100vw - 40px),calc((min(46svh,430px) - var(--fp)) * var(--ar) + var(--fp))) !important}
+  .pp-art img.is-small{width:min(calc(100vw - 40px),calc((min(300px,40svh) - var(--fp)) * var(--ar) + var(--fp))) !important}
+}
+/* until the picture is there its frame, mat and shadow are not drawn (no empty black square first) */
+.pp-art img.is-loading{border-color:transparent !important;background:transparent !important;box-shadow:none !important}
