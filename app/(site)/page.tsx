@@ -8,7 +8,7 @@ import HashRedirect from "@/components/site/HashRedirect";
 import Marquee from "@/components/site/Marquee";
 import IgRoll from "@/components/site/IgRoll";
 import {
-  BIO_LINE, BIO_SUB, EMAIL, INSTAGRAM, NOW, NOW_SHOWING_CONFIRMED, PORTRAIT, SERIES_PAGES, SHOWS, SITE, STUDIO_PATH, worksIn,
+  BIO_LINE, BIO_SUB, EMAIL, INSTAGRAM, NOW, NOW_SHOWING_CONFIRMED, PORTRAIT, SERIES_BY_SLUG, SERIES_PAGES, SHOWS, SITE, STUDIO_PATH, worksIn,
   LEAD,
 } from "@/lib/site";
 import { BY_ID } from "@/lib/works";
@@ -81,7 +81,7 @@ export default function Home() {
           {/* eslint-disable-next-line @next/next/no-img-element */}
           <img className="round" src="/site/ex/kala-dolly.jpg" alt="Dr Dolly Prasad beside one of her paintings" loading="lazy" {...dims("/site/ex/kala-dolly.jpg")} />
           <figure className="hw-q">
-            <blockquote>{SERIES_PAGES[0].quote}</blockquote>
+            <blockquote>{SERIES_BY_SLUG.get("gone-are-the-days")!.quote}</blockquote>
             <figcaption>Dr Dolly Prasad, on Gone Are The Days</figcaption>
             <Link className="link" href="/about">Her story →</Link>
           </figure>

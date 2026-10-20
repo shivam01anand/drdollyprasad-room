@@ -70,9 +70,14 @@ export const MIXED_WALL: Item[][] = [
 ];
 
 /** Collections (CR-007): one column per collection, led by its own label tile, then its paintings */
-const TONES = ["rust", "dark", "stone", "rust", "dark"] as const;
-export const SERIES_WALL: Item[][] = SERIES_PAGES.map((s, i) => [
-  { k: "n", em: "Collection", title: s.label, sub: `${worksIn(s.label).length} works · ${s.period}`, href: `/series/${s.slug}`, tone: TONES[i % TONES.length] } as Item,
+/** the tone cycle the exhibition wall uses by index (unchanged) */
+const TONE_CYCLE = ["rust", "dark", "stone", "rust", "dark"] as const;
+/** tones keyed by collection, so a reorder of SERIES_PAGES never recolours a tile (R4 B1-4) */
+const TONES: Record<string, "rust" | "dark" | "stone"> = {
+  "gone-are-the-days": "rust", "bandh-darwaze": "dark", faith: "stone", portraits: "rust", "recent-work": "dark",
+};
+export const SERIES_WALL: Item[][] = SERIES_PAGES.map((s) => [
+  { k: "n", em: "Collection", title: s.label, sub: `${worksIn(s.label).length} works · ${s.period}`, href: `/series/${s.slug}`, tone: TONES[s.slug] ?? "rust" } as Item,
   ...worksIn(s.label).map((w) => P(w.id)),
 ]);
 
@@ -97,7 +102,7 @@ export const ABOUT_WALL: Item[][] = ABOUT_BASE.map((col, i) => {
  * Everything here is from the site's own records (lib/site: SHOWS, PRESS, RECORD).
  */
 export const SHOW_WALL: Item[][] = SHOWS.map((sh, i) => [
-  { k: "n", em: sh.when, title: sh.name ?? sh.title, sub: `${sh.venue}, ${sh.city}`, href: `#${sh.id}`, tone: TONES[i % TONES.length] } as Item,
+  { k: "n", em: sh.when, title: sh.name ?? sh.title, sub: `${sh.venue}, ${sh.city}`, href: `#${sh.id}`, tone: TONE_CYCLE[i % TONE_CYCLE.length] } as Item,
   ...sh.albums.flatMap((al) => al.photos.map((ph) => X(ph.src, al.title, sh.title, sh.venue, ph.alt, `#${sh.id}`))),
   ...(sh.works ?? []).map((id) => P(id)),
 ]);

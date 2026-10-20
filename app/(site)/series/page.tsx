@@ -13,7 +13,7 @@ import { SERIES_WALL } from "@/components/site/Collage";
 
 export const metadata: Metadata = {
   title: "Collections",
-  description: "Dr Dolly Prasad’s five collections: Gone Are The Days, Bandh Darwaze, Faith, Portraits and her spring work.",
+  description: "Dr Dolly Prasad’s five collections: Onset of Spring, Bandh Darwaze, Gone Are The Days, Portraits and Faith.",
   alternates: { canonical: "/series" },
 };
 
@@ -48,9 +48,8 @@ export default function SeriesIndex() {
           <section id={s.slug} className={`sband ${i % 2 ? "band-indigo" : "band-white"}`}>
             <div className="wrap srow">
               <div className="s-txt">
-                <span className="s-n">{String(i + 1).padStart(2, "0")}</span>
                 <h2><Link href={`/series/${s.slug}`}>{s.label}</Link></h2>
-                <span className="eyebrow">{works.length} works · {s.period}</span>
+                <span className="eyebrow">{s.period} · {works.length} works</span>
                 <p className="s-line">{s.line}</p>
                 <Link className={i % 2 ? "btn btn-light" : "btn"} href={`/series/${s.slug}`}>Read the story</Link>
               </div>
