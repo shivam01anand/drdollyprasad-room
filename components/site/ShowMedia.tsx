@@ -27,6 +27,7 @@ export default function ShowMedia({ photos, label }: { photos: Photo[]; label: s
   const root = useRef<HTMLDivElement>(null);
   const hero = useRef<HTMLButtonElement>(null);
   const strip = useRef<HTMLDivElement>(null);
+  const userAt = useRef(0); // when the visitor last touched or scrolled the strip
   const n = photos.length;
   const p = photos[i];
 
@@ -55,6 +56,21 @@ export default function ShowMedia({ photos, label }: { photos: Photo[]; label: s
     return swipe(el, (d) => { setI((k) => (((k + d) % n) + n) % n); setHeld((h) => h + 1); });
   }, [n]);
 
+  // the visitor's own hand on the strip: the roll and the strip's auto-scroll wait
+  useEffect(() => {
+    const s = strip.current;
+    if (!s) return;
+    const mark = () => { userAt.current = performance.now(); setHeld((h) => h + 1); };
+    s.addEventListener("pointerdown", mark);
+    s.addEventListener("wheel", mark, { passive: true });
+    s.addEventListener("touchstart", mark, { passive: true });
+    s.addEventListener("keydown", mark);
+    return () => {
+      s.removeEventListener("pointerdown", mark); s.removeEventListener("wheel", mark);
+      s.removeEventListener("touchstart", mark); s.removeEventListener("keydown", mark);
+    };
+  }, []);
+
   // it rolls on by itself while it is on screen
   const rolling = seen && !still && open === null && n > 1;
   useEffect(() => {
@@ -63,11 +79,23 @@ export default function ShowMedia({ photos, label }: { photos: Photo[]; label: s
     return () => clearTimeout(t);
   }, [rolling, i, go, held]);
 
-  // keep the current photograph in view in the strip (sideways only; the page never jumps)
+  // the next photograph is fetched ahead, so a change never shows an empty frame
+  useEffect(() => {
+    if (n < 2) return;
+    const im = new Image();
+    im.decoding = "async";
+    im.src = photos[(i + 1) % n].src;
+  }, [i, n, photos]);
+
+  // keep the current photograph in view in the strip (sideways only; the page never jumps),
+  // but only when it has gone out of view, and never while the visitor is using the strip
   useEffect(() => {
     const s = strip.current;
     const b = s?.children[i] as HTMLElement | undefined;
     if (!s || !b) return;
+    if (performance.now() - userAt.current < HOLD_MS) return;
+    const out = b.offsetLeft < s.scrollLeft || b.offsetLeft + b.offsetWidth > s.scrollLeft + s.clientWidth;
+    if (!out) return;
     const left = b.offsetLeft - (s.clientWidth - b.offsetWidth) / 2;
     s.scrollTo({ left: Math.max(0, left), behavior: still ? "auto" : "smooth" });
   }, [i, still]);
@@ -76,7 +104,7 @@ export default function ShowMedia({ photos, label }: { photos: Photo[]; label: s
     <div className="sm-media" ref={root}>
       <button type="button" className="sm-hero" ref={hero} onClick={() => setOpen(i)} aria-label={`Open full screen: ${p.alt}`}>
         {/* eslint-disable-next-line @next/next/no-img-element */}
-        <img key={p.src} src={p.src} alt={p.alt} loading={i === 0 ? "eager" : "lazy"} decoding="async" draggable={false} {...dims(p.src)} />
+        <img key={p.src} src={p.src} alt={p.alt} loading="eager" decoding="async" draggable={false} {...dims(p.src)} />
       </button>
       <p className="sm-cap" aria-live="off">{p.alt}</p>
       {n > 1 && (
