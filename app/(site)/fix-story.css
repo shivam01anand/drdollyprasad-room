@@ -247,7 +247,10 @@
 /* ==== R4 fix 3 (Brand P1-3): one big showing per painting ==== */
 /* Bandh Darwaze: the 2x2 opening carries its two chapters; under each pair, its caption block; each door once */
 .so-pairs{display:flex;flex-direction:column;gap:28px}
-.so-doors .so-grid img.framed{height:clamp(200px,18vw,280px);width:calc((clamp(200px,18vw,280px) - var(--fp)) * var(--ar) + var(--fp))}
+/* the doors are square: two across never run wider than the column (t768 G1 19 px sideways scroll) */
+.so-doors .so-art{container-type:inline-size}
+.so-doors .so-grid{--dh:min(clamp(200px,18vw,280px),calc((100cqw - 16px) / 2))}
+.so-doors .so-grid img.framed{height:var(--dh);width:calc((var(--dh) - var(--fp)) * var(--ar) + var(--fp))}
 .so-pcap{text-align:center;margin:14px auto 0;max-width:540px}
 .so-pcap>*{margin:0}
 .so-pcap .chv-n{margin-bottom:4px}
