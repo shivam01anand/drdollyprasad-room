@@ -95,6 +95,13 @@
   /* widows */
   h1,h2,h3,.chap-big,.card-t{text-wrap:balance !important}
   .lede,.quote{text-wrap:pretty !important}
+  /* retired grey #6E645A gone: intro ledes in muted; About and story body on the one body role, in ink (review #2 P1) */
+  .lede,.page-head .lede,.story-head .lede{color:var(--muted) !important}
+  .ab-p{color:var(--ink) !important}
+  .ab-band.tone-dark .ab-p,.band-indigo .ab-p{color:var(--on-indigo) !important}
+  .ab-band.tone-dark .eyebrow,.band-indigo .eyebrow{color:var(--muted-on-indigo) !important}
+  .chap-small{font:400 18px/1.6 var(--sans) !important;color:var(--ink) !important}
+  .chap-dark .chap-small{color:var(--on-indigo) !important}
   /* story chapters on indigo: quiet numeral, white heading, no retired peach/cream (review #2 P1) */
   .chap-dark .chap-h span,.band-indigo .chap-h span{color:var(--muted-on-indigo) !important}
   .chap-dark .chap-h h2,.band-indigo .chap-h h2{color:#FFFFFF !important}
@@ -124,6 +131,7 @@
     .prevnext a span,.gal-cap em,.zoom-cap small,.ss-cap small,.tile.flip .back em,.flip-back em,.flip-back u,
     .xcard em,.ncard em,.ccard em,.scard em,.qcard small,.nowstrip .live,.now-line .live,.wh .namecard .eyebrow,.ex-index span,.five-n,.sband .s-n,.s-n,label{font-size:13px !important}
     .ex-ch-year{font-size:20px !important}
+    .chap-small{font-size:16px !important;line-height:1.55 !important}
     .timeline small,.tl-photos{font-size:13px !important}
     .tl-year{font-size:16px !important}
     .sm-cap{height:calc(2em * 1.45) !important;-webkit-line-clamp:2 !important;line-clamp:2 !important}
