@@ -5,12 +5,26 @@
    round the edges. Cormorant Garamond for titles, Jost for everything else.
    ========================================================================== */
 
+/* R4 fix 8 (DC P1-3, G9b): fallback faces sized to the web fonts' metrics, so the text set before Cormorant Garamond and
+   Jost arrive wraps and stands at the same size, and the swap does not reflow the story openings (GATD 1920 slow-link CLS
+   0.093). Values from the font files (fontTools): Cormorant 500 avg width 0.3879 em, ascent 0.924, descent 0.287; Jost 400
+   0.4285 em, ascent 1.07, descent 0.375; against Times New Roman / Liberation Serif 0.402 em and Arial / Liberation Sans
+   0.4455 em (metric-compatible pairs). ascent/descent overrides = web font metric / size-adjust. */
+@font-face{font-family:"Cormorant Garamond Fallback";src:local("Times New Roman"),local("TimesNewRomanPSMT"),local("Liberation Serif"),local("LiberationSerif");
+  font-weight:100 599;size-adjust:96.5%;ascent-override:95.75%;descent-override:29.74%;line-gap-override:0%}
+@font-face{font-family:"Cormorant Garamond Fallback";src:local("Times New Roman Bold"),local("TimesNewRomanPS-BoldMT"),local("Liberation Serif Bold"),local("LiberationSerif-Bold");
+  font-weight:600 900;size-adjust:96.5%;ascent-override:95.75%;descent-override:29.74%;line-gap-override:0%}
+@font-face{font-family:"Jost Fallback";src:local("Arial"),local("ArialMT"),local("Liberation Sans"),local("LiberationSans");
+  font-weight:100 599;size-adjust:96.2%;ascent-override:111.2%;descent-override:38.98%;line-gap-override:0%}
+@font-face{font-family:"Jost Fallback";src:local("Arial Bold"),local("Arial-BoldMT"),local("Liberation Sans Bold"),local("LiberationSans-Bold");
+  font-weight:600 900;size-adjust:96.2%;ascent-override:111.2%;descent-override:38.98%;line-gap-override:0%}
+
 :root{
   --bg:#FFFFFF; --ink:#26211D; --muted:#4E463E; --soft:#6E645A; --line:#E3DBCF;
   --wall:#EDE6DB; --stone:#E7E1D8; --rust:#A84B2A; --rust-ink:#FBF9F5; --green:#2F6B45; --sold:#9A3B22;
   --frame:#1C1B1A; --dark:#1F1C1A; --dark-ink:#F3EEE6; --dark-muted:#CBC1B4;
-  --serif:"Cormorant Garamond",Georgia,"Times New Roman",serif;
-  --sans:"Jost","Helvetica Neue",Arial,sans-serif;
+  --serif:"Cormorant Garamond","Cormorant Garamond Fallback",Georgia,"Times New Roman",serif;
+  --sans:"Jost","Jost Fallback","Helvetica Neue",Arial,sans-serif;
   --rail:20px;          /* the side rules */
   --band:20px;          /* the rules above and below */
   --ornament:#8A7A68;   /* the border's ink: a warm, quiet brown */
