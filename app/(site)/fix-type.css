@@ -29,3 +29,20 @@ body,.pp-text p,.sband .s-line,.pp-story{font-size:18px !important;line-height:1
   .sband .s-txt .btn{grid-area:b !important;justify-self:end;align-self:center;min-height:32px;white-space:nowrap}
   .sband .s-txt .eyebrow{align-self:center}
 }
+
+/* COO 20 Oct 02:00 (Shubham: "squish the empty space"): tighter rhythm site-wide */
+:root{ --sec-y:clamp(32px,4vw,56px) !important; --sec-y-tight:clamp(24px,3vw,40px) !important }
+.band-indigo .sec{padding-block:clamp(24px,3vw,40px) !important}
+.chap{padding-block:clamp(20px,3vw,40px) !important}
+.chap-h{margin-bottom:18px !important}
+.chap-big{margin-top:22px !important}
+.story-hero{padding-block:clamp(20px,3vw,36px) !important}
+.wp-lower{margin-top:16px !important}
+/* every painting card except the Works grid (which keeps one box per row for a shared baseline): the title sits close under the painting */
+.card{gap:10px}
+:not(.pf-grid) > .card .mat, .marq .card .mat{padding:0 !important}
+:not(.pf-grid) > .card .mat img, .marq .card .mat img{margin-bottom:0 !important}
+.sec-head{margin-bottom:18px !important}
+/* Home, Key collections: the box fits the painting (it was a fixed tall box), title close under it */
+.series-tiles .mat{height:auto !important;padding:0 !important;align-items:flex-end}
+.series-tiles .mat img{max-height:var(--mh) !important}
