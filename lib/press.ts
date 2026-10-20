@@ -95,3 +95,7 @@ export const PRESS_ITEMS: PressItem[] = ORDER.map((id) => RAW.find((p) => p.id =
 /** the shorter set for About: four photographs and the NCR excerpt */
 export const PRESS_SHORT = ["ihc-press-01", "tv-ncr-2010", "ihc-press-06", "ihc-press-03", "tv-archive", "delhi-times"]
   .map((id) => PRESS_ITEMS.find((p) => p.id === id)!);
+
+/** every item, for the moving press row on Exhibitions and About (R3, Shubham 20 Oct: all the press, all the accolades):
+ *  the six above first, in their order (the two clips apart), then the four that had been left out */
+export const PRESS_ALL: PressItem[] = [...PRESS_ITEMS, ...RAW.filter((p) => !ORDER.includes(p.id))];

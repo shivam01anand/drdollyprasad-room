@@ -3,8 +3,8 @@ import Link from "next/link";
 import { Fragment } from "react";
 import Until from "@/components/Until";
 import ShowMedia from "@/components/site/ShowMedia";
-import Press from "@/components/site/Press";
-import { PRESS_ITEMS } from "@/lib/press";
+import PressRow from "@/components/site/PressRow";
+import { PRESS_ALL } from "@/lib/press";
 import WallHero from "@/components/site/WallHero";
 import { SHOW_WALL } from "@/components/site/Collage";
 import { NOW, NOW_SHOWING_CONFIRMED, RECORD, RECORD_LINE, SHOWS } from "@/lib/site";
@@ -90,7 +90,7 @@ export default function Exhibitions() {
             <h2 id="press-h">In the press</h2>
           </div>
         </div>
-        <Press items={PRESS_ITEMS} />
+        <PressRow items={PRESS_ALL} />
       </section>
           )}
           </Fragment>

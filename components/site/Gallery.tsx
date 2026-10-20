@@ -3,7 +3,7 @@
 import { useEffect, useRef, useState } from "react";
 import { swipe } from "@/lib/drift";
 
-export type Shot = { src: string; alt: string; title?: string; line?: string; source?: string };
+export type Shot = { src: string; alt: string; title?: string; line?: string; source?: string; video?: boolean; poster?: string };
 
 /**
  * A quiet full-screen look at a set of photographs (the press collage and the
@@ -49,8 +49,13 @@ export default function Gallery({ shots, start, label, onClose }: { shots: Shot[
     <div className="gal" role="dialog" aria-modal="true" aria-label={label}
          onClick={(e) => { if (e.target === e.currentTarget) done.current(); }}>
       <div className="gal-stage" ref={stage} onClick={(e) => { if (e.target === e.currentTarget) done.current(); }}>
-        {/* eslint-disable-next-line @next/next/no-img-element */}
-        <img key={s.src} src={s.src} alt={s.alt} draggable={false} />
+        {s.video ? (
+          // a television excerpt (press row, R3): it plays here, muted, with its controls; sound is a tap away
+          <video key={s.src} src={s.src} poster={s.poster} aria-label={s.alt} controls muted autoPlay playsInline preload="metadata" />
+        ) : (
+          // eslint-disable-next-line @next/next/no-img-element
+          <img key={s.src} src={s.src} alt={s.alt} draggable={false} />
+        )}
       </div>
       <div className="gal-bar">
         <p className="gal-cap" aria-live="polite">

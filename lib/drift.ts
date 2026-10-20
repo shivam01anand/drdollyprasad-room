@@ -176,7 +176,8 @@ export function driftRow(view: HTMLElement, track: HTMLElement, o: { seconds: nu
   const stopClock = clock(view, (dt, now) => {
     if (held) return;
     const scale = motionScale(reduced);
-    const resting = now < holdUntil || hover || focus || scale === 0;
+    // a row inside [data-hold] (e.g. the press row while its Gallery is open) waits
+    const resting = now < holdUntil || hover || focus || scale === 0 || !!view.closest("[data-hold]");
     const target = resting ? 0 : dir * speed * scale;
     // a fling coasts and slows gently (COAST_K); the drift returns over RAMP_S
     const k = Math.abs(v) > speed * 1.2 ? COAST_K : 1 / RAMP_S * 2.2;
