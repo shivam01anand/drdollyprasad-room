@@ -13,3 +13,12 @@ body,.pp-text p,.sband .s-line,.pp-story{font-size:18px !important;line-height:1
 
 /* phones: titles keep their phone size; dropdowns 16px so iPhone Safari does not zoom in on tap */
 @media (max-width:760px){ .sband h2{font-size:28px !important} .fsel select{font-size:16px !important} }
+
+/* COO 20 Oct 01:50 (Shubham): squeeze the empty space in Collections bands.
+   The picture box fits the painting; the title sits close under it; less padding above and below each band. */
+.sband{padding-block:clamp(20px,2.4vw,32px) !important}
+.sband .band-marq{padding-block:6px 10px !important}
+.sband .band-marq .card .mat{height:auto !important;min-height:0 !important;aspect-ratio:auto !important;padding:0 !important;display:flex;align-items:flex-end;justify-content:center}
+.sband .band-marq .card{gap:10px}
+.sband .band-marq .card .card-t{margin-top:0 !important}
+@media (max-width:760px){ .sband{padding-block:18px !important} .sband .srow{gap:8px !important} }
