@@ -64,3 +64,18 @@
 .ig-roll{padding-block:24px 40px !important;margin-block:-24px -40px !important;
   -webkit-mask-image:linear-gradient(90deg,transparent 0,#000 24px,#000 calc(100% - 24px),transparent) !important;
           mask-image:linear-gradient(90deg,transparent 0,#000 24px,#000 calc(100% - 24px),transparent) !important}
+
+/* ---- B3 · header (4-REVIEW1-DECISION 3.7): 92 px on >=768 (28 band + 64 bar); no compacting on scroll.
+   The ornament band scrolls away with the page (sticky top is minus the band), so only the 64 px bar stays. ---- */
+:root{--hdr-h:63px;--hdr-bar:63px}
+@media (min-width:768px){
+  :root{--band:28px;--hdr-h:92px;--hdr-bar:64px}
+  .band-top{margin-top:0 !important}
+  .hdr{top:calc(-1 * var(--band)) !important}
+  .hdr-in,.is-scrolled .hdr-in{min-height:64px !important;padding-block:6px !important;box-sizing:border-box;transition:none !important}
+  .brand img,.is-scrolled .brand img{width:48px !important;height:48px !important;transition:none !important}
+  .brand-t i,.is-scrolled .brand-t i{opacity:1 !important;max-height:20px !important;transition:none !important}
+  .brand-t b{transition:none !important}
+}
+.hdr{background:rgba(255,255,255,.96) !important}
+.ex-ch,.sband,[id]{scroll-margin-top:calc(var(--hdr-bar) + 16px)}
