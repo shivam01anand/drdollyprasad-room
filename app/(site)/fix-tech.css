@@ -196,3 +196,6 @@ html[data-motion="paused"] *,html[data-motion="paused"] *::before,html[data-moti
   .press-open img,.press-clip{aspect-ratio:4/3 !important;height:auto !important;max-height:none !important;object-fit:cover !important}
   .press-item.is-clipping .press-open img{object-fit:contain !important;background:#F6F3EE !important}
 }
+
+/* review #2 R2-7: a disabled pager button is not a box */
+.pf-pager .btn:disabled,.pf-pager .btn[aria-disabled="true"]{opacity:.4 !important;border-color:transparent !important;background:transparent !important}
