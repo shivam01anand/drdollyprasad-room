@@ -54,13 +54,11 @@ body,.pp-text p,.sband .s-line,.pp-story{font-size:18px !important;line-height:1
 .band-indigo .card .st-sold,.band-indigo .card .meta-parts{color:#D3D8E8 !important}
 /* COO: phones — painting info never starts a line with a dot; no reserved title height in "More from" */
 @media (max-width:640px){
-  .card .meta-parts .mp + .mp::before{content:none !important}
   .card .meta-parts{column-gap:.6em !important}
   #more-from .card-t{min-height:0 !important}
 }
 /* Home Key collections: the lines under each title are centred under the painting (they sat 52px left on laptop) */
 .series-tiles .m-card .meta{margin-inline:auto !important;text-align:center}
-@media (max-width:640px){ .card .meta-parts{flex-direction:column !important;align-items:center;row-gap:0} }
 /* COO (Shubham 02:34): the painting page's medium · size · year line, as calm as everywhere else */
 .pp-text p.pp-facts,.pp-facts{font-size:14px !important;line-height:1.5 !important;color:#4a5066 !important;letter-spacing:0 !important}
 @media (max-width:640px){ .pp-text p.pp-facts,.pp-facts{font-size:13px !important} }

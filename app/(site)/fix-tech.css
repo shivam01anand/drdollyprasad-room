@@ -54,3 +54,7 @@
 @media (max-width:640px){
   .pf-grid.works-grid .mat img{width:min(calc(100cqw - 12px),calc((125cqw - 22px) * var(--ar))) !important}
 }
+
+/* ---- B2 · phone cards: "36 × 48 in · 2018" on one line, status under it (T12; Brand R1 #23) ---- */
+.card .meta-parts{flex-direction:row !important}
+.card-t{hyphens:none;-webkit-hyphens:none}
