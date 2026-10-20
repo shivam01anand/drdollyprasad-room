@@ -1,1 +1,34 @@
 /* Tech team: pages (20 Oct night). Only this team edits this file. */
+
+/* ---- card meta: parts never break mid-part; the separator belongs to the part after it ---- */
+.meta-parts{display:flex;flex-wrap:wrap;column-gap:0}
+.meta-parts .mp{white-space:nowrap}
+.meta-parts .mp + .mp::before{content:"·";margin-inline:.45em}
+@media (max-width:1000px){ .card .meta-parts{font-size:13px} }
+/* phones: grids show size and year only; the medium is on the painting's own page */
+@media (max-width:640px){
+  .card .meta-parts{font-size:12.5px;line-height:1.35}
+  .card .meta-parts .mp-med{display:none}
+  .card .meta-parts .mp-med + .mp::before{display:none}
+}
+
+/* ---- Works grid: every picture sits in a box of one height, painting bottom-aligned,
+   so all captions in a row (and across rows) share one baseline ---- */
+.pf-grid.works-grid .card{align-self:start}
+.pf-grid.works-grid .mat{flex:none;box-sizing:border-box;aspect-ratio:4 / 5;align-items:flex-end;justify-content:center;padding:0}
+.pf-grid.works-grid .mat img{width:auto;height:auto;max-width:calc(100cqw - 24px);max-height:calc(125cqw - 34px);margin-bottom:20px;aspect-ratio:var(--ar,1)}
+.pf-grid.works-grid .card-t{min-height:2.3em}
+@media (max-width:640px){ .pf-grid.works-grid .mat img{max-width:calc(100cqw - 12px);max-height:calc(125cqw - 22px);margin-bottom:14px} .pf-grid.works-grid .card-t{min-height:0} }
+
+/* wide screens: the works grid uses the full content width, five across */
+@media (min-width:1600px){
+  .pf-grid.works-grid{max-width:none;grid-template-columns:repeat(5,minmax(0,1fr)) !important}
+}
+
+/* ---- painting page, "More from …" on phones: heading smaller, the link under it ---- */
+@media (max-width:640px){
+  #more-from .sec-head{grid-template-columns:minmax(0,1fr);row-gap:10px}
+  #more-from .sec-head>div>h2{font-size:26px !important;line-height:1.15}
+  #more-from .sec-head>.link{grid-column:1;grid-row:2;justify-self:start}
+  #more-from .card-t{min-height:2.3em}
+}
