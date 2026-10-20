@@ -160,7 +160,7 @@ export default async function SeriesStory({ params }: Props) {
           </div>
           <Link className="go" href={`/series/${next.slug}`}>
             <span className="eyebrow" style={{ color: "inherit" }}>Next collection</span>
-            <b>{next.label} →</b>
+            <b>{next.label.includes(" ") ? <>{next.label.slice(0, next.label.lastIndexOf(" ") + 1)}<span className="nw">{next.label.slice(next.label.lastIndexOf(" ") + 1)} →</span></> : <span className="nw">{next.label} →</span>}</b>
           </Link>
         </div>
       </section>
