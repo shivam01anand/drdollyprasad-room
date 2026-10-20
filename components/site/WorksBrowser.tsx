@@ -1,7 +1,6 @@
 "use client";
 
 import { useEffect, useMemo, useState } from "react";
-import Link from "next/link";
 import Card from "./Card";
 import { SERIES_PAGES } from "@/lib/site";
 import { WORKS, type Work } from "@/lib/works";
@@ -50,11 +49,8 @@ export default function WorksBrowser() {
     (size === "all" || sizeOf(w) === size));
   const n = (f: (w: Work) => boolean) => all.filter(f).length;
 
-  // grouped by collection, the bands alternating white and indigo as the home page does
-  const groups = SERIES_PAGES.slice().reverse()
-    .map((sp) => ({ sp, items: shown.filter((w) => w.series === sp.label) })).filter((g) => g.items.length);
+  // one portfolio of every painting (Shubham, 20 Oct); the collection is a filter, not a section
   const SECTION_OPEN = 8; // the first eight paintings load at once; the rest as you scroll
-  let seen = 0;
 
   return (
     <>
@@ -92,24 +88,13 @@ export default function WorksBrowser() {
         </p>
       </div>
       </div>
-      {groups.length ? groups.map((g, k) => {
-        const first = seen; seen += g.items.length;
-        return (
-          <section key={g.sp.slug} className={`wgroup ${k % 2 ? "band-indigo" : "band-white"}`} aria-labelledby={`wg-${g.sp.slug}`}>
-            <div className="wrap">
-              <div className="sec-head wg-head">
-                <div>
-                  <h2 id={`wg-${g.sp.slug}`}>{g.sp.label}</h2>
-                  <p className="sec-line">{g.sp.line}</p>
-                  <p className="meta">{g.items.length} {g.items.length === 1 ? "painting" : "paintings"} · {g.sp.period}</p>
-                </div>
-                <Link className="link" href={`/series/${g.sp.slug}`}>The collection →</Link>
-              </div>
-              <div className="grid works-grid">{g.items.map((w, i) => <Card key={w.id} w={w} eager={first + i < SECTION_OPEN} />)}</div>
-            </div>
-          </section>
-        );
-      }) : <div className="wrap"><p className="empty">No paintings match these filters.</p></div>}
+      {shown.length ? (
+        <section className="wgroup band-white portfolio" aria-label="All the paintings">
+          <div className="wrap">
+            <div className="grid works-grid pf-grid">{shown.map((w, i) => <Card key={w.id} w={w} eager={i < SECTION_OPEN} />)}</div>
+          </div>
+        </section>
+      ) : <div className="wrap"><p className="empty">No paintings match these filters.</p></div>}
     </>
   );
 }

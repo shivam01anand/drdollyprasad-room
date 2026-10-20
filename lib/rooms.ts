@@ -203,7 +203,8 @@ export function roomsFor(work: Work, aspect: number, opts: { pilot?: boolean } =
   const stated = work.inches ? work.inches * 2.54 : 0;
   const ownView = own ? { room: own, at: hang(own, stated || own.cm, aspect), trueSize: !!stated } : undefined;
   // the new photographic room first; a work's earlier 3D room stays as a second view
-  if (pilot) return [{ room: pilot, at: hang(pilot, pilot.cm, aspect), trueSize: false }, ...(ownView ? [ownView] : [])];
+  // the new photographic room only; the earlier 3D room is no longer shown on painting pages (Shubham, 20 Oct)
+  if (pilot) return [{ room: pilot, at: hang(pilot, pilot.cm, aspect), trueSize: false }];
   if (ownView) return [ownView];
   if (!stated) return [];
   return GENERIC.map((room) => ({ room, at: hang(room, stated, aspect), trueSize: true }));
