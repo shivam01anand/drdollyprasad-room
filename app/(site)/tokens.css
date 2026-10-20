@@ -89,7 +89,7 @@
   .pp-toggle,.pp-zoom{border:1px solid var(--ink) !important;color:var(--ink) !important}
   /* DC review #2 P0-1: pressed/hover keeps its label: white on ink (the line above had made it ink on ink) */
   .pp-toggle:hover,.pp-toggle[aria-pressed="true"],.pp-zoom:hover{background:var(--ink) !important;color:#FFFFFF !important}
-  .sband .s-txt .btn{min-height:44px !important;padding-inline:0 !important}
+  .sband .s-txt .btn{min-height:44px !important}
   .ftr-links .btn{min-height:44px !important}
   /* 3.8 footer: links J 14/400 */
   .ftr-links a:not(.btn),.ftr-ig{font-weight:400 !important}
@@ -133,6 +133,17 @@
   .pnx-next .pnx-k{color:var(--muted-on-indigo) !important}
   .pnx-next .pnx-t,.pnx-prev:hover .pnx-t,.pnx-prev:hover .pnx-k{color:#FFFFFF !important}
   .pp-text a.pp-back{font:400 14px/1.45 var(--sans) !important;color:var(--muted) !important;letter-spacing:0 !important}
+
+  /* ---- R4 B3-1: /series bands and Ask row (type and colour) ---- */
+  .sband .s-line{font:400 16px/1.5 var(--sans) !important}
+  .sband.band-white .s-line{color:var(--muted) !important}
+  .sband .s-txt .btn{color:inherit !important;background:transparent !important;border:1px solid currentColor !important;text-decoration:none !important}
+  .sband.band-white .s-txt .btn{color:var(--ink) !important}
+  .sband.band-white .s-txt .btn:hover{background:var(--ink) !important;color:#FFFFFF !important}
+  .sband.band-indigo .s-txt .btn:hover{background:#FFFFFF !important;color:var(--indigo) !important}
+  .btn-solid.btn-on-indigo{background:#FFFFFF !important;color:var(--indigo) !important;border-color:#FFFFFF !important;background-image:none !important}
+  .btn-solid.btn-on-indigo:hover{background:var(--muted-on-indigo) !important;border-color:var(--muted-on-indigo) !important}
+
 
   @media (max-width:640px){
     .story-head h1{font-size:44px !important}

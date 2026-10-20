@@ -92,3 +92,38 @@
 /* ---- R4 B2-4: painting page back link to its collection ---- */
 .pp-text a.pp-back{display:inline-flex;align-items:center;min-height:44px;margin:-10px 0 -6px;text-decoration:none;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;max-width:100%}
 .pp-text a.pp-back:hover{text-decoration:underline;text-underline-offset:4px}
+
+/* ==== R4 B3-1: /series = collage hero (450 at 1440x900) -> switcher -> five bands -> one Ask row ==== */
+@media (min-width:641px){ .wh.wh-dir .collage{height:clamp(420px,50svh,480px) !important} }
+.sband.band-white,.sband.band-indigo{padding-block:40px}
+.sband .srow.wrap{max-width:1360px;box-sizing:border-box}
+@media (min-width:761px){
+  .sband .srow{display:grid !important;grid-template-columns:300px minmax(0,1fr);column-gap:40px !important;row-gap:0}
+  .sband .srow .s-txt{max-width:none}
+}
+.sband .s-txt .s-line{margin:2px 0 0;display:-webkit-box;-webkit-box-orient:vertical;-webkit-line-clamp:2;line-clamp:2;overflow:hidden}
+.sband .s-txt .btn{align-self:flex-start;margin-top:10px;white-space:nowrap}
+.sband .s-txt .btn::after,.sband .s-txt .btn::before{content:none !important}
+/* one picture height per row; the painting keeps its own shape (width from its ratio), never cropped */
+.sband .marq .card{flex:none !important;width:auto !important}
+.sband .card .mat{container-type:normal !important}
+.sband .card .mat{width:auto !important;height:auto !important;aspect-ratio:auto !important;padding:0 !important;flex:none !important}
+.sband .card .mat img{height:240px !important;width:auto !important;max-width:none !important;max-height:none !important;aspect-ratio:auto !important;object-fit:contain !important}
+.sband .marq{padding-block:16px 20px}
+.sband .marq-set>.card{gap:4px}
+.sband .marq-set>.card>.card-t{min-height:0 !important;white-space:nowrap}
+@media (min-width:761px) and (max-width:1099px){ .sband .card .mat img{height:210px !important} }
+@media (max-width:760px){
+  .sband.band-white,.sband.band-indigo{padding-block:28px}
+  .sband .srow .s-txt{grid-template-columns:minmax(0,1fr) auto !important;grid-template-areas:"t b" "e e" "l l" !important;row-gap:4px !important}
+  .sband .s-txt .btn{min-height:44px !important;margin:0}
+  .sband .s-txt .s-line{-webkit-line-clamp:1;line-clamp:1;display:block;white-space:nowrap;text-overflow:ellipsis}
+  .sband .card .mat img{height:170px !important}
+  .sband .marq{padding-block:12px 4px}
+}
+/* the one Ask row: title and line left, one button right (about 160 px at D) */
+.ibnd:has(.ibnd-one){margin-top:0}
+.ibnd:has(.ibnd-one) .sec{max-width:1360px;box-sizing:border-box;display:flex;align-items:center;justify-content:space-between;flex-wrap:wrap;gap:16px 40px;padding-block:44px}
+.ibnd:has(.ibnd-one) .sec-head{margin:0;display:block}
+.ibnd-one{flex:none}
+@media (max-width:760px){ .ibnd:has(.ibnd-one) .sec{padding-block:32px} .ibnd-one,.ibnd-one .btn{width:100%} }

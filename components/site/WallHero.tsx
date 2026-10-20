@@ -17,13 +17,14 @@ export default function WallHero({ columns, label, face, eyebrow, title, red, he
   held?: string;
   sub?: React.ReactNode;
   children?: React.ReactNode;
-  size?: "home" | "page";
+  /** "dir": a directory page (R4 B3-1, /series): the "page" hero at a shorter height on >=641 */
+  size?: "home" | "page" | "dir";
   speed?: number;
   /** kept for callers; the wall is never blurred now */
   soft?: boolean;
 }) {
   return (
-    <section className={`wh wh-${size}`} aria-label={label}>
+    <section className={`wh wh-${size === "dir" ? "page wh-dir" : size}`} aria-label={label}>
       {/* CR-006: one small white card, the same on every landing: eyebrow, title, one short line, the buttons */}
       <div className="wh-card namecard">
         {eyebrow && <p className="eyebrow">{eyebrow}</p>}

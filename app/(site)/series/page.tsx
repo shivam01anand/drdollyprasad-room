@@ -2,12 +2,10 @@ import type { Metadata } from "next";
 import { Fragment } from "react";
 import IndigoBand from "@/components/site/IndigoBand";
 import Link from "next/link";
-import Card, { thumb } from "@/components/site/Card";
-import { LEAD, ON_THE_WORK, SERIES_PAGES, SMALL_PHOTO, worksIn } from "@/lib/site";
-import { BY_ID } from "@/lib/works";
-import { dims } from "@/lib/images";
+import Card from "@/components/site/Card";
+import { LEAD, SERIES_PAGES, SMALL_PHOTO, worksIn } from "@/lib/site";
 import Marquee from "@/components/site/Marquee";
-import FiveBlocks from "@/components/site/FiveBlocks";
+import CollectionsSwitcher from "@/components/site/CollectionsSwitcher";
 import WallHero from "@/components/site/WallHero";
 import { SERIES_WALL } from "@/components/site/Collage";
 
@@ -18,31 +16,27 @@ export const metadata: Metadata = {
 };
 
 
-/** the overview: the five collections as large tiles, then each collection as a band of its own */
+/**
+ * R4 B3-1: the overview. Collage hero (one button) -> the collections switcher (navigation) -> the five
+ * collections as bands, newest first (content) -> one Ask row. The five appear twice: switcher and bands.
+ */
 export default function SeriesIndex() {
   return (
     <>
-      <WallHero columns={SERIES_WALL} label="The five collections" eyebrow="Five collections" title="Her Collections" red="Collections"
+      <WallHero size="dir" columns={SERIES_WALL} label="The five collections" eyebrow="Five collections" title="Her Collections" red="Collections"
                 sub={<>The everyday, held <span className="red">sacred</span>, in five collections.</>}>
-        <a className="btn btn-solid" href="#gone-are-the-days">The five collections</a>
-        <Link className="btn" href="/works">See all the works</Link>
+        <Link className="btn btn-solid" href="/series/recent-work">Start with the newest</Link>
       </WallHero>
 
-      <section className="wrap" style={{ paddingBottom: 8 }}>
-        <div className="five-head">
-          <p className="eyebrow">Five collections</p>
-          <h2>A doctor’s eye, looking deeper into the everyday</h2>
-        </div>
-        <FiveBlocks blocks={SERIES_PAGES.map((s) => ({ slug: s.slug, label: s.label, n: worksIn(s.label).length, period: s.period,
-          pics: [LEAD[s.slug] ?? s.hero, ...worksIn(s.label).map((w) => w.id).filter((id) => id !== (LEAD[s.slug] ?? s.hero) && !SMALL_PHOTO.has(id))]
-            .map((id) => ({ src: thumb(id), alt: `${BY_ID.get(id)?.title}, from ${s.label}` })) }))} />
-        <p className="quote series-sum-q">“{ON_THE_WORK}”<span className="eyebrow">Dr Dolly Prasad, on her work</span></p>
-      </section>
+      <CollectionsSwitcher />
 
       {SERIES_PAGES.map((s, i) => {
         const works = worksIn(s.label);
-        const row = [...works].sort((a, b) => Number(a.status === "Sold") - Number(b.status === "Sold"))
-          .filter((w) => !SMALL_PHOTO.has(w.id));
+        // the row opens on the collection's lead painting (unchanged), then the rest, sold last
+        const lead = LEAD[s.slug] ?? s.hero;
+        const rest = works.filter((w) => w.id !== lead && !SMALL_PHOTO.has(w.id))
+          .sort((a, b) => Number(a.status === "Sold") - Number(b.status === "Sold"));
+        const row = [...works.filter((w) => w.id === lead), ...rest];
         return (
           <Fragment key={s.slug}>
           <section id={s.slug} className={`sband ${i % 2 ? "band-indigo" : "band-white"}`}>
@@ -63,8 +57,9 @@ export default function SeriesIndex() {
           </Fragment>
         );
       })}
-      <IndigoBand title="Ask about a painting" line="Prices are on request. Write about any painting, or about her work in general." href="/enquire" label="Send an enquiry">
-        <div className="ibnd-chips"><Link className="btn btn-light" href="/works">See all the works</Link><Link className="btn btn-light" href="/exhibitions">Exhibitions</Link></div>
+      {/* Chief Content 2c §2: the same line, word for word, as the story pages' ask row */}
+      <IndigoBand title="Ask about a painting" line="Prices on request. Ask about any painting here, or about her work in general.">
+        <div className="ibnd-one"><Link className="btn btn-solid btn-on-indigo" href="/enquire">Send an enquiry</Link></div>
       </IndigoBand>
     </>
   );
