@@ -19,4 +19,10 @@ html,body,*{font-variant-numeric:lining-nums;font-feature-settings:"lnum" 1,"ker
 .sm-strip::-webkit-scrollbar{display:none}
 .sm-strip button{flex:none !important;width:clamp(64px,6vw,84px) !important;aspect-ratio:4/3;min-height:0 !important}
 @media (max-width:640px){ .sm-strip button{width:68px !important;min-width:0 !important} }
-@media (prefers-reduced-motion:reduce){ .sm-hero img{animation:none} }
+/* "Reduce motion" (lib/motion-rules, Brand R1 #2): no slide or zoom; the old photograph crossfades into the new one */
+.sm-hero img.sm-out{pointer-events:none}
+@keyframes smOut{from{opacity:1}to{opacity:0}}
+@media (prefers-reduced-motion:reduce){
+  .sm-hero img{animation:smIn var(--sm-fade,600ms) linear both}
+  .sm-hero img.sm-out{animation:smOut var(--sm-fade,600ms) linear both}
+}
