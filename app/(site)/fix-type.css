@@ -52,3 +52,12 @@ body,.pp-text p,.sband .s-line,.pp-story{font-size:18px !important;line-height:1
 /* small labels stay readable on indigo bands (the type style's grey is for white grounds only) */
 .band-indigo .card .meta,.band-indigo .card .status,.band-indigo .five-m,.band-indigo .eyebrow,.band-indigo .fsel span,.ibnd .meta{color:#D3D8E8 !important}
 .band-indigo .card .st-sold,.band-indigo .card .meta-parts{color:#D3D8E8 !important}
+/* COO: phones — painting info never starts a line with a dot; no reserved title height in "More from" */
+@media (max-width:640px){
+  .card .meta-parts .mp + .mp::before{content:none !important}
+  .card .meta-parts{column-gap:.6em !important}
+  #more-from .card-t{min-height:0 !important}
+}
+/* Home Key collections: the lines under each title are centred under the painting (they sat 52px left on laptop) */
+.series-tiles .m-card .meta{margin-inline:auto !important;text-align:center}
+@media (max-width:640px){ .card .meta-parts{flex-direction:column !important;align-items:center;row-gap:0} }
