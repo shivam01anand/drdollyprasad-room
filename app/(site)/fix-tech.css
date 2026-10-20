@@ -116,3 +116,9 @@
 /* ---- B4 copy (C12): the Exhibitions end band is title + buttons on one row ---- */
 .next-series .ask:not(:has(.meta)){display:flex !important;flex-direction:row !important;flex-wrap:wrap;align-items:center;justify-content:space-between;gap:16px 24px}
 @media (max-width:640px){ .next-series .ask:not(:has(.meta)){flex-direction:column !important;align-items:flex-start} }
+
+/* ---- B2 follow-up: at 641-1000 px the card meta can wrap to two lines ("Oil on canvas · 36 × 48 in · 2018"),
+   which pushed one picture up by a line in More from (768: 20 px). The meta keeps a two-line box there;
+   phone chapter swipes keep a two-line caption box so their pictures share a bottom line. ---- */
+@media (min-width:641px) and (max-width:1000px){ .marq-set>.card>.meta,#more-from .card .meta,.grid-5 .card .meta{min-height:2.8em} }
+@media (max-width:760px){ .chap-works.n3 figcaption,.chap-works.n4 figcaption{min-height:2.8em} }
