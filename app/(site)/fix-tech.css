@@ -130,7 +130,7 @@
 
 /* ---- B4 · Collections tile row (4-REVIEW1-DECISION 4.2): kept, smaller, styled like every other card, and each tile
    jumps to its band on the page (instant, no smooth-scroll). ---- */
-.five-stage{aspect-ratio:auto !important;height:200px;background:#FFFFFF !important}
+.five-stage{aspect-ratio:auto !important;height:200px;background:#FFFFFF !important;align-self:stretch}
 .five-stage img{border:4px solid var(--frame);box-shadow:0 10px 24px -10px rgba(0,0,0,.28)}
 .five-b{align-items:center;text-align:center}
 .five-b:hover .five-t{color:inherit !important;text-decoration:underline;text-underline-offset:4px;text-decoration-thickness:1px}
@@ -170,3 +170,8 @@ html:has(.five){scroll-behavior:auto}
 .ftr-motion:hover{text-decoration:underline;text-underline-offset:4px}
 html[data-motion="paused"] *,html[data-motion="paused"] *::before,html[data-motion="paused"] *::after{animation-play-state:paused !important}
 .card .meta-parts{column-gap:0 !important}
+/* QC follow-ups: header exactly 28 + 64 (+1 px rule); the footer motion link is a 44 px tap target on phones;
+   phone chapter swipes keep the picture centred over its caption */
+@media (min-width:768px){ .hdr{padding-top:0 !important} }
+@media (max-width:640px){ .ftr-motion{min-height:44px;display:inline-flex;align-items:center} }
+@media (max-width:760px){ .chap-works.n3>figure>a,.chap-works.n4>figure>a{align-self:auto} }
