@@ -361,8 +361,9 @@ These are not new from this review but are still open.
 - Never write "18 solo exhibitions": the record is exhibitions and art fairs.
 - Nothing goes live until Shubham says "make it live".
 - **"sacred" is always red** (19 Oct 2026, Shubham): wherever the tagline
-  word "sacred" appears on the site, it is set in the brand red (`var(--red)`,
-  the same red as "Dolly"). Only the colour changes; the words stay as they are.
+  word "sacred" appears on the site, it is set in the same red as "Dolly"
+  (`var(--red)`, #D4202A on white; on indigo the brand's lighter red #EF4B53,
+  as for any red word there). Only the colour changes; the words stay as they are.
 
 ## PR #11 review fixes (18 Oct 2026, night): P2 left open
 
