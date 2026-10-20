@@ -70,6 +70,9 @@
   .ex-ch-year{font:500 24px/1.2 var(--serif) !important;color:var(--ink) !important}
   .tl-year{font:500 16px/1.3 var(--sans) !important;font-variant-numeric:lining-nums tabular-nums !important;color:var(--ink) !important;letter-spacing:0 !important}
   .ex-quote{border-left-color:var(--rule) !important}
+  /* the record table: venue J 16 ink, city and month J 14 muted (3.2 "Record table year + venue") */
+  .timeline ul li{font:400 16px/1.45 var(--sans) !important;color:var(--ink) !important}
+  .timeline small,.tl-photos{font:400 14px/1.45 var(--sans) !important;color:var(--muted) !important;letter-spacing:0 !important;text-transform:none !important}
   /* text link */
   a.link,span.link,button.link{font-family:var(--sans) !important;font-size:14px !important;font-weight:500 !important;letter-spacing:0 !important;text-transform:none !important;
     text-decoration:underline !important;text-underline-offset:4px !important;text-decoration-thickness:1px !important}
@@ -113,6 +116,8 @@
     .prevnext a span,.gal-cap em,.zoom-cap small,.ss-cap small,.tile.flip .back em,.flip-back em,.flip-back u,
     .xcard em,.ncard em,.ccard em,.scard em,.qcard small,.nowstrip .live,.now-line .live,.wh .namecard .eyebrow,.ex-index span,.five-n,.sband .s-n,.s-n,label{font-size:13px !important}
     .ex-ch-year{font-size:20px !important}
+    .timeline small,.tl-photos{font-size:13px !important}
+    .tl-year{font-size:16px !important}
     .sm-cap{height:calc(2em * 1.45) !important;-webkit-line-clamp:2 !important;line-clamp:2 !important}
     .fsel select,input,textarea,select{font-size:16px !important}
   }

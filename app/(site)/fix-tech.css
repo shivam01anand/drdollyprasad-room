@@ -175,3 +175,6 @@ html[data-motion="paused"] *,html[data-motion="paused"] *::before,html[data-moti
 @media (min-width:768px){ .hdr{padding-top:0 !important} }
 @media (max-width:640px){ .ftr-motion{min-height:44px;display:inline-flex;align-items:center} }
 @media (max-width:760px){ .chap-works.n3>figure>a,.chap-works.n4>figure>a{align-self:auto} }
+/* Exhibitions: less empty page between the record and the end band (QC G4: 142 px) */
+.ex-record{padding-bottom:clamp(16px,2vw,28px) !important}
+.ex-record + .sec-tight{padding-top:clamp(12px,1.6vw,20px) !important}
