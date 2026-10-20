@@ -1,0 +1,15 @@
+/* Type: option B "Clear sans", chosen by Shubham in the poll, 20 Oct. Loaded last so it wins. */
+/* B - Clear sans: all small text Jost sentence case 14px muted; body 18px; stronger contrast */
+.eyebrow,.sband .s-n,.card .meta,.card .status,.pp-status .status,.fsel span,.fsel select,.pf-pager .btn,.sband .s-txt .btn,.pp-toggle,.pp-zoom,.five-m,.pp-facts,.pp-status a{font-family:'Jost',sans-serif !important;text-transform:none !important;letter-spacing:0 !important;font-size:14px !important;font-weight:400 !important}
+.band-white .eyebrow,.band-white .s-n,.card .meta,.five-m,.pp-facts,.fsel span{color:#4a5066 !important}
+.band-indigo .eyebrow,.band-indigo .s-n{color:#d3d8ea !important}
+.fsel select,.pf-pager .btn,.sband .s-txt .btn,.pp-toggle,.pp-zoom{font-weight:500 !important}
+@media (min-width:761px){ .sband h2{font-size:40px !important} }
+.sband h2{font-weight:500 !important}
+.pp-title,.card-t{font-weight:500 !important}
+body,.pp-text p,.sband .s-line,.pp-story{font-size:18px !important;line-height:1.6 !important}
+.band-white .s-line,.pp-story{color:#161E3A !important}
+.btn,.btn-solid{text-transform:none !important;letter-spacing:0 !important;font-size:14px !important;font-weight:500 !important}
+
+/* phones: titles keep their phone size; dropdowns 16px so iPhone Safari does not zoom in on tap */
+@media (max-width:760px){ .sband h2{font-size:28px !important} .fsel select{font-size:16px !important} }

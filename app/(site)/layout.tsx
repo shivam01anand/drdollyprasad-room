@@ -9,6 +9,7 @@ import "./site.css";
 import "./fix-pages.css";
 import "./fix-about.css";
 import "./fix-story.css";
+import "./fix-type.css";
 import Header from "@/components/site/Header";
 import Footer from "@/components/site/Footer";
 import { Band, Rails } from "@/components/site/Borders";
