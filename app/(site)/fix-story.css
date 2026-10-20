@@ -98,10 +98,11 @@
 .sband.band-white,.sband.band-indigo{padding-block:40px}
 .sband .srow.wrap{max-width:1360px;box-sizing:border-box}
 @media (min-width:761px){
-  .sband .srow{display:grid !important;grid-template-columns:300px minmax(0,1fr);column-gap:40px !important;row-gap:0}
+  .sband .srow{display:grid !important;grid-template-columns:320px minmax(0,1fr);column-gap:40px !important;row-gap:0}
   .sband .srow .s-txt{max-width:none}
 }
-.sband .s-txt .s-line{margin:2px 0 0;display:-webkit-box;-webkit-box-orient:vertical;-webkit-line-clamp:2;line-clamp:2;overflow:hidden}
+/* R4 fix 1 (Brand P1-1, COO 1): the line is shown whole, never cut with an ellipsis; a balanced wrap, up to 3 lines (D) */
+.sband .s-txt .s-line{margin:2px 0 0;display:block;overflow:visible;white-space:normal;-webkit-line-clamp:unset;line-clamp:none;text-overflow:clip;text-wrap:balance}
 .sband .s-txt .btn{align-self:flex-start;margin-top:10px;white-space:nowrap}
 .sband .s-txt .btn::after,.sband .s-txt .btn::before{content:none !important}
 /* one picture height per row; the painting keeps its own shape (width from its ratio), never cropped */
@@ -117,7 +118,6 @@
   .sband.band-white,.sband.band-indigo{padding-block:28px}
   .sband .srow .s-txt{grid-template-columns:minmax(0,1fr) auto !important;grid-template-areas:"t b" "e e" "l l" !important;row-gap:4px !important}
   .sband .s-txt .btn{min-height:44px !important;margin:0}
-  .sband .s-txt .s-line{-webkit-line-clamp:1;line-clamp:1;display:block;white-space:nowrap;text-overflow:ellipsis}
   .sband .card .mat img{height:170px !important}
   .sband .marq{padding-block:12px 4px}
 }
