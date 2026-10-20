@@ -132,7 +132,8 @@
   .pnx-t{font:500 36px/1.1 var(--serif) !important;color:var(--ink) !important}
   .pnx-next .pnx-k{color:var(--muted-on-indigo) !important}
   .pnx-next .pnx-t,.pnx-prev:hover .pnx-t,.pnx-prev:hover .pnx-k{color:#FFFFFF !important}
-  .pp-text a.pp-back{font:400 14px/1.45 var(--sans) !important;color:var(--muted) !important;letter-spacing:0 !important}
+  /* R4 P2-1 (Brand): the back link is the main way back to the story: J 15 ink, not a footnote */
+  .pp-text a.pp-back{font:400 15px/1.45 var(--sans) !important;color:var(--ink) !important;letter-spacing:0 !important}
 
   /* ---- R4 B3-1: /series bands and Ask row (type and colour) ---- */
   .sband .s-line{font:400 16px/1.5 var(--sans) !important}
