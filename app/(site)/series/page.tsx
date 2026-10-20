@@ -3,7 +3,7 @@ import { Fragment } from "react";
 import IndigoBand from "@/components/site/IndigoBand";
 import Link from "next/link";
 import Card, { thumb } from "@/components/site/Card";
-import { ON_THE_WORK, SERIES_PAGES, SMALL_PHOTO, worksIn } from "@/lib/site";
+import { LEAD, ON_THE_WORK, SERIES_PAGES, SMALL_PHOTO, worksIn } from "@/lib/site";
 import { BY_ID } from "@/lib/works";
 import { dims } from "@/lib/images";
 import Marquee from "@/components/site/Marquee";
@@ -16,6 +16,7 @@ export const metadata: Metadata = {
   description: "Dr Dolly Prasad’s five collections: Gone Are The Days, Bandh Darwaze, Faith, Portraits and her spring work.",
   alternates: { canonical: "/series" },
 };
+
 
 /** the overview: the five collections as large tiles, then each collection as a band of its own */
 export default function SeriesIndex() {
@@ -33,7 +34,7 @@ export default function SeriesIndex() {
           <h2>A doctor’s eye, looking deeper into the everyday</h2>
         </div>
         <FiveBlocks blocks={SERIES_PAGES.map((s) => ({ slug: s.slug, label: s.label, n: worksIn(s.label).length, period: s.period,
-          pics: [s.hero, ...worksIn(s.label).map((w) => w.id).filter((id) => id !== s.hero && !SMALL_PHOTO.has(id))]
+          pics: [LEAD[s.slug] ?? s.hero, ...worksIn(s.label).map((w) => w.id).filter((id) => id !== (LEAD[s.slug] ?? s.hero) && !SMALL_PHOTO.has(id))]
             .map((id) => ({ src: thumb(id), alt: `${BY_ID.get(id)?.title}, from ${s.label}` })) }))} />
         <p className="quote series-sum-q">“{ON_THE_WORK}”<span className="eyebrow">Dr Dolly Prasad, on her work</span></p>
       </section>

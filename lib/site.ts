@@ -245,6 +245,12 @@ export const SERIES_PAGES: SeriesPage[] = [
   },
 ];
 
+/** the one painting that stands for each collection where only one is shown (Shubham, 20 Oct): the strongest image */
+export const LEAD: Record<string, string> = {
+  "gone-are-the-days": "bulls-and-wheel", "bandh-darwaze": "red-and-teal-door-lock", faith: "monks-and-blue-buddha",
+  portraits: "red-turban-portrait", "recent-work": "woman-with-poppies",
+};
+
 export const SERIES_BY_LABEL = new Map(SERIES_PAGES.map((s) => [s.label, s]));
 export const SERIES_BY_SLUG = new Map(SERIES_PAGES.map((s) => [s.slug, s]));
 export const seriesPath = (label: string) => `/series/${SERIES_BY_LABEL.get(label)?.slug ?? ""}`;

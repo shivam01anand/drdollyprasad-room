@@ -9,6 +9,7 @@ import Marquee from "@/components/site/Marquee";
 import IgRoll from "@/components/site/IgRoll";
 import {
   BIO_LINE, BIO_SUB, EMAIL, INSTAGRAM, NOW, NOW_SHOWING_CONFIRMED, PORTRAIT, SERIES_PAGES, SHOWS, SITE, STUDIO_PATH, worksIn,
+  LEAD,
 } from "@/lib/site";
 import { BY_ID } from "@/lib/works";
 import { dims } from "@/lib/images";
@@ -66,8 +67,8 @@ export default function Home() {
           <Link key={s.slug} className="card m-card" href={`/series/${s.slug}`}>
             <div className="mat">
               {/* eslint-disable-next-line @next/next/no-img-element */}
-              <img className="framed thin" src={thumb(s.hero)} alt={`${BY_ID.get(s.hero)?.title}, from ${s.label}`} loading="eager" {...dims(thumb(s.hero))}
-                   style={{ ["--ar" as string]: `${dims(thumb(s.hero)).width} / ${dims(thumb(s.hero)).height}` }} />
+              <img className="framed thin" src={thumb(LEAD[s.slug] ?? s.hero)} alt={`${BY_ID.get(LEAD[s.slug] ?? s.hero)?.title}, from ${s.label}`} loading="eager" {...dims(thumb(LEAD[s.slug] ?? s.hero))}
+                   style={{ ["--ar" as string]: `${dims(thumb(LEAD[s.slug] ?? s.hero)).width} / ${dims(thumb(LEAD[s.slug] ?? s.hero)).height}` }} />
             </div>
             <span className="card-t">{s.label}</span>
             <span className="meta">{worksIn(s.label).length} works · {s.period}</span>

@@ -17,7 +17,7 @@ export default function FiveBlocks({ blocks }: { blocks: Block[] }) {
     <ol className="five" aria-label="The five collections">
       {blocks.map((b, k) => {
         // the five blocks change one after another, not all at once
-        const on = Math.floor((tick + k * 0.6)) % b.pics.length;
+        const on = tick === 0 ? 0 : Math.floor(tick + k * 0.6) % b.pics.length; // every block opens on its lead painting
         return (
           <li key={b.slug}>
             <Link className="five-b" href={`/series/${b.slug}`}>
