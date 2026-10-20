@@ -13,7 +13,7 @@
  * hidden tab. Transforms only, so nothing on the page shifts.
  */
 
-import { REDUCED_KEEPS_MOVING, REDUCED_SPEED, motionPaused } from "./motion-rules";
+import { REDUCED_KEEPS_MOVING, REDUCED_MIN_PX_S, REDUCED_SPEED, motionPaused } from "./motion-rules";
 
 const HOLD_MS = 1400; // how long a let-go row rests before it drifts again
 const RAMP_S = 1.6; // how long it takes to come back up to speed
@@ -178,7 +178,9 @@ export function driftRow(view: HTMLElement, track: HTMLElement, o: { seconds: nu
     const scale = motionScale(reduced);
     // a row inside [data-hold] (e.g. the press row while its Gallery is open) waits
     const resting = now < holdUntil || hover || focus || scale === 0 || !!view.closest("[data-hold]");
-    const target = resting ? 0 : dir * speed * scale;
+    // R4 polish 4 (G10a, 1920): under reduced motion a short or slow row still visibly drifts (never under
+    // REDUCED_MIN_PX_S), so a wide screen does not leave one row looking stopped at 4 px/s
+    const target = resting ? 0 : dir * (scale > 0 && scale < 1 ? Math.max(speed * scale, REDUCED_MIN_PX_S) : speed * scale);
     // a fling coasts and slows gently (COAST_K); the drift returns over RAMP_S
     const k = Math.abs(v) > speed * 1.2 ? COAST_K : 1 / RAMP_S * 2.2;
     v += (target - v) * Math.min(1, dt * k);

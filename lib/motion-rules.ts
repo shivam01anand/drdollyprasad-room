@@ -15,6 +15,8 @@ export const REDUCED_KEEPS_MOVING = true;
 
 /** rows and the wall under "Reduce motion": this share of the normal speed */
 export const REDUCED_SPEED = 0.5;
+/** ...but a moving row never drifts slower than this under "Reduce motion" (px/s), so it never reads as stuck */
+export const REDUCED_MIN_PX_S = 7;
 
 /** the exhibition photograph roll (Brand: 3.2 s too quick; COO tie-break after the consultant debate, 21 Oct: 3.5 s) */
 export const PHOTO_ROLL_MS = 3500;
