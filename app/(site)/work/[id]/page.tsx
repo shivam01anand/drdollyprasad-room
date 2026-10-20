@@ -23,9 +23,19 @@ import { ChatIcon, InstagramIcon } from "@/components/site/Icons";
 
 export const dynamicParams = false;
 
-/** R4 B2-5: built, not shipped. Turn on only when Chief Content locks the label (preview note: "Shown at: wording with Chief Content"). */
-const SHOW_SHOWN_AT = process.env.SHOW_SHOWN_AT === "1";
-const SHOWN_AT_LABEL = "[Content to write]";
+/** R4 B2-5 / Chief Content 2c §1: wording locked ("Shown at"). ON for the R4 preview; it ships only with Shubham's OK
+ *  on that preview. Build with SHOW_SHOWN_AT=0 to hide the row again. */
+const SHOW_SHOWN_AT = process.env.SHOW_SHOWN_AT !== "0";
+const SHOWN_AT_LABEL = "Shown at";
+/** Chief Content 2c §1.5 FACT FLAG: these two are dated 2016 to 2018 but listed under IHC, November 2010.
+ *  The row stays off for them until Mummy confirms (the data is not edited). */
+const SHOWN_AT_HOLD = new Set(["bulls-and-wheel", "coins-and-clay-bank"]);
+const MONTHS = ["january", "february", "march", "april", "may", "june", "july", "august", "september", "october", "november", "december"];
+/** newest first: year, then the last month named in `when` */
+const showKey = (sh: { year: string; when: string }) => {
+  const m = sh.when.toLowerCase().match(new RegExp(MONTHS.join("|"), "g"));
+  return Number(sh.year) * 100 + (m ? MONTHS.indexOf(m[m.length - 1]) + 1 : 0);
+};
 export const generateStaticParams = () => WORKS.map((w) => ({ id: w.id }));
 
 type Props = { params: Promise<{ id: string }> };
@@ -63,7 +73,7 @@ export default async function WorkPage({ params }: Props) {
     ? { href: `/series/${e.crossesTo}`, kicker: `${dir} collection`, label: SERIES_BY_SLUG.get(e.crossesTo)!.label }
     : { href: workPath(e.id), kicker: `${dir} painting`, label: BY_ID.get(e.id)!.title };
   // R4 B2-5: "Shown at", only where SHOWS names this painting; held until Chief Content locks the label
-  const shownAt = SHOWS.filter((sh) => sh.works?.includes(id));
+  const shownAt = SHOWN_AT_HOLD.has(id) ? [] : SHOWS.filter((sh) => sh.works?.includes(id)).sort((a, b) => showKey(b) - showKey(a));
   const d = DIMS.get(id);
   const src = LARGE.has(id) ? `/art/large/${id}.jpg` : `/art/works/${id}.jpg`;
   const size = inchDims(w, d ? { w: d.w, h: d.h } : undefined);
@@ -94,9 +104,10 @@ export default async function WorkPage({ params }: Props) {
   const rows: [string, React.ReactNode][] = [
     ["Size", w.size ? `${w.size}${cm} (height × width)` : "On request"],
     ["Status", sold ? "In a private collection" : statusText(w)],
-    ...(SHOW_SHOWN_AT && shownAt.length ? [[SHOWN_AT_LABEL, shownAt.map((sh, i) => (
-      <span key={sh.id}>{i > 0 ? " · " : ""}<Link href={`/exhibitions#${sh.id}`}>{sh.name ?? sh.title}, {sh.year}</Link></span>
-    ))] as [string, React.ReactNode]] : []),
+    // Chief Content 2c §1.2-1.3: "{name}, {title}, {year}" (or "{title}, {year}"), one show per line, newest first
+    ...(SHOW_SHOWN_AT && shownAt.length ? [[SHOWN_AT_LABEL, <span className="shown-at">{shownAt.map((sh) => (
+      <Link key={sh.id} href={`/exhibitions#${sh.id}`}>{sh.name ? `${sh.name}, ${sh.title}` : sh.title}, {sh.year}</Link>
+    ))}</span>] as [string, React.ReactNode]] : []),
   ];
 
   const tabs = [
@@ -152,7 +163,7 @@ export default async function WorkPage({ params }: Props) {
         </IndigoBand>
       )}
 
-      <PrevNext label={`More from ${coll.label}`} count={`${nb.index + 1} of ${nb.total}`}
+      <PrevNext label="Previous and next painting" count={`${nb.index + 1} of ${nb.total} in ${coll.label}`}
                 prev={end(nb.prev, "Previous")} next={end(nb.next, "Next")} />
 
       </div>
