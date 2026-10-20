@@ -87,8 +87,9 @@ const RAW: PressItem[] = [
 
 /** one mosaic, stills and the two television clips mixed and spread out (Shubham, 19 Oct 2026):
  *  the India Habitat Centre interview first, top left; a clip never sits next to the other */
-const ORDER = ["ihc-press-01", "tv-ncr-2010", "ihc-press-06", "ihc-press-03", "delhi-times", "ihc-press-02",
-  "tv-archive", "ihc-press-04", "ihc-press-05"]; // "Listening" (ihc-press-b) dropped: near-duplicate (Chief Content 2c, C11); the photo stays in the IHC album
+const ORDER = ["ihc-press-01", "tv-ncr-2010", "ihc-press-06", "ihc-press-03", "delhi-times", "tv-archive"];
+// six cards, 3 + 3 (Chief Content 2c C11; Brand review #2 P1-6): "In conversation", "On the red-brick wall" and
+// "The artist and her audience" dropped as near-duplicate interview photos; they stay in the IHC album // "Listening" (ihc-press-b) dropped: near-duplicate (Chief Content 2c, C11); the photo stays in the IHC album
 export const PRESS_ITEMS: PressItem[] = ORDER.map((id) => RAW.find((p) => p.id === id)!);
 
 /** the shorter set for About: four photographs and the NCR excerpt */
