@@ -102,7 +102,10 @@
 
   /* widows */
   h1,h2,h3,.chap-big,.card-t{text-wrap:balance !important}
-  .lede,.quote{text-wrap:pretty !important}
+  /* G15 (Gate D / DC P2-7): short lines balance so no lede or hero line ends on one word; body paragraphs avoid a lone last word */
+  .lede,.page-head .lede,.story-head .lede,.sec-line,.wh-line,.ex-sum{text-wrap:balance !important}
+  .quote{text-wrap:pretty !important}
+  .ab-p,.chap-small,.tband-card p,.pp-story.is-ours{text-wrap:pretty !important}
   /* her words verbatim, ours flagged: our description (no quote of hers) is plain body, not the inline-quote role */
   .pp-story.is-ours,.pp-text p.pp-story.is-ours{font:400 18px/1.6 var(--sans) !important;color:var(--ink) !important}
   /* DC review #2 P1-1: small text on indigo uses muted-on-indigo (#5F564D was 2.28:1) */
