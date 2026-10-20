@@ -127,3 +127,87 @@
 .ibnd:has(.ibnd-one) .sec-head{margin:0;display:block}
 .ibnd-one{flex:none}
 @media (max-width:760px){ .ibnd:has(.ibnd-one) .sec{padding-block:32px} .ibnd-one,.ibnd-one .btn{width:100%} }
+
+/* ==== R4 B3-2: story opening, two columns (words left, cover right); one column on phones (fix-phone.css) ==== */
+.story-open.wrap,.chv .chv-in.wrap,.story-end.wrap{max-width:1360px;box-sizing:border-box}
+.story-open{display:grid;grid-template-columns:minmax(0,6fr) minmax(0,6fr);gap:56px;align-items:center;padding-block:32px 40px}
+.so-txt>*{margin:0}
+.so-txt .eyebrow{margin-bottom:10px}
+.so-txt h1{margin-bottom:12px}
+.so-txt .lede{max-width:none;margin-inline:0;text-align:left}
+.so-epi{margin:20px 0 0}
+.so-epi.hers{border-left:1px solid var(--ink);padding-left:20px}
+.so-epi.hers p{margin:0}
+.so-epi .so-sig{margin-top:10px}
+.so-intro{margin-top:16px}
+.so-ps{display:flex;flex-direction:column;gap:14px}
+.so-ps p{margin:0}
+.so-intro.has-photo{display:grid;grid-template-columns:minmax(0,1fr) 200px;gap:24px;align-items:start}
+.so-photo{margin:0;width:200px}
+.so-photo img{display:block;width:100%;height:auto}
+.so-photo figcaption{margin-top:8px;overflow-wrap:anywhere}
+.so-art{min-width:0}
+.so-art figure{margin:0}
+.so-art a{display:block}
+.so-art figure img.framed{display:block;margin-inline:auto;width:auto;height:auto;max-width:100%;max-height:min(72svh,600px)}
+.so-art figcaption{text-align:center;margin-top:14px;white-space:normal;text-wrap:balance}
+.so-grid{display:grid;grid-template-columns:repeat(2,max-content);gap:16px;justify-content:center}
+.so-grid img.framed{display:block;width:auto;height:clamp(180px,17vw,260px);max-width:none}
+@media (min-width:761px) and (max-width:1099px){ .story-open{gap:40px} .so-intro.has-photo{grid-template-columns:minmax(0,1fr)} }
+
+/* ==== R4 B3-3: chapters on white, separated by one rule; the painting leads ==== */
+.chap.chv{padding-block:0 !important;background:transparent}
+.chv .chv-in{border-top:1px solid var(--rule)}
+.chv-txt>*{margin:0}
+.chv-n{display:block;margin-bottom:8px}
+.chv-t{margin:0 0 16px}
+.chv-words{display:flex;flex-direction:column;gap:12px}
+.chv .chap-big,.chv .chap-small,.chv .chap-sig{text-align:left;margin:0;max-width:none}
+.chv .chap-sig{margin-top:-4px}
+.chv-facts{margin-top:16px !important}
+.chv-txt>.link{display:flex;width:max-content;align-items:center;min-height:44px;margin-top:4px}
+/* A: one painting */
+.chv.single .chv-in{display:grid;grid-template-columns:minmax(0,7fr) minmax(0,5fr);gap:56px;align-items:center;padding-block:48px}
+.chv.single.flip .chv-in{grid-template-columns:minmax(0,5fr) minmax(0,7fr)}
+.chv.single.flip .chv-art{order:2}
+.chv-art{min-width:0}
+.chv-art a{display:block}
+.chv-art img.framed{display:block;margin-inline:auto;width:auto;height:auto;max-width:100%;max-height:clamp(380px,38vw,540px)}
+.chv.single .chv-txt{max-width:460px}
+.chv.single.flip .chv-txt{justify-self:end}
+/* B: several paintings, text above one row of one height that fits the content width (never wraps or scrolls) */
+.chv.multi .chv-in{padding-block:48px}
+.chv-rowbox{container-type:inline-size;min-width:0}
+.chv.multi .chv-txt{max-width:640px;margin-bottom:28px}
+.chv-row{--F:24px;--rh:min(clamp(260px,24vw,340px),calc((100cqw - var(--n) * var(--F) - (var(--n) - 1) * 24px) / var(--rs) + var(--F)));
+  display:flex;gap:24px;align-items:flex-start}
+.chv-row figure{margin:0;flex:none;display:flex;flex-direction:column}
+.chv-row a{display:block}
+.chv-row img.framed{display:block;height:var(--rh);width:auto;max-width:none;max-height:none}
+.chv-row figcaption{width:0;min-width:100%;margin-top:8px;text-wrap:balance}
+@media (min-width:761px) and (max-width:1099px){
+  .chv.single .chv-in{gap:40px}
+  .chv-art img.framed{max-height:clamp(320px,40vw,440px)}
+}
+/* room view, a small thumbnail (both variants); a 44 px tap target */
+.room-th{display:flex;width:max-content;align-items:center;gap:12px;margin-top:12px;padding:0;background:none;border:0;cursor:pointer;min-height:44px;text-align:left}
+.room-th img{display:block;width:160px;height:auto;border:1px solid var(--rule)}
+.room-th:hover span,.room-th:focus-visible span{text-decoration:underline;text-underline-offset:4px}
+
+/* ==== R4 B3-4: "Also in this collection", only the paintings not shown above; one height, last row centred ==== */
+.also-row{display:flex;flex-wrap:wrap;justify-content:center;gap:32px}
+.also-row .card{flex:none !important;width:auto !important;max-width:none !important;gap:4px}
+.also-row .card .mat{container-type:normal !important}
+.also-row .card .mat{width:auto !important;height:auto !important;aspect-ratio:auto !important;padding:0 !important;flex:none !important}
+.also-row .card .mat img{height:200px !important;width:auto !important;max-width:none !important;max-height:none !important;aspect-ratio:auto !important}
+.also-row .card-t{min-height:0 !important}
+/* a compact band (padding on the indigo layer, none on the section) */
+.ibnd:has(.also-row){margin-top:0 !important;padding-block:40px !important}
+.ibnd:has(.also-row) .sec{padding-block:0 !important}
+@media (max-width:760px){ .ibnd:has(.also-row){padding-block:32px !important} .ibnd:has(.also-row) .sec-head{margin-bottom:18px} }
+
+/* ==== R4 B3-5: end of the story page: one ask line, then the collections pager ==== */
+.story-end{padding-block:28px 48px}
+.se-ask{text-align:center;margin:0 0 20px}
+.se-ask a{text-decoration:underline;text-underline-offset:4px;white-space:nowrap}
+.story-end .pnx{padding-block:0}

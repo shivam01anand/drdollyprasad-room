@@ -144,6 +144,23 @@
   .btn-solid.btn-on-indigo{background:#FFFFFF !important;color:var(--indigo) !important;border-color:#FFFFFF !important;background-image:none !important}
   .btn-solid.btn-on-indigo:hover{background:var(--muted-on-indigo) !important;border-color:var(--muted-on-indigo) !important}
 
+  /* ---- R4 B3-2 to B3-5: story opening, chapters, room thumbnail, ask line (type and colour) ---- */
+  .story-open h1{font:500 88px/1 var(--serif) !important;letter-spacing:-.02em !important;color:var(--ink) !important}
+  .so-epi,.so-epi p{font:500 24px/1.4 var(--serif) !important;font-style:normal !important;color:var(--ink) !important}
+  .so-epi p.so-sig,.so-photo figcaption,.so-art figcaption,.chv-n,.chv-facts,.room-th span{font:400 14px/1.45 var(--sans) !important;letter-spacing:0 !important;text-transform:none !important;color:var(--muted) !important}
+  .room-th span{font-weight:500 !important;color:var(--ink) !important}
+  .so-p{font:400 18px/1.6 var(--sans) !important;color:var(--ink) !important;text-wrap:pretty !important}
+  .chv-t{font:500 36px/1.12 var(--serif) !important;color:var(--ink) !important}
+  .chv-row figcaption{font:400 13px/1.4 var(--sans) !important;color:var(--muted) !important;letter-spacing:0 !important}
+  .se-ask{font:400 16px/1.5 var(--sans) !important;color:var(--ink) !important}
+  .se-ask a,.se-ask b{color:var(--ink) !important;font-weight:500 !important}
+  @media (min-width:761px) and (max-width:1099px){ .story-open h1{font-size:64px !important} }
+  @media (max-width:760px){
+    .story-open h1{font-size:44px !important}
+    .so-epi,.so-epi p{font-size:20px !important}
+    .so-p{font-size:16px !important;line-height:1.55 !important}
+    .chv-t{font-size:28px !important}
+  }
 
   @media (max-width:640px){
     .story-head h1{font-size:44px !important}

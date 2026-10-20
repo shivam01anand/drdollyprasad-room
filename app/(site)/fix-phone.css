@@ -40,3 +40,43 @@
 @media (max-width:760px){
   .chap .framed,.story-open .framed{width:auto !important;max-width:100% !important;height:auto !important;max-height:min(64svh,420px) !important;aspect-ratio:var(--ar,auto);display:block;margin-inline:auto}
 }
+/* ==== R4 B3 phones (<=760): story opening, chapters, Also, in one column ==== */
+@media (max-width:760px){
+  .story-open{display:flex;flex-direction:column;align-items:stretch;gap:16px;padding-block:24px 32px}
+  .story-open .so-txt{display:contents}
+  .story-open .eyebrow{order:1;margin:0}
+  .story-open h1{order:2;margin:0}
+  .story-open .lede{order:3}
+  .story-open .so-art{order:4}
+  .story-open .so-epi{order:5;margin:0}
+  .story-open .so-intro{order:6;margin:0}
+  .so-intro.has-photo{display:flex;flex-direction:column;gap:16px}
+  .so-photo{width:100%;max-width:280px}
+  .so-grid{grid-template-columns:repeat(2,minmax(0,1fr));gap:12px}
+  .so-grid img.framed{height:auto !important}
+  .chv .chv-in{padding-block:32px !important}
+  .chv.single .chv-in{display:flex;flex-direction:column;align-items:stretch;gap:0}
+  .chv.single .chv-txt{display:contents}
+  .chv.single .chv-n{order:-3}
+  .chv.single .chv-t{order:-2}
+  .chv.single .chv-art{order:-1;margin-bottom:18px}
+  .chv.multi .chv-txt{margin-bottom:18px}
+  /* Brand pick: several paintings become one swipe strip, one height, bleeding off the right edge, never cropped */
+  .chv-row{--F:16px;--ph:min(300px,calc((82vw - var(--F)) / var(--rmax) + var(--F)));gap:16px;overflow-x:auto;overflow-y:hidden;
+    scroll-snap-type:x proximity;margin-right:calc(-1 * var(--gut));padding-right:var(--gut);scrollbar-width:none;-webkit-overflow-scrolling:touch}
+  .chv-row::-webkit-scrollbar{display:none}
+  .chv-row figure{scroll-snap-align:start}
+  .chap .chv-row img.framed{height:var(--ph) !important;width:auto !important;max-width:none !important;max-height:none !important}
+  .also-row{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:20px 14px;justify-items:center}
+  .also-row .card{width:100% !important;align-items:center;text-align:center}
+  .also-row .card .mat img{height:auto !important;max-height:150px !important;max-width:100% !important;width:auto !important}
+  .also-row .card:last-child:nth-child(odd){grid-column:1 / -1}
+  .also-row .card:last-child:nth-child(odd) .mat{justify-content:center}
+}
+/* R4 B3-5 phones: the end stays one short block (ask line, Next first, then Previous) */
+@media (max-width:760px){
+  .story-end{padding-block:16px 24px}
+  .story-end .se-ask{margin-bottom:14px}
+  .story-end .pnx-c{min-height:84px;padding:16px 18px}
+  .story-end .pnx-g{gap:10px}
+}
