@@ -40,7 +40,7 @@ export default function Home() {
   const total = SERIES_PAGES.reduce((n, s) => n + worksIn(s.label).length, 0);
   return (
     <>
-      <WallHero columns={HOME} label="Dr Dolly Prasad" size="home" face={PORTRAIT} eyebrow="Oil on canvas · New Delhi"
+      <WallHero columns={HOME} label="Dr Dolly Prasad" size="home" face={PORTRAIT} eyebrow="Paintings in oil · New Delhi"
                 title="Dr Dolly Prasad" red="Dolly" sub={<>The everyday, held <span className="red">sacred</span>.</>}>
         <Link className="btn btn-solid" href="/works">See all {total} works</Link>
         <a className="btn" href={STUDIO_PATH}><span className="lbl-wide">Walk through the studio</span><span className="lbl-phone">Enter the studio</span></a>
