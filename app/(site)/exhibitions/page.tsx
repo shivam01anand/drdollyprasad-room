@@ -3,8 +3,8 @@ import Link from "next/link";
 import { Fragment } from "react";
 import Until from "@/components/Until";
 import ShowMedia from "@/components/site/ShowMedia";
-import Press from "@/components/site/Press";
-import { PRESS_ITEMS } from "@/lib/press";
+import PressRow from "@/components/site/PressRow";
+import { PRESS_ALL } from "@/lib/press";
 import WallHero from "@/components/site/WallHero";
 import { SHOW_WALL } from "@/components/site/Collage";
 import { NOW, NOW_SHOWING_CONFIRMED, RECORD, RECORD_LINE, SHOWS } from "@/lib/site";
@@ -13,19 +13,24 @@ import { dims } from "@/lib/images";
 
 export const metadata: Metadata = {
   title: "Exhibitions",
-  description: "Dr Dolly Prasad’s exhibitions: eighteen exhibitions and art fairs, 2005 to 2018, including India Habitat Centre (2010), A Lifetime to Paint at ICCR (2010), the First International Kala Mela (2018), Triveni Kala Sangam (2007) and more.",
+  description: "Dr Dolly Prasad’s exhibitions: eighteen exhibitions and art fairs, 2005 to 2018, including India Habitat Centre (2010), A Lifetime to Paint at ICCR (2010), the First International Kala Mela (2018) and more.",
   alternates: { canonical: "/exhibitions" },
 };
 
 const years = [...new Set(RECORD.map((r) => r.year))];
+// R6 (Shubham, 20 Oct 22:50): his order on this page beats newest-first: India Habitat Centre, then the press,
+// then A Lifetime to Paint, then Kala Mela. SHOWS itself stays newest first for every other listing.
+const ORDER = ["india-habitat-centre-2010", "a-lifetime-to-paint", "kala-mela-2018"];
+const shows = ORDER.map((id) => SHOWS.find((s) => s.id === id)!);
+const AFTER_FIRST = "press";
 
 export default function Exhibitions() {
   return (
     <>
     <WallHero columns={SHOW_WALL} label="Her exhibitions" eyebrow="2005 to 2018" title="Her Exhibitions" red="Exhibitions"
-              held="Eighteen exhibitions, Delhi to Bombay: the things you walk past, hung where you stop.">
-      <a className="btn btn-solid" href="#india-habitat-centre-2010">See the shows</a>
-      <a className="btn" href="#record">The full record</a>
+              held="Eighteen exhibitions and art fairs, Delhi to Bombay: the things you walk past, hung where you stop.">
+      <a className="btn btn-solid" href={`#${shows[0].id}`}>See the shows</a>
+      <a className="btn" href="#record">List of exhibitions</a>
     </WallHero>
     <div className="wrap">
       {NOW_SHOWING_CONFIRMED && <Until until={NOW.until}>
@@ -43,55 +48,55 @@ export default function Exhibitions() {
       </Until>}
 
       <nav className="ex-index" aria-label="On this page">
-        {SHOWS.slice(0, 1).map((s) => <a key={s.id} href={`#${s.id}`}><span>{s.year}</span>{s.name ?? s.title}</a>)}
-        <a href="#press"><span>Press</span>In the press</a>
-        {SHOWS.slice(1).map((s) => <a key={s.id} href={`#${s.id}`}><span>{s.year}</span>{s.name ?? s.title}</a>)}
-        <a href="#record"><span>2005–18</span>The record</a>
+        {/* R6: the page's own order (India Habitat Centre, the press, A Lifetime to Paint, Kala Mela), then the list */}
+        {shows.map((s, k) => (
+          <Fragment key={s.id}>
+            <a href={`#${s.id}`}><span>{s.year}</span>{s.name ?? s.title}</a>
+            {k === 0 && <a href={`#${AFTER_FIRST}`}><span>Press</span>In the press</a>}
+          </Fragment>
+        ))}
+        <a href="#record"><span>2005–18</span>List of exhibitions</a>
       </nav>
 
-      {/* each show a calm chapter: year, title, venue; a few lines; one photograph large and a strip under it (CR-005) */}
-      {SHOWS.map((s, k) => {
+      {/* R6: each show one compact row, the photograph and its strip on the left, the heading, her words and the caption on the right */}
+      {shows.map((s, k) => {
         const photos = s.albums.flatMap((a) => a.photos);
         return (
           <Fragment key={s.id}>
-          <section id={s.id} className={`ex-ch${k % 2 ? " band-cream" : ""}`} aria-labelledby={`${s.id}-h`}>
-            <header className="ex-ch-head">
-              <span className="ex-ch-year">{s.year}</span>
-              <div>
-                <h2 id={`${s.id}-h`}>{s.name ?? s.title}</h2>
-                <p className="ex-ch-where">{s.where ?? `${s.venue}, ${s.city} · ${s.when}`}</p>
-              </div>
-            </header>
-            <div className="ex-ch-body">
-              <div className="ex-ch-txt">
-                {s.quote && (
-                  <figure className="ex-quote">
-                    <blockquote>“{s.quote}”</blockquote>
-                    <figcaption>Dr Dolly Prasad, on her exhibitions</figcaption>
-                  </figure>
-                )}
-                {s.works && s.works.length > 0 && (
-                  <p className="ex-works">
-                    <span>On the walls</span>
-                    {s.works.map((id) => <Link key={id} href={workPath(id)}>{BY_ID.get(id)?.title}</Link>)}
-                  </p>
-                )}
-                {s.note && <p className="meta">{s.note}</p>}
-              </div>
-              <ShowMedia photos={photos} label={`Photographs: ${s.name ?? s.title}`} />
-            </div>
+          <section id={s.id} className="ex-ch" aria-labelledby={`${s.id}-h`}>
+            <ShowMedia photos={photos} label={`Photographs: ${s.name ?? s.title}`}
+                       walls={s.works?.length ? s.works.map((id, j) => (
+                         <Fragment key={id}>{j > 0 && ", "}<Link href={workPath(id)}>{BY_ID.get(id)?.title}</Link></Fragment>
+                       )) : undefined}
+                       side={<>
+                         <header className="ex-ch-head">
+                           <span className="ex-ch-year">{s.year}</span>
+                           <h2 id={`${s.id}-h`}>{s.name ?? s.title}</h2>
+                           <p className="ex-ch-where">{s.where ?? `${s.venue}, ${s.city} · ${s.when}`}</p>
+                         </header>
+                         {(s.quote || s.note) && (
+                           <div className="ex-ch-txt">
+                             {s.quote && (
+                               <figure className="ex-quote">
+                                 <blockquote>“{s.quote}”</blockquote>
+                                 <figcaption>Dr Dolly Prasad, on her exhibitions</figcaption>
+                               </figure>
+                             )}
+                             {s.note && <p className="meta">{s.note}</p>}
+                           </div>
+                         )}
+                       </>} />
           </section>
-          {/* In the press is the page's third section: right after India Habitat Centre, the show the interviews are from (QA P1-1) */}
           {k === 0 && (
             <section id="press" className="ex-press band-indigo" aria-labelledby="press-h">
-        <span id="on-screen" aria-hidden="true" />
-        <div className="sec-head">
-          <div>
-            <h2 id="press-h">In the press</h2>
-          </div>
-        </div>
-        <Press items={PRESS_ITEMS} />
-      </section>
+              <span id="on-screen" aria-hidden="true" />
+              <div className="sec-head">
+                <div>
+                  <h2 id="press-h">In the press</h2>
+                </div>
+              </div>
+              <PressRow items={PRESS_ALL} />
+            </section>
           )}
           </Fragment>
         );
@@ -100,7 +105,7 @@ export default function Exhibitions() {
       <section id="record" className="ex-record">
         <div className="sec-head">
           <div>
-            <p className="eyebrow">The record</p>
+            <p className="eyebrow">List of exhibitions</p>
             <h2>{RECORD_LINE}</h2>
           </div>
         </div>

@@ -9,14 +9,11 @@ import { paintingProperties, track } from "@/lib/analytics";
 const Zoom = dynamic(() => import("./Zoom"), { ssr: false });
 
 const nameOf = (w: Work) => `${w.title}, ${w.medium.toLowerCase()}, by Dr Dolly Prasad`;
-/** close views of the painting itself: the same image, framed tight (never altered) */
-const DETAILS = [["32% 28%", "Detail, upper left"], ["72% 40%", "Detail, right"], ["48% 82%", "Detail, lower centre"]] as const;
-
-type View = { k: "full" } | { k: "detail"; i: number } | { k: "room"; id: string };
+type View = { k: "full" } | { k: "room"; id: string };
 
 /**
- * CR-007: the painting first, as large as the screen allows; under it a swipeable
- * strip of the other views (close details, rooms); and a quiet "See it in a room"
+ * CR-007: the painting first, as large as the screen allows; under it two views
+ * only (R6, Shubham 20 Oct: the painting and the room); and a quiet "See it in a room"
  * switch that puts the painting on a wall, with its stated size as the caption.
  */
 export default function PaintingStage({ w, src, dims, small, sub, children }: {
@@ -41,14 +38,12 @@ export default function PaintingStage({ w, src, dims, small, sub, children }: {
   };
   const stated = w.inches ? w.inches * 2.54 : 0;
   const toScale = !!rv && !!size && (rv.trueSize || (!!stated && "cm" in rv.room && Math.abs((rv.room as { cm: number }).cm - stated) < 1.5));
-  const same = (v: View) => v.k === view.k && (v.k === "detail" ? (view as { i: number }).i === v.i : v.k === "room" ? (view as { id: string }).id === v.id : true);
+  const same = (v: View) => v.k === view.k && (v.k === "room" ? (view as { id: string }).id === v.id : true);
 
   const items: { v: View; label: string; thumb: React.ReactNode }[] = [
     { v: { k: "full" }, label: "The painting", thumb: <img src={src} alt="" loading="lazy" /> },
-    // order (Shubham, 20 Oct): the painting, then the room, then the close views
+    // R6 (Shubham, 20 Oct): just the two, the painting and the room; no close-up crops
     ...rooms.slice(0, 1).map((r) => ({ v: { k: "room", id: r.room.id } as View, label: r.room.label, thumb: <img src={r.room.thumb} alt="" loading="lazy" /> })),
-    ...DETAILS.map(([pos, label], i) => ({ v: { k: "detail", i } as View, label, thumb: <span className="pp-crop" style={{ backgroundImage: `url(${src})`, backgroundPosition: pos }} /> })),
-    ...rooms.slice(1).map((r) => ({ v: { k: "room", id: r.room.id } as View, label: r.room.label, thumb: <img src={r.room.thumb} alt="" loading="lazy" /> })),
   ];
 
   return (
@@ -62,12 +57,6 @@ export default function PaintingStage({ w, src, dims, small, sub, children }: {
                  onLoad={() => setReady(true)}
                  className={[small ? "is-small" : "", ready ? "" : "is-loading"].filter(Boolean).join(" ") || undefined}
                  style={dims ? { ["--ar" as string]: `${dims.w} / ${dims.h}` } : undefined} />
-          </button>
-        )}
-        {view.k === "detail" && (
-          <button type="button" className="pp-art pp-detail" onClick={open} aria-label={`Zoom ${w.title}`}>
-            <span className="pp-detail-in" role="img" aria-label={`${DETAILS[view.i][1]} of ${name}`}
-                  style={{ backgroundImage: `url(${src})`, backgroundPosition: DETAILS[view.i][0] }} />
           </button>
         )}
         {rv && (
@@ -106,13 +95,13 @@ export default function PaintingStage({ w, src, dims, small, sub, children }: {
         )}
       </div>
 
-      <div className="pp-strip" ref={strip} role="group" aria-label="Other views">
+      {items.length > 1 && <div className="pp-strip" ref={strip} role="group" aria-label="Other views">
         {items.map((it) => (
-          <button key={it.label + (it.v.k === "detail" ? it.v.i : "")} type="button" className="pp-chip" aria-pressed={same(it.v)} aria-label={it.label} title={it.label} onClick={() => setView(it.v)}>
+          <button key={it.label} type="button" className="pp-chip" aria-pressed={same(it.v)} aria-label={it.label} title={it.label} onClick={() => setView(it.v)}>
             {it.thumb}
           </button>
         ))}
-      </div>
+      </div>}
       {children}
 
       {zoom && <Zoom id={w.id} src={src} alt={name} title={w.title} sub={sub} onClose={() => setZoom(false)} />}

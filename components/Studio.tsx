@@ -11,6 +11,7 @@ import Lightbox, { type LightboxHandle } from "./Lightbox";
 import Cursor, { roomCursorLabel } from "./Cursor";
 import WallLabels from "./WallLabels";
 import Stops from "./Stops";
+import Until from "./Until";
 import QuickIndex from "./QuickIndex";
 import { WORKS_FILTER, type WorksFilter } from "./Works";
 import * as music from "@/lib/music";
@@ -802,7 +803,7 @@ export default function Studio({ dims }: { dims: Dims }) {
                 {c.verse.split("\n").map((ln, k) => <span className="poem-line" key={k} data-line={ln}>{ln}</span>)}
               </p>
             )}
-            {c.body && <p className="lede">{c.body}</p>}
+            {c.body && (c.bodyUntil ? <Until until={c.bodyUntil}><p className="lede">{c.body}</p></Until> : <p className="lede">{c.body}</p>)}
             {c.quote && <blockquote className="quote">“{c.quote}”</blockquote>}
           </div>
         ) : null)}
@@ -830,7 +831,7 @@ export default function Studio({ dims }: { dims: Dims }) {
                 <div className="chapter-text">
                   <h2 className="lab">{c.eyebrow}</h2>
                   {c.verse && <p className="poem">{c.verse}</p>}
-                  {c.body && <p className="lede">{c.body}</p>}
+                  {c.body && (c.bodyUntil ? <Until until={c.bodyUntil}><p className="lede">{c.body}</p></Until> : <p className="lede">{c.body}</p>)}
                   {c.quote && <blockquote className="quote">“{c.quote}”</blockquote>}
                 </div>
               )}

@@ -19,10 +19,10 @@
 @layer final {
   /* ---- 3.3 colour tokens: one ink, one muted, one red; rust retired ---- */
   :root{
-    --ink:#141210 !important; --black:#141210 !important;
-    --muted:#5F564D !important; --rust:#5F564D !important;
-    --on-indigo:#FFFFFF !important; --muted-on-indigo:#D3D8E8 !important;
-    --red:#D4202A !important; --red-on-indigo:#EF4B53 !important; --red-tint:#FBEAEA !important;
+    --ink:#1A1614 !important; --black:#1A1614 !important;
+    --muted:#6A615B !important; --rust:#6A615B !important;
+    --on-indigo:#F3EEE7 !important; --muted-on-indigo:#AFA49A !important;
+    --red:#D4202A !important; --red-on-indigo:#E5343B !important; --red-tint:#FBEDEC !important;
     --rule:#CFC8BE !important;
   }
 
@@ -38,7 +38,7 @@
   /* H3 role: exhibition chapter, Collections band, series chapter title */
   .ex-ch-head h2,.sband h2,.chap-h h2{font-family:var(--serif) !important;font-weight:500 !important;font-size:36px !important;line-height:1.12 !important}
   /* feature quote (one per page) */
-  .hw-q blockquote,.story-quote .quote{font:500 40px/1.25 var(--serif) !important;font-style:normal !important}
+  .story-quote .quote{font:500 40px/1.25 var(--serif) !important;font-style:normal !important}
   /* inline quote: her words inside a block */
   .pp-story,.pp-text p.pp-story,.ex-quote blockquote,.tabpanel .quote,.series-sum-q,.ab-quote,.chap-big.hers,.qcard blockquote{font:500 24px/1.4 var(--serif) !important;font-style:normal !important;color:var(--ink) !important}
   /* chapter big line (ours) */
@@ -47,7 +47,7 @@
   /* hero line in the collage card */
   .wh-line{font:500 19px/1.35 var(--serif) !important;letter-spacing:0 !important}
   /* card titles, every card */
-  .card-t,.card .card-t,.series-tiles .m-card b,.five-t,.press figcaption b{font:500 20px/1.2 var(--serif) !important;letter-spacing:0 !important}
+  .card-t,.card .card-t,.series-row .m-card b,.five-t,.press figcaption b{font:500 20px/1.2 var(--serif) !important;letter-spacing:0 !important}
   /* CTA band title */
   .next-series .ask b{font:500 28px/1.2 var(--serif) !important}
   /* header brand name */
@@ -58,13 +58,13 @@
   p.meta.ig-sub{font:400 16px/1.5 var(--sans) !important}
   /* small: one size, sentence case, muted */
   .eyebrow,.card .meta,.card .meta-parts,.card .meta-parts .mp,.card .status,.pp-status,.pp-status .status,.pp-text .status,.pp-facts,.pp-text p.pp-facts,
-  .sm-cap,.ex-ch-where,.ex-kind,.ex-works span,.fsel span,.five-m,.series-tiles .meta,.chap-works figcaption,.chap-sig,
+  .sm-cap,.ex-ch-where,.ex-kind,.ex-works span,.fsel span,.five-m,.series-row .meta,.chap-works figcaption,.chap-sig,
   .press figcaption span,.press figcaption em,.press-videos figcaption em,.pp-cap,.pp-story span,.ftr p.meta,.ftr .meta,
   .ftr-links a:not(.btn),.ftr-ig,.prevnext a span,.gal-cap em,.zoom-cap small,.ss-cap small,.tile.flip .back em,.flip-back em,.flip-back u,
   .xcard em,.ncard em,.ccard em,.scard em,.qcard small,.nowstrip .live,.now-line .live,.wh .namecard .eyebrow,.ex-index span,.five-n,.sband .s-n,.s-n,label{
     font-family:var(--sans) !important;font-size:14px !important;font-weight:400 !important;letter-spacing:0 !important;text-transform:none !important;font-style:normal !important}
   .card .meta,.card .meta-parts,.card .status{line-height:1.4 !important}
-  .eyebrow,.card .meta,.card .meta-parts,.pp-facts,.pp-text p.pp-facts,.sm-cap,.ex-ch-where,.ex-kind,.ex-works span,.five-m,.series-tiles .meta,
+  .eyebrow,.card .meta,.card .meta-parts,.pp-facts,.pp-text p.pp-facts,.sm-cap,.ex-ch-where,.ex-kind,.ex-works span,.five-m,.series-row .meta,
   .chap-works figcaption,.chap-sig,.pp-cap,.ftr p.meta,.ex-index span,.five-n,.sband .s-n,.s-n,.tile.flip .back em,.flip-back em,.qcard small,.prevnext a span{color:var(--muted) !important}
   /* exhibition photo captions are one line on a laptop (Content's captions are <= 60 characters), two on a phone (4.5) */
   .sm-cap{line-height:1.45 !important;height:1.45em !important;-webkit-line-clamp:1 !important;line-clamp:1 !important}
@@ -88,8 +88,8 @@
     font-family:var(--sans) !important;font-size:14px !important;font-weight:500 !important;letter-spacing:0 !important;text-transform:none !important;line-height:1 !important}
   .pp-toggle,.pp-zoom{border:1px solid var(--ink) !important;color:var(--ink) !important}
   /* DC review #2 P0-1: pressed/hover keeps its label: white on ink (the line above had made it ink on ink) */
-  .pp-toggle:hover,.pp-toggle[aria-pressed="true"],.pp-zoom:hover{background:var(--ink) !important;color:#FFFFFF !important}
-  .sband .s-txt .btn{min-height:44px !important;padding-inline:0 !important}
+  .pp-toggle:hover,.pp-toggle[aria-pressed="true"],.pp-zoom:hover{background:var(--ink) !important;color:#F5F4F0 !important}
+  .sband .s-txt .btn{min-height:44px !important}
   .ftr-links .btn{min-height:44px !important}
   /* 3.8 footer: links J 14/400 */
   .ftr-links a:not(.btn),.ftr-ig{font-weight:400 !important}
@@ -108,9 +108,9 @@
   .ab-p,.chap-small,.tband-card p,.pp-story.is-ours{text-wrap:pretty !important}
   /* her words verbatim, ours flagged: our description (no quote of hers) is plain body, not the inline-quote role */
   .pp-story.is-ours,.pp-text p.pp-story.is-ours{font:400 18px/1.6 var(--sans) !important;color:var(--ink) !important}
-  /* DC review #2 P1-1: small text on indigo uses muted-on-indigo (#5F564D was 2.28:1) */
+  /* DC review #2 P1-1: small text on indigo uses muted-on-indigo (#6A615B was 2.28:1) */
   .tone-dark .eyebrow,.band-indigo .eyebrow,.chap-dark .chap-sig,.chap-dark .eyebrow,.next-series .eyebrow,.ab-press .eyebrow{color:var(--muted-on-indigo) !important}
-  /* retired grey #6E645A gone: intro ledes in muted; About and story body on the one body role, in ink (review #2 P1) */
+  /* retired grey #6A615B gone: intro ledes in muted; About and story body on the one body role, in ink (review #2 P1) */
   .lede,.page-head .lede,.story-head .lede{color:var(--muted) !important}
   .ab-p{color:var(--ink) !important}
   .ab-band.tone-dark .ab-p,.band-indigo .ab-p{color:var(--on-indigo) !important}
@@ -119,11 +119,80 @@
   .chap-dark .chap-small{color:var(--on-indigo) !important}
   /* story chapters on indigo: quiet numeral, white heading, no retired peach/cream (review #2 P1) */
   .chap-dark .chap-h span,.band-indigo .chap-h span{color:var(--muted-on-indigo) !important}
-  .chap-dark .chap-h h2,.band-indigo .chap-h h2{color:#FFFFFF !important}
-  .chap-dark .chap-big.hers,.chap-dark .chap-big{color:#FFFFFF !important}
+  .chap-dark .chap-h h2,.band-indigo .chap-h h2{color:#F3EEE7 !important}
+  .chap-dark .chap-big.hers,.chap-dark .chap-big{color:#F3EEE7 !important}
   /* one red: the 'In a private collection' dot is muted grey, not a second red (review #2 P1) */
-  .st-sold i,.pp-text .st-sold i,.card .st-sold i{background:#5F564D !important}
+  .st-sold i,.pp-text .st-sold i,.card .st-sold i{background:#6A615B !important}
   .band-indigo .st-sold i,.chap-dark .st-sold i{background:var(--muted-on-indigo) !important}
+
+  /* ---- R4 B2: switcher, Previous/Next pair, painting back link (type and colour) ---- */
+  .csw-t,.csw-pn{font:500 14px/1.2 var(--sans) !important;color:var(--muted) !important;letter-spacing:0 !important;text-transform:none !important}
+  .csw-i:hover .csw-t,.csw-i:focus-visible .csw-t,.csw-pn:hover,.csw-pn:focus-visible,.csw-i[aria-current="page"] .csw-t{color:var(--ink) !important}
+  .pnx-n,.pnx-k{font:400 14px/1.4 var(--sans) !important;color:var(--muted) !important;letter-spacing:0 !important;text-transform:none !important}
+  .pnx-t{font:500 36px/1.1 var(--serif) !important;color:var(--ink) !important}
+  .pnx-next .pnx-k{color:var(--muted-on-indigo) !important}
+  .pnx-next .pnx-t,.pnx-prev:hover .pnx-t,.pnx-prev:hover .pnx-k{color:#F3EEE7 !important}
+  /* R4 P2-1 (Brand): the back link is the main way back to the story: J 15 ink, not a footnote */
+  .pp-text a.pp-back{font:400 15px/1.45 var(--sans) !important;color:var(--ink) !important;letter-spacing:0 !important}
+
+  /* ---- R4 B3-1: /series bands and Ask row (type and colour) ---- */
+  .sband .s-line{font:400 16px/1.5 var(--sans) !important}
+  .sband.band-white .s-line{color:var(--muted) !important}
+  .sband .s-txt .btn{color:inherit !important;background:transparent !important;border:1px solid currentColor !important;text-decoration:none !important}
+  .sband.band-white .s-txt .btn{color:var(--ink) !important}
+  .sband.band-white .s-txt .btn:hover{background:var(--ink) !important;color:#F5F4F0 !important}
+  .sband.band-indigo .s-txt .btn:hover{background:#F3EEE7 !important;color:var(--indigo) !important}
+  .btn-solid.btn-on-indigo{background:#F3EEE7 !important;color:var(--indigo) !important;border-color:#F3EEE7 !important;background-image:none !important}
+  .btn-solid.btn-on-indigo:hover{background:var(--muted-on-indigo) !important;border-color:var(--muted-on-indigo) !important}
+
+  /* ---- R4 B3-2 to B3-5: story opening, chapters, room thumbnail, ask line (type and colour) ---- */
+  .story-open h1{font:500 88px/1 var(--serif) !important;letter-spacing:-.02em !important;color:var(--ink) !important}
+  .so-epi,.so-epi p{font:500 24px/1.4 var(--serif) !important;font-style:normal !important;color:var(--ink) !important}
+  .so-epi p.so-sig,.so-photo figcaption,.so-art figcaption,.chv-n,.chv-facts,.room-th span{font:400 14px/1.45 var(--sans) !important;letter-spacing:0 !important;text-transform:none !important;color:var(--muted) !important}
+  .room-th span{font-weight:500 !important;color:var(--ink) !important}
+  .so-p{font:400 18px/1.6 var(--sans) !important;color:var(--ink) !important;text-wrap:pretty !important}
+  .chv-t{font:500 36px/1.12 var(--serif) !important;color:var(--ink) !important}
+  .chv-row figcaption{font:400 13px/1.4 var(--sans) !important;color:var(--muted) !important;letter-spacing:0 !important}
+  .se-ask{font:400 16px/1.5 var(--sans) !important;color:var(--ink) !important}
+  /* R4 fix 3: Bandh caption blocks (H3 C 24, line, facts J 14) and the GATD room caption */
+  .so-pt{font:500 24px/1.2 var(--serif) !important;color:var(--ink) !important}
+  .so-pcap .chap-big:not(.hers){font:500 20px/1.35 var(--serif) !important;color:var(--ink) !important}
+  .so-pcap .chap-small{font:400 16px/1.5 var(--sans) !important;color:var(--ink) !important}
+  .chv-room figcaption{font:400 14px/1.45 var(--sans) !important;color:var(--muted) !important;letter-spacing:0 !important}
+  .se-ask a,.se-ask b{color:var(--ink) !important;font-weight:500 !important}
+  @media (min-width:761px) and (max-width:1099px){ .story-open h1{font-size:64px !important} }
+  @media (max-width:760px){
+    .story-open h1{font-size:44px !important}
+    .so-epi,.so-epi p{font-size:20px !important}
+    .so-p{font-size:16px !important;line-height:1.55 !important}
+    .chv-t{font-size:28px !important}
+  }
+
+  /* ---- R5 Kajal + Khadi (PALETTE-SPEC §1, §2): focus rings and frames on the dark ground ---- */
+  :focus-visible{outline-color:#1A1614 !important}
+  .band-indigo :focus-visible,.ab-band.tone-dark :focus-visible,.chap-dark :focus-visible{outline-color:#F3EEE7 !important}
+  /* on Kajal: frame #2E2622 (lighter than the ground), lit top/left edge #4A3F38, thin bone mat #EDE6DA; widths kept */
+  .band-indigo :is(.framed,.tile .framed,.viewer .paper img,img.framed,.slides-stage img,.clip img,.ab-portrait img,.ig-track img,.now-box .imgs img,.wpa-art img,.freel-stage img,.pp-art img,.room-art img,.five-stage img),.ab-band.tone-dark :is(.framed,.tile .framed,.viewer .paper img,img.framed,.slides-stage img,.clip img,.ab-portrait img,.ig-track img,.now-box .imgs img,.wpa-art img,.freel-stage img,.pp-art img,.room-art img,.five-stage img),.chap-dark :is(.framed,.tile .framed,.viewer .paper img,img.framed,.slides-stage img,.clip img,.ab-portrait img,.ig-track img,.now-box .imgs img,.wpa-art img,.freel-stage img,.pp-art img,.room-art img,.five-stage img){border-color:#2E2622 !important;background:#EDE6DA !important;padding:4px !important;box-shadow:-1px -1px 0 0 #4A3F38 !important}
+  @media (max-width:640px){ .band-indigo :is(.framed,.tile .framed,.viewer .paper img,img.framed,.slides-stage img,.clip img,.ab-portrait img,.ig-track img,.now-box .imgs img,.wpa-art img,.freel-stage img,.pp-art img,.room-art img,.five-stage img),.ab-band.tone-dark :is(.framed,.tile .framed,.viewer .paper img,img.framed,.slides-stage img,.clip img,.ab-portrait img,.ig-track img,.now-box .imgs img,.wpa-art img,.freel-stage img,.pp-art img,.room-art img,.five-stage img),.chap-dark :is(.framed,.tile .framed,.viewer .paper img,img.framed,.slides-stage img,.clip img,.ab-portrait img,.ig-track img,.now-box .imgs img,.wpa-art img,.freel-stage img,.pp-art img,.room-art img,.five-stage img){padding:3px !important} }
+
+  /* R5 gate P1: light note cards lift off Khadi as paper; P2-2: no Khadi hairline touching the dark press band */
+  .note,.next-series .ask{background:#FAF9F6 !important;box-shadow:inset 0 0 0 1px var(--hair) !important}
+  .ex-press.band-indigo,.ex-press + .ex-record{border-top-color:transparent !important}
+
+  /* ---- R6 (4-R6-SPEC §2d): Exhibitions rows. Year on its own line as Small; the quote at the 20 px role; the caption whole ---- */
+  .ex-ch .ex-ch-year{font:400 14px/1.4 var(--sans) !important;color:var(--muted) !important}
+  .ex-ch .ex-quote blockquote{font-size:20px !important}
+  .ex-ch .sm-cap{height:auto !important;-webkit-line-clamp:unset !important;line-clamp:none !important}
+  .ex-press + .ex-ch{border-top-color:transparent !important}
+  @media (min-width:641px) and (max-width:1099px){ .ex-ch-head h2{font-size:32px !important} }
+  /* R6 §4b Home artist band: section H2, body lead, label, card title, small; no red */
+  .hw-intro h2{font-family:var(--serif) !important;font-weight:500 !important;font-size:44px !important;line-height:1.12 !important;color:var(--ink) !important}
+  .hw-lede{font:400 18px/1.6 var(--sans) !important;color:var(--ink) !important}
+  .hw-press h3{font:500 14px/1.4 var(--sans) !important;color:var(--muted) !important;letter-spacing:0 !important;text-transform:none !important}
+  .hw-pi b{font:500 17px/1.2 var(--serif) !important;color:var(--ink) !important}
+  .hw-pi-t .hw-pi-s{font:400 14px/1.4 var(--sans) !important;color:var(--muted) !important}
+  @media (max-width:640px){ .hw-intro h2{font-size:28px !important} .hw-lede{font-size:16px !important;line-height:1.55 !important} .hw-pi b{font-size:16px !important} .hw-pi-t .hw-pi-s{font-size:13px !important} }
+  @media (max-width:640px){ .ex-ch .ex-ch-year{font-size:13px !important} .ex-ch .sm-cap{height:auto !important;-webkit-line-clamp:unset !important;line-clamp:none !important} }
 
   @media (max-width:640px){
     .story-head h1{font-size:44px !important}
@@ -132,16 +201,16 @@
     .pp-title{font-size:30px !important}
     .sec-head h2,#more-from h2,#more-from .sec-head>div>h2,.ab-txt h2,.ab-statement h2,.five-head h2,.ig-band h2,.txt>h2{font-size:28px !important}
     .ex-ch-head h2,.sband h2,.chap-h h2{font-size:26px !important}
-    .hw-q blockquote,.story-quote .quote{font-size:26px !important}
+    .story-quote .quote{font-size:26px !important}
     .pp-story,.pp-text p.pp-story,.ex-quote blockquote,.tabpanel .quote,.series-sum-q,.ab-quote,.chap-big.hers,.qcard blockquote{font-size:20px !important}
     .chap-big:not(.hers){font-size:24px !important}
     .wh-line{font-size:17px !important}
-    .card-t,.card .card-t,.series-tiles .m-card b,.five-t,.press figcaption b{font-size:17px !important}
+    .card-t,.card .card-t,.series-row .m-card b,.five-t,.press figcaption b{font-size:17px !important}
     .next-series .ask b{font-size:24px !important}
     .brand-t b,.is-scrolled .brand-t b{font-size:20px !important}
     .ab-p,.lede,.sec-line,.ex-sum,.page-head .lede,.tband-card p{font-size:16px !important;line-height:1.55 !important}
     .eyebrow,.card .meta,.card .meta-parts,.card .meta-parts .mp,.card .status,.pp-status,.pp-status .status,.pp-text .status,.pp-facts,.pp-text p.pp-facts,
-    .sm-cap,.ex-ch-where,.ex-kind,.ex-works span,.fsel span,.five-m,.series-tiles .meta,.chap-works figcaption,.chap-sig,
+    .sm-cap,.ex-ch-where,.ex-kind,.ex-works span,.fsel span,.five-m,.series-row .meta,.chap-works figcaption,.chap-sig,
     .press figcaption span,.press figcaption em,.press-videos figcaption em,.pp-cap,.pp-story span,.ftr p.meta,.ftr .meta,
     .prevnext a span,.gal-cap em,.zoom-cap small,.ss-cap small,.tile.flip .back em,.flip-back em,.flip-back u,
     .xcard em,.ncard em,.ccard em,.scard em,.qcard small,.nowstrip .live,.now-line .live,.wh .namecard .eyebrow,.ex-index span,.five-n,.sband .s-n,.s-n,label{font-size:13px !important}
@@ -152,5 +221,8 @@
     .tl-year{font-size:16px !important}
     .sm-cap{height:calc(2em * 1.45) !important;-webkit-line-clamp:2 !important;line-clamp:2 !important}
     .fsel select,input,textarea,select{font-size:16px !important}
+  }
+  @media (max-width:760px){
+    .pnx-t{font-size:28px !important}
   }
 }

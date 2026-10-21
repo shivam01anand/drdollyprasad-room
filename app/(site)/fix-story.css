@@ -42,9 +42,261 @@
   .band-bottom{margin-bottom:0}
 }
 
-/* 7. home "Key collections" row: starts on the page margin; both ends fade out instead of cutting a caption mid-word */
+/* 7. (R6) the home "Key collections" marquee is now a still row: .series-row in fix-tech.css */
+
+/* ---- R4 B2-2: collections switcher (layout; type and colour in tokens.css) ---- */
+.csw{position:sticky;top:calc(var(--hdr-bar) + 1px);z-index:19;height:44px;background:rgba(245,244,240,.96);border-bottom:1px solid var(--rule)}
+.csw-in{display:flex;gap:28px;justify-content:center;align-items:center;max-width:1360px;height:100%;margin-inline:auto;padding-inline:var(--gut);box-sizing:border-box;overflow-x:auto;overflow-y:hidden;scrollbar-width:none}
+.csw-in::-webkit-scrollbar{display:none}
+.csw-nav{flex:none}
+.csw-l{display:flex;gap:28px;align-items:center;list-style:none;margin:0;padding:0}
+.csw-l li{margin:0;padding:0}
+.csw-i,.csw-pn{display:inline-flex;align-items:center;gap:8px;min-height:44px;text-decoration:none;white-space:nowrap}
+.csw-th{width:28px;height:28px;object-fit:cover;border-radius:2px;display:block;flex:none}
+.csw-i[aria-current="page"] .csw-t{text-decoration:underline;text-decoration-thickness:2px;text-underline-offset:6px}
+.csw-pn{flex:none}
+@media (min-width:761px) and (max-width:1099px){ .csw-in,.csw-l{gap:16px} .csw-in{justify-content:flex-start} }
+.csw-in>.csw-pn:first-child{margin-right:auto}
+.csw-in>.csw-pn:last-child{margin-left:auto}
+@media (max-width:760px){
+  .csw{position:static;height:auto}
+  .csw-in{justify-content:flex-start;overflow-x:auto;scroll-snap-type:x proximity;scrollbar-width:none;gap:20px;
+    -webkit-mask-image:linear-gradient(90deg,#000 calc(100% - 24px),transparent);mask-image:linear-gradient(90deg,#000 calc(100% - 24px),transparent)}
+  .csw-in::-webkit-scrollbar{display:none}
+  .csw-l{gap:20px}
+  .csw-i,.csw-pn{scroll-snap-align:start}
+  .csw-in>.csw-pn:first-child{margin-right:0}
+  .csw-in>.csw-pn:last-child{margin-left:0;padding-right:24px}
+}
+
+/* ---- R4 B2-3: Previous / Next pair (painting pager and story end) ---- */
+.pnx{margin:0;padding-block:28px}
+.pnx-n{text-align:center;margin:0 0 14px}
+.pnx-g{display:grid;grid-template-columns:1fr 1fr;gap:16px}
+.pnx-c{display:flex;flex-direction:column;justify-content:center;gap:8px;min-height:140px;padding:28px 32px;box-sizing:border-box;text-decoration:none}
+.pnx-prev{border:1px solid var(--ink);background:#F5F4F0}
+.pnx-next{background:#211B18;border:1px solid #211B18;text-align:right;align-items:flex-end}
+.pnx-prev:hover{background:var(--ink)}
+.pnx-next:hover{background:#2E2622}
+@media (max-width:760px){
+  .pnx-g{grid-template-columns:1fr;gap:12px}
+  .pnx-next{order:-1}
+  .pnx-c{min-height:112px;padding:22px 20px}
+}
+
+/* ---- R4 B2-4: painting page back link to its collection ---- */
+.pp-text a.pp-back{display:inline-flex;align-items:center;min-height:44px;margin:-10px 0 -2px;text-decoration:none;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;max-width:100%}
+.pp-text a.pp-back:hover{text-decoration:underline;text-underline-offset:4px}
+
+/* ==== R4 B3-1: /series = collage hero (450 at 1440x900) -> switcher -> five bands -> one Ask row ==== */
+/* R4 fix 4 (Brand P1-4): "heroes taller": 540 at 1440x900 (was 450, the shortest hero on the site); capped at 553 (Brand 560) so the first band stays <= 690 on 1080-tall screens (S2); phones unchanged */
+@media (min-width:641px){ .wh.wh-dir .collage{height:clamp(500px,60svh,553px) !important} }
+.sband.band-white,.sband.band-indigo{padding-block:40px}
+.sband .srow.wrap{max-width:1360px;box-sizing:border-box}
 @media (min-width:761px){
-  .marq.series-tiles{padding-left:var(--gut);
-    -webkit-mask-image:linear-gradient(90deg,transparent 0,#000 calc(var(--gut) * .8),#000 calc(100% - var(--gut) * .8),transparent 100%);
-    mask-image:linear-gradient(90deg,transparent 0,#000 calc(var(--gut) * .8),#000 calc(100% - var(--gut) * .8),transparent 100%)}
+  .sband .srow{display:grid !important;grid-template-columns:320px minmax(0,1fr);column-gap:40px !important;row-gap:0}
+  .sband .srow .s-txt{max-width:none}
+}
+/* R4 fix 1 (Brand P1-1, COO 1): the line is shown whole, never cut with an ellipsis; a balanced wrap, up to 3 lines (D) */
+.sband .s-txt .s-line{margin:2px 0 0;display:block;overflow:visible;white-space:normal;-webkit-line-clamp:unset;line-clamp:none;text-overflow:clip;text-wrap:balance}
+.sband .s-txt .btn{align-self:flex-start;margin-top:10px;white-space:nowrap}
+.sband .s-txt .btn::after,.sband .s-txt .btn::before{content:none !important}
+/* one picture height per row; the painting keeps its own shape (width from its ratio), never cropped */
+.sband .marq .card{flex:none !important;width:auto !important}
+.sband .card .mat{container-type:normal !important}
+.sband .card .mat{width:auto !important;height:auto !important;aspect-ratio:auto !important;padding:0 !important;flex:none !important}
+.sband .card .mat img{height:240px !important;width:auto !important;max-width:none !important;max-height:none !important;aspect-ratio:auto !important;object-fit:contain !important}
+.sband .marq{padding-block:16px 20px}
+.sband .marq-set>.card{gap:4px}
+.sband .marq-set>.card>.card-t{min-height:0 !important;white-space:nowrap}
+@media (min-width:761px) and (max-width:1099px){ .sband .card .mat img{height:210px !important} }
+@media (max-width:760px){
+  .sband.band-white,.sband.band-indigo{padding-block:28px}
+  .sband .srow .s-txt{grid-template-columns:minmax(0,1fr) auto !important;grid-template-areas:"t b" "e e" "l l" !important;row-gap:4px !important}
+  .sband .s-txt .btn{min-height:44px !important;margin:0}
+  .sband .card .mat img{height:170px !important}
+  .sband .marq{padding-block:12px 4px}
+}
+/* the one Ask row: title and line left, one button right (about 160 px at D) */
+.ibnd:has(.ibnd-one){margin-top:0}
+.ibnd:has(.ibnd-one) .sec{max-width:1360px;box-sizing:border-box;display:flex;align-items:center;justify-content:space-between;flex-wrap:wrap;gap:16px 40px;padding-block:44px}
+.ibnd:has(.ibnd-one) .sec-head{margin:0;display:block}
+.ibnd-one{flex:none}
+@media (max-width:760px){ .ibnd:has(.ibnd-one) .sec{padding-block:32px} .ibnd-one,.ibnd-one .btn{width:100%} }
+
+/* ==== R4 B3-2: story opening, two columns (words left, cover right); one column on phones (fix-phone.css) ==== */
+.story-open.wrap,.chv .chv-in.wrap,.story-end.wrap{max-width:1360px;box-sizing:border-box}
+/* the words sit at the top of the row (not centred): when the web fonts swap in, the text reflows from its own
+   top instead of re-centring the whole block (G9 CLS 0.065 -> see BUILD-R4-B3) */
+.story-open{display:grid;grid-template-columns:minmax(0,6fr) minmax(0,6fr);gap:56px;align-items:start;padding-block:32px 40px}
+.so-txt>*{margin:0}
+.so-txt .eyebrow{margin-bottom:10px}
+.so-txt h1{margin-bottom:12px}
+.so-txt .lede{max-width:none;margin-inline:0;text-align:left}
+.so-epi{margin:20px 0 0}
+.so-epi.hers{border-left:1px solid var(--ink);padding-left:20px}
+.so-epi.hers p{margin:0}
+.so-epi .so-sig{margin-top:10px}
+.so-intro{margin-top:16px}
+.so-ps{display:flex;flex-direction:column;gap:14px}
+.so-ps p{margin:0}
+.so-intro.has-photo{display:grid;grid-template-columns:minmax(0,1fr) 200px;gap:24px;align-items:start}
+.so-photo{margin:0;width:200px}
+.so-photo img{display:block;width:100%;height:auto}
+.so-photo figcaption{margin-top:8px;overflow-wrap:anywhere}
+.so-art{min-width:0}
+.so-art figure{margin:0}
+.so-art a{display:block}
+.so-art figure img.framed{display:block;margin-inline:auto;width:auto;height:auto;max-width:100%;max-height:min(72svh,600px)}
+.so-art figcaption{text-align:center;margin-top:14px;white-space:normal;text-wrap:balance}
+.so-grid{display:grid;grid-template-columns:repeat(2,max-content);gap:16px;justify-content:center}
+.so-grid img.framed{display:block;width:auto;height:clamp(180px,17vw,260px);max-width:none}
+@media (min-width:761px) and (max-width:1099px){ .story-open{gap:40px} .so-intro.has-photo{grid-template-columns:minmax(0,1fr)} }
+
+/* ==== R4 B3-3: chapters on white, separated by one rule; the painting leads ==== */
+.chap.chv{padding-block:0 !important;background:transparent}
+.chv .chv-in{border-top:1px solid var(--rule)}
+.chv-txt>*{margin:0}
+.chv-n{display:block;margin-bottom:8px}
+.chv-t{margin:0 0 16px}
+.chv-words{display:flex;flex-direction:column;gap:12px}
+.chv .chap-big,.chv .chap-small,.chv .chap-sig{text-align:left;margin:0;max-width:none}
+.chv .chap-sig{margin-top:-4px}
+.chv-facts{margin-top:16px !important}
+.chv-txt>.link{display:flex;width:max-content;align-items:center;min-height:44px;margin-top:4px}
+/* A: one painting */
+.chv.single .chv-in{display:grid;grid-template-columns:minmax(0,7fr) minmax(0,5fr);gap:56px;align-items:center;padding-block:48px}
+.chv.single.flip .chv-in{grid-template-columns:minmax(0,5fr) minmax(0,7fr)}
+.chv.single.flip .chv-art{order:2}
+.chv-art{min-width:0}
+.chv-art a{display:block}
+.chv-art img.framed{display:block;margin-inline:auto;width:auto;height:auto;max-width:100%;max-height:clamp(380px,38vw,540px)}
+.chv.single .chv-txt{max-width:460px}
+.chv.single.flip .chv-txt{justify-self:end}
+/* B: several paintings, text above one row of one height that fits the content width (never wraps or scrolls) */
+.chv.multi .chv-in{padding-block:48px}
+.chv-rowbox{container-type:inline-size;min-width:0}
+@media (min-width:761px){
+  .chv.multi.beside .chv-in{display:grid;grid-template-columns:minmax(0,5fr) minmax(0,7fr);gap:56px;align-items:center}
+  .chv.multi.beside .chv-txt{margin-bottom:0}
+  .chv.multi.beside .chv-row{justify-content:center}
+}
+.chv.multi .chv-txt{max-width:640px;margin-bottom:28px}
+.chv-row{--F:24px;--rh:min(clamp(260px,24vw,340px),calc((100cqw - var(--n) * var(--F) - (var(--n) - 1) * 24px - var(--rx, 0px)) / var(--rs) + var(--F)));
+  display:flex;gap:24px;align-items:flex-start}
+.chv-row figure{margin:0;flex:none;display:flex;flex-direction:column}
+.chv-row a{display:block}
+.chv-row img.framed{display:block;height:var(--rh);width:auto;max-width:none;max-height:none}
+.chv-row figcaption{width:0;min-width:100%;margin-top:8px;text-wrap:balance}
+/* R4 fix 2 (Brand P1-2, COO 2, consultant P1-2/P1-3): a row of 3+ paintings under its text fills the content width at one
+   shared height (the cqw fit term), capped at 440 px (D) / 360 px (T), never cropped or wrapped; whatever is still short
+   is centred. Captions sit centred under each painting, as everywhere else on the site. */
+.chv-row figcaption{text-align:center}
+@media (min-width:1100px){ .chv.multi:not(.beside) .chv-row{--rh:min(440px,calc((100cqw - var(--n) * var(--F) - (var(--n) - 1) * 24px - var(--rx, 0px)) / var(--rs) + var(--F)))} }
+@media (min-width:761px) and (max-width:1099px){ .chv.multi:not(.beside) .chv-row{--rh:min(360px,calc((100cqw - var(--n) * var(--F) - (var(--n) - 1) * 24px - var(--rx, 0px)) / var(--rs) + var(--F)))} }
+@media (min-width:761px){ .chv.multi:not(.beside) .chv-row{justify-content:center} }
+/* R4 polish 2 (DC P2-1): at >=1440 a two-painting row beside its text grows to 400 px (from 340), so "Light and
+   scripture" is not a sparse band on large screens; the cqw fit term still keeps the row inside its column */
+@media (min-width:1440px){ .chv.multi.beside .chv-row{--rh:min(400px,calc((100cqw - var(--n) * var(--F) - (var(--n) - 1) * 24px - var(--rx, 0px)) / var(--rs) + var(--F)))} }
+@media (min-width:761px) and (max-width:1099px){
+  .chv.single .chv-in{gap:40px}
+  .chv-art img.framed{max-height:clamp(320px,40vw,440px)}
+}
+/* room view, a small thumbnail (both variants); a 44 px tap target */
+.room-th{display:flex;width:max-content;align-items:center;gap:12px;margin-top:12px;padding:0;background:none;border:0;cursor:pointer;min-height:44px;text-align:left}
+.room-th img{display:block;width:160px;height:auto;border:1px solid var(--rule)}
+.room-th:hover span,.room-th:focus-visible span{text-decoration:underline;text-underline-offset:4px}
+
+/* ==== R4 B3-4: "Also in this collection", only the paintings not shown above; one height, last row centred ==== */
+.also-row{display:flex;flex-wrap:wrap;justify-content:center;gap:32px}
+.also-row .card{flex:none !important;width:auto !important;max-width:none !important;gap:4px}
+.also-row .card .mat{container-type:normal !important}
+.also-row .card .mat{width:auto !important;height:auto !important;aspect-ratio:auto !important;padding:0 !important;flex:none !important}
+.also-row .card .mat img{height:200px !important;width:auto !important;max-width:none !important;max-height:none !important;aspect-ratio:auto !important}
+.also-row .card-t{min-height:0 !important}
+/* a compact band; at D (>=1100) the heading stands beside the paintings, as on the /series bands, so the band is one row high */
+.ibnd:has(.also-row){margin-top:0 !important;padding-block:40px !important}
+.ibnd:has(.also-row) .sec{padding-block:0 !important}
+@media (min-width:1100px){
+  .ibnd:has(.also-row) .sec{display:grid;grid-template-columns:260px minmax(0,1fr);column-gap:40px;align-items:center;max-width:1360px;box-sizing:border-box}
+  .ibnd:has(.also-row) .sec-head{margin:0;padding:0;border:0;display:block}
+}
+@media (max-width:760px){ .ibnd:has(.also-row){padding-block:32px !important} .ibnd:has(.also-row) .sec-head{margin-bottom:18px} }
+
+/* ==== R4 B3-5: end of the story page: one ask line, then the collections pager ==== */
+.story-end{padding-block:28px 48px}
+.se-ask{text-align:center;margin:0 0 20px}
+.se-ask a{text-decoration:underline;text-underline-offset:4px;white-space:nowrap}
+.story-end .pnx{padding-block:0}
+
+/* ==== R4 B3 CLS: every painting's box is reserved at its own shape before the file arrives ====
+   width:auto on a not-yet-loaded <img> is 0 (the width/height attributes only give a ratio), so each fixed-height
+   picture gets its width from --ar (width / height) and the frame (--fp = border + mat, both sides). */
+.story-open .framed,.chv .framed,.sband .card .mat img,.also-row .card .mat img{--fp:24px}
+.so-art figure img.framed{width:min(100%,calc((min(72svh,600px) - var(--fp)) * var(--ar) + var(--fp)));height:auto;max-height:none;aspect-ratio:auto var(--ar)}
+.so-grid img.framed{width:calc((clamp(180px,17vw,260px) - var(--fp)) * var(--ar) + var(--fp))}
+.chv-art img.framed{width:min(100%,calc((clamp(380px,38vw,540px) - var(--fp)) * var(--ar) + var(--fp)));height:auto;max-height:none;aspect-ratio:auto var(--ar)}
+@media (min-width:761px) and (max-width:1099px){ .chv-art img.framed{width:min(100%,calc((clamp(320px,40vw,440px) - var(--fp)) * var(--ar) + var(--fp)))} }
+.chv-row img.framed{width:calc((var(--rh) - var(--fp)) * var(--ar) + var(--fp))}
+.sband .card .mat img{width:calc((240px - var(--fp)) * var(--ar) + var(--fp)) !important}
+@media (min-width:761px) and (max-width:1099px){ .sband .card .mat img{width:calc((210px - var(--fp)) * var(--ar) + var(--fp)) !important} }
+.also-row .card .mat img{width:calc((200px - var(--fp)) * var(--ar) + var(--fp)) !important}
+
+/* ==== R4 fix 3 (Brand P1-3): one big showing per painting ==== */
+/* Bandh Darwaze: the 2x2 opening carries its two chapters; under each pair, its caption block; each door once */
+.so-pairs{display:flex;flex-direction:column;gap:28px}
+/* the doors are square: two across never run wider than the column (t768 G1 19 px sideways scroll) */
+.so-doors .so-art{container-type:inline-size}
+.so-doors .so-grid{--dh:min(clamp(200px,18vw,280px),calc((100cqw - 16px) / 2))}
+.so-doors .so-grid img.framed{height:var(--dh);width:calc((var(--dh) - var(--fp)) * var(--ar) + var(--fp))}
+.so-pcap{text-align:center;margin:14px auto 0;max-width:540px}
+.so-pcap>*{margin:0}
+.so-pcap .chv-n{margin-bottom:4px}
+.so-pcap .so-pt{margin:0 0 8px}
+.so-pcap .chv-words{gap:6px;align-items:center}
+.so-pcap .chap-big,.so-pcap .chap-small{text-align:center;margin:0 !important;max-width:none}
+.so-pcap .chv-facts{margin-top:8px !important}
+/* GATD "Roads": the room view takes the painting slot at the chapter painting's height */
+.chv-room{margin:0}
+.chv-room a{display:block}
+.chv-room img.room-img{display:block;margin-inline:auto;width:min(100%,calc(clamp(380px,38vw,540px) * var(--ar)));height:auto;aspect-ratio:auto var(--ar)}
+.chv-room figcaption{text-align:center;margin-top:12px;text-wrap:balance}
+@media (min-width:761px) and (max-width:1099px){ .chv-room img.room-img{width:min(100%,calc(clamp(320px,40vw,440px) * var(--ar)))} }
+@media (max-width:760px){ .chv-room img.room-img{width:100%} .so-pairs{gap:24px} }
+
+/* ==== R4 fix 4 (Brand P1-4, DC P2-2): hero label tiles. The wall starts with its label tiles whole (lib/drift settleHero);
+   as it drifts, a tile passing the header edge fades over 16 px and one passing the name box goes under a soft
+   halo in the wall's tone, so it reads as passing under the card, never as clipped. */
+/* (R6 perf fix 2: no mask on the moving wall; this rule was already overridden by fix-tech.css's bottom-only fade,
+   which is now a still overlay in fix-tech.css) */
+.wh .wh-card.namecard{box-shadow:0 0 0 12px rgba(245,244,240,.72),0 0 28px 16px rgba(245,244,240,.55),var(--paper-shadow,0 0 0 transparent)}
+
+/* R4 fix 7 (consultant P1-6): hero photograph tiles wait out of sight until their file arrives (components/site/WallDrift) */
+.wh .collage .xcard{transition:opacity .45s ease}
+.wh .collage .xcard.is-waiting{opacity:0}
+
+/* R4 P2 (consultant P2, COO P2): /series bands and story pages start on the site's own edge (the gutter, 43 px at 1440,
+   where the header and hero sit), not 40 px further in: the 1360 px content cap now excludes the gutters */
+.sband .srow.wrap,.story-open.wrap,.chv .chv-in.wrap,.story-end.wrap{max-width:calc(1360px + 2 * var(--gut))}
+
+/* ==== R4 stage-7 (COO): the cover's room view in its chapter row, at the row height ====
+   The room view has no frame, so it is exactly --rh tall and --rh x 3:2 wide (never cropped); --rx (set on the row) is the
+   extra width that takes over a framed picture's, so the row's fit-to-width term stays exact. Bottoms and captions
+   line up with the paintings (G2). */
+.chv-row .row-room img.room-img{display:block;max-width:none;height:var(--rh);width:calc(var(--rh) * var(--ar))}
+@media (max-width:760px){
+  .chap .chv-row .row-room img.room-img{height:var(--ph) !important;width:calc(var(--ph) * var(--ar)) !important}
+}
+/* a cover with no room view comes back small, at the row height, beside its text (none today: every cover has a room) */
+@media (min-width:761px){
+  .chv.single.cover-small .chv-in{grid-template-columns:auto minmax(0,1fr)}
+  .chv.single.cover-small .chv-art img.framed{width:calc((340px - var(--fp)) * var(--ar) + var(--fp))}
+}
+
+/* R4 polish 4 (DC P2-4/P2-5, 1920 soft misses). (a) /series: past the 1,360 px cap each band's row of paintings runs on
+   to the right edge of the screen, as the hero does, instead of stopping with ~280 px blank (the text column stays on
+   the site edge). (b) Home .hw-band: on large screens the portrait grows and her line takes a wider measure, so the band is not a thin strip. */
+@media (min-width:1600px){
+  .sband{overflow-x:clip}
+  .sband .srow .s-works{margin-right:calc(-1 * max(0px, (100vw - 1360px - 2 * var(--gut)) / 2) - var(--gut));min-width:0}
 }

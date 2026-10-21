@@ -13,7 +13,7 @@
  * hidden tab. Transforms only, so nothing on the page shifts.
  */
 
-import { REDUCED_KEEPS_MOVING, REDUCED_SPEED, motionPaused } from "./motion-rules";
+import { REDUCED_KEEPS_MOVING, REDUCED_MIN_PX_S, REDUCED_SPEED, motionPaused } from "./motion-rules";
 
 const HOLD_MS = 1400; // how long a let-go row rests before it drifts again
 const RAMP_S = 1.6; // how long it takes to come back up to speed
@@ -176,8 +176,11 @@ export function driftRow(view: HTMLElement, track: HTMLElement, o: { seconds: nu
   const stopClock = clock(view, (dt, now) => {
     if (held) return;
     const scale = motionScale(reduced);
-    const resting = now < holdUntil || hover || focus || scale === 0;
-    const target = resting ? 0 : dir * speed * scale;
+    // a row inside [data-hold] (e.g. the press row while its Gallery is open) waits
+    const resting = now < holdUntil || hover || focus || scale === 0 || !!view.closest("[data-hold]");
+    // R4 polish 4 (G10a, 1920): under reduced motion a short or slow row still visibly drifts (never under
+    // REDUCED_MIN_PX_S), so a wide screen does not leave one row looking stopped at 4 px/s
+    const target = resting ? 0 : dir * (scale > 0 && scale < 1 ? Math.max(speed * scale, REDUCED_MIN_PX_S) : speed * scale);
     // a fling coasts and slows gently (COAST_K); the drift returns over RAMP_S
     const k = Math.abs(v) > speed * 1.2 ? COAST_K : 1 / RAMP_S * 2.2;
     v += (target - v) * Math.min(1, dt * k);
@@ -260,6 +263,59 @@ export function driftRow(view: HTMLElement, track: HTMLElement, o: { seconds: nu
  * over `swaySeconds`. Dragging moves the wall sideways and (with a mouse) the
  * columns up or down; after a moment it carries on from where it was left.
  */
+const SETTLE_GLIDE_S = 1.2;
+const SETTLE_MAX_PX = 48;
+const LABEL = ".ncard,.ccard,.xcard,.qcard,.scard";
+/**
+ * R4 fix 4: the start offset (px, per column) that keeps a hero wall's label tiles whole at first view. Scores every
+ * start y of each column over the next 6 s of drift: a label tile may not straddle the wall's top edge (or sit within
+ * 12 px of it), the bottom edge, or the name box's edge (16 px margin); wholly behind the box is fine. Picks the best
+ * score nearest the current position. Returns null outside a hero (no name box).
+ */
+function settleHero(cols: HTMLElement, st: { c: HTMLElement; down: boolean; dur: number; h: number; y: number }[], m: number): number[] | null {
+  const wall = cols.parentElement, card = cols.closest(".wh")?.querySelector<HTMLElement>(".namecard");
+  if (!wall || !card) return null;
+  const W = wall.getBoundingClientRect(), C = card.getBoundingClientRect();
+  if (!W.height) return null;
+  const H = W.height, ct = C.top - W.top, cb = C.bottom - W.top, M = 16, TOP = 12;
+  const times = [0, 1.5, 3, 4.5, 6], weight = [4, 2, 1.5, 1, 0.5];
+  return st.map((s) => {
+    const cr = s.c.getBoundingClientRect();
+    const underCard = cr.left < C.right + M && cr.right > C.left - M;
+    const base = cr.top - s.y - W.top; // the column's top in the wall, untransformed
+    const tiles = Array.from(s.c.querySelectorAll<HTMLElement>(LABEL)).map((t) => {
+      const r = t.getBoundingClientRect();
+      return [base + r.top - cr.top, base + r.bottom - cr.top] as const; // position in the wall at y = 0
+    });
+    if (!tiles.length || s.h <= 1 || cr.right <= W.left || cr.left >= W.right) return 0; // nothing to place, or off screen
+    const v = (s.down ? 1 : -1) * (s.h / s.dur) * (m || 0);
+    const bad = (a: number, b: number) => {
+      if (b <= 0 || a >= H) return 0;                         // out of view
+      let k = 0;
+      if (a < TOP) k += 1;                                       // under / against the header edge
+      if (b > H) k += 0.5;                                       // crossing the faded bottom edge
+      if (underCard && !(a >= ct && b <= cb) && b > ct - M && a < cb + M) k += 1; // half under the name box
+      return k;
+    };
+    let best = 0, bestCost = Infinity;
+    for (let y = -s.h; y < 0; y += 4) {
+      // a column clear of the name box shows one of its labels whole at first view (hiding them all is not a fix)
+      let cost = !underCard && !tiles.some(([a, b]) => a + y >= TOP && b + y <= H - 48) ? 6 : 0;
+      for (let ti = 0; ti < times.length; ti++) {
+        const off = y + v * times[ti];
+        for (const [a, b] of tiles) cost += weight[ti] * bad(a + off, b + off);
+      }
+      // nearest to where it is now (mod one repeat), so the glide is short
+      let d = y - s.y; d -= Math.round(d / s.h) * s.h;
+      // R6 perf fix 3: never glide more than 48 px (an offset of half a repeat read as the wall jumping at 100-600x its drift)
+      if (Math.abs(d) > SETTLE_MAX_PX) continue;
+      cost += Math.abs(d) / 4000;
+      if (cost < bestCost) { bestCost = cost; best = d; }
+    }
+    return best;
+  });
+}
+
 export function driftWall(cols: HTMLElement, o: { swaySeconds?: number } = {}): Teardown {
   const sway = o.swaySeconds ?? 70;
   const columns = Array.from(cols.querySelectorAll<HTMLElement>(":scope > .col"));
@@ -272,13 +328,25 @@ export function driftWall(cols: HTMLElement, o: { swaySeconds?: number } = {}): 
   const measure = () => {
     const d = parseFloat(getComputedStyle(cols).getPropertyValue("--drift")) || 0;
     amp = (d / 100) * cols.offsetWidth;
-    for (const s of st) s.h = Math.max(1, s.c.scrollHeight / (Number(s.c.dataset.rep) || 2));
+    // one repeat's height from the content, not the box: the wall's grid stretches every column to the tallest one, so
+    // scrollHeight / rep overstated the shorter columns' repeat (their labels then sat off their true period, and the
+    // wrap jumped by the difference). R4 fix 4.
+    for (const s of st) {
+      const last = s.c.lastElementChild as HTMLElement | null, cs = getComputedStyle(s.c);
+      const gap = parseFloat(cs.rowGap) || 0, pad = parseFloat(cs.paddingTop) || 0;
+      const content = last ? last.getBoundingClientRect().bottom - s.c.getBoundingClientRect().top : s.c.scrollHeight;
+      s.h = Math.max(1, (content - pad + gap) / (Number(s.c.dataset.rep) || 2));
+    }
   };
   measure();
   // pick up exactly where the CSS animation had got to
   x = Math.max(amp, Math.min(0, at(cols).x));
   st.forEach((s) => { s.y = at(s.c).y; });
   if (amp) { const u = Math.acos(Math.max(-1, Math.min(1, 1 - (2 * x) / amp))) / Math.PI; p = u; }
+  // R4 fix 4 (Brand P1-4): in a page hero, each column glides (0.8 s) to a start where its label tiles are whole:
+  // >= 12 px below the header edge, clear of the name box by >= 16 px or wholly behind it, for the first few seconds
+  const dy = settleHero(cols, st, motionScale(reduced));
+  let settle = dy && dy.some((v) => v) ? SETTLE_GLIDE_S : 0;
   const ro = new ResizeObserver(measure);
   ro.observe(cols);
 
@@ -291,6 +359,15 @@ export function driftWall(cols: HTMLElement, o: { swaySeconds?: number } = {}): 
 
   const stopClock = clock(cols, (dt, now) => {
     const m = motionScale(reduced);
+    if (settle > 0 && dy) {
+      // R6 perf fix 3: an eased glide (smoothstep), so it starts and lands at drift speed: <= 48 px over 1.2 s peaks at 60 px/s
+      const sstep = (u: number) => u * u * (3 - 2 * u);
+      const u0 = 1 - settle / SETTLE_GLIDE_S; settle -= dt;
+      const u1 = Math.min(1, 1 - Math.max(0, settle) / SETTLE_GLIDE_S);
+      const f = sstep(u1) - sstep(u0);
+      st.forEach((s, i) => { s.y += dy[i] * f; wrapY(s); });
+      if (held || m === 0) { paint(); return; }
+    }
     if (held || m === 0) return;
     // a painting under the mouse holds the wall still while it is lifted (CR-005), then it eases off again
     if (now < holdUntil) return;

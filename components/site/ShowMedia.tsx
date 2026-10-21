@@ -1,6 +1,6 @@
 "use client";
 
-import { useCallback, useEffect, useRef, useState } from "react";
+import { useCallback, useEffect, useRef, useState, type ReactNode } from "react";
 import Gallery from "./Gallery";
 import { dims } from "@/lib/images";
 import { swipe } from "@/lib/drift";
@@ -23,8 +23,11 @@ const sm = (src: string) => src.replace("/site/ex/", "/site/ex/sm/");
  * hidden. The strip is only scrolled for the visitor when the current
  * photograph has gone out of its view, and never within 6 s of their own touch.
  * Under "Reduce motion" (lib/motion-rules) it changes every 5 s as a crossfade.
+ *
+ * R6 (Exhibitions, side by side): with `side`, the photograph and its strip sit in
+ * .ex-ch-media and the show's heading and text (`side`) with the caption in .ex-ch-side.
  */
-export default function ShowMedia({ photos, label }: { photos: Photo[]; label: string }) {
+export default function ShowMedia({ photos, label, walls, side }: { photos: Photo[]; label: string; walls?: ReactNode; side?: ReactNode }) {
   const [i, setI] = useState(0);
   const [prev, setPrev] = useState<number | null>(null);
   const [open, setOpen] = useState<number | null>(null);
@@ -71,7 +74,9 @@ export default function ShowMedia({ photos, label }: { photos: Photo[]; label: s
     const el = root.current;
     if (!el) return;
     const io = new IntersectionObserver(([e]) => setSeen(e.isIntersecting), { threshold: 0.3 });
-    io.observe(el);
+    // at >=1100 the Exhibitions grid sets .sm-media to display:contents (no box, never "intersecting"),
+    // so the large photograph is what is watched
+    io.observe(el.querySelector<HTMLElement>(".sm-hero") ?? el);
     // a keyboard visitor inside the block holds the roll (a mouse click does not)
     const fin = (e: FocusEvent) => { if ((e.target as HTMLElement).matches?.(":focus-visible")) setFocused(true); };
     const fout = (e: FocusEvent) => { if (!el.contains(e.relatedTarget as Node)) { setFocused(false); setHeld((h) => h + 1); } };
@@ -163,6 +168,7 @@ export default function ShowMedia({ photos, label }: { photos: Photo[]; label: s
   const q = prev !== null ? photos[prev] : null;
   return (
     <div className="sm-media" ref={root}>
+      <div className="ex-ch-media">
       <button type="button" className={`sm-hero${reduced ? " is-fade" : ""}`} ref={hero} onClick={() => setOpen(i)} aria-label={`Open full screen: ${p.alt}`}
               style={{ ["--sm-fade" as string]: `${PHOTO_FADE_MS_REDUCED}ms` }}>
         {q && (
@@ -172,7 +178,6 @@ export default function ShowMedia({ photos, label }: { photos: Photo[]; label: s
         {/* eslint-disable-next-line @next/next/no-img-element */}
         <img key={p.src} src={p.src} alt={p.alt} loading="eager" decoding="async" draggable={false} {...dims(p.src)} />
       </button>
-      <p className="sm-cap" aria-live="off">{p.cap ?? p.alt}</p>
       {n > 1 && (
         <div className="sm-strip" ref={strip} role="group" aria-label={`${label}: photographs`}>
           {photos.map((x, k) => (
@@ -183,8 +188,15 @@ export default function ShowMedia({ photos, label }: { photos: Photo[]; label: s
               <img src={sm(x.src)} alt="" loading="lazy" decoding="async" draggable={false} {...dims(sm(x.src))} />
             </button>
           ))}
+          {/* R6: a computer shows five tiles at most, in one line (four photographs and "+N more"); the rest open full screen */}
+          {n > 5 && <button type="button" className="sm-more" onClick={() => setOpen(4)}>+{n - 4} more</button>}
         </div>
       )}
+      </div>
+      <div className="ex-ch-side">
+        {side}
+        <p className="sm-cap"><span aria-live="off">{p.cap ?? p.alt}</span>{walls && <span className="sm-walls"> · On the walls: {walls}</span>}</p>
+      </div>
       {open !== null && (
         <Gallery label={label} start={open} onClose={() => setOpen(null)} shots={photos.map((x) => ({ src: x.src, alt: x.alt, line: x.alt }))} />
       )}

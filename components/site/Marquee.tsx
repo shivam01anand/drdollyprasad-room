@@ -24,7 +24,15 @@ export default function Marquee({ children, seconds = 60, copies = 4, reverse = 
     if (!v || !t) return;
     // the copies are for the eye only: out of the tab order, still clickable
     t.querySelectorAll<HTMLElement>(".marq-set[aria-hidden] a, .marq-set[aria-hidden] button").forEach((a) => { a.tabIndex = -1; });
-    return driftRow(v, t, { seconds, copies, reverse, pauseOnHover: true });
+    // R6 perf fix 4: only as many copies as the widest this screen can be needs to loop without a seam
+    // (one set + the view: ceil(view / set) + 1); the surplus copies are not drawn, so they cost no layers or paint
+    const sets = Array.from(t.children) as HTMLElement[];
+    const one = sets[0]?.getBoundingClientRect().width || 0;
+    const wide = Math.max(v.clientWidth, window.screen ? Math.max(screen.width, screen.height) : 0);
+    const need = one > 0 ? Math.min(copies, Math.max(2, Math.ceil(wide / one) + 1)) : copies;
+    sets.forEach((s, i) => { s.style.display = i < need ? "" : "none"; });
+    t.style.setProperty("--copies", String(need));
+    return driftRow(v, t, { seconds, copies: need, reverse, pauseOnHover: true });
   }, [seconds, copies, reverse]);
 
   return (

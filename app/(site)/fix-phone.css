@@ -5,6 +5,10 @@
 @media (max-width:760px){
   .story-hero>.meta,.story-hero>p.meta{padding-inline:18px !important;text-align:center !important;text-wrap:balance}
 }
+/* F12 (R4 B1-1): the story caption always wraps, never pushes the page sideways */
+@media (max-width:760px){
+  .story-hero .meta,.so-art figcaption{white-space:normal;overflow-wrap:anywhere}
+}
 /* F3 */
 @media (max-width:760px){
   .card .status{white-space:nowrap !important;font-size:12.5px !important}
@@ -29,8 +33,77 @@
   .sm-strip button{flex:1 1 0 !important;width:auto !important;min-width:0 !important;white-space:nowrap}
 }
 /* F11 */
-.band-indigo .card .st-enquire i,.ibnd .card .st-enquire i{box-shadow:inset 0 0 0 1px #D3D8E8 !important}
-/* F6 */
+.band-indigo .card .st-enquire i,.ibnd .card .st-enquire i{box-shadow:inset 0 0 0 1px #AFA49A !important}
+/* F6 removed (R4 B1-2): max-height:52vw on a 100%-wide frame letterboxed the paintings (up to 1.93x).
+   F13 (R4 B1-2): on phones, chapter and story-opening frames follow the painting's own shape.
+   The global .framed rule (site.css) is left alone: tiles, slides, About and the IG track use it. */
 @media (max-width:760px){
-  .chap-works .framed{max-height:52vw !important}
+  .chap .framed,.story-open .framed{width:auto !important;max-width:100% !important;height:auto !important;max-height:min(64svh,420px) !important;aspect-ratio:var(--ar,auto);display:block;margin-inline:auto}
+}
+/* ==== R4 B3 phones (<=760): story opening, chapters, Also, in one column ==== */
+@media (max-width:760px){
+  .story-open{display:flex;flex-direction:column;align-items:stretch;gap:16px;padding-block:24px 32px}
+  .story-open .so-txt{display:contents}
+  .story-open .eyebrow{order:1;margin:0}
+  .story-open h1{order:2;margin:0}
+  .story-open .lede{order:3}
+  .story-open .so-art{order:4}
+  .story-open .so-epi{order:5;margin:0}
+  .story-open .so-intro{order:6;margin:0}
+  .so-intro.has-photo{display:flex;flex-direction:column;gap:16px}
+  .so-photo{width:100%;max-width:280px}
+  .so-grid{grid-template-columns:repeat(2,minmax(0,1fr));gap:12px}
+  .so-grid img.framed{height:auto !important}
+  .chv .chv-in{padding-block:32px !important}
+  .chv.single .chv-in{display:flex;flex-direction:column;align-items:stretch;gap:0}
+  .chv.single .chv-txt{display:contents}
+  .chv.single .chv-n{order:-3}
+  .chv.single .chv-t{order:-2}
+  .chv.single .chv-art{order:-1;margin-bottom:18px}
+  .chv.multi .chv-txt{margin-bottom:18px}
+  /* Brand pick: several paintings become one swipe strip, one height, bleeding off the right edge, never cropped */
+  .chv-row{--F:16px;--ph:min(300px,calc((82vw - var(--F)) / var(--rmax) + var(--F)));gap:16px;overflow-x:auto;overflow-y:hidden;
+    scroll-snap-type:x proximity;margin-right:calc(-1 * var(--gut));padding-right:var(--gut);scrollbar-width:none;-webkit-overflow-scrolling:touch}
+  .chv-row::-webkit-scrollbar{display:none}
+  .chv-row figure{scroll-snap-align:start}
+  .chap .chv-row img.framed{height:var(--ph) !important;width:auto !important;max-width:none !important;max-height:none !important}
+  .also-row{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:20px 14px;justify-items:center}
+  .also-row .card{width:100% !important;align-items:center;text-align:center}
+  .also-row .card .mat img{height:auto !important;max-height:150px !important;max-width:100% !important;width:auto !important}
+  .also-row .card:last-child:nth-child(odd){grid-column:1 / -1}
+  .also-row .card:last-child:nth-child(odd) .mat{justify-content:center}
+}
+/* R4 B3-5 phones: the end stays one short block (ask line, Next first, then Previous) */
+@media (max-width:760px){
+  .story-end{padding-block:16px 24px}
+  .story-end .se-ask{margin-bottom:14px}
+  .story-end .pnx-c{min-height:84px;padding:16px 18px}
+  .story-end .pnx-g{gap:10px}
+}
+/* R4 B3 CLS on phones: the same reserved boxes (frame 4 + mat 4, both sides) */
+@media (max-width:760px){
+  .story-open .framed,.chv .framed,.sband .card .mat img,.also-row .card .mat img{--fp:16px}
+  .story-open .so-art figure img.framed,.chap .chv-art img.framed{width:min(100%,calc((min(64svh,420px) - var(--fp)) * var(--ar) + var(--fp))) !important;height:auto !important;max-height:none !important;aspect-ratio:auto var(--ar) !important}
+  .story-open .so-grid img.framed{width:100% !important;height:auto !important;max-height:none !important;aspect-ratio:auto var(--ar) !important}
+  .chap .chv-row img.framed{width:calc((var(--ph) - var(--fp)) * var(--ar) + var(--fp)) !important}
+  .sband .card .mat img{width:calc((170px - var(--fp)) * var(--ar) + var(--fp)) !important}
+  .also-row .card .mat img{width:min(100%,calc((150px - var(--fp)) * var(--ar) + var(--fp))) !important;height:auto !important;max-height:none !important;aspect-ratio:auto var(--ar) !important}
+}
+/* R4 B3 phones: "Also in" pictures sit on one bottom line in a 150 px box, so captions share a line (G2) */
+@media (max-width:760px){
+  .also-row .card .mat{height:150px !important;display:flex !important;align-items:flex-end !important;justify-content:center !important;width:100% !important}
+}
+/* R4 B3 G9b: the cover caption keeps a two-line box on phones, so the font swap (fallback 2 lines -> Jost 1 line)
+   does not pull the epigraph and intro up (slow-link CLS 0.053 on recent-work) */
+@media (max-width:760px){ .story-open .so-art figcaption{min-height:calc(2 * 1.45em)} }
+/* R4 fix 5 (COO 5, consultant P1-4, DC P2-3): on phones every chapter reads the same way: title -> painting(s) -> words.
+   The desktop zigzag (.flip puts the art second) out-ranked the phone order on alternate single chapters, and multi
+   chapters put their words before the row. */
+@media (max-width:760px){
+  .chv.single.flip .chv-art{order:-1}
+  .chv.multi .chv-in{display:flex;flex-direction:column;align-items:stretch}
+  .chv.multi .chv-txt{display:contents}
+  .chv.multi .chv-n{order:-4}
+  .chv.multi .chv-t{order:-3}
+  .chv.multi .chv-rowbox{order:-2;margin-bottom:18px}
 }

@@ -16,9 +16,9 @@ function load(file) {
   m.filename = abs;
   m.paths = Module._nodeModulePaths(path.dirname(abs));
   const nativeRequire = Module.createRequire(abs);
-  m.require = (id) => id.startsWith('.')
-    ? load(path.relative(root, path.resolve(path.dirname(abs), id + '.ts')))
-    : nativeRequire(id);
+  m.require = (id) => !id.startsWith('.') || id.endsWith('.json')
+    ? nativeRequire(id)
+    : load(path.relative(root, path.resolve(path.dirname(abs), id + '.ts')));
   m._compile(ts.transpileModule(fs.readFileSync(abs, 'utf8'), {
     compilerOptions: { module: ts.ModuleKind.CommonJS, target: ts.ScriptTarget.ES2020, esModuleInterop: true },
   }).outputText, abs);

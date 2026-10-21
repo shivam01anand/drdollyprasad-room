@@ -13,6 +13,7 @@ import {
 } from "@/lib/site";
 import { BY_ID } from "@/lib/works";
 import { dims } from "@/lib/images";
+import { PRESS_HOME } from "@/lib/press";
 
 const PERSON = {
   "@context": "https://schema.org",
@@ -30,11 +31,12 @@ const PERSON = {
 const AVAILABLE = ["boy-with-bananas", "temple-bells", "bulls-and-wheel", "woman-with-poppies"];
 const IG = ["patterned-turban-portrait", "bulls-and-wheel", "temple-bells", "red-turban-portrait", "coins-and-clay-bank", "offering-of-light", "yellow-turban-portrait", "terracotta-pots", "boy-with-bananas", "red-and-teal-door-lock"];
 const now = NOW;
+// R4 fix 7 (Brand P1-5): "On the walls" reads newest first, in the one SHOWS order (Kala Mela first)
 const CARDS = [
   { id: "india-habitat-centre-2010", src: "/site/ex/ihc-03.jpg", alt: "Dr Dolly Prasad lights the lamp at the opening at India Habitat Centre" },
   { id: "a-lifetime-to-paint", src: "/site/ex/iccr-speech.jpg", alt: "Dr Dolly Prasad speaks at the opening of A Lifetime to Paint, ICCR" },
   { id: "kala-mela-2018", src: "/site/ex/kala-dolly.jpg", alt: "Dr Dolly Prasad beside her painting at the First International Kala Mela" },
-];
+].sort((a, b) => SHOWS.findIndex((x) => x.id === a.id) - SHOWS.findIndex((x) => x.id === b.id));
 
 export default function Home() {
   const total = SERIES_PAGES.reduce((n, s) => n + worksIn(s.label).length, 0);
@@ -61,9 +63,10 @@ export default function Home() {
           <Link className="link" href="/series">All collections →</Link>
         </div>
       </section>
-      <Marquee seconds={70} label="The five collections" className="series-tiles">
+      {/* R6 (Shubham 20 Oct 22:50): a still, smaller row, every painting at one height, never cropped (the hero above already moves) */}
+      <div className="series-row wrap" role="list" aria-label="The five collections">
         {SERIES_PAGES.map((s) => (
-          <Link key={s.slug} className="card m-card" href={`/series/${s.slug}`}>
+          <Link key={s.slug} className="card m-card" role="listitem" href={`/series/${s.slug}`}>
             <div className="mat">
               {/* eslint-disable-next-line @next/next/no-img-element */}
               <img className="framed thin" src={thumb(LEAD[s.slug] ?? s.hero)} alt={`${BY_ID.get(LEAD[s.slug] ?? s.hero)?.title}, from ${s.label}`} loading="eager" {...dims(thumb(LEAD[s.slug] ?? s.hero))}
@@ -73,18 +76,40 @@ export default function Home() {
             <span className="meta">{worksIn(s.label).length} works · {s.period}</span>
           </Link>
         ))}
-      </Marquee>
+      </div>
       </div>
 
-      <section className="hw-band">
+      {/* R6 (4-R6-SPEC §4b, Chief Content R6 §1-2): who she is in five seconds, the proof beside it, then her story */}
+      <section className="hw-band" aria-labelledby="hw-h">
         <div className="wrap hw-in">
           {/* eslint-disable-next-line @next/next/no-img-element */}
           <img className="round" src="/site/ex/kala-dolly.jpg" alt="Dr Dolly Prasad beside one of her paintings" loading="lazy" {...dims("/site/ex/kala-dolly.jpg")} />
-          <figure className="hw-q">
-            <blockquote>{SERIES_PAGES[0].quote}</blockquote>
-            <figcaption>Dr Dolly Prasad, on Gone Are The Days</figcaption>
+          <div className="hw-intro">
+            <p className="eyebrow">The artist</p>
+            <h2 id="hw-h">Dr Dolly Prasad, painter of the everyday</h2>
+            <p className="hw-lede">A New Delhi artist who holds the everyday sacred. For her, the ordinary is never small: a clay gullak, a closed door, a lamp lifted at aarti, a face at the corner of a lane. Those ordinary days were the good ones, and she paints them so we can see them clearly, and keep seeing the ones we are living today.</p>
             <Link className="link" href="/about">Her story →</Link>
-          </figure>
+          </div>
+          <aside className="hw-press" aria-labelledby="hw-press-h">
+            <h3 id="hw-press-h">In the press</h3>
+            <ul>
+              {PRESS_HOME.map((p) => {
+                const src = p.kind === "video" ? p.poster! : p.sm ?? p.src;
+                return (
+                  <li key={p.id}>
+                    <Link className={`hw-pi${p.kind === "video" ? " is-video" : ""}`} href="/exhibitions#press">
+                      <span className="hw-pi-img">
+                        {/* eslint-disable-next-line @next/next/no-img-element */}
+                        <img src={src} alt={p.alt} loading="lazy" decoding="async" width={72} height={54} />
+                      </span>
+                      <div className="hw-pi-t"><p className="hw-pi-n"><b>{p.home.t}</b></p><p className="hw-pi-s">{p.home.s}</p></div>
+                    </Link>
+                  </li>
+                );
+              })}
+            </ul>
+            <Link className="link" href="/exhibitions#press">All the press →</Link>
+          </aside>
         </div>
       </section>
 

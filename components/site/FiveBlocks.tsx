@@ -28,9 +28,8 @@ export default function FiveBlocks({ blocks }: { blocks: Block[] }) {
                        loading="eager" />
                 ))}
               </span>
-              <span className="five-n">{String(k + 1).padStart(2, "0")}</span>
               <span className="five-t">{b.label}</span>
-              <span className="five-m">{b.n} works · {b.period}</span>
+              <span className="five-m">{b.period} · {b.n} works</span>
             </a>
           </li>
         );

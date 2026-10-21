@@ -22,9 +22,7 @@
 /* Collections bands: the row's window edge sat on the column line and cut the shadow of the first card with a hard
    vertical line. The window now starts --fade into the gutter and fades over it, so the shadow dissolves instead. */
 @media (min-width:761px){
-  .sband .band-marq{--fade:24px;padding-left:var(--fade) !important;margin-left:calc(-1 * var(--fade)) !important;
-    -webkit-mask-image:linear-gradient(90deg,transparent 0,#000 var(--fade),#000 calc(100% - var(--fade)),transparent);
-            mask-image:linear-gradient(90deg,transparent 0,#000 var(--fade),#000 calc(100% - var(--fade)),transparent)}
+  .sband .band-marq{--fade:24px;padding-left:var(--fade) !important;margin-left:calc(-1 * var(--fade)) !important}
   /* review #2 R2-2: the track starts a further --fade in, so the first painting is clear of the fade at rest and only fades while passing the edge */
   .sband .band-marq .marq-track{padding-left:var(--fade) !important}
 }
@@ -39,13 +37,6 @@
 @media (max-width:1000px){ .marq-set>.card>.card-t,#more-from .card-t,.grid-5 .card-t{min-height:2.3em !important;text-wrap:balance}
   .grid-5 .card-t{min-height:2.4em !important} /* two title lines at line-height 1.2 are 2.4em: a wrapped title no longer drops its row by 2 px (review #2 R2-4) */ }
 /* Home, Key collections: one count line under each title, one line box (the 2-line description is cut, C17) */
-.series-tiles .m-card .meta{display:-webkit-box !important;-webkit-box-orient:vertical;-webkit-line-clamp:1;line-clamp:1;overflow:hidden;min-height:1.4em}
-/* collection pages, chapter pictures: picture and caption share rows across the chapter (subgrid),
-   pictures on one bottom line whatever the caption length */
-.chap-works:not(.n1){align-items:stretch}
-.chap-works>figure{display:grid;grid-row:span 2;grid-template-rows:subgrid;row-gap:8px}
-.chap-works>figure>a{align-self:end}
-@media (max-width:760px){ .chap-works.n3>figure,.chap-works.n4>figure{display:flex;justify-content:flex-end} }
 
 /* ---- B2 · Works grid: one bottom line per row, no fixed tall box (T6 option A; Brand R1 #20) ----
    Each card spans four subgrid rows (picture, title, meta, status), so a row's picture track is as tall as
@@ -65,9 +56,7 @@
 
 /* Home Instagram roll (Design Control, extends T5): its clip box cut the frames' shadow with a hard left and bottom edge.
    More room below and above, and the two ends fade over 24 px instead of cutting. */
-.ig-roll{padding-block:24px 40px !important;margin-block:-24px -40px !important;
-  -webkit-mask-image:linear-gradient(90deg,transparent 0,#000 24px,#000 calc(100% - 24px),transparent) !important;
-          mask-image:linear-gradient(90deg,transparent 0,#000 24px,#000 calc(100% - 24px),transparent) !important}
+.ig-roll{padding-block:24px 40px !important;margin-block:-24px -40px !important}
 
 /* ---- B3 · header (4-REVIEW1-DECISION 3.7): 92 px on >=768 (28 band + 64 bar); no compacting on scroll.
    The ornament band scrolls away with the page (sticky top is minus the band), so only the 64 px bar stays. ---- */
@@ -81,7 +70,7 @@
   .brand-t i,.is-scrolled .brand-t i{opacity:1 !important;max-height:20px !important;transition:none !important}
   .brand-t b{transition:none !important}
 }
-.hdr{background:rgba(255,255,255,.96) !important}
+.hdr{background:rgba(245,244,240,.96) !important}
 .ex-ch,.sband,[id]{scroll-margin-top:calc(var(--hdr-bar) + 16px)}
 
 /* ---- B4 · painting page (4-REVIEW1-DECISION 4.1; T7). The text, the Enquire button and the links now sit inside
@@ -106,7 +95,6 @@
   .pp-art img{width:calc((min(calc(100svh - var(--hdr-h,92px) - 140px),760px) - var(--fp)) * var(--ar) + var(--fp)) !important;max-width:100% !important}
   .pp-art img.is-small{width:calc((420px - var(--fp)) * var(--ar) + var(--fp)) !important}
   .pp-room{width:min(100%,900px,calc((100svh - var(--hdr-h,92px) - 140px) * 1.5)) !important}
-  .pp-detail-in{width:min(100%,760px) !important;max-height:calc(100svh - var(--hdr-h,92px) - 140px) !important}
 }
 @media (max-width:640px){
   .pp-strip{order:1;justify-content:center}
@@ -127,7 +115,6 @@
    which pushed one picture up by a line in More from (768: 20 px). The meta keeps a two-line box there;
    phone chapter swipes keep a two-line caption box so their pictures share a bottom line. ---- */
 @media (min-width:641px) and (max-width:1000px){ .marq-set>.card>.meta,#more-from .card .meta,.grid-5 .card .meta{min-height:2.8em} }
-@media (max-width:760px){ .chap-works.n3 figcaption,.chap-works.n4 figcaption{min-height:2.8em} }
 
 /* C23: the Home hero pair on a phone says "Enter the studio" (desktop keeps "Walk through the studio") */
 .lbl-phone{display:none}
@@ -135,7 +122,7 @@
 
 /* ---- B4 · Collections tile row (4-REVIEW1-DECISION 4.2): kept, smaller, styled like every other card, and each tile
    jumps to its band on the page (instant, no smooth-scroll). ---- */
-.five-stage{aspect-ratio:auto !important;height:200px;background:#FFFFFF !important;align-self:stretch}
+.five-stage{aspect-ratio:auto !important;height:200px;background:#F5F4F0 !important;align-self:stretch}
 .five-stage img{border:4px solid var(--frame);box-shadow:0 10px 24px -10px rgba(0,0,0,.28)}
 .five-b{align-items:center;text-align:center}
 .five-b:hover .five-t{color:inherit !important;text-decoration:underline;text-underline-offset:4px;text-decoration-thickness:1px}
@@ -148,11 +135,8 @@ html:has(.five){scroll-behavior:auto}
 }
 
 /* ---- B4 · hero heights and hero buttons (4-REVIEW1-DECISION 4.3) ---- */
-/* Works on a laptop: a short hero, so the filter bar and the top of the first row show at 1440 x 900 */
-@media (min-width:641px){ body:has(.pf-grid.works-grid) .wh .collage{height:clamp(280px,36vh,340px) !important;min-height:0 !important} }
+/* R3 (4-R3-DECISION §3): the heroes are a little taller, leaving a hint of the page below; heights now live in the R3 block */
 @media (max-width:640px){
-  .wh-home .collage{height:min(68svh,520px) !important;min-height:0 !important}
-  .wh-page .collage,body:has(.pf-grid.works-grid) .wh .collage{height:min(58svh,440px) !important;min-height:0 !important}
   .wh .namecard,.wh .namecard.has-face{min-height:0 !important}
   .wh .namecard .ctas{display:grid !important;grid-template-columns:1fr 1fr;gap:8px;width:100%}
   .wh .namecard .ctas .btn{width:100% !important;min-height:44px !important;padding-inline:10px !important;white-space:nowrap}
@@ -161,10 +145,6 @@ html:has(.five){scroll-behavior:auto}
 
 /* ---- B4 · Exhibitions on the same container as every other page (4.5; T17): no narrower column, no blank left ---- */
 .ex-index,.ex-ch,.ex-press,.ex-record,.now-line{max-width:calc(var(--max) + 2 * var(--gut)) !important}
-@media (min-width:901px){
-  .ex-ch-body{grid-template-columns:minmax(0,1fr) minmax(0,1.15fr) !important;column-gap:48px !important;padding-left:0 !important;align-items:center !important}
-  /* review #2: with the lede gone the text column is short; centre it on the photo so the space reads as intended */
-}
 
 /* ---- B3 3.8 · a separator dot belongs to the part before it, so no wrapped line starts with "·" ---- */
 .meta-parts .mp + .mp::before{content:none !important}
@@ -180,15 +160,13 @@ html[data-motion="paused"] *,html[data-motion="paused"] *::before,html[data-moti
    phone chapter swipes keep the picture centred over its caption */
 @media (min-width:768px){ .hdr{padding-top:0 !important} }
 @media (max-width:640px){ .ftr-motion{min-height:44px;display:inline-flex;align-items:center} }
-@media (max-width:760px){ .chap-works.n3>figure>a,.chap-works.n4>figure>a{align-self:auto} }
 /* Exhibitions: less empty page between the record and the end band (QC G4: 142 px) */
 .ex-record{padding-bottom:clamp(16px,2vw,28px) !important}
 .ex-record + .sec-tight{padding-top:clamp(12px,1.6vw,20px) !important}
 
 /* review #2 (Brand P2-4 / COO #10): the hero wall drifts, so a tile is always crossing its bottom edge; a hard cut read as a
    clipped caption ("Lighting the lamp"). The last 48 px of the wall now fade out, so a passing tile dissolves instead of being cut. */
-.wh .collage{-webkit-mask-image:linear-gradient(180deg,#000 calc(100% - 48px),transparent) !important;
-                    mask-image:linear-gradient(180deg,#000 calc(100% - 48px),transparent) !important}
+/* (R6 perf fix 2: the fade is now a still overlay, see the R6 perf block at the end of this file) */
 
 /* DC review #2 P1-3: phone press row, every card the same 4:3 picture box; the Delhi Times clipping sits whole (contain) on
    the cream it already has on desktop, so it no longer runs 40 px taller and leaves a blank under the others */
@@ -200,13 +178,196 @@ html[data-motion="paused"] *,html[data-motion="paused"] *::before,html[data-moti
 /* review #2 R2-7: a disabled pager button is not a box */
 .pf-pager .btn:disabled,.pf-pager .btn[aria-disabled="true"]{opacity:.4 !important;border-color:transparent !important;background:transparent !important}
 
-/* COO stage 7: Exhibitions chapter (>900px) as one two-column grid. The LEFT column holds the whole text group (year + title,
-   venue line, quote, On the walls), kept together and centred against the photo column on the right; the header no longer spans
-   above. Spacer rows 1 and 4 (1fr each) do the centring. <=900px is unchanged. */
-@media (min-width:901px){
-  .ex-ch{display:grid !important;grid-template-columns:minmax(0,1fr) minmax(0,1.15fr);grid-template-rows:1fr auto auto 1fr;column-gap:48px}
-  .ex-ch>.ex-ch-body{display:contents !important}
-  .ex-ch>.ex-ch-head{grid-column:1;grid-row:2;margin-bottom:24px !important}
-  .ex-ch .ex-ch-txt{grid-column:1;grid-row:3;padding:0 !important;margin:0 !important}
-  .ex-ch .ex-ch-body>.sm-media{grid-column:2;grid-row:1 / -1;align-self:center;margin:0 !important}
+/* ---- R3 ---- */
+/* §3 heroes: a little taller, a hint of the next section still showing (Shubham 20 Oct) */
+:root{--hint:64px}
+@media (min-width:641px){
+  .wh-home .collage,.wh-page .collage{height:min(calc(100svh - var(--hdr-h) - var(--hint)),780px) !important;min-height:0 !important}
+  body:has(.pf-grid.works-grid) .wh .collage{height:clamp(380px,46svh,440px) !important;min-height:0 !important}
+}
+@media (max-width:640px){
+  :root{--hint:72px}
+  .wh-home .collage{height:min(calc(100svh - var(--hdr-h) - var(--hint)),600px) !important;min-height:0 !important}
+  .wh-page .collage,body:has(.pf-grid.works-grid) .wh .collage{height:min(64svh,520px) !important;min-height:0 !important}
+}
+/* §3 name box: less padding round the same type (no font changes; type stays in tokens.css) */
+.wh .namecard{width:fit-content !important;max-width:min(440px,calc(100% - 48px)) !important;min-width:min(360px,calc(100% - 48px));padding:28px 36px 26px !important;gap:0 !important}
+.wh .namecard .eyebrow{margin:0 0 8px !important}
+.wh .namecard h1{margin:0 0 6px !important}
+.wh .namecard .wh-line{margin:0 0 18px !important}
+.wh .namecard .ctas{margin-top:0 !important;gap:10px}
+.wh .namecard .face{margin-bottom:8px !important}
+@media (max-width:640px){
+  .wh .namecard{padding:20px 20px 18px !important;max-width:calc(100% - 40px) !important;min-width:0}
+  .wh .namecard .wh-line{margin-bottom:14px !important}
+  .wh .namecard .ctas{gap:8px}
+}
+/* §2 In the press: one moving row of all ten (Marquee + lib/drift; never stops under the mouse, CR-007) */
+.press.press-row{display:block !important;column-count:auto !important;overflow:visible !important;margin:0 !important;padding:0 !important;scroll-snap-type:none !important}
+.press-row{--ph:240px;--pgap:28px}
+@media (max-width:1099px){ .press-row{--ph:210px;--pgap:22px} }
+@media (max-width:640px){ .press-row{--ph:180px;--pgap:16px} }
+.press-marq.marq{padding:24px 0 40px !important;margin-inline:calc(-1 * var(--gut))}
+.press-marq .marq-track{padding-left:40px}
+.press-marq .marq-set{gap:var(--pgap) !important;padding-right:var(--pgap) !important;align-items:flex-start}
+.press-marq .press-item{flex:none;width:auto;min-width:220px;margin:0 !important;break-inside:auto;display:flex;flex-direction:column;gap:12px}
+.press-marq .media{position:relative;display:block;margin-inline:auto;padding:0;height:var(--ph);width:calc(var(--ph) * var(--ar));line-height:0;cursor:pointer;
+  border:1px solid #000;background:var(--paper,#F6F3EE);box-shadow:var(--card-shadow,var(--paper-shadow))}
+.press-marq .media img{width:100% !important;height:100% !important;max-height:none !important;aspect-ratio:auto !important;object-fit:cover !important;border:0 !important;box-shadow:none !important;transform:none !important;display:block}
+.press-marq .is-clipping .media img{object-fit:contain !important;padding:10px;background:var(--paper,#F6F3EE) !important}
+.press-marq .press-play{pointer-events:none}
+.press-marq figcaption{width:0;min-width:100%;display:flex;flex-direction:column;gap:3px}
+.press-marq figcaption b{display:-webkit-box;-webkit-line-clamp:2;-webkit-box-orient:vertical;overflow:hidden;min-height:2lh;text-wrap:balance}
+.press-marq figcaption span{display:block}
+@media (max-width:640px){ .press-marq .press-item{min-width:180px} .press-marq figcaption span{min-height:2lh} }
+.press-row .press-more{margin-top:0}
+/* ---- R6 §2d Exhibitions (Shubham 20 Oct 22:50: "more dense, side by side"): each show one compact row.
+   Left: the photograph (top- and left-aligned in a fixed-height stage) and one line of at most five tiles under it,
+   sharing its left edge, 10 px below it. Right: year, title, where, her words, the caption ("On the walls").
+   Phone: heading, photograph, strip (scrolls by hand), caption, quote. Type sizes live in tokens.css (R6 block). ---- */
+.sm-more,.sm-strip .sm-more{display:none}
+.ex-ch{border-top:1px solid var(--hair)}
+.ex-ch.band-cream{background:transparent}
+.ex-ch .sm-media,.ex-ch .ex-ch-side{display:contents !important}
+.ex-ch .ex-ch-media{display:flex;flex-direction:column;gap:7px;width:100%;min-width:0;container-type:inline-size}
+.ex-ch .sm-hero{height:min(360px,64cqw) !important;width:100%;place-items:start start !important;justify-items:start !important;align-items:start !important;padding:0 !important}
+.ex-ch .sm-hero img{max-height:100% !important;max-width:100% !important}
+.ex-ch .sm-strip{display:flex !important;flex-wrap:nowrap !important;gap:8px !important;margin:0 -3px !important;padding:3px !important;overflow:hidden !important}
+.ex-ch .sm-strip button{flex:none !important;width:84px !important;height:56px !important;min-width:0 !important;min-height:0 !important;aspect-ratio:auto !important}
+.ex-ch .sm-strip button img{width:100%;height:100%;object-fit:cover}
+.ex-ch .sm-strip:has(.sm-more)>button:not(.sm-more):nth-child(n+5){display:none !important}
+.ex-ch .sm-strip .sm-more{display:grid !important;place-items:center;background:var(--paper,#F6F3EE);box-shadow:inset 0 0 0 1px var(--rule)}
+.ex-ch .ex-ch-head{display:block !important;margin:0 0 12px !important;padding:0 !important}
+.ex-ch .ex-ch-head .ex-ch-year{display:block;margin:0 0 4px}
+.ex-ch .ex-ch-head h2{margin:0}
+.ex-ch .ex-ch-where{margin:6px 0 0 !important}
+.ex-ch .ex-ch-txt{margin:16px 0 0 !important;padding:0 !important}
+.ex-ch .sm-cap{display:block !important;margin:16px 0 0 !important;-webkit-line-clamp:unset !important;line-clamp:none !important;height:auto !important;min-height:0 !important;overflow:visible !important}
+.sm-walls a{text-decoration:underline;text-underline-offset:4px}
+@media (min-width:641px){
+  .ex-ch{display:grid !important;grid-template-columns:minmax(0,1fr) minmax(0,1fr);grid-template-rows:auto auto auto 1fr;column-gap:32px;align-items:start;padding-block:36px !important}
+  .ex-ch .ex-ch-media{grid-column:1;grid-row:1 / -1}
+  .ex-ch .ex-ch-head,.ex-ch .ex-ch-txt,.ex-ch .sm-cap{grid-column:2}
+  .ex-ch .ex-ch-head{grid-row:1}
+  .ex-ch .ex-ch-txt{grid-row:2}
+  .ex-ch .sm-cap{grid-row:3}
+  .ex-ch .sm-strip button{width:72px !important;height:48px !important}
+  .ex-ch .sm-hero{height:min(300px,64cqw) !important}
+}
+@media (min-width:1100px){
+  .ex-ch{grid-template-columns:minmax(0,560px) minmax(0,1fr);column-gap:48px;padding-block:40px !important}
+  .ex-ch .sm-hero{height:min(360px,64cqw) !important}
+  .ex-ch .sm-strip button{width:84px !important;height:56px !important}
+}
+@media (max-width:640px){
+  .ex-ch{display:flex !important;flex-direction:column;gap:14px;padding-block:28px !important}
+  .ex-ch .ex-ch-head{order:1;margin:0 !important}
+  .ex-ch .ex-ch-media{order:2}
+  .ex-ch .sm-cap{order:3;margin:0 !important}
+  .ex-ch .ex-ch-txt{order:4;margin:0 !important}
+  .ex-ch .sm-hero{height:min(62vw,260px) !important}
+  .ex-ch .sm-strip{overflow-x:auto !important}
+  .ex-ch .sm-strip button{width:64px !important;height:44px !important}
+  .ex-ch .sm-strip:has(.sm-more)>button:not(.sm-more):nth-child(n+5){display:block !important}
+  .ex-ch .sm-strip .sm-more{display:none !important}
+}
+/* the index fits one line at 1440 */
+@media (min-width:1100px){ .ex-index{flex-wrap:nowrap;gap:0 24px} .ex-index a{white-space:nowrap} }
+
+/* R4 B2-2: where the collections switcher is sticky (>=761), anchors land below header bar + switcher (44 px) */
+@media (min-width:761px){
+  html:has(.csw) :is(.ex-ch,.sband,[id]){scroll-margin-top:calc(var(--hdr-bar) + 1px + 44px + 16px)}
+}
+
+/* R4 fix 6 (consultant P1-5): the band fade sits wholly outside the first painting. The first painting starts 48 px into
+   the row's window (marq + track padding); the fade now runs over 8 to 48 px, so at rest the first painting is at full
+   strength, and the previous painting's frame (which ended ~4 px into the window, inside the old 0 to 24 px fade) is
+   wholly transparent instead of a faint vertical bar. A painting only fades while it passes the edge. */
+/* (R6 perf fix 2: this fade is now a still overlay with the same stops, see the R6 perf block at the end of this file) */
+
+/* ---- R6 §4a Home, Key collections (Shubham 20 Oct 22:50: "all look different in size; make that area smaller"):
+   a still row (no marquee), every painting at one height inside its frame and mat, never cropped, centred. ---- */
+.series-row{display:flex;justify-content:center;align-items:flex-end;gap:40px;padding-block:8px 32px;margin:0 auto;list-style:none}
+.series-row .m-card{width:auto !important;flex:none;display:flex;flex-direction:column;align-items:center;text-align:center;gap:6px}
+.series-row .mat{height:auto !important;aspect-ratio:auto !important;padding:0 !important;width:auto !important;display:block !important;container-type:normal !important}
+.series-row .mat img{height:200px !important;width:auto !important;max-height:none !important;max-width:none !important;object-fit:contain;box-sizing:border-box;margin:0 !important;display:block}
+.series-row .card-t,.series-row .meta{text-align:center;margin-inline:auto}
+.series-row .m-card .meta{white-space:nowrap}
+/* the band stays <= 460 px at 1440 (was ~770): a tighter head over the row */
+.layer.band-indigo:has(.series-row) .sec{padding-top:16px !important;padding-bottom:24px !important}
+.layer.band-indigo:has(.series-row) .sec .sec-head{margin-bottom:0 !important}
+@media (max-width:1099px){
+  .series-row{justify-content:flex-start;gap:28px;overflow-x:auto;overscroll-behavior-x:contain;scroll-snap-type:x proximity;padding-inline:var(--gut);scrollbar-width:none;max-width:none !important}
+  .series-row::-webkit-scrollbar{display:none}
+  .series-row .m-card{scroll-snap-align:start}
+  .series-row .mat img{height:170px !important}
+}
+@media (max-width:640px){
+  .series-row{gap:20px;padding-bottom:36px}
+  .series-row .mat img{height:150px !important}
+}
+
+/* ---- R6 §4b Home, the artist band: portrait, who she is, and "In the press" beside it (no red here) ---- */
+.hw-band{padding-block:56px !important}
+.hw-in{display:grid !important;grid-template-columns:200px minmax(0,1fr) 340px;column-gap:48px;align-items:center;justify-content:stretch !important}
+.hw-in .round{width:200px !important;height:200px !important}
+.hw-intro{display:flex;flex-direction:column;align-items:flex-start;gap:0;min-width:0}
+.hw-intro .eyebrow{margin:0 0 8px}
+.hw-intro h2{margin:0 0 12px}
+.hw-lede{margin:0 0 16px;max-width:560px}
+.hw-press{border-left:1px solid var(--hair);padding-left:32px;min-width:0}
+.hw-press h3{margin:0 0 8px}
+.hw-press ul{list-style:none;margin:0 0 12px;padding:0}
+.hw-press li{margin:0;padding:0}
+.hw-pi{display:grid;grid-template-columns:72px 1fr;column-gap:14px;align-items:center;min-height:54px;padding-block:8px;text-decoration:none;color:inherit}
+.hw-pi-img{position:relative;display:block;width:72px;height:54px;line-height:0}
+.hw-pi-img img{width:72px;height:54px;object-fit:cover;display:block;border:1px solid var(--rule);box-sizing:border-box;background:#FAF9F6}
+.hw-pi.is-video .hw-pi-img::after{content:"";position:absolute;left:50%;top:50%;width:0;height:0;margin:-7px 0 0 -5px;
+  border-style:solid;border-width:7px 0 7px 11px;border-color:transparent transparent transparent #F3EEE7;filter:drop-shadow(0 1px 2px rgba(0,0,0,.5))}
+.hw-pi-t{display:flex;flex-direction:column;gap:2px;min-width:0}
+.hw-pi-t p{margin:0}
+.hw-pi:hover b{text-decoration:underline;text-underline-offset:4px;text-decoration-thickness:1px}
+@media (min-width:641px) and (max-width:1099px){
+  .hw-band{padding-block:48px !important}
+  .hw-in{grid-template-columns:160px minmax(0,1fr);row-gap:32px}
+  .hw-in .round{width:160px !important;height:160px !important}
+  .hw-press{grid-column:1 / -1;border-left:0;border-top:1px solid var(--hair);padding:24px 0 0}
+  .hw-press ul{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:20px}
+}
+@media (max-width:640px){
+  .hw-band{padding-block:40px !important}
+  .hw-in{grid-template-columns:minmax(0,1fr);row-gap:24px}
+  .hw-in .round{width:120px !important;height:120px !important}
+  .hw-press{border-left:0;border-top:1px solid var(--hair);padding:24px 0 0}
+  .hw-pi{min-height:54px}
+}
+
+/* ---- R6 perf fix 2 (PERF-DIAGNOSIS §2): no mask on a box whose content moves. A mask there is re-applied on every frame.
+   Each fade is now a still gradient overlay in the ground colour, with the same stops as the mask it replaces
+   (content x a + ground x (1 - a) is what the mask showed, and is what the overlay paints), so the look is unchanged. ---- */
+.marq,.ig-roll,.wh .collage{--fade-bg:#F5F4F0}
+.band-indigo .marq,.ab-band.tone-dark .marq,.sband.band-indigo .marq{--fade-bg:var(--indigo,#211B18)}
+.wh .collage::after,.press-marq.marq::after,.ig-roll::after{content:"";position:absolute;inset:0;pointer-events:none;z-index:3}
+.press-marq.marq,.ig-roll{position:relative}
+/* hero wall: its last 48 px fade out */
+.wh .collage::after{display:block;background:linear-gradient(180deg,transparent calc(100% - 48px),var(--fade-bg));-webkit-backdrop-filter:none;backdrop-filter:none}
+/* press row: 40 px at each end */
+.press-marq.marq::after{background:linear-gradient(90deg,var(--fade-bg),transparent 40px,transparent calc(100% - 40px),var(--fade-bg))}
+/* Home Instagram roll: 24 px at each end */
+.ig-roll::after{background:linear-gradient(90deg,var(--fade-bg) 0,transparent 24px,transparent calc(100% - 24px),var(--fade-bg))}
+/* /series bands (>=761): clear 0 to 8 px, fading in to 2 x --fade on the left; --fade on the right */
+@media (min-width:761px){
+  .sband .band-marq{position:relative}
+  .sband .band-marq::after{content:"";position:absolute;inset:0;pointer-events:none;z-index:3;
+    background:linear-gradient(90deg,var(--fade-bg) 0,var(--fade-bg) 8px,transparent calc(var(--fade) * 2),transparent calc(100% - var(--fade)),var(--fade-bg))}
+}
+/* R6 §4b at >=1600 (as R4 polish 4 did for this band): a larger portrait and wider measure, so the band is not a thin
+   strip across a wide screen (QC S3 fill at 1920 was 0.23 with the 1440 values) */
+@media (min-width:1600px){
+  .hw-band{padding-block:36px !important}
+  .hw-in{grid-template-columns:280px minmax(0,1fr) 380px;column-gap:56px}
+  .hw-in .round{width:280px !important;height:280px !important}
+  .hw-lede{max-width:640px}
+  .hw-pi{grid-template-columns:88px 1fr}
+  .hw-pi-img,.hw-pi-img img{width:88px;height:66px}
 }

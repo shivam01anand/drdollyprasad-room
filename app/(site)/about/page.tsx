@@ -3,8 +3,8 @@ import Link from "next/link";
 import Roll, { type RollItem } from "@/components/site/Roll";
 import WallHero from "@/components/site/WallHero";
 import { ABOUT_WALL } from "@/components/site/Collage";
-import Press from "@/components/site/Press";
-import { PRESS_SHORT } from "@/lib/press";
+import PressRow from "@/components/site/PressRow";
+import { PRESS_ALL } from "@/lib/press";
 import { LOOK, PULL, ON_THE_WORK, PORTRAIT_LARGE, STUDIO_PATH, shownYear } from "@/lib/site";
 import { BY_ID, workPath } from "@/lib/works";
 
@@ -91,7 +91,7 @@ export default function About() {
         </div>
       </section>
 
-      {/* In the press, short (CR-005): right after the second section, linking to the full set on Exhibitions */}
+      {/* In the press (R3): the same moving row of every item as Exhibitions, linking on to it */}
       <section className="ab-band tone-dark band-indigo ab-press" aria-labelledby="ab-press-h">
         <div className="wrap">
           <div className="sec-head">
@@ -100,7 +100,7 @@ export default function About() {
               <h2 id="ab-press-h">In the press</h2>
             </div>
           </div>
-          <Press items={PRESS_SHORT} more={{ href: "/exhibitions#press", label: "All the press, on Exhibitions" }} />
+          <PressRow items={PRESS_ALL} more={{ href: "/exhibitions#press", label: "All the press, on Exhibitions" }} />
         </div>
       </section>
 

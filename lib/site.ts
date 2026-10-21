@@ -149,6 +149,41 @@ export type SeriesPage = {
 };
 
 export const SERIES_PAGES: SeriesPage[] = [
+  // R4 B1-3: newest first. This array is the one order source for every listing of the collections.
+  {
+    slug: "recent-work", label: "Onset of Spring", period: "2024 to 2026",
+    line: "Flowers, leaves, a bird and a pause, in her own words. Beauty, found even among the thorns.",
+    hero: "boy-with-bananas",
+    held: "The smallest moments bloom, if you stop long enough to see them.",
+    intro: [
+      "Her spring work turns inward, and looks up. A child beneath banana leaves. A woman beside a bird. Bells hung with red thread. Beauty, noticed anyway.",
+      "Five of the six paintings come with her own words. They are given here in full.",
+    ],
+    chapters: [
+      { title: "Under Canopy of Greens", works: ["boy-with-bananas"], room: true, hers: true, big: WORDS["boy-with-bananas"] },
+      { title: "Threads of Faith", works: ["temple-bells"], hers: true, big: WORDS["temple-bells"] },
+      { title: "Whispers of Stillness", works: ["woman-with-bird"], room: true, dark: true, hers: true, big: WORDS["woman-with-bird"] },
+      { title: "Petals of Thought", works: ["woman-with-red-flower"], hers: true, big: WORDS["woman-with-red-flower"] },
+      { title: "Blooming Innocence", works: ["child-among-flowers"], room: true, hers: true, big: WORDS["child-among-flowers"] },
+      { title: "Woman with Poppies", works: ["woman-with-poppies"], big: LOOK["woman-with-poppies"] },
+    ],
+  },
+  {
+    slug: "bandh-darwaze", label: "Bandh Darwaze", period: "2018",
+    line: "Four shut doors: a ring, a lock, a bolt, a knocker. A closed door is a door someone cared for.",
+    hero: "red-and-teal-door-lock",
+    held: "A closed door keeps one world inside, and turns you toward another.",
+    intro: [
+      "Bandh darwaze: closed doors. Four small square canvases, each a close look at the hardware of an old door, painted over worn, colour-washed wood.",
+      "No people, no rooms. Only what a hand reaches for at a threshold. Shut, but kept: the layered paint is proof of care.",
+    ],
+    chapters: [
+      { title: "The ring and the lock", works: ["weathered-door-ring", "red-and-teal-door-lock"], dark: true,
+        big: "A ring to knock with. A lock to keep the rest unseen." },
+      { title: "The bolt and the knocker", works: ["teal-door-bolt", "carved-door-knocker"],
+        small: "A foot square each, the four are made to be seen together, on one wall." },
+    ],
+  },
   {
     slug: "gone-are-the-days", label: "Gone Are The Days", period: "2016 to 2018",
     line: "A tonga, a clay gullak, a twenty-paise coin. The ordinary days were the good ones, and here they still are.",
@@ -174,19 +209,21 @@ export const SERIES_PAGES: SeriesPage[] = [
     ],
   },
   {
-    slug: "bandh-darwaze", label: "Bandh Darwaze", period: "2018",
-    line: "Four shut doors: a ring, a lock, a bolt, a knocker. A closed door is a door someone cared for.",
-    hero: "red-and-teal-door-lock",
-    held: "A closed door keeps one world inside, and turns you toward another.",
+    slug: "portraits", label: "Portraits", period: "2005 to 2015",
+    line: "A turban, a kettle, a stack of kadhais. The people who carry our days, given a long, unhurried look.",
+    hero: "three-veiled-women",
+    held: "Every face you meet holds a story. Here, there is time to find it.",
     intro: [
-      "Bandh darwaze: closed doors. Four small square canvases, each a close look at the hardware of an old door, painted over worn, colour-washed wood.",
-      "No people, no rooms. Only what a hand reaches for at a threshold. Shut, but kept: the layered paint is proof of care.",
+      "The play of emotion on a face has always held her. These portraits stay close: elders in turbans, a chai boy between orders, a kadhai seller among his pans, a doodhwala on his round.",
+      "Each figure is painted with the things of their work beside them. The face is where you meet them; the rest is theirs to keep. The people who carry our days are given the time the street did not.",
     ],
     chapters: [
-      { title: "The ring and the lock", works: ["weathered-door-ring", "red-and-teal-door-lock"], dark: true,
-        big: "A ring to knock with. A lock to keep the rest unseen." },
-      { title: "The bolt and the knocker", works: ["teal-door-bolt", "carved-door-knocker"],
-        small: "A foot square each, the four are made to be seen together, on one wall." },
+      { title: "Turbans", works: ["red-turban-portrait", "yellow-turban-portrait", "patterned-turban-portrait"],
+        big: "Red, yellow, a lattice of cloth.", small: "The colour draws you in. The faces keep you there." },
+      { title: "Working lives", works: ["boy-and-kettle", "man-among-metal-pans", "milkman-on-bicycle"], dark: true,
+        small: "A kettle, a stack of kadhais, milk cans on a bicycle: each figure is painted with the things of their day." },
+      { title: "Together", works: ["three-veiled-women", "mother-and-child"], room: true,
+        big: "Red veils, gathered close." },
     ],
   },
   {
@@ -207,42 +244,6 @@ export const SERIES_PAGES: SeriesPage[] = [
         small: "A flame, a tree wound with thread, the morning news: the rituals of an ordinary day." },
     ],
   },
-  {
-    slug: "portraits", label: "Portraits", period: "2005 to 2015",
-    line: "A turban, a kettle, a stack of kadhais. The people who carry our days, given a long, unhurried look.",
-    hero: "three-veiled-women",
-    held: "Every face you meet holds a story. Here, there is time to find it.",
-    intro: [
-      "The play of emotion on a face has always held her. These portraits stay close: elders in turbans, a chai boy between orders, a kadhai seller among his pans, a doodhwala on his round.",
-      "Each figure is painted with the things of their work beside them. The face is where you meet them; the rest is theirs to keep. The people who carry our days are given the time the street did not.",
-    ],
-    chapters: [
-      { title: "Turbans", works: ["red-turban-portrait", "yellow-turban-portrait", "patterned-turban-portrait"],
-        big: "Red, yellow, a lattice of cloth.", small: "The colour draws you in. The faces keep you there." },
-      { title: "Working lives", works: ["boy-and-kettle", "man-among-metal-pans", "milkman-on-bicycle"], dark: true,
-        small: "A kettle, a stack of kadhais, milk cans on a bicycle: each figure is painted with the things of their day." },
-      { title: "Together", works: ["three-veiled-women", "mother-and-child"], room: true,
-        big: "Red veils, gathered close." },
-    ],
-  },
-  {
-    slug: "recent-work", label: "Onset of Spring", period: "2024 to 2026",
-    line: "Flowers, leaves, a bird and a pause, in her own words. Beauty, found even among the thorns.",
-    hero: "boy-with-bananas",
-    held: "The smallest moments bloom, if you stop long enough to see them.",
-    intro: [
-      "Her spring work turns inward, and looks up. A child beneath banana leaves. A woman beside a bird. Bells hung with red thread. Beauty, noticed anyway.",
-      "Five of the six paintings come with her own words. They are given here in full.",
-    ],
-    chapters: [
-      { title: "Under Canopy of Greens", works: ["boy-with-bananas"], room: true, hers: true, big: WORDS["boy-with-bananas"] },
-      { title: "Threads of Faith", works: ["temple-bells"], hers: true, big: WORDS["temple-bells"] },
-      { title: "Whispers of Stillness", works: ["woman-with-bird"], room: true, dark: true, hers: true, big: WORDS["woman-with-bird"] },
-      { title: "Petals of Thought", works: ["woman-with-red-flower"], hers: true, big: WORDS["woman-with-red-flower"] },
-      { title: "Blooming Innocence", works: ["child-among-flowers"], room: true, hers: true, big: WORDS["child-among-flowers"] },
-      { title: "Woman with Poppies", works: ["woman-with-poppies"], big: LOOK["woman-with-poppies"] },
-    ],
-  },
 ];
 
 /** the one painting that stands for each collection where only one is shown (Shubham, 20 Oct): the strongest image */
@@ -251,10 +252,44 @@ export const LEAD: Record<string, string> = {
   portraits: "red-turban-portrait", "recent-work": "woman-with-poppies",
 };
 
+/** the collection order, newest first (R4 B1-3); every listing reads SERIES_PAGES, this is its slug list */
+export const SERIES_ORDER = SERIES_PAGES.map((s) => s.slug);
 export const SERIES_BY_LABEL = new Map(SERIES_PAGES.map((s) => [s.label, s]));
 export const SERIES_BY_SLUG = new Map(SERIES_PAGES.map((s) => [s.slug, s]));
 export const seriesPath = (label: string) => `/series/${SERIES_BY_LABEL.get(label)?.slug ?? ""}`;
 export const worksIn = (label: string) => WORKS.filter((w) => w.series === label);
+
+/* ---- R4 B2-1: one order, so the switcher, the pager, the story page and the bands cannot disagree ---- */
+/** a collection's paintings in her chapter order (flattened), then any not featured in a chapter, in register order */
+export function collectionOrder(slug: string): string[] {
+  const s = SERIES_BY_SLUG.get(slug);
+  if (!s) return [];
+  const featured = [...featuredIds(s)];
+  return [...featured, ...worksIn(s.label).map((w) => w.id).filter((id) => !featured.includes(id))];
+}
+/** every painting a story page shows in its chapters, in chapter order */
+export const featuredIds = (s: SeriesPage) => new Set(s.chapters.flatMap((c) => c.works));
+/** the collections either side, wrapping round (Faith -> Onset of Spring; Onset of Spring <- Faith) */
+export function seriesNeighbours(slug: string) {
+  const i = SERIES_PAGES.findIndex((s) => s.slug === slug), n = SERIES_PAGES.length;
+  return { prev: SERIES_PAGES[(i - 1 + n) % n], next: SERIES_PAGES[(i + 1) % n] };
+}
+/**
+ * a painting's neighbours inside its collection. At the ends, prev/next are the last/first painting of the
+ * adjacent collection, flagged with `crossesTo` (that collection's slug); the painting page then links to
+ * that collection's story page.
+ */
+export function neighbours(id: string) {
+  const w = WORKS.find((x) => x.id === id);
+  const s = w ? SERIES_BY_LABEL.get(w.series) : undefined;
+  if (!w || !s) return undefined;
+  const order = collectionOrder(s.slug), index = order.indexOf(id), total = order.length;
+  const { prev: ps, next: ns } = seriesNeighbours(s.slug);
+  const prev = index > 0 ? { id: order[index - 1] } : { id: collectionOrder(ps.slug).at(-1)!, crossesTo: ps.slug };
+  const next = index < total - 1 ? { id: order[index + 1] } : { id: collectionOrder(ns.slug)[0], crossesTo: ns.slug };
+  return { prev, next, index, total, slug: s.slug } as {
+    prev: { id: string; crossesTo?: string }; next: { id: string; crossesTo?: string }; index: number; total: number; slug: string };
+}
 
 /** these photographs are too small to enlarge; they stay in the catalogue but out of showcases */
 export const SMALL_PHOTO = new Set(["elder-woman-portrait", "horse-cart-and-autorickshaw", "rickshaw-and-autorickshaw", "riverside-figures"]);
@@ -342,9 +377,6 @@ const CAP: Record<string, string> = {
   "kala-painting": "The Cart-Man and the Rupaya, Kala Mela",
   "kala-selfie": "A visitor’s selfie with the paintings, Kala Mela",
   "kala-booklet": "The First International Kala Mela booklet",
-  "triveni-1": "The invitation, Triveni Kala Sangam, May 2007",
-  "triveni-2": "The back of the invitation, Triveni Kala Sangam",
-  "triveni-3": "The artist sheet, Triveni Kala Sangam",
 };
 const ph = (n: string, alt: string): Photo => ({ src: `/site/ex/${n}.jpg`, alt, ...(CAP[n] ? { cap: CAP[n] } : {}) });
 
@@ -363,7 +395,8 @@ export const NOW = {
   works: ["temple-bells", "boy-with-bananas"],
 };
 
-export const SHOWS: Show[] = [
+/** the shows as first recorded (the Exhibitions hero wall keeps this column order and its tones) */
+export const SHOWS_AS_RECORDED: Show[] = [
   {
     id: "india-habitat-centre-2010", title: "India Habitat Centre", kind: "Exhibition", where: "Open Palm Court, India Habitat Centre, New Delhi · November 2010",
     venue: "Open Palm Court, India Habitat Centre", city: "New Delhi", when: "November 2010", year: "2010",
@@ -423,19 +456,17 @@ export const SHOWS: Show[] = [
       ] },
     ],
   },
-  {
-    id: "triveni-2007", title: "Triveni Kala Sangam", name: "Recent paintings, with Sangeeta Sharma", kind: "Two-artist exhibition", where: "Two-artist exhibition · Triveni Kala Sangam, Mandi House, New Delhi · 10 to 20 May 2007",
-    venue: "Triveni Kala Sangam, Mandi House", city: "New Delhi", when: "10 to 20 May 2007", year: "2007",
-    lede: "The invitation keeps what no photograph did: two names, ten days in May, and the paintings chosen to introduce them, among them Lajja, Intezar and Mannat.",
-    albums: [
-      { title: "The invitation", line: "From the paper archive.", photos: [
-        ph("triveni-1", "The invitation to an exhibition of recent paintings by Dolly Prasad and Sangeeta Sharma, Triveni Kala Sangam, 10 to 20 May 2007."),
-        ph("triveni-2", "The back of the invitation, with paintings and small portraits of Sangeeta Sharma and Dolly Prasad."),
-        ph("triveni-3", "The artist sheet: the invitation, her portrait and three paintings, Lajja, Intezar and Mannat."),
-      ] },
-    ],
-  },
 ];
+
+const MONTHS = ["january", "february", "march", "april", "may", "june", "july", "august", "september", "october", "november", "december"];
+/** a show's date as a number (year * 100 + the last month named in `when`), for newest-first order */
+export const showKey = (sh: { year: string; when: string }) => {
+  const m = sh.when.toLowerCase().match(new RegExp(MONTHS.join("|"), "g"));
+  return Number(sh.year) * 100 + (m ? MONTHS.indexOf(m[m.length - 1]) + 1 : 0);
+};
+/** R4 fix 7 (Brand P1-5, "latest first"): the one sorted source, newest first: Kala Mela 2018, India Habitat Centre
+ *  Nov 2010, A Lifetime to Paint June 2010. Every listing of the shows reads this (Exhibitions sets its own order, R6). */
+export const SHOWS: Show[] = [...SHOWS_AS_RECORDED].sort((a, b) => showKey(b) - showKey(a));
 
 export const PRESS = {
   clipping: ph("delhi-times", "A Delhi Times clipping, Must See Must Do, listing Art Today And Tomorrow, a group show at Travancore Art Gallery."),
@@ -459,7 +490,7 @@ export const RECORD: RecordEntry[] = [
   { year: "2009", month: "March", venue: "Foyer, Convention Centre, India Habitat Centre", city: "Delhi" },
   { year: "2008", month: "September", venue: "Epicenter", city: "Gurgaon" },
   { year: "2008", month: "August", venue: "India Habitat Centre", city: "New Delhi" },
-  { year: "2007", month: "May", venue: "Triveni Kala Sangam", city: "New Delhi", show: "triveni-2007" },
+  { year: "2007", month: "May", venue: "Triveni Kala Sangam", city: "New Delhi" },
   { year: "2007", venue: "Travancore Art Gallery", city: "New Delhi" },
   { year: "2007", venue: "Indraprastha Art Gallery", city: "New Delhi" },
   { year: "2006", venue: "Nehru Art Gallery", city: "Bombay" },

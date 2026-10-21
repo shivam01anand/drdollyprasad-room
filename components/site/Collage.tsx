@@ -1,6 +1,6 @@
 import Link from "next/link";
 import { BY_ID, workPath } from "@/lib/works";
-import { LOOK, SERIES_PAGES, worksIn, ON_EXHIBITIONS, ON_THE_WORK, PRESS, PULL, SHOWS, SMALL_PHOTO, labelLine } from "@/lib/site";
+import { LOOK, SERIES_PAGES, worksIn, ON_EXHIBITIONS, ON_THE_WORK, PRESS, PULL, SHOWS, SHOWS_AS_RECORDED, SMALL_PHOTO, labelLine } from "@/lib/site";
 import { dims, smSet } from "@/lib/images";
 import { thumb } from "./Card";
 import WallDrift from "./WallDrift";
@@ -70,11 +70,24 @@ export const MIXED_WALL: Item[][] = [
 ];
 
 /** Collections (CR-007): one column per collection, led by its own label tile, then its paintings */
-const TONES = ["rust", "dark", "stone", "rust", "dark"] as const;
-export const SERIES_WALL: Item[][] = SERIES_PAGES.map((s, i) => [
-  { k: "n", em: "Collection", title: s.label, sub: `${worksIn(s.label).length} works · ${s.period}`, href: `/series/${s.slug}`, tone: TONES[i % TONES.length] } as Item,
+/** the tone cycle the exhibition wall uses by index (unchanged) */
+const TONE_CYCLE = ["rust", "dark", "stone", "rust", "dark"] as const;
+/** tones keyed by collection, so a reorder of SERIES_PAGES never recolours a tile (R4 B1-4) */
+const TONES: Record<string, "rust" | "dark" | "stone"> = {
+  "gone-are-the-days": "rust", "bandh-darwaze": "dark", faith: "stone", portraits: "rust", "recent-work": "dark",
+};
+export const SERIES_WALL: Item[][] = SERIES_PAGES.map((s) => [
+  { k: "n", em: "Collection", title: s.label, sub: `${worksIn(s.label).length} works · ${s.period}`, href: `/series/${s.slug}`, tone: TONES[s.slug] ?? "rust" } as Item,
   ...worksIn(s.label).map((w) => P(w.id)),
 ]);
+
+/**
+ * R4 fix 4 (Brand P1-4): the /series hero wall, seven columns. The two columns that drift behind the name box (3rd and
+ * 4th of 7) carry paintings only, so all five label tiles sit in the columns either side of the box. Same tiles,
+ * tones and labels; only the column order changes (newest first, left to right).
+ */
+const paintingsOnly = (col: Item[]) => { const p = col.filter((it) => it.k === "p"); const h = Math.ceil(p.length / 2); return [...p.slice(h), ...p.slice(0, h)]; };
+export const SERIES_HERO_WALL: Item[][] = [SERIES_WALL[0], SERIES_WALL[1], paintingsOnly(SERIES_WALL[2]), paintingsOnly(SERIES_WALL[3]), SERIES_WALL[2], SERIES_WALL[3], SERIES_WALL[4]];
 
 /** Works and About (CR-006): the same paintings, in another order, so every landing has its wall */
 export const WORKS_WALL: Item[][] = [...MIXED_WALL].reverse().map((c) => [...c].reverse());
@@ -96,8 +109,9 @@ export const ABOUT_WALL: Item[][] = ABOUT_BASE.map((col, i) => {
  * short lines about each show, the venues by name and the numbers from her record.
  * Everything here is from the site's own records (lib/site: SHOWS, PRESS, RECORD).
  */
-export const SHOW_WALL: Item[][] = SHOWS.map((sh, i) => [
-  { k: "n", em: sh.when, title: sh.name ?? sh.title, sub: `${sh.venue}, ${sh.city}`, href: `#${sh.id}`, tone: TONES[i % TONES.length] } as Item,
+// the hero wall keeps its recorded column order and tones (R4 fix 7 sorts the page's listings, not the wall's art)
+export const SHOW_WALL: Item[][] = SHOWS_AS_RECORDED.map((sh, i) => [
+  { k: "n", em: sh.when, title: sh.name ?? sh.title, sub: `${sh.venue}, ${sh.city}`, href: `#${sh.id}`, tone: TONE_CYCLE[i % TONE_CYCLE.length] } as Item,
   ...sh.albums.flatMap((al) => al.photos.map((ph) => X(ph.src, al.title, sh.title, sh.venue, ph.alt, `#${sh.id}`))),
   ...(sh.works ?? []).map((id) => P(id)),
 ]);
@@ -163,7 +177,9 @@ function Tile({ it }: { it: Item }) {
 }
 
 /** every column holds its list REP times, so it is full at the start and loops without a seam, however tall the wall */
-const repFor = (items: Item[]) => (items.length >= 8 ? 2 : 4);
+// R6 perf fix 4: fewer duplicate tiles. Measured (1440, 390, 2560 on /, /series, /exhibitions, /works): a seamless loop needs
+// 1 + wall height / one repeat <= 1.88 for every column, so two repeats cover any column of 6+ tiles and three any shorter one
+const repFor = (items: Item[]) => (items.length >= 6 ? 2 : 3);
 
 /** every wall is seven columns wide, so a tile is the same size on every page (CR-008); a short wall repeats its columns, the repeats started half way down */
 const WALL_COLS = 7;
