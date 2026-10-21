@@ -185,10 +185,17 @@ p{margin:0}
 .tile .framed{width:100%;height:auto}
 /* a painting tile turns over under the cursor to its label; the wall keeps moving */
 /* the still tile holds the hover; only the card inside turns, so it can never stall edge-on under the cursor */
-.tile.flip{position:relative;perspective:1000px}
-.tile.flip .flipper{position:relative;display:block;transform-style:preserve-3d;transition:transform .55s cubic-bezier(.3,.7,.2,1)}
-.tile.flip .framed{display:block;backface-visibility:hidden;-webkit-backface-visibility:hidden}
-.tile.flip .back{position:absolute;inset:0;transform:rotateY(180deg);backface-visibility:hidden;-webkit-backface-visibility:hidden;
+/* R6 perf fix 1: the 3D set-up (perspective, preserve-3d, backface) only where a tile can turn, i.e. under a mouse.
+   On a phone the back is display:none, so the 3D bought nothing and kept ~300 GPU layers alive on every moving wall. */
+.tile.flip{position:relative}
+.tile.flip .flipper{position:relative;display:block;transition:transform .55s cubic-bezier(.3,.7,.2,1)}
+.tile.flip .framed{display:block}
+@media (hover:hover){
+  .tile.flip{perspective:1000px}
+  .tile.flip .flipper{transform-style:preserve-3d}
+  .tile.flip .framed,.tile.flip .back{backface-visibility:hidden;-webkit-backface-visibility:hidden}
+}
+.tile.flip .back{position:absolute;inset:0;transform:rotateY(180deg);
   background:var(--bg);border:6px solid var(--frame);box-shadow:var(--lift);overflow:hidden;
   display:flex;flex-direction:column;justify-content:center;align-items:center;gap:6px;padding:12px;text-align:center;color:var(--ink);container-type:size}
 .tile.flip .back em{font-style:normal;font-size:13px;letter-spacing:.14em;text-transform:uppercase;color:var(--rust)}
@@ -923,11 +930,12 @@ h1,h2,h3{font-weight:500;letter-spacing:-.005em}
 .grid{gap:40px 22px}
 
 /* the collection tiles turn over on a computer: the painting, then the collection in a line */
-.flip-in{position:relative;transform-style:preserve-3d;transition:transform .9s var(--ease-io);margin-bottom:10px}
+.flip-in{position:relative;transition:transform .9s var(--ease-io);margin-bottom:10px}
+@media (hover:hover){ .flip-in{transform-style:preserve-3d} }
 .flip-in .mat{margin-bottom:0}
 .flip-back{position:absolute;inset:0;display:flex;flex-direction:column;justify-content:center;gap:10px;padding:12%;
   background:var(--ink);color:var(--bg);transform:rotateY(180deg);-webkit-backface-visibility:hidden;backface-visibility:hidden}
-.flip-front{-webkit-backface-visibility:hidden;backface-visibility:hidden}
+@media (hover:hover){ .flip-front{-webkit-backface-visibility:hidden;backface-visibility:hidden} }
 .flip-back em{font-style:normal;font-size:13px;letter-spacing:.2em;text-transform:uppercase;color:#E0A07E}
 .flip-back b{font-family:var(--serif);font-size:26px;font-weight:500;line-height:1.05}
 .flip-back span{font-size:15px;line-height:1.5;color:var(--dark-muted)}
