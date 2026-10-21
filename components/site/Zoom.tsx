@@ -10,7 +10,7 @@ import { reducedMotion } from "@/lib/motion";
  * (lib/closelook) on the painting page. A click or tap goes close to the
  * brushwork under it; the wheel, a trackpad pinch or two fingers set how
  * close; one finger or the pointer travels across the canvas. Esc, the close
- * button or the phone's back gesture return to the page. The largest file
+ * button, a click on the dark area or the phone's back gesture return to the page. The largest file
  * there is loads on the first zoom.
  */
 export default function Zoom({ id, src, alt, title, sub, onClose }: {
@@ -22,6 +22,21 @@ export default function Zoom({ id, src, alt, title, sub, onClose }: {
   const shut = useRef<HTMLButtonElement>(null);
   const done = useRef(onClose);
   done.current = onClose;
+  // R6: a click on the dark area (not the painting, not a button) closes, like the X.
+  // A pinch (second finger) or a drag that ends on the backdrop never closes.
+  const down = useRef<{ x: number; y: number; out: boolean } | null>(null);
+  const fingers = useRef(0);
+  const outside = (t: EventTarget | null) => !(t instanceof Element) || !t.closest(".zoom-frame, .zoom-bar button");
+  const onDown = (e: React.PointerEvent) => {
+    fingers.current++;
+    down.current = fingers.current > 1 ? (down.current ? { ...down.current, out: false } : null) : { x: e.clientX, y: e.clientY, out: outside(e.target) };
+  };
+  const onUp = () => { fingers.current = Math.max(0, fingers.current - 1); };
+  const onClick = (e: React.MouseEvent) => {
+    const d = down.current;
+    down.current = null;
+    if (d && d.out && outside(e.target) && Math.hypot(e.clientX - d.x, e.clientY - d.y) < 8) done.current();
+  };
 
   useEffect(() => {
     const touch = matchMedia("(pointer: coarse)").matches;
@@ -60,7 +75,8 @@ export default function Zoom({ id, src, alt, title, sub, onClose }: {
   }, [id]);
 
   return (
-    <div className="zoom" role="dialog" aria-modal="true" aria-label={`${title}, full screen`}>
+    <div className="zoom" role="dialog" aria-modal="true" aria-label={`${title}, full screen`}
+         onPointerDown={onDown} onPointerUp={onUp} onPointerCancel={onUp} onClick={onClick}>
       <div className="zoom-stage">
         <div className="zoom-frame" ref={frame} data-cursor="Look closer">
           {/* eslint-disable-next-line @next/next/no-img-element */}

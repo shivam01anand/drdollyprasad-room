@@ -100,7 +100,6 @@
   .pp-art img{width:calc((min(calc(100svh - var(--hdr-h,92px) - 140px),760px) - var(--fp)) * var(--ar) + var(--fp)) !important;max-width:100% !important}
   .pp-art img.is-small{width:calc((420px - var(--fp)) * var(--ar) + var(--fp)) !important}
   .pp-room{width:min(100%,900px,calc((100svh - var(--hdr-h,92px) - 140px) * 1.5)) !important}
-  .pp-detail-in{width:min(100%,760px) !important;max-height:calc(100svh - var(--hdr-h,92px) - 140px) !important}
 }
 @media (max-width:640px){
   .pp-strip{order:1;justify-content:center}
