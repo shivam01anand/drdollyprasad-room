@@ -263,7 +263,8 @@ export function driftRow(view: HTMLElement, track: HTMLElement, o: { seconds: nu
  * over `swaySeconds`. Dragging moves the wall sideways and (with a mouse) the
  * columns up or down; after a moment it carries on from where it was left.
  */
-const SETTLE_S = 0.8;
+const SETTLE_GLIDE_S = 1.2;
+const SETTLE_MAX_PX = 48;
 const LABEL = ".ncard,.ccard,.xcard,.qcard,.scard";
 /**
  * R4 fix 4: the start offset (px, per column) that keeps a hero wall's label tiles whole at first view. Scores every
@@ -306,6 +307,8 @@ function settleHero(cols: HTMLElement, st: { c: HTMLElement; down: boolean; dur:
       }
       // nearest to where it is now (mod one repeat), so the glide is short
       let d = y - s.y; d -= Math.round(d / s.h) * s.h;
+      // R6 perf fix 3: never glide more than 48 px (an offset of half a repeat read as the wall jumping at 100-600x its drift)
+      if (Math.abs(d) > SETTLE_MAX_PX) continue;
       cost += Math.abs(d) / 4000;
       if (cost < bestCost) { bestCost = cost; best = d; }
     }
@@ -343,7 +346,7 @@ export function driftWall(cols: HTMLElement, o: { swaySeconds?: number } = {}): 
   // R4 fix 4 (Brand P1-4): in a page hero, each column glides (0.8 s) to a start where its label tiles are whole:
   // >= 12 px below the header edge, clear of the name box by >= 16 px or wholly behind it, for the first few seconds
   const dy = settleHero(cols, st, motionScale(reduced));
-  let settle = dy ? SETTLE_S : 0;
+  let settle = dy && dy.some((v) => v) ? SETTLE_GLIDE_S : 0;
   const ro = new ResizeObserver(measure);
   ro.observe(cols);
 
@@ -357,7 +360,11 @@ export function driftWall(cols: HTMLElement, o: { swaySeconds?: number } = {}): 
   const stopClock = clock(cols, (dt, now) => {
     const m = motionScale(reduced);
     if (settle > 0 && dy) {
-      const f = Math.min(dt, settle) / SETTLE_S; settle -= dt;
+      // R6 perf fix 3: an eased glide (smoothstep), so it starts and lands at drift speed: <= 48 px over 1.2 s peaks at 60 px/s
+      const sstep = (u: number) => u * u * (3 - 2 * u);
+      const u0 = 1 - settle / SETTLE_GLIDE_S; settle -= dt;
+      const u1 = Math.min(1, 1 - Math.max(0, settle) / SETTLE_GLIDE_S);
+      const f = sstep(u1) - sstep(u0);
       st.forEach((s, i) => { s.y += dy[i] * f; wrapY(s); });
       if (held || m === 0) { paint(); return; }
     }
