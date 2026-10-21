@@ -50,7 +50,7 @@
 }
 
 /* ---- R4 B2-2: collections switcher (layout; type and colour in tokens.css) ---- */
-.csw{position:sticky;top:calc(var(--hdr-bar) + 1px);z-index:19;height:44px;background:rgba(255,255,255,.96);border-bottom:1px solid var(--rule)}
+.csw{position:sticky;top:calc(var(--hdr-bar) + 1px);z-index:19;height:44px;background:rgba(245,244,240,.96);border-bottom:1px solid var(--rule)}
 .csw-in{display:flex;gap:28px;justify-content:center;align-items:center;max-width:1360px;height:100%;margin-inline:auto;padding-inline:var(--gut);box-sizing:border-box;overflow-x:auto;overflow-y:hidden;scrollbar-width:none}
 .csw-in::-webkit-scrollbar{display:none}
 .csw-nav{flex:none}
@@ -79,10 +79,10 @@
 .pnx-n{text-align:center;margin:0 0 14px}
 .pnx-g{display:grid;grid-template-columns:1fr 1fr;gap:16px}
 .pnx-c{display:flex;flex-direction:column;justify-content:center;gap:8px;min-height:140px;padding:28px 32px;box-sizing:border-box;text-decoration:none}
-.pnx-prev{border:1px solid var(--ink);background:#FFFFFF}
-.pnx-next{background:#161E3A;border:1px solid #161E3A;text-align:right;align-items:flex-end}
+.pnx-prev{border:1px solid var(--ink);background:#F5F4F0}
+.pnx-next{background:#211B18;border:1px solid #211B18;text-align:right;align-items:flex-end}
 .pnx-prev:hover{background:var(--ink)}
-.pnx-next:hover{background:#1f2a52}
+.pnx-next:hover{background:#2E2622}
 @media (max-width:760px){
   .pnx-g{grid-template-columns:1fr;gap:12px}
   .pnx-next{order:-1}
@@ -274,7 +274,7 @@
    halo in the wall's tone, so it reads as passing under the card, never as clipped. */
 .wh .collage{-webkit-mask-image:linear-gradient(180deg,transparent 0,#000 16px,#000 calc(100% - 48px),transparent) !important;
                     mask-image:linear-gradient(180deg,transparent 0,#000 16px,#000 calc(100% - 48px),transparent) !important}
-.wh .wh-card.namecard{box-shadow:0 0 0 12px rgba(255,255,255,.72),0 0 28px 16px rgba(255,255,255,.55),var(--paper-shadow,0 0 0 transparent)}
+.wh .wh-card.namecard{box-shadow:0 0 0 12px rgba(245,244,240,.72),0 0 28px 16px rgba(245,244,240,.55),var(--paper-shadow,0 0 0 transparent)}
 
 /* R4 fix 7 (consultant P1-6): hero photograph tiles wait out of sight until their file arrives (components/site/WallDrift) */
 .wh .collage .xcard{transition:opacity .45s ease}

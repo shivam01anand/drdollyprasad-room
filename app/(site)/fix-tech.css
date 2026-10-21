@@ -75,7 +75,7 @@
   .brand-t i,.is-scrolled .brand-t i{opacity:1 !important;max-height:20px !important;transition:none !important}
   .brand-t b{transition:none !important}
 }
-.hdr{background:rgba(255,255,255,.96) !important}
+.hdr{background:rgba(245,244,240,.96) !important}
 .ex-ch,.sband,[id]{scroll-margin-top:calc(var(--hdr-bar) + 16px)}
 
 /* ---- B4 · painting page (4-REVIEW1-DECISION 4.1; T7). The text, the Enquire button and the links now sit inside
@@ -128,7 +128,7 @@
 
 /* ---- B4 · Collections tile row (4-REVIEW1-DECISION 4.2): kept, smaller, styled like every other card, and each tile
    jumps to its band on the page (instant, no smooth-scroll). ---- */
-.five-stage{aspect-ratio:auto !important;height:200px;background:#FFFFFF !important;align-self:stretch}
+.five-stage{aspect-ratio:auto !important;height:200px;background:#F5F4F0 !important;align-self:stretch}
 .five-stage img{border:4px solid var(--frame);box-shadow:0 10px 24px -10px rgba(0,0,0,.28)}
 .five-b{align-items:center;text-align:center}
 .five-b:hover .five-t{color:inherit !important;text-decoration:underline;text-underline-offset:4px;text-decoration-thickness:1px}

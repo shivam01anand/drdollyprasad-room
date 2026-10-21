@@ -54,8 +54,8 @@
   .next-series:has(>.ask:only-child) .ask{flex-direction:row !important;flex-wrap:wrap;align-items:center;gap:12px 28px}
   .next-series:has(>.ask:only-child) .ask>div{margin-left:auto}
   /* #8 */
-  .next-series .go{background:#161E3A !important}
-  .next-series .go:hover{background:#1f2a52 !important}
+  .next-series .go{background:#211B18 !important}
+  .next-series .go:hover{background:#2E2622 !important}
   /* #13 */
   #more-from>.wrap,#more-from .sec-head,#more-from .grid{padding-inline:0 !important}
   .wp-lower{padding-bottom:0 !important}
