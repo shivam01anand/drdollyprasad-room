@@ -177,7 +177,9 @@ function Tile({ it }: { it: Item }) {
 }
 
 /** every column holds its list REP times, so it is full at the start and loops without a seam, however tall the wall */
-const repFor = (items: Item[]) => (items.length >= 8 ? 2 : 4);
+// R6 perf fix 4: fewer duplicate tiles. Measured (1440, 390, 2560 on /, /series, /exhibitions, /works): a seamless loop needs
+// 1 + wall height / one repeat <= 1.88 for every column, so two repeats cover any column of 6+ tiles and three any shorter one
+const repFor = (items: Item[]) => (items.length >= 6 ? 2 : 3);
 
 /** every wall is seven columns wide, so a tile is the same size on every page (CR-008); a short wall repeats its columns, the repeats started half way down */
 const WALL_COLS = 7;

@@ -949,8 +949,10 @@ h1,h2,h3{font-weight:500;letter-spacing:-.005em}
 @media (hover:none){ .flip-back{display:none} }
 
 /* ---- the moving wall: tiles answer the pointer ---- */
-.tile{transition:transform .5s var(--ease),filter .5s ease}
-@media (hover:hover){ .collage:hover .tile{filter:saturate(.85) brightness(.97)} .collage .tile:hover{transform:scale(1.035);filter:none;position:relative;z-index:1} }
+/* R6 perf fix 4: no filter on the ~150 moving tiles while the mouse rests on the wall (it halved the frame rate);
+   only the tile under the mouse answers, by lifting */
+.tile{transition:transform .5s var(--ease)}
+@media (hover:hover){ .collage .tile:hover{transform:scale(1.035);position:relative;z-index:1} }
 .framed,.xcard,.tcard,.ncard,.scard{box-shadow:var(--shadow-1)}
 .namecard{box-shadow:0 30px 80px -20px rgba(38,33,29,.45);padding-bottom:30px}
 .namecard h1{font-size:clamp(44px,5vw,64px)}
