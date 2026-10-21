@@ -19,10 +19,10 @@
 @layer final {
   /* ---- 3.3 colour tokens: one ink, one muted, one red; rust retired ---- */
   :root{
-    --ink:#141210 !important; --black:#141210 !important;
-    --muted:#5F564D !important; --rust:#5F564D !important;
-    --on-indigo:#FFFFFF !important; --muted-on-indigo:#D3D8E8 !important;
-    --red:#D4202A !important; --red-on-indigo:#EF4B53 !important; --red-tint:#FBEAEA !important;
+    --ink:#1A1614 !important; --black:#1A1614 !important;
+    --muted:#6A615B !important; --rust:#6A615B !important;
+    --on-indigo:#F3EEE7 !important; --muted-on-indigo:#AFA49A !important;
+    --red:#D4202A !important; --red-on-indigo:#E5343B !important; --red-tint:#FBEDEC !important;
     --rule:#CFC8BE !important;
   }
 
@@ -88,7 +88,7 @@
     font-family:var(--sans) !important;font-size:14px !important;font-weight:500 !important;letter-spacing:0 !important;text-transform:none !important;line-height:1 !important}
   .pp-toggle,.pp-zoom{border:1px solid var(--ink) !important;color:var(--ink) !important}
   /* DC review #2 P0-1: pressed/hover keeps its label: white on ink (the line above had made it ink on ink) */
-  .pp-toggle:hover,.pp-toggle[aria-pressed="true"],.pp-zoom:hover{background:var(--ink) !important;color:#FFFFFF !important}
+  .pp-toggle:hover,.pp-toggle[aria-pressed="true"],.pp-zoom:hover{background:var(--ink) !important;color:#F5F4F0 !important}
   .sband .s-txt .btn{min-height:44px !important}
   .ftr-links .btn{min-height:44px !important}
   /* 3.8 footer: links J 14/400 */
@@ -108,9 +108,9 @@
   .ab-p,.chap-small,.tband-card p,.pp-story.is-ours{text-wrap:pretty !important}
   /* her words verbatim, ours flagged: our description (no quote of hers) is plain body, not the inline-quote role */
   .pp-story.is-ours,.pp-text p.pp-story.is-ours{font:400 18px/1.6 var(--sans) !important;color:var(--ink) !important}
-  /* DC review #2 P1-1: small text on indigo uses muted-on-indigo (#5F564D was 2.28:1) */
+  /* DC review #2 P1-1: small text on indigo uses muted-on-indigo (#6A615B was 2.28:1) */
   .tone-dark .eyebrow,.band-indigo .eyebrow,.chap-dark .chap-sig,.chap-dark .eyebrow,.next-series .eyebrow,.ab-press .eyebrow{color:var(--muted-on-indigo) !important}
-  /* retired grey #6E645A gone: intro ledes in muted; About and story body on the one body role, in ink (review #2 P1) */
+  /* retired grey #6A615B gone: intro ledes in muted; About and story body on the one body role, in ink (review #2 P1) */
   .lede,.page-head .lede,.story-head .lede{color:var(--muted) !important}
   .ab-p{color:var(--ink) !important}
   .ab-band.tone-dark .ab-p,.band-indigo .ab-p{color:var(--on-indigo) !important}
@@ -119,10 +119,10 @@
   .chap-dark .chap-small{color:var(--on-indigo) !important}
   /* story chapters on indigo: quiet numeral, white heading, no retired peach/cream (review #2 P1) */
   .chap-dark .chap-h span,.band-indigo .chap-h span{color:var(--muted-on-indigo) !important}
-  .chap-dark .chap-h h2,.band-indigo .chap-h h2{color:#FFFFFF !important}
-  .chap-dark .chap-big.hers,.chap-dark .chap-big{color:#FFFFFF !important}
+  .chap-dark .chap-h h2,.band-indigo .chap-h h2{color:#F3EEE7 !important}
+  .chap-dark .chap-big.hers,.chap-dark .chap-big{color:#F3EEE7 !important}
   /* one red: the 'In a private collection' dot is muted grey, not a second red (review #2 P1) */
-  .st-sold i,.pp-text .st-sold i,.card .st-sold i{background:#5F564D !important}
+  .st-sold i,.pp-text .st-sold i,.card .st-sold i{background:#6A615B !important}
   .band-indigo .st-sold i,.chap-dark .st-sold i{background:var(--muted-on-indigo) !important}
 
   /* ---- R4 B2: switcher, Previous/Next pair, painting back link (type and colour) ---- */
@@ -131,7 +131,7 @@
   .pnx-n,.pnx-k{font:400 14px/1.4 var(--sans) !important;color:var(--muted) !important;letter-spacing:0 !important;text-transform:none !important}
   .pnx-t{font:500 36px/1.1 var(--serif) !important;color:var(--ink) !important}
   .pnx-next .pnx-k{color:var(--muted-on-indigo) !important}
-  .pnx-next .pnx-t,.pnx-prev:hover .pnx-t,.pnx-prev:hover .pnx-k{color:#FFFFFF !important}
+  .pnx-next .pnx-t,.pnx-prev:hover .pnx-t,.pnx-prev:hover .pnx-k{color:#F3EEE7 !important}
   /* R4 P2-1 (Brand): the back link is the main way back to the story: J 15 ink, not a footnote */
   .pp-text a.pp-back{font:400 15px/1.45 var(--sans) !important;color:var(--ink) !important;letter-spacing:0 !important}
 
@@ -140,9 +140,9 @@
   .sband.band-white .s-line{color:var(--muted) !important}
   .sband .s-txt .btn{color:inherit !important;background:transparent !important;border:1px solid currentColor !important;text-decoration:none !important}
   .sband.band-white .s-txt .btn{color:var(--ink) !important}
-  .sband.band-white .s-txt .btn:hover{background:var(--ink) !important;color:#FFFFFF !important}
-  .sband.band-indigo .s-txt .btn:hover{background:#FFFFFF !important;color:var(--indigo) !important}
-  .btn-solid.btn-on-indigo{background:#FFFFFF !important;color:var(--indigo) !important;border-color:#FFFFFF !important;background-image:none !important}
+  .sband.band-white .s-txt .btn:hover{background:var(--ink) !important;color:#F5F4F0 !important}
+  .sband.band-indigo .s-txt .btn:hover{background:#F3EEE7 !important;color:var(--indigo) !important}
+  .btn-solid.btn-on-indigo{background:#F3EEE7 !important;color:var(--indigo) !important;border-color:#F3EEE7 !important;background-image:none !important}
   .btn-solid.btn-on-indigo:hover{background:var(--muted-on-indigo) !important;border-color:var(--muted-on-indigo) !important}
 
   /* ---- R4 B3-2 to B3-5: story opening, chapters, room thumbnail, ask line (type and colour) ---- */
@@ -167,6 +167,13 @@
     .so-p{font-size:16px !important;line-height:1.55 !important}
     .chv-t{font-size:28px !important}
   }
+
+  /* ---- R5 Kajal + Khadi (PALETTE-SPEC §1, §2): focus rings and frames on the dark ground ---- */
+  :focus-visible{outline-color:#1A1614 !important}
+  .band-indigo :focus-visible,.ab-band.tone-dark :focus-visible,.chap-dark :focus-visible{outline-color:#F3EEE7 !important}
+  /* on Kajal: frame #2E2622 (lighter than the ground), lit top/left edge #4A3F38, thin bone mat #EDE6DA; widths kept */
+  .band-indigo :is(.framed,.tile .framed,.viewer .paper img,img.framed,.slides-stage img,.clip img,.ab-portrait img,.ig-track img,.now-box .imgs img,.wpa-art img,.freel-stage img,.pp-art img,.room-art img,.five-stage img),.ab-band.tone-dark :is(.framed,.tile .framed,.viewer .paper img,img.framed,.slides-stage img,.clip img,.ab-portrait img,.ig-track img,.now-box .imgs img,.wpa-art img,.freel-stage img,.pp-art img,.room-art img,.five-stage img),.chap-dark :is(.framed,.tile .framed,.viewer .paper img,img.framed,.slides-stage img,.clip img,.ab-portrait img,.ig-track img,.now-box .imgs img,.wpa-art img,.freel-stage img,.pp-art img,.room-art img,.five-stage img){border-color:#2E2622 !important;background:#EDE6DA !important;padding:4px !important;box-shadow:-1px -1px 0 0 #4A3F38 !important}
+  @media (max-width:640px){ .band-indigo :is(.framed,.tile .framed,.viewer .paper img,img.framed,.slides-stage img,.clip img,.ab-portrait img,.ig-track img,.now-box .imgs img,.wpa-art img,.freel-stage img,.pp-art img,.room-art img,.five-stage img),.ab-band.tone-dark :is(.framed,.tile .framed,.viewer .paper img,img.framed,.slides-stage img,.clip img,.ab-portrait img,.ig-track img,.now-box .imgs img,.wpa-art img,.freel-stage img,.pp-art img,.room-art img,.five-stage img),.chap-dark :is(.framed,.tile .framed,.viewer .paper img,img.framed,.slides-stage img,.clip img,.ab-portrait img,.ig-track img,.now-box .imgs img,.wpa-art img,.freel-stage img,.pp-art img,.room-art img,.five-stage img){padding:3px !important} }
 
   @media (max-width:640px){
     .story-head h1{font-size:44px !important}
