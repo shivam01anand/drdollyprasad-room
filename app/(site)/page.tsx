@@ -102,7 +102,7 @@ export default function Home() {
                         {/* eslint-disable-next-line @next/next/no-img-element */}
                         <img src={src} alt={p.alt} loading="lazy" decoding="async" width={72} height={54} />
                       </span>
-                      <span className="hw-pi-t"><b>{p.home.t}</b><span>{p.home.s}</span></span>
+                      <div className="hw-pi-t"><p className="hw-pi-n"><b>{p.home.t}</b></p><p className="hw-pi-s">{p.home.s}</p></div>
                     </Link>
                   </li>
                 );
