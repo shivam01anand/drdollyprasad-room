@@ -87,7 +87,7 @@ export default function Home() {
           <div className="hw-intro">
             <p className="eyebrow">The artist</p>
             <h2 id="hw-h">Dr Dolly Prasad, painter of the everyday</h2>
-            <p className="hw-lede">A doctor in New Delhi, she paints the people, objects and lanes of everyday India with a close, unhurried eye. Her work has hung in eighteen exhibitions and art fairs, 2005 to 2018.</p>
+            <p className="hw-lede">A New Delhi artist who holds the everyday sacred. For her, the ordinary is never small: a clay gullak, a closed door, a lamp lifted at aarti, a face at the corner of a lane. Those ordinary days were the good ones, and she paints them so we can see them clearly, and keep seeing the ones we are living today.</p>
             <Link className="link" href="/about">Her story →</Link>
           </div>
           <aside className="hw-press" aria-labelledby="hw-press-h">
