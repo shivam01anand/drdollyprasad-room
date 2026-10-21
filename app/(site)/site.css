@@ -264,9 +264,6 @@ p{margin:0}
 @media (prefers-reduced-motion:reduce){ .nowstrip .live i{animation:none} }
 
 /* ---- home sections ---- */
-.series-tiles .mat{aspect-ratio:4/5}
-.series-tiles .mat img{max-height:calc(125cqw - 20px)}
-.series-tiles .card-t{font-size:24px}
 .shows{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:22px}
 .shows a{display:flex;flex-direction:column;gap:7px;text-decoration:none}
 .shows img{width:100%;aspect-ratio:4/3;object-fit:cover}
@@ -276,10 +273,6 @@ p{margin:0}
 .hw-band{background:var(--stone);padding-block:clamp(40px,6vw,72px)}
 .hw-in{display:flex;flex-wrap:wrap;gap:clamp(28px,5vw,64px);align-items:center;justify-content:center}
 .hw-in .round{width:220px;height:220px;border-radius:50%;object-fit:cover;border:3px solid var(--ink);flex:none}
-.hw-q{margin:0;flex:0 1 760px;display:flex;flex-direction:column;gap:14px;align-items:flex-start}
-.hw-q blockquote{margin:0;font-family:var(--serif);font-style:italic;font-weight:500;font-size:clamp(28px,3.3vw,46px);line-height:1.18}
-.hw-q blockquote::before{content:"“";display:block;font-size:1.8em;line-height:.6;color:var(--rust);margin-bottom:.1em}
-.hw-q figcaption{font-size:15px;color:var(--muted)}
 @media (max-width:640px){ .hw-in .round{width:140px;height:140px} .hw-in{justify-content:flex-start} }
 .ig-ctas{display:flex;gap:10px;flex-wrap:wrap}
 .ig-band{background:var(--wall);padding-block:clamp(36px,5vw,56px)}
@@ -2307,11 +2300,6 @@ body *{font-style:normal !important}
 .pp .pp-text .pp-status{margin-top:4px}
 
 /* home: Key collections, the pictures much bigger, centred in their space */
-.series-tiles .m-card{width:clamp(270px,34vw,500px)}
-.series-tiles .mat{--mh:clamp(290px,31vw,470px);aspect-ratio:auto;height:var(--mh);padding:6px 4px 10px;align-items:center;justify-content:center}
-.series-tiles .mat img{width:min(100%,calc((var(--mh) - 16px) * var(--ar,.8)));height:auto;max-height:calc(var(--mh) - 16px);max-width:100%}
-@media (max-width:640px){ .series-tiles .m-card{width:min(78vw,340px)} .series-tiles .mat{--mh:clamp(290px,82vw,340px)} }
-.series-tiles .m-card .meta{max-width:46ch}
 
 /* collections: five bands, white and indigo in turn (as Works does); the last is white, so the closing indigo band is never doubled */
 .sband.band-white{background:#F5F4F0}
@@ -2329,10 +2317,7 @@ body *{font-style:normal !important}
 
 /* collection stories: a dark chapter is the middle indigo band; it runs edge to edge */
 .chap-dark{box-shadow:0 0 0 100vmax var(--dark);clip-path:inset(0 -100vmax)}
-.series-tiles .m-card{text-align:center;align-items:center}
-.series-tiles .m-card .card-t,.series-tiles .m-card .meta{text-align:center}
 .sband .eyebrow,.sband .btn{font-size:13px}
-.series-tiles .m-card .mat{width:100%;align-self:stretch}
 /* "sacred" is always red (Shubham, 19 Oct 2026): same red as "Dolly"; colour only */
 .wh .namecard .wh-line .red,.brand-t .red{color:var(--red);font:inherit}
 

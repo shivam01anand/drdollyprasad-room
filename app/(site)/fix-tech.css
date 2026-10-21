@@ -39,7 +39,6 @@
 @media (max-width:1000px){ .marq-set>.card>.card-t,#more-from .card-t,.grid-5 .card-t{min-height:2.3em !important;text-wrap:balance}
   .grid-5 .card-t{min-height:2.4em !important} /* two title lines at line-height 1.2 are 2.4em: a wrapped title no longer drops its row by 2 px (review #2 R2-4) */ }
 /* Home, Key collections: one count line under each title, one line box (the 2-line description is cut, C17) */
-.series-tiles .m-card .meta{display:-webkit-box !important;-webkit-box-orient:vertical;-webkit-line-clamp:1;line-clamp:1;overflow:hidden;min-height:1.4em}
 
 /* ---- B2 · Works grid: one bottom line per row, no fixed tall box (T6 option A; Brand R1 #20) ----
    Each card spans four subgrid rows (picture, title, meta, status), so a row's picture track is as tall as
@@ -284,6 +283,63 @@ html[data-motion="paused"] *,html[data-motion="paused"] *::before,html[data-moti
 
 /* R4 B2-2: where the collections switcher is sticky (>=761), anchors land below header bar + switcher (44 px) */
 @media (min-width:761px){
+/* (R6 perf fix 2: this fade is now a still overlay with the same stops, see the R6 perf block at the end of this file) */
+
+/* ---- R6 §4a Home, Key collections (Shubham 20 Oct 22:50: "all look different in size; make that area smaller"):
+   a still row (no marquee), every painting at one height inside its frame and mat, never cropped, centred. ---- */
+.series-row{display:flex;justify-content:center;align-items:flex-end;gap:40px;padding-block:8px 32px;margin:0 auto;list-style:none}
+.series-row .m-card{width:auto !important;flex:none;display:flex;flex-direction:column;align-items:center;text-align:center;gap:6px}
+.series-row .mat{height:auto !important;aspect-ratio:auto !important;padding:0 !important;width:auto !important;display:block !important;container-type:normal !important}
+.series-row .mat img{height:200px !important;width:auto !important;max-height:none !important;max-width:none !important;object-fit:contain;box-sizing:border-box;margin:0 !important;display:block}
+.series-row .card-t,.series-row .meta{text-align:center;margin-inline:auto}
+.series-row .m-card .meta{white-space:nowrap}
+/* the band stays <= 460 px at 1440 (was ~770): a tighter head over the row */
+.layer.band-indigo:has(.series-row) .sec{padding-top:16px !important;padding-bottom:24px !important}
+.layer.band-indigo:has(.series-row) .sec .sec-head{margin-bottom:0 !important}
+@media (max-width:1099px){
+  .series-row{justify-content:flex-start;gap:28px;overflow-x:auto;overscroll-behavior-x:contain;scroll-snap-type:x proximity;padding-inline:var(--gut);scrollbar-width:none;max-width:none !important}
+  .series-row::-webkit-scrollbar{display:none}
+  .series-row .m-card{scroll-snap-align:start}
+  .series-row .mat img{height:170px !important}
+}
+@media (max-width:640px){
+  .series-row{gap:20px;padding-bottom:36px}
+  .series-row .mat img{height:150px !important}
+}
+
+/* ---- R6 §4b Home, the artist band: portrait, who she is, and "In the press" beside it (no red here) ---- */
+.hw-band{padding-block:56px !important}
+.hw-in{display:grid !important;grid-template-columns:200px minmax(0,1fr) 340px;column-gap:48px;align-items:center;justify-content:stretch !important}
+.hw-in .round{width:200px !important;height:200px !important}
+.hw-intro{display:flex;flex-direction:column;align-items:flex-start;gap:0;min-width:0}
+.hw-intro .eyebrow{margin:0 0 8px}
+.hw-intro h2{margin:0 0 12px}
+.hw-lede{margin:0 0 16px;max-width:560px}
+.hw-press{border-left:1px solid var(--hair);padding-left:32px;min-width:0}
+.hw-press h3{margin:0 0 8px}
+.hw-press ul{list-style:none;margin:0 0 12px;padding:0}
+.hw-press li{margin:0;padding:0}
+.hw-pi{display:grid;grid-template-columns:72px 1fr;column-gap:14px;align-items:center;min-height:54px;padding-block:8px;text-decoration:none;color:inherit}
+.hw-pi-img{position:relative;display:block;width:72px;height:54px;line-height:0}
+.hw-pi-img img{width:72px;height:54px;object-fit:cover;display:block;border:1px solid var(--rule);box-sizing:border-box;background:#FAF9F6}
+.hw-pi.is-video .hw-pi-img::after{content:"";position:absolute;left:50%;top:50%;width:0;height:0;margin:-7px 0 0 -5px;
+  border-style:solid;border-width:7px 0 7px 11px;border-color:transparent transparent transparent #F3EEE7;filter:drop-shadow(0 1px 2px rgba(0,0,0,.5))}
+.hw-pi-t{display:flex;flex-direction:column;gap:2px;min-width:0}
+.hw-pi:hover b{text-decoration:underline;text-underline-offset:4px;text-decoration-thickness:1px}
+@media (min-width:641px) and (max-width:1099px){
+  .hw-band{padding-block:48px !important}
+  .hw-in{grid-template-columns:160px minmax(0,1fr);row-gap:32px}
+  .hw-in .round{width:160px !important;height:160px !important}
+  .hw-press{grid-column:1 / -1;border-left:0;border-top:1px solid var(--hair);padding:24px 0 0}
+  .hw-press ul{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:20px}
+}
+@media (max-width:640px){
+  .hw-band{padding-block:40px !important}
+  .hw-in{grid-template-columns:minmax(0,1fr);row-gap:24px}
+  .hw-in .round{width:120px !important;height:120px !important}
+  .hw-press{border-left:0;border-top:1px solid var(--hair);padding:24px 0 0}
+  .hw-pi{min-height:54px}
+}
   html:has(.csw) :is(.ex-ch,.sband,[id]){scroll-margin-top:calc(var(--hdr-bar) + 1px + 44px + 16px)}
 }
 

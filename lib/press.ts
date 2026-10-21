@@ -34,6 +34,9 @@ export type PressItem = {
   credit?: string;
   /** the one line under the card's title, where it is not the source (Chief Content 2c, C10) */
   card?: string;
+  /** R6 Home "In the press" panel (Chief Content R6 §2): bold = the named outlet or venue, small = what and when;
+   *  each recombines this item's own fields above, no new facts */
+  home?: { t: string; s: string };
 };
 
 const IHC = "India Habitat Centre · November 2010";
@@ -42,15 +45,17 @@ const ph = (n: string, alt: string, title: string, line: string): PressItem => (
 });
 
 const RAW: PressItem[] = [
-  ph("ihc-press-01", "Dr Dolly Prasad smiles as a cameraman films her beside The Bullocks, a reporter’s microphone held up to her.",
+  { ...ph("ihc-press-01", "Dr Dolly Prasad smiles as a cameraman films her beside The Bullocks, a reporter’s microphone held up to her.",
     "In front of the cameras",
     "Interviewed beside The Bullocks at Open Palm Court, India Habitat Centre, New Delhi."),
+    home: { t: "India Habitat Centre", s: "On camera · November 2010" } },
   {
     id: "tv-ncr-2010", kind: "video", src: "/site/press/tv-ncr-2010.mp4", poster: "/site/press/tv-ncr-2010-smile.jpg",
     alt: "A television excerpt: the camera moves from her paintings to Dr Dolly Prasad, speaking in the exhibition.",
     title: "On screen · June 2010",
     line: "The recording carries a 12 June 2010 date display. The camera turns from the paintings to her, speaking within the exhibition.",
     source: "Television archive", credit: "NCR television. Original broadcast sound.", card: "NCR television · 12 June 2010",
+    home: { t: "NCR television", s: "On screen · 12 June 2010" },
   },
   {
     id: "tv-archive", kind: "video", src: "/site/press/tv-archive.mp4", poster: "/site/press/tv-archive.jpg",
@@ -71,6 +76,7 @@ const RAW: PressItem[] = [
     title: "Delhi Times · Must See Must Do",
     line: "A listing for Art Today And Tomorrow, a group show of paintings at Travancore Art Gallery. The genuine scanned clipping.",
     source: "In the papers",
+    home: { t: "Delhi Times", s: "Must See Must Do" },
   },
   ph("ihc-press-02", "Dr Dolly Prasad speaks into a reporter’s microphone, The Bullocks behind her.",
     "In conversation",
@@ -91,6 +97,10 @@ const ORDER = ["ihc-press-01", "tv-ncr-2010", "ihc-press-06", "ihc-press-03", "d
 // six cards, 3 + 3 (Chief Content 2c C11; Brand review #2 P1-6): "In conversation", "On the red-brick wall" and
 // "The artist and her audience" dropped as near-duplicate interview photos; they stay in the IHC album // "Listening" (ihc-press-b) dropped: near-duplicate (Chief Content 2c, C11); the photo stays in the IHC album
 export const PRESS_ITEMS: PressItem[] = ORDER.map((id) => RAW.find((p) => p.id === id)!);
+
+/** R6 (Shubham 20 Oct 22:50, "a small In the press so people take her seriously"): the three named outlets or venues
+ *  shown beside the artist on Home; Chief Content R6 §2 wording, from each item's `home` field */
+export const PRESS_HOME = ["tv-ncr-2010", "delhi-times", "ihc-press-01"].map((id) => RAW.find((x) => x.id === id)!) as (PressItem & { home: { t: string; s: string } })[];
 
 /** every item, for the moving press row on Exhibitions and About (R3, Shubham 20 Oct: all the press, all the accolades):
  *  the six above first, in their order (the two clips apart), then the four that had been left out */

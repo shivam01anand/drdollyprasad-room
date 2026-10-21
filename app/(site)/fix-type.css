@@ -45,8 +45,6 @@ body,.pp-text p,.sband .s-line,.pp-story{font-size:18px !important;line-height:1
 :not(.pf-grid) > .card .mat img, .marq .card .mat img{margin-bottom:0 !important}
 .sec-head{margin-bottom:18px !important}
 /* Home, Key collections: the box fits the painting (it was a fixed tall box), title close under it */
-.series-tiles .mat{height:auto !important;padding:0 !important;align-items:flex-end}
-.series-tiles .mat img{max-height:var(--mh) !important}
 
 /* COO final pass: painting info wraps cleanly at the separators (it overflowed into the next card on iPad) */
 .card .meta.meta-parts,.card .meta-parts{display:flex !important;flex-wrap:wrap;justify-content:center;width:100%}
@@ -59,7 +57,6 @@ body,.pp-text p,.sband .s-line,.pp-story{font-size:18px !important;line-height:1
   #more-from .card-t{min-height:0 !important}
 }
 /* Home Key collections: the lines under each title are centred under the painting (they sat 52px left on laptop) */
-.series-tiles .m-card .meta{margin-inline:auto !important;text-align:center}
 /* COO (Shubham 02:34): the painting page's medium · size · year line, as calm as everywhere else */
 .pp-text p.pp-facts,.pp-facts{font-size:14px !important;line-height:1.5 !important;color:#6A615B !important;letter-spacing:0 !important}
 @media (max-width:640px){ .pp-text p.pp-facts,.pp-facts{font-size:13px !important} }

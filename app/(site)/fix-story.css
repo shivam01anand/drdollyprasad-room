@@ -42,12 +42,7 @@
   .band-bottom{margin-bottom:0}
 }
 
-/* 7. home "Key collections" row: starts on the page margin; both ends fade out instead of cutting a caption mid-word */
-@media (min-width:761px){
-  .marq.series-tiles{padding-left:var(--gut);
-    -webkit-mask-image:linear-gradient(90deg,transparent 0,#000 calc(var(--gut) * .8),#000 calc(100% - var(--gut) * .8),transparent 100%);
-    mask-image:linear-gradient(90deg,transparent 0,#000 calc(var(--gut) * .8),#000 calc(100% - var(--gut) * .8),transparent 100%)}
-}
+/* 7. (R6) the home "Key collections" marquee is now a still row: .series-row in fix-tech.css */
 
 /* ---- R4 B2-2: collections switcher (layout; type and colour in tokens.css) ---- */
 .csw{position:sticky;top:calc(var(--hdr-bar) + 1px);z-index:19;height:44px;background:rgba(245,244,240,.96);border-bottom:1px solid var(--rule)}
@@ -304,7 +299,4 @@
 @media (min-width:1600px){
   .sband{overflow-x:clip}
   .sband .srow .s-works{margin-right:calc(-1 * max(0px, (100vw - 1360px - 2 * var(--gut)) / 2) - var(--gut));min-width:0}
-  .hw-in .round{width:300px;height:300px}
-  .hw-q{flex-basis:880px}
-  .hw-q blockquote{text-wrap:pretty} /* the type token keeps her line at 40 px; no one-word last line on the wider measure */
 }

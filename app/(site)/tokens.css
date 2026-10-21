@@ -38,7 +38,7 @@
   /* H3 role: exhibition chapter, Collections band, series chapter title */
   .ex-ch-head h2,.sband h2,.chap-h h2{font-family:var(--serif) !important;font-weight:500 !important;font-size:36px !important;line-height:1.12 !important}
   /* feature quote (one per page) */
-  .hw-q blockquote,.story-quote .quote{font:500 40px/1.25 var(--serif) !important;font-style:normal !important}
+  .story-quote .quote{font:500 40px/1.25 var(--serif) !important;font-style:normal !important}
   /* inline quote: her words inside a block */
   .pp-story,.pp-text p.pp-story,.ex-quote blockquote,.tabpanel .quote,.series-sum-q,.ab-quote,.chap-big.hers,.qcard blockquote{font:500 24px/1.4 var(--serif) !important;font-style:normal !important;color:var(--ink) !important}
   /* chapter big line (ours) */
@@ -47,7 +47,7 @@
   /* hero line in the collage card */
   .wh-line{font:500 19px/1.35 var(--serif) !important;letter-spacing:0 !important}
   /* card titles, every card */
-  .card-t,.card .card-t,.series-tiles .m-card b,.five-t,.press figcaption b{font:500 20px/1.2 var(--serif) !important;letter-spacing:0 !important}
+  .card-t,.card .card-t,.series-row .m-card b,.five-t,.press figcaption b{font:500 20px/1.2 var(--serif) !important;letter-spacing:0 !important}
   /* CTA band title */
   .next-series .ask b{font:500 28px/1.2 var(--serif) !important}
   /* header brand name */
@@ -58,13 +58,13 @@
   p.meta.ig-sub{font:400 16px/1.5 var(--sans) !important}
   /* small: one size, sentence case, muted */
   .eyebrow,.card .meta,.card .meta-parts,.card .meta-parts .mp,.card .status,.pp-status,.pp-status .status,.pp-text .status,.pp-facts,.pp-text p.pp-facts,
-  .sm-cap,.ex-ch-where,.ex-kind,.ex-works span,.fsel span,.five-m,.series-tiles .meta,.chap-works figcaption,.chap-sig,
+  .sm-cap,.ex-ch-where,.ex-kind,.ex-works span,.fsel span,.five-m,.series-row .meta,.chap-works figcaption,.chap-sig,
   .press figcaption span,.press figcaption em,.press-videos figcaption em,.pp-cap,.pp-story span,.ftr p.meta,.ftr .meta,
   .ftr-links a:not(.btn),.ftr-ig,.prevnext a span,.gal-cap em,.zoom-cap small,.ss-cap small,.tile.flip .back em,.flip-back em,.flip-back u,
   .xcard em,.ncard em,.ccard em,.scard em,.qcard small,.nowstrip .live,.now-line .live,.wh .namecard .eyebrow,.ex-index span,.five-n,.sband .s-n,.s-n,label{
     font-family:var(--sans) !important;font-size:14px !important;font-weight:400 !important;letter-spacing:0 !important;text-transform:none !important;font-style:normal !important}
   .card .meta,.card .meta-parts,.card .status{line-height:1.4 !important}
-  .eyebrow,.card .meta,.card .meta-parts,.pp-facts,.pp-text p.pp-facts,.sm-cap,.ex-ch-where,.ex-kind,.ex-works span,.five-m,.series-tiles .meta,
+  .eyebrow,.card .meta,.card .meta-parts,.pp-facts,.pp-text p.pp-facts,.sm-cap,.ex-ch-where,.ex-kind,.ex-works span,.five-m,.series-row .meta,
   .chap-works figcaption,.chap-sig,.pp-cap,.ftr p.meta,.ex-index span,.five-n,.sband .s-n,.s-n,.tile.flip .back em,.flip-back em,.qcard small,.prevnext a span{color:var(--muted) !important}
   /* exhibition photo captions are one line on a laptop (Content's captions are <= 60 characters), two on a phone (4.5) */
   .sm-cap{line-height:1.45 !important;height:1.45em !important;-webkit-line-clamp:1 !important;line-clamp:1 !important}
@@ -179,6 +179,21 @@
   .note,.next-series .ask{background:#FAF9F6 !important;box-shadow:inset 0 0 0 1px var(--hair) !important}
   .ex-press.band-indigo,.ex-press + .ex-record{border-top-color:transparent !important}
 
+  /* ---- R6 (4-R6-SPEC §2d): Exhibitions rows. Year on its own line as Small; the quote at the 20 px role; the caption whole ---- */
+  .ex-ch .ex-ch-year{font:400 14px/1.4 var(--sans) !important;color:var(--muted) !important}
+  .ex-ch .ex-quote blockquote{font-size:20px !important}
+  .ex-ch .sm-cap{height:auto !important;-webkit-line-clamp:unset !important;line-clamp:none !important}
+  .ex-press + .ex-ch{border-top-color:transparent !important}
+  @media (min-width:641px) and (max-width:1099px){ .ex-ch-head h2{font-size:32px !important} }
+  /* R6 §4b Home artist band: section H2, body lead, label, card title, small; no red */
+  .hw-intro h2{font-family:var(--serif) !important;font-weight:500 !important;font-size:44px !important;line-height:1.12 !important;color:var(--ink) !important}
+  .hw-lede{font:400 18px/1.6 var(--sans) !important;color:var(--ink) !important}
+  .hw-press h3{font:500 14px/1.4 var(--sans) !important;color:var(--muted) !important;letter-spacing:0 !important;text-transform:none !important}
+  .hw-pi b{font:500 17px/1.2 var(--serif) !important;color:var(--ink) !important}
+  .hw-pi-t span{font:400 14px/1.4 var(--sans) !important;color:var(--muted) !important}
+  @media (max-width:640px){ .hw-intro h2{font-size:28px !important} .hw-lede{font-size:16px !important;line-height:1.55 !important} .hw-pi b{font-size:16px !important} .hw-pi-t span{font-size:13px !important} }
+  @media (max-width:640px){ .ex-ch .ex-ch-year{font-size:13px !important} .ex-ch .sm-cap{height:auto !important;-webkit-line-clamp:unset !important;line-clamp:none !important} }
+
   @media (max-width:640px){
     .story-head h1{font-size:44px !important}
     .wh-card h1{font-size:36px !important}
@@ -186,16 +201,16 @@
     .pp-title{font-size:30px !important}
     .sec-head h2,#more-from h2,#more-from .sec-head>div>h2,.ab-txt h2,.ab-statement h2,.five-head h2,.ig-band h2,.txt>h2{font-size:28px !important}
     .ex-ch-head h2,.sband h2,.chap-h h2{font-size:26px !important}
-    .hw-q blockquote,.story-quote .quote{font-size:26px !important}
+    .story-quote .quote{font-size:26px !important}
     .pp-story,.pp-text p.pp-story,.ex-quote blockquote,.tabpanel .quote,.series-sum-q,.ab-quote,.chap-big.hers,.qcard blockquote{font-size:20px !important}
     .chap-big:not(.hers){font-size:24px !important}
     .wh-line{font-size:17px !important}
-    .card-t,.card .card-t,.series-tiles .m-card b,.five-t,.press figcaption b{font-size:17px !important}
+    .card-t,.card .card-t,.series-row .m-card b,.five-t,.press figcaption b{font-size:17px !important}
     .next-series .ask b{font-size:24px !important}
     .brand-t b,.is-scrolled .brand-t b{font-size:20px !important}
     .ab-p,.lede,.sec-line,.ex-sum,.page-head .lede,.tband-card p{font-size:16px !important;line-height:1.55 !important}
     .eyebrow,.card .meta,.card .meta-parts,.card .meta-parts .mp,.card .status,.pp-status,.pp-status .status,.pp-text .status,.pp-facts,.pp-text p.pp-facts,
-    .sm-cap,.ex-ch-where,.ex-kind,.ex-works span,.fsel span,.five-m,.series-tiles .meta,.chap-works figcaption,.chap-sig,
+    .sm-cap,.ex-ch-where,.ex-kind,.ex-works span,.fsel span,.five-m,.series-row .meta,.chap-works figcaption,.chap-sig,
     .press figcaption span,.press figcaption em,.press-videos figcaption em,.pp-cap,.pp-story span,.ftr p.meta,.ftr .meta,
     .prevnext a span,.gal-cap em,.zoom-cap small,.ss-cap small,.tile.flip .back em,.flip-back em,.flip-back u,
     .xcard em,.ncard em,.ccard em,.scard em,.qcard small,.nowstrip .live,.now-line .live,.wh .namecard .eyebrow,.ex-index span,.five-n,.sband .s-n,.s-n,label{font-size:13px !important}
