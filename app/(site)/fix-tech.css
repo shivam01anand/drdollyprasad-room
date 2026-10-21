@@ -22,9 +22,7 @@
 /* Collections bands: the row's window edge sat on the column line and cut the shadow of the first card with a hard
    vertical line. The window now starts --fade into the gutter and fades over it, so the shadow dissolves instead. */
 @media (min-width:761px){
-  .sband .band-marq{--fade:24px;padding-left:var(--fade) !important;margin-left:calc(-1 * var(--fade)) !important;
-    -webkit-mask-image:linear-gradient(90deg,transparent 0,#000 var(--fade),#000 calc(100% - var(--fade)),transparent);
-            mask-image:linear-gradient(90deg,transparent 0,#000 var(--fade),#000 calc(100% - var(--fade)),transparent)}
+  .sband .band-marq{--fade:24px;padding-left:var(--fade) !important;margin-left:calc(-1 * var(--fade)) !important}
   /* review #2 R2-2: the track starts a further --fade in, so the first painting is clear of the fade at rest and only fades while passing the edge */
   .sband .band-marq .marq-track{padding-left:var(--fade) !important}
 }
@@ -58,9 +56,7 @@
 
 /* Home Instagram roll (Design Control, extends T5): its clip box cut the frames' shadow with a hard left and bottom edge.
    More room below and above, and the two ends fade over 24 px instead of cutting. */
-.ig-roll{padding-block:24px 40px !important;margin-block:-24px -40px !important;
-  -webkit-mask-image:linear-gradient(90deg,transparent 0,#000 24px,#000 calc(100% - 24px),transparent) !important;
-          mask-image:linear-gradient(90deg,transparent 0,#000 24px,#000 calc(100% - 24px),transparent) !important}
+.ig-roll{padding-block:24px 40px !important;margin-block:-24px -40px !important}
 
 /* ---- B3 · header (4-REVIEW1-DECISION 3.7): 92 px on >=768 (28 band + 64 bar); no compacting on scroll.
    The ornament band scrolls away with the page (sticky top is minus the band), so only the 64 px bar stays. ---- */
@@ -170,8 +166,7 @@ html[data-motion="paused"] *,html[data-motion="paused"] *::before,html[data-moti
 
 /* review #2 (Brand P2-4 / COO #10): the hero wall drifts, so a tile is always crossing its bottom edge; a hard cut read as a
    clipped caption ("Lighting the lamp"). The last 48 px of the wall now fade out, so a passing tile dissolves instead of being cut. */
-.wh .collage{-webkit-mask-image:linear-gradient(180deg,#000 calc(100% - 48px),transparent) !important;
-                    mask-image:linear-gradient(180deg,#000 calc(100% - 48px),transparent) !important}
+/* (R6 perf fix 2: the fade is now a still overlay, see the R6 perf block at the end of this file) */
 
 /* DC review #2 P1-3: phone press row, every card the same 4:3 picture box; the Delhi Times clipping sits whole (contain) on
    the cream it already has on desktop, so it no longer runs 40 px taller and leaves a blank under the others */
@@ -212,9 +207,7 @@ html[data-motion="paused"] *,html[data-motion="paused"] *::before,html[data-moti
 .press-row{--ph:240px;--pgap:28px}
 @media (max-width:1099px){ .press-row{--ph:210px;--pgap:22px} }
 @media (max-width:640px){ .press-row{--ph:180px;--pgap:16px} }
-.press-marq.marq{padding:24px 0 40px !important;margin-inline:calc(-1 * var(--gut));
-  -webkit-mask-image:linear-gradient(90deg,transparent,#000 40px,#000 calc(100% - 40px),transparent) !important;
-          mask-image:linear-gradient(90deg,transparent,#000 40px,#000 calc(100% - 40px),transparent) !important}
+.press-marq.marq{padding:24px 0 40px !important;margin-inline:calc(-1 * var(--gut))}
 .press-marq .marq-track{padding-left:40px}
 .press-marq .marq-set{gap:var(--pgap) !important;padding-right:var(--pgap) !important;align-items:flex-start}
 .press-marq .press-item{flex:none;width:auto;min-width:220px;margin:0 !important;break-inside:auto;display:flex;flex-direction:column;gap:12px}
@@ -283,6 +276,13 @@ html[data-motion="paused"] *,html[data-motion="paused"] *::before,html[data-moti
 
 /* R4 B2-2: where the collections switcher is sticky (>=761), anchors land below header bar + switcher (44 px) */
 @media (min-width:761px){
+  html:has(.csw) :is(.ex-ch,.sband,[id]){scroll-margin-top:calc(var(--hdr-bar) + 1px + 44px + 16px)}
+}
+
+/* R4 fix 6 (consultant P1-5): the band fade sits wholly outside the first painting. The first painting starts 48 px into
+   the row's window (marq + track padding); the fade now runs over 8 to 48 px, so at rest the first painting is at full
+   strength, and the previous painting's frame (which ended ~4 px into the window, inside the old 0 to 24 px fade) is
+   wholly transparent instead of a faint vertical bar. A painting only fades while it passes the edge. */
 /* (R6 perf fix 2: this fade is now a still overlay with the same stops, see the R6 perf block at the end of this file) */
 
 /* ---- R6 §4a Home, Key collections (Shubham 20 Oct 22:50: "all look different in size; make that area smaller"):
@@ -340,15 +340,23 @@ html[data-motion="paused"] *,html[data-motion="paused"] *::before,html[data-moti
   .hw-press{border-left:0;border-top:1px solid var(--hair);padding:24px 0 0}
   .hw-pi{min-height:54px}
 }
-  html:has(.csw) :is(.ex-ch,.sband,[id]){scroll-margin-top:calc(var(--hdr-bar) + 1px + 44px + 16px)}
-}
 
-/* R4 fix 6 (consultant P1-5): the band fade sits wholly outside the first painting. The first painting starts 48 px into
-   the row's window (marq + track padding); the fade now runs over 8 to 48 px, so at rest the first painting is at full
-   strength, and the previous painting's frame (which ended ~4 px into the window, inside the old 0 to 24 px fade) is
-   wholly transparent instead of a faint vertical bar. A painting only fades while it passes the edge. */
+/* ---- R6 perf fix 2 (PERF-DIAGNOSIS §2): no mask on a box whose content moves. A mask there is re-applied on every frame.
+   Each fade is now a still gradient overlay in the ground colour, with the same stops as the mask it replaces
+   (content x a + ground x (1 - a) is what the mask showed, and is what the overlay paints), so the look is unchanged. ---- */
+.marq,.ig-roll,.wh .collage{--fade-bg:#F5F4F0}
+.band-indigo .marq,.ab-band.tone-dark .marq,.sband.band-indigo .marq{--fade-bg:var(--indigo,#211B18)}
+.wh .collage::after,.press-marq.marq::after,.ig-roll::after{content:"";position:absolute;inset:0;pointer-events:none;z-index:3}
+.press-marq.marq,.ig-roll{position:relative}
+/* hero wall: its last 48 px fade out */
+.wh .collage::after{display:block;background:linear-gradient(180deg,transparent calc(100% - 48px),var(--fade-bg));-webkit-backdrop-filter:none;backdrop-filter:none}
+/* press row: 40 px at each end */
+.press-marq.marq::after{background:linear-gradient(90deg,var(--fade-bg),transparent 40px,transparent calc(100% - 40px),var(--fade-bg))}
+/* Home Instagram roll: 24 px at each end */
+.ig-roll::after{background:linear-gradient(90deg,var(--fade-bg) 0,transparent 24px,transparent calc(100% - 24px),var(--fade-bg))}
+/* /series bands (>=761): clear 0 to 8 px, fading in to 2 x --fade on the left; --fade on the right */
 @media (min-width:761px){
-  .sband .band-marq{
-    -webkit-mask-image:linear-gradient(90deg,transparent 0,transparent 8px,#000 calc(var(--fade) * 2),#000 calc(100% - var(--fade)),transparent) !important;
-            mask-image:linear-gradient(90deg,transparent 0,transparent 8px,#000 calc(var(--fade) * 2),#000 calc(100% - var(--fade)),transparent) !important}
+  .sband .band-marq{position:relative}
+  .sband .band-marq::after{content:"";position:absolute;inset:0;pointer-events:none;z-index:3;
+    background:linear-gradient(90deg,var(--fade-bg) 0,var(--fade-bg) 8px,transparent calc(var(--fade) * 2),transparent calc(100% - var(--fade)),var(--fade-bg))}
 }
