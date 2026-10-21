@@ -175,6 +175,10 @@
   .band-indigo :is(.framed,.tile .framed,.viewer .paper img,img.framed,.slides-stage img,.clip img,.ab-portrait img,.ig-track img,.now-box .imgs img,.wpa-art img,.freel-stage img,.pp-art img,.room-art img,.five-stage img),.ab-band.tone-dark :is(.framed,.tile .framed,.viewer .paper img,img.framed,.slides-stage img,.clip img,.ab-portrait img,.ig-track img,.now-box .imgs img,.wpa-art img,.freel-stage img,.pp-art img,.room-art img,.five-stage img),.chap-dark :is(.framed,.tile .framed,.viewer .paper img,img.framed,.slides-stage img,.clip img,.ab-portrait img,.ig-track img,.now-box .imgs img,.wpa-art img,.freel-stage img,.pp-art img,.room-art img,.five-stage img){border-color:#2E2622 !important;background:#EDE6DA !important;padding:4px !important;box-shadow:-1px -1px 0 0 #4A3F38 !important}
   @media (max-width:640px){ .band-indigo :is(.framed,.tile .framed,.viewer .paper img,img.framed,.slides-stage img,.clip img,.ab-portrait img,.ig-track img,.now-box .imgs img,.wpa-art img,.freel-stage img,.pp-art img,.room-art img,.five-stage img),.ab-band.tone-dark :is(.framed,.tile .framed,.viewer .paper img,img.framed,.slides-stage img,.clip img,.ab-portrait img,.ig-track img,.now-box .imgs img,.wpa-art img,.freel-stage img,.pp-art img,.room-art img,.five-stage img),.chap-dark :is(.framed,.tile .framed,.viewer .paper img,img.framed,.slides-stage img,.clip img,.ab-portrait img,.ig-track img,.now-box .imgs img,.wpa-art img,.freel-stage img,.pp-art img,.room-art img,.five-stage img){padding:3px !important} }
 
+  /* R5 gate P1: light note cards lift off Khadi as paper; P2-2: no Khadi hairline touching the dark press band */
+  .note,.next-series .ask{background:#FAF9F6 !important;box-shadow:inset 0 0 0 1px var(--hair) !important}
+  .ex-press.band-indigo,.ex-press + .ex-record{border-top-color:transparent !important}
+
   @media (max-width:640px){
     .story-head h1{font-size:44px !important}
     .wh-card h1{font-size:36px !important}
