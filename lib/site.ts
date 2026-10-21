@@ -377,9 +377,6 @@ const CAP: Record<string, string> = {
   "kala-painting": "The Cart-Man and the Rupaya, Kala Mela",
   "kala-selfie": "A visitor’s selfie with the paintings, Kala Mela",
   "kala-booklet": "The First International Kala Mela booklet",
-  "triveni-1": "The invitation, Triveni Kala Sangam, May 2007",
-  "triveni-2": "The back of the invitation, Triveni Kala Sangam",
-  "triveni-3": "The artist sheet, Triveni Kala Sangam",
 };
 const ph = (n: string, alt: string): Photo => ({ src: `/site/ex/${n}.jpg`, alt, ...(CAP[n] ? { cap: CAP[n] } : {}) });
 
@@ -459,18 +456,6 @@ export const SHOWS_AS_RECORDED: Show[] = [
       ] },
     ],
   },
-  {
-    id: "triveni-2007", title: "Triveni Kala Sangam", name: "Recent paintings, with Sangeeta Sharma", kind: "Two-artist exhibition", where: "Two-artist exhibition · Triveni Kala Sangam, Mandi House, New Delhi · 10 to 20 May 2007",
-    venue: "Triveni Kala Sangam, Mandi House", city: "New Delhi", when: "10 to 20 May 2007", year: "2007",
-    lede: "The invitation keeps what no photograph did: two names, ten days in May, and the paintings chosen to introduce them, among them Lajja, Intezar and Mannat.",
-    albums: [
-      { title: "The invitation", line: "From the paper archive.", photos: [
-        ph("triveni-1", "The invitation to an exhibition of recent paintings by Dolly Prasad and Sangeeta Sharma, Triveni Kala Sangam, 10 to 20 May 2007."),
-        ph("triveni-2", "The back of the invitation, with paintings and small portraits of Sangeeta Sharma and Dolly Prasad."),
-        ph("triveni-3", "The artist sheet: the invitation, her portrait and three paintings, Lajja, Intezar and Mannat."),
-      ] },
-    ],
-  },
 ];
 
 const MONTHS = ["january", "february", "march", "april", "may", "june", "july", "august", "september", "october", "november", "december"];
@@ -480,7 +465,7 @@ export const showKey = (sh: { year: string; when: string }) => {
   return Number(sh.year) * 100 + (m ? MONTHS.indexOf(m[m.length - 1]) + 1 : 0);
 };
 /** R4 fix 7 (Brand P1-5, "latest first"): the one sorted source, newest first: Kala Mela 2018, India Habitat Centre
- *  Nov 2010, A Lifetime to Paint June 2010, Triveni 2007. Every listing of the shows reads this. */
+ *  Nov 2010, A Lifetime to Paint June 2010. Every listing of the shows reads this (Exhibitions sets its own order, R6). */
 export const SHOWS: Show[] = [...SHOWS_AS_RECORDED].sort((a, b) => showKey(b) - showKey(a));
 
 export const PRESS = {
@@ -505,7 +490,7 @@ export const RECORD: RecordEntry[] = [
   { year: "2009", month: "March", venue: "Foyer, Convention Centre, India Habitat Centre", city: "Delhi" },
   { year: "2008", month: "September", venue: "Epicenter", city: "Gurgaon" },
   { year: "2008", month: "August", venue: "India Habitat Centre", city: "New Delhi" },
-  { year: "2007", month: "May", venue: "Triveni Kala Sangam", city: "New Delhi", show: "triveni-2007" },
+  { year: "2007", month: "May", venue: "Triveni Kala Sangam", city: "New Delhi" },
   { year: "2007", venue: "Travancore Art Gallery", city: "New Delhi" },
   { year: "2007", venue: "Indraprastha Art Gallery", city: "New Delhi" },
   { year: "2006", venue: "Nehru Art Gallery", city: "Bombay" },

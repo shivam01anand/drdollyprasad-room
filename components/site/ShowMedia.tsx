@@ -23,8 +23,11 @@ const sm = (src: string) => src.replace("/site/ex/", "/site/ex/sm/");
  * hidden. The strip is only scrolled for the visitor when the current
  * photograph has gone out of its view, and never within 6 s of their own touch.
  * Under "Reduce motion" (lib/motion-rules) it changes every 5 s as a crossfade.
+ *
+ * R6 (Exhibitions, side by side): with `side`, the photograph and its strip sit in
+ * .ex-ch-media and the show's heading and text (`side`) with the caption in .ex-ch-side.
  */
-export default function ShowMedia({ photos, label, walls }: { photos: Photo[]; label: string; walls?: ReactNode }) {
+export default function ShowMedia({ photos, label, walls, side }: { photos: Photo[]; label: string; walls?: ReactNode; side?: ReactNode }) {
   const [i, setI] = useState(0);
   const [prev, setPrev] = useState<number | null>(null);
   const [open, setOpen] = useState<number | null>(null);
@@ -165,6 +168,7 @@ export default function ShowMedia({ photos, label, walls }: { photos: Photo[]; l
   const q = prev !== null ? photos[prev] : null;
   return (
     <div className="sm-media" ref={root}>
+      <div className="ex-ch-media">
       <button type="button" className={`sm-hero${reduced ? " is-fade" : ""}`} ref={hero} onClick={() => setOpen(i)} aria-label={`Open full screen: ${p.alt}`}
               style={{ ["--sm-fade" as string]: `${PHOTO_FADE_MS_REDUCED}ms` }}>
         {q && (
@@ -174,7 +178,6 @@ export default function ShowMedia({ photos, label, walls }: { photos: Photo[]; l
         {/* eslint-disable-next-line @next/next/no-img-element */}
         <img key={p.src} src={p.src} alt={p.alt} loading="eager" decoding="async" draggable={false} {...dims(p.src)} />
       </button>
-      <p className="sm-cap"><span aria-live="off">{p.cap ?? p.alt}</span>{walls && <span className="sm-walls"> · On the walls: {walls}</span>}</p>
       {n > 1 && (
         <div className="sm-strip" ref={strip} role="group" aria-label={`${label}: photographs`}>
           {photos.map((x, k) => (
@@ -185,10 +188,15 @@ export default function ShowMedia({ photos, label, walls }: { photos: Photo[]; l
               <img src={sm(x.src)} alt="" loading="lazy" decoding="async" draggable={false} {...dims(sm(x.src))} />
             </button>
           ))}
-          {/* a computer shows six tiles at most; the rest are a click away in the full-screen look (R3 §1) */}
-          {n > 6 && <button type="button" className="sm-more" onClick={() => setOpen(5)}>+{n - 5} more</button>}
+          {/* R6: a computer shows five tiles at most, in one line (four photographs and "+N more"); the rest open full screen */}
+          {n > 5 && <button type="button" className="sm-more" onClick={() => setOpen(4)}>+{n - 4} more</button>}
         </div>
       )}
+      </div>
+      <div className="ex-ch-side">
+        {side}
+        <p className="sm-cap"><span aria-live="off">{p.cap ?? p.alt}</span>{walls && <span className="sm-walls"> · On the walls: {walls}</span>}</p>
+      </div>
       {open !== null && (
         <Gallery label={label} start={open} onClose={() => setOpen(null)} shots={photos.map((x) => ({ src: x.src, alt: x.alt, line: x.alt }))} />
       )}

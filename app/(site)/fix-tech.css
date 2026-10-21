@@ -229,34 +229,58 @@ html[data-motion="paused"] *,html[data-motion="paused"] *::before,html[data-moti
 .press-marq figcaption span{display:block}
 @media (max-width:640px){ .press-marq .press-item{min-width:180px} .press-marq figcaption span{min-height:2lh} }
 .press-row .press-more{margin-top:0}
-/* §1 Exhibitions chapters: head across; photo left, quote + six tiles right; caption (with "On the walls") under the photo */
-@media (min-width:1100px){
-  .ex-ch{display:grid !important;grid-template-columns:minmax(0,7fr) minmax(0,5fr) !important;column-gap:40px !important;
-         grid-template-rows:auto auto 1fr auto !important;grid-template-areas:"head head" "photo txt" "photo strip" "cap strip";
-         padding-block:48px !important}
-  .ex-ch>.ex-ch-body,.ex-ch .sm-media{display:contents !important}
-  .ex-ch>.ex-ch-head{grid-area:head !important;grid-column:auto !important;grid-row:auto !important;margin-bottom:24px !important;align-items:baseline}
-  .ex-ch .ex-ch-txt{grid-area:txt !important;grid-column:auto !important;grid-row:auto !important;margin:0 0 20px !important;padding:0 !important}
-  .ex-ch .sm-hero{grid-area:photo;height:clamp(340px,28vw,420px) !important;align-self:start}
-  .ex-ch .sm-cap{grid-area:cap;margin-top:12px !important;min-height:2.9em}
-  .ex-ch .sm-strip{grid-area:strip;align-self:start;display:grid !important;grid-template-columns:repeat(3,minmax(0,1fr));gap:10px;overflow:visible !important}
-  .ex-ch .sm-strip button{width:100% !important;height:auto !important;aspect-ratio:3/2}
-  .ex-ch .sm-strip button img{width:100%;height:100%;object-fit:cover}
-  .ex-ch .sm-strip:has(.sm-more) button:not(.sm-more):nth-child(n+6){display:none !important}
-  .ex-ch .sm-more{display:flex !important;align-items:center;justify-content:center;background:var(--paper,#F6F3EE);border:1px solid var(--rule)}
-}
+/* ---- R6 §2d Exhibitions (Shubham 20 Oct 22:50: "more dense, side by side"): each show one compact row.
+   Left: the photograph (top- and left-aligned in a fixed-height stage) and one line of at most five tiles under it,
+   sharing its left edge, 10 px below it. Right: year, title, where, her words, the caption ("On the walls").
+   Phone: heading, photograph, strip (scrolls by hand), caption, quote. Type sizes live in tokens.css (R6 block). ---- */
 .sm-more,.sm-strip .sm-more{display:none}
-/* the caption now carries "On the walls": never clamped (fix-night's 2-line clamp would cut it); its height is reserved below */
-.ex-ch .sm-cap{display:block !important;-webkit-line-clamp:unset !important;line-clamp:none !important;height:auto !important;overflow:visible !important}
+.ex-ch{border-top:1px solid var(--hair)}
+.ex-ch.band-cream{background:transparent}
+.ex-ch .sm-media,.ex-ch .ex-ch-side{display:contents !important}
+.ex-ch .ex-ch-media{display:flex;flex-direction:column;gap:7px;width:100%;min-width:0;container-type:inline-size}
+.ex-ch .sm-hero{height:min(360px,64cqw) !important;width:100%;place-items:start start !important;justify-items:start !important;align-items:start !important;padding:0 !important}
+.ex-ch .sm-hero img{max-height:100% !important;max-width:100% !important}
+.ex-ch .sm-strip{display:flex !important;flex-wrap:nowrap !important;gap:8px !important;margin:0 -3px !important;padding:3px !important;overflow:hidden !important}
+.ex-ch .sm-strip button{flex:none !important;width:84px !important;height:56px !important;min-width:0 !important;min-height:0 !important;aspect-ratio:auto !important}
+.ex-ch .sm-strip button img{width:100%;height:100%;object-fit:cover}
+.ex-ch .sm-strip:has(.sm-more)>button:not(.sm-more):nth-child(n+5){display:none !important}
+.ex-ch .sm-strip .sm-more{display:grid !important;place-items:center;background:var(--paper,#F6F3EE);box-shadow:inset 0 0 0 1px var(--rule)}
+.ex-ch .ex-ch-head{display:block !important;margin:0 0 12px !important;padding:0 !important}
+.ex-ch .ex-ch-head .ex-ch-year{display:block;margin:0 0 4px}
+.ex-ch .ex-ch-head h2{margin:0}
+.ex-ch .ex-ch-where{margin:6px 0 0 !important}
+.ex-ch .ex-ch-txt{margin:16px 0 0 !important;padding:0 !important}
+.ex-ch .sm-cap{display:block !important;margin:16px 0 0 !important;-webkit-line-clamp:unset !important;line-clamp:none !important;height:auto !important;min-height:0 !important;overflow:visible !important}
 .sm-walls a{text-decoration:underline;text-underline-offset:4px}
-@media (min-width:641px) and (max-width:1099px){
-  .ex-ch-body{display:flex !important;flex-direction:column;align-items:stretch !important;gap:16px;padding-left:0 !important}
-  .ex-ch .sm-media{width:100%}
-  .ex-ch .sm-hero{height:min(60vw,440px) !important}
-  .ex-ch .sm-cap{min-height:2.9em}
+@media (min-width:641px){
+  .ex-ch{display:grid !important;grid-template-columns:minmax(0,1fr) minmax(0,1fr);grid-template-rows:auto auto auto 1fr;column-gap:32px;align-items:start;padding-block:36px !important}
+  .ex-ch .ex-ch-media{grid-column:1;grid-row:1 / -1}
+  .ex-ch .ex-ch-head,.ex-ch .ex-ch-txt,.ex-ch .sm-cap{grid-column:2}
+  .ex-ch .ex-ch-head{grid-row:1}
+  .ex-ch .ex-ch-txt{grid-row:2}
+  .ex-ch .sm-cap{grid-row:3}
+  .ex-ch .sm-strip button{width:72px !important;height:48px !important}
+  .ex-ch .sm-hero{height:min(300px,64cqw) !important}
 }
-/* R4 polish 3 (DC P2-3): the 3-line IHC caption ran 11 px past its reserved height to 2 px above the strip */
-@media (max-width:640px){ .ex-ch .sm-cap{min-height:auto;margin-bottom:8px} }
+@media (min-width:1100px){
+  .ex-ch{grid-template-columns:minmax(0,560px) minmax(0,1fr);column-gap:48px;padding-block:40px !important}
+  .ex-ch .sm-hero{height:min(360px,64cqw) !important}
+  .ex-ch .sm-strip button{width:84px !important;height:56px !important}
+}
+@media (max-width:640px){
+  .ex-ch{display:flex !important;flex-direction:column;gap:14px;padding-block:28px !important}
+  .ex-ch .ex-ch-head{order:1;margin:0 !important}
+  .ex-ch .ex-ch-media{order:2}
+  .ex-ch .sm-cap{order:3;margin:0 !important}
+  .ex-ch .ex-ch-txt{order:4;margin:0 !important}
+  .ex-ch .sm-hero{height:min(62vw,260px) !important}
+  .ex-ch .sm-strip{overflow-x:auto !important}
+  .ex-ch .sm-strip button{width:64px !important;height:44px !important}
+  .ex-ch .sm-strip:has(.sm-more)>button:not(.sm-more):nth-child(n+5){display:block !important}
+  .ex-ch .sm-strip .sm-more{display:none !important}
+}
+/* the index fits one line at 1440 */
+@media (min-width:1100px){ .ex-index{flex-wrap:nowrap;gap:0 24px} .ex-index a{white-space:nowrap} }
 
 /* R4 B2-2: where the collections switcher is sticky (>=761), anchors land below header bar + switcher (44 px) */
 @media (min-width:761px){
