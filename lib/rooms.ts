@@ -196,7 +196,13 @@ export function hang(room: Room, longestCm: number, aspect: number): Hang {
 export type RoomView = { room: Room; at: Hang; trueSize: boolean };
 
 /** the rooms a work can be seen in: its own, else the generic ones if she has stated its size */
-export function roomsFor(work: Work, aspect: number, opts: { pilot?: boolean } = {}): RoomView[] {
+export function roomsFor(work: Work, aspect: number, opts: { pilot?: boolean; withPilot?: boolean } = {}): RoomView[] {
+  // the studio's lightbox: its own room (or the generic ones), then every hallway / console shot made for it
+  if (opts.withPilot) {
+    const base = roomsFor(work, aspect);
+    const extra = PILOT.filter((r) => r.work === work.id).map((room) => ({ room, at: hang(room, room.cm, aspect), trueSize: false }));
+    return [...base, ...extra];
+  }
   // the hallway pilot is shown on the website's painting pages only (not in the studio)
   const pilot = opts.pilot ? PILOT.find((r) => r.work === work.id) : undefined;
   const own = TAILORED.find((r) => r.work === work.id);

@@ -10,14 +10,16 @@ import Featured from "./Featured";
 import Lightbox, { type LightboxHandle } from "./Lightbox";
 import Cursor, { roomCursorLabel } from "./Cursor";
 import WallLabels from "./WallLabels";
-import Stops from "./Stops";
 import Until from "./Until";
-import QuickIndex from "./QuickIndex";
+import RoomMap, { roomsOfWalk } from "./RoomMap";
+import AboutHer from "./AboutHer";
+import Desk from "./Desk";
 import { WORKS_FILTER, type WorksFilter } from "./Works";
 import * as music from "@/lib/music";
 import { CHAPTERS, WALK_ORDER, stopOf } from "@/lib/chapters";
 import { activeVariant } from "@/lib/room/variants";
-import { BY_ID, EMAIL, FEATURED } from "@/lib/works";
+import { BY_ID, FEATURED } from "@/lib/works";
+import { askPath } from "@/lib/studio-ask";
 import { rebaseWalkScroll, walkProgress } from "@/lib/walk-layout";
 import { paintingProperties, track } from "@/lib/analytics";
 
@@ -31,6 +33,7 @@ export default function Studio({ dims }: { dims: Dims }) {
   const hudRef = useRef<HTMLDivElement>(null);
   const mainRef = useRef<HTMLElement>(null);
   const copyRef = useRef<HTMLDivElement>(null);
+  const villageRef = useRef<HTMLDivElement>(null);
   const preRef = useRef<PreloaderHandle>(null);
   const lbRef = useRef<LightboxHandle>(null);
   const roomRef = useRef<Room | null>(null);
@@ -59,21 +62,21 @@ export default function Studio({ dims }: { dims: Dims }) {
   /** the tanpura (lib/music.ts) */
   const [playing, setPlaying] = useState(false);
   useEffect(() => music.onChange(setPlaying), []);
-  // a visitor who chose music and came straight back in (no Step inside): the first
-  // touch or key brings it back, since a browser starts sound only from a gesture
+  // Music is on by default, at low volume, and starts on the visitor's first tap, key or click
+  // (a browser starts sound only from a real gesture; a wheel or a scroll is not one). A stored
+  // "off" is respected (music.wanted reads it inside try/catch). Listeners stay until sound runs.
   useEffect(() => {
-    if (!ready) return;
-    const wake = () => {
-      if (music.wanted() && !music.isPlaying()) music.start();
-      off();
+    const events = ["pointerup", "touchend", "keydown", "click"] as const;
+    const off = () => events.forEach((e) => removeEventListener(e, wake, true));
+    const wake = (e: Event) => {
+      if ((e.target as Element | null)?.closest?.(".music-btn")) return;   // the toggle decides for itself
+      if (!music.wanted()) { off(); return; }
+      if (!music.isPlaying()) music.start();
+      setTimeout(() => { if (music.wake()) off(); }, 250);
     };
-    const off = () => { removeEventListener("pointerup", wake, true); removeEventListener("keydown", wake, true); };
-    if (music.wanted() && !music.isPlaying()) {
-      addEventListener("pointerup", wake, true);
-      addEventListener("keydown", wake, true);
-    }
+    if (music.wanted()) events.forEach((e) => addEventListener(e, wake, true));
     return off;
-  }, [ready]);
+  }, []);
   const [active, setActive] = useState(0);
   const [loadEpoch, setLoadEpoch] = useState(0);
   useEffect(() => {
@@ -176,6 +179,13 @@ export default function Studio({ dims }: { dims: Dims }) {
         if (!room?.introDone || dead) document.documentElement.dataset.hud = CHAPTERS[idx]?.ink ?? "";
       }
 
+      // the village line draws left to right with the walk (CSS reads --walk; static when motion is reduced)
+      const vil = villageRef.current;
+      if (vil && centers.length) {
+        const a = centers[0], z = centers[centers.length - 1];
+        vil.style.setProperty("--walk", String(clamp01(z > a ? (s - a) / (z - a) : 0)));
+      }
+
       // past the plan, the live room shrinks into a held card …
       const st = stageRef.current, hud = hudRef.current;
       const end = centers.length ? centers[centers.length - 1] : Infinity;
@@ -258,7 +268,7 @@ export default function Studio({ dims }: { dims: Dims }) {
       if (!coarse || e.touches.length !== 1 || locks.current.size || !centers.length) return;
       const target = e.target as Element;
       // the carousel, the sheet, the labels and the header keep their own touches
-      if (target.closest(".sec-featured, .sheet, .lb, .hud a, .hud button, .wall-label")) return;
+      if (target.closest(".sec-featured, .sheet, .lb, .hud a, .hud button, .wall-label, .walk-panel")) return;
       const last = centers[centers.length - 1];
       const inWalk = lastScroll <= last + 4;
       const atWorks = !inWalk && Math.abs(lastScroll - worksTop) < 8;
@@ -273,7 +283,7 @@ export default function Studio({ dims }: { dims: Dims }) {
       const dx = t.clientX - swipe.x0, dy = t.clientY - swipe.y0;
       if (!swipe.mode) {
         if (Math.abs(dx) < 8 && Math.abs(dy) < 8) return;
-        swipe.mode = Math.abs(dx) > Math.abs(dy) * 1.2 && !swipe.back ? "look" : "walk";
+        swipe.mode = "walk";   // one gesture: vertical. A sideways drag does nothing.
       }
       if (swipe.back && dy < -6) { swipe.on = false; return; }
       if (e.cancelable) e.preventDefault();
@@ -684,6 +694,9 @@ export default function Studio({ dims }: { dims: Dims }) {
   };
   // the chapter in view, for the header's "you are here"
   const here = ready ? CHAPTERS[active]?.id : undefined;
+  const walkRooms = roomsOfWalk();
+  const at = walkRooms.findIndex((r) => active >= r.first && active <= r.last);
+  const nextRoom = at >= 0 && active === walkRooms[at].last ? walkRooms[at + 1] : undefined;
 
   // a link to one painting (its own page's "See it in her studio", or a shared /#work=<id>): once
   // the house is open, walk to the wall it hangs on and open it there; /#works goes to the collage
@@ -729,7 +742,7 @@ export default function Studio({ dims }: { dims: Dims }) {
       {/* the header — line work and pills, as in the original */}
       <header className="hud" ref={hudRef} inert={!ready && !failed} data-state="pre">
         <div className="hud-top">
-          <a className="brand" href="#top" aria-label="Dr Dolly Prasad — back to the door"
+          <a className="brand" href="#top" aria-label="Dr Dolly Prasad, back to the door"
              onClick={(e) => {
                e.preventDefault();
                const quick = reducedMotion();
@@ -737,11 +750,9 @@ export default function Studio({ dims }: { dims: Dims }) {
              }}>
             <div data-brand-target className="brand-target" />
           </a>
-          <div className="hud-meta lab">
-            <span data-hud-text="New Delhi">New Delhi</span>
-            <span ref={clockRef} />
-          </div>
-          <a className="hud-mail lab" href={`mailto:${EMAIL}`} data-hud-text="↳ Write to me">↳ Write to me</a>
+          <span className="mask hud-map"><button type="button" className="pill hud-pill map-btn" aria-expanded={stops} aria-haspopup="dialog"
+                  onClick={() => setStops((o) => !o)}>
+            <svg viewBox="0 0 24 24" aria-hidden="true"><path d="M4 6.5h16M4 12h16M4 17.5h16" /></svg>The rooms</button></span>
           <button type="button" className="diya-btn music-btn" aria-pressed={playing}
                   aria-label={playing ? "Pause the music" : "Play the music"} onClick={() => music.toggle()}>
             <svg viewBox="0 0 32 32" aria-hidden="true">
@@ -751,41 +762,9 @@ export default function Studio({ dims }: { dims: Dims }) {
               {!playing && <path d="M6 6l20 20" className="dish-line" />}
             </svg>
           </button>
-          <button type="button" className="diya-btn" aria-pressed={mode === "dark"}
-                  aria-label={mode === "dark" ? "Put out the diya" : "Light the diya"}
-                  onClick={() => setMode(mode === "dark" ? "light" : "dark")}>
-            <svg viewBox="0 0 32 32" aria-hidden="true">
-              <path d="M16 6c2.6 3.1 3.6 5.4 3.6 7.2a3.6 3.6 0 0 1-7.2 0c0-1.8 1-4.1 3.6-7.2Z" className="flame" />
-              <path d="M5 19.5h22c-1 4.2-5.3 7-11 7s-10-2.8-11-7Z" className="dish" />
-            </svg>
-          </button>
         </div>
         <div className="hud-bottom">
-          <span className="lab hud-hint">Scroll ↓</span>
-          {/* the phone's dock: where you are in the house, the works, and the rest in a sheet */}
-          {ready && !failed && (
-            <div className="dock">
-              <button type="button" className="dock-where" disabled={!ready} onClick={() => setStops(true)}
-                      aria-label={`Stop ${active + 1} of ${CHAPTERS.length}: ${CHAPTERS[active]?.stop}. All stops`}>
-                <span className="lab dock-n">{String(active + 1).padStart(2, "0")}<i>/{String(CHAPTERS.length).padStart(2, "0")}</i></span>
-                <span className="dock-name" key={active}>{CHAPTERS[active]?.stop}</span>
-              </button>
-              <button type="button" className="dock-menu" disabled={!ready} aria-label="Menu" aria-expanded={stops}
-                      onClick={() => setStops(true)}>
-                <svg viewBox="0 0 24 24" aria-hidden="true"><path d="M5 8.5h14M5 15.5h14" /></svg>
-              </button>
-            </div>
-          )}
-          <nav className="hud-pills" aria-label="Site">
-            <span className="mask"><a className="pill hud-pill" href="/">← The website</a></span>
-            <span className="mask"><button type="button" className="pill hud-pill" aria-current={here === "featured" || undefined}
-                  onClick={() => go(failed ? "#works" : "[data-chapter='featured']")}>Works<span className="arr"> →</span></button></span>
-            {!failed && (
-              <span className="mask"><button type="button" className="pill hud-pill" aria-current={here === "plan" || undefined}
-                    onClick={() => go("[data-chapter='plan']", true)}>Exhibitions<span className="arr"> →</span></button></span>
-            )}
-            <span className="mask"><button type="button" className="pill hud-pill" onClick={() => go("#contact")}>Contact<span className="arr"> →</span></button></span>
-          </nav>
+          <span className="lab hud-hint">Scroll to walk</span>
         </div>
       </header>
 
@@ -808,6 +787,13 @@ export default function Studio({ dims }: { dims: Dims }) {
           </div>
         ) : null)}
       </div>
+
+      {/* the village line, drawn along the foot as the walk goes (hidden from assistive tech: decoration) */}
+      <div className="village" ref={villageRef} aria-hidden="true" />
+
+      {/* the entrance and her desk: panels for chapters "about" and "desk" (lib/chapters.ts hooks them up) */}
+      <AboutHer open={ready && here === "about"} />
+      <Desk open={ready && here === "desk"} />
 
       <WallLabels room={roomRef} active={active} live={ready && !failed}
                   onOpen={(id) => lbRef.current?.open(id, null, WALK_ORDER)} />
@@ -840,29 +826,20 @@ export default function Studio({ dims }: { dims: Dims }) {
         )}
       </main>
 
-      {/* a phone's way to walk without knowing the gesture: an arrow at each edge */}
-      {ready && !failed && (
-        <div className="edge-nav" aria-hidden="false">
-          <button type="button" className="edge-btn is-prev" aria-label="The last wall" disabled={active === 0}
-                  onClick={() => stepRef.current(-1)}><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M14.5 5.5 8 12l6.5 6.5" /></svg></button>
-          <button type="button" className="edge-btn is-next" aria-label="The next wall"
-                  onClick={() => stepRef.current(1)}><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M9.5 5.5 16 12l-6.5 6.5" /></svg></button>
-        </div>
-      )}
       {coach && (
         <div className="coach" role="status">
           <span className="coach-hand" aria-hidden="true" />
           <span className="coach-text">Swipe up to walk through the house</span>
-          <span className="coach-sub lab">or swipe sideways · or tap ‹ ›</span>
         </div>
       )}
 
-      {!failed && (
-        <QuickIndex active={active} live={ready} onStop={goStop} onWorks={showWorks}
-                    onPlan={() => go("[data-chapter='plan']", true)} onContact={() => go("#contact")} />
+      <RoomMap open={stops} active={active} onClose={closeStops} onGo={goStop} onWorks={() => showWorks("all")} />
+      {/* at a room's last stop: on to the next room */}
+      {ready && !failed && nextRoom && (
+        <button type="button" className="next-room" key={nextRoom.name} onClick={() => goStop(nextRoom.first)}>
+          Next room<span className="next-name">: {nextRoom.name}</span> <span aria-hidden="true">→</span>
+        </button>
       )}
-      <Stops open={stops} active={active} onClose={closeStops} onGo={goStop}
-             onContact={() => go("#contact")} onWorks={showWorks} />
       <Lightbox ref={lbRef} dims={dims} onOpenChange={onLightbox} />
       <Cursor live={ready || failed} />
     </>
