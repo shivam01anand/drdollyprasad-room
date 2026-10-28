@@ -792,8 +792,8 @@ export default function Studio({ dims }: { dims: Dims }) {
       <div className="village" ref={villageRef} aria-hidden="true" />
 
       {/* the entrance and her desk: panels for chapters "about" and "desk" (lib/chapters.ts hooks them up) */}
-      {!failed && <AboutHer open={ready && here === "about"} />}
-      {!failed && <Desk open={ready && here === "desk"} />}
+      <AboutHer open={ready && here === "about"} />
+      <Desk open={ready && here === "desk"} />
 
       <WallLabels room={roomRef} active={active} live={ready && !failed}
                   onOpen={(id) => lbRef.current?.open(id, null, WALK_ORDER)} />
@@ -833,7 +833,7 @@ export default function Studio({ dims }: { dims: Dims }) {
         </div>
       )}
 
-      <RoomMap open={stops && !failed} active={active} onClose={closeStops} onGo={goStop} onWorks={() => showWorks("all")} />
+      <RoomMap open={stops} active={active} onClose={closeStops} onGo={goStop} onWorks={() => showWorks("all")} />
       {/* at a room's last stop: on to the next room */}
       {ready && !failed && nextRoom && (
         <button type="button" className="next-room" key={nextRoom.name} onClick={() => goStop(nextRoom.first)}>

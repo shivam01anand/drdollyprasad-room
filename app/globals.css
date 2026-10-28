@@ -748,3 +748,4 @@ html[data-room="off"] .village{display:none}
 .next-room:hover{background:var(--oxide);border-color:var(--oxide);color:#F5F4F0}
 @keyframes next-in{from{opacity:0;transform:translateY(8px)}}
 @media (max-width:760px){ .next-room{right:auto;left:var(--gut);bottom:18px;height:44px} .next-name{display:none} }
+html[data-room="off"] .hud-map{display:none}
