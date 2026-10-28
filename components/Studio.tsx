@@ -696,6 +696,27 @@ export default function Studio({ dims }: { dims: Dims }) {
   const walkRooms = roomsOfWalk();
   const at = walkRooms.findIndex((r) => active >= r.first && active <= r.last);
   const nextRoom = at >= 0 && active === walkRooms[at].last ? walkRooms[at + 1] : undefined;
+  // the words wait for the walk: a stop's copy and panel show once the camera is (nearly) there,
+  // so a long glide never puts one stop's words over another stop's wall
+  const [near, setNear] = useState(true);
+  useEffect(() => {
+    if (!ready) return;
+    const t = window.setInterval(() => {
+      const r = roomRef.current;
+      setNear(!r || failed ? true : Math.abs(r.at * (CHAPTERS.length - 1) - active) < 0.3);
+    }, 120);
+    return () => clearInterval(t);
+  }, [ready, failed, active]);
+
+  // the page knows when a panel (About her, Her desk) is up, and when the next-room step shows:
+  // wall labels and the scroll hint step back so one thing speaks at a time (globals.css)
+  const panel = near && (here === "about" || here === "desk") ? here : "";
+  useEffect(() => {
+    const d = document.documentElement.dataset;
+    if (panel) d.panel = panel; else delete d.panel;
+    if (nextRoom) d.next = "1"; else delete d.next;
+  }, [panel, nextRoom]);
+  useEffect(() => () => { delete document.documentElement.dataset.panel; delete document.documentElement.dataset.next; }, []);
 
   // a link to one painting (its own page's "See it in her studio", or a shared /#work=<id>): once
   // the house is open, walk to the wall it hangs on and open it there; /#works goes to the collage
@@ -768,7 +789,7 @@ export default function Studio({ dims }: { dims: Dims }) {
       </header>
 
       {/* the copy slot — fixed, below the header's reach */}
-      <div className="copy" ref={copyRef} data-has="0" aria-hidden="true">
+      <div className="copy" ref={copyRef} data-has="0" data-near={near ? "1" : "0"} aria-hidden="true">
         {CHAPTERS.map((c, i) => (c.body || c.verse || c.quote) ? (
           <div className="copy-panel" data-i={i} data-on="0" key={c.id}>
             <div className="copy-head">
@@ -791,8 +812,8 @@ export default function Studio({ dims }: { dims: Dims }) {
       <div className="village" ref={villageRef} aria-hidden="true" />
 
       {/* the entrance and her desk: panels for chapters "about" and "desk" (lib/chapters.ts hooks them up) */}
-      <AboutHer open={ready && here === "about"} />
-      <Desk open={ready && here === "desk"} />
+      <AboutHer open={ready && panel === "about"} />
+      <Desk open={ready && panel === "desk"} />
 
       <WallLabels room={roomRef} active={active} live={ready && !failed}
                   onOpen={(id) => lbRef.current?.open(id, null, WALK_ORDER)} />
