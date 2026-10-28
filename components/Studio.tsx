@@ -6,7 +6,6 @@ import "lenis/dist/lenis.css";
 import type { Room } from "@/lib/room/Room";
 import { motion, gsap, scrambleTo, reducedMotion } from "@/lib/motion";
 import Preloader, { type PreloaderHandle } from "./Preloader";
-import Featured from "./Featured";
 import Lightbox, { type LightboxHandle } from "./Lightbox";
 import Cursor, { roomCursorLabel } from "./Cursor";
 import WallLabels from "./WallLabels";
@@ -18,7 +17,7 @@ import { WORKS_FILTER, type WorksFilter } from "./Works";
 import * as music from "@/lib/music";
 import { CHAPTERS, WALK_ORDER, stopOf } from "@/lib/chapters";
 import { activeVariant } from "@/lib/room/variants";
-import { BY_ID, FEATURED } from "@/lib/works";
+import { BY_ID } from "@/lib/works";
 import { askPath } from "@/lib/studio-ask";
 import { rebaseWalkScroll, walkProgress } from "@/lib/walk-layout";
 import { paintingProperties, track } from "@/lib/analytics";
@@ -806,24 +805,18 @@ export default function Studio({ dims }: { dims: Dims }) {
 
       {/* one section per chapter — the same source as the camera */}
       <main className="chapters" ref={mainRef} id="top">
-        {CHAPTERS.map((c) =>
-          c.slot === "featured" ? (
-            <section className="sec sec-featured" key={c.id} data-chapter={c.id} aria-label="Featured works">
-              <Featured dims={dims} onOpen={(id, img) => lbRef.current?.open(id, img, FEATURED)} />
-            </section>
-          ) : (
-            <section className="sec" key={c.id} data-chapter={c.id} aria-label={c.eyebrow}>
-              {(c.body || c.verse || c.quote) && (
-                <div className="chapter-text">
-                  <h2 className="lab">{c.eyebrow}</h2>
-                  {c.verse && <p className="poem">{c.verse}</p>}
-                  {c.body && (c.bodyUntil ? <Until until={c.bodyUntil}><p className="lede">{c.body}</p></Until> : <p className="lede">{c.body}</p>)}
-                  {c.quote && <blockquote className="quote">“{c.quote}”</blockquote>}
-                </div>
-              )}
-            </section>
-          )
-        )}
+        {CHAPTERS.map((c) => (
+          <section className="sec" key={c.id} data-chapter={c.id} aria-label={c.eyebrow}>
+            {(c.body || c.verse || c.quote) && (
+              <div className="chapter-text">
+                <h2 className="lab">{c.eyebrow}</h2>
+                {c.verse && <p className="poem">{c.verse}</p>}
+                {c.body && (c.bodyUntil ? <Until until={c.bodyUntil}><p className="lede">{c.body}</p></Until> : <p className="lede">{c.body}</p>)}
+                {c.quote && <blockquote className="quote">“{c.quote}”</blockquote>}
+              </div>
+            )}
+          </section>
+        ))}
       </main>
 
       {coach && (

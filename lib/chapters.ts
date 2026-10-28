@@ -27,8 +27,6 @@ export type Chapter = {
   quote?: string;
   /** rendered as verse, one line per line */
   verse?: string;
-  /** the section is content of its own (the featured slider) */
-  slot?: "featured";
   /** the header sits on dark material in this framing: light ink. Only until the room is drawn (or
    *  if it fails): then the header reads its ink from the frame itself (Studio, Room.readLumaBehind) */
   ink?: "light";
@@ -94,9 +92,8 @@ export const CHAPTERS: Chapter[] = [
   { id: "presence", eyebrow: "“Woman with Poppies”", stop: "Woman with Poppies", room: "About her", space: "aangan",
     view: "presence", labels: ["woman-with-poppies"] },
   // About her: her, at her easel, painting; the press and films beside (copy locked 27 Oct)
-  { id: "about", eyebrow: "A doctor who paints", stop: "About her", room: "About her", space: "aangan",
-    body: "Dr Dolly Prasad is a doctor and oil painter in New Delhi. Her work has been shown in eighteen exhibitions " +
-      "and art fairs, 2005–2018, and is held by collectors in India, the USA and the UK.",
+  // her words and the press are drawn by components/AboutHer.tsx (copy locked 27 Oct)
+  { id: "about", eyebrow: "About her", stop: "About her", room: "About her", space: "aangan",
     press: ABOUT_PRESS, view: "easel", dusk: 0.04,
     // the canvas she is working on, from her own photograph (scripts/figure/make.py)
     asides: [{ anchor: "easel", title: "On her easel", line: "A new painting, in progress", size: [1.28, 1.06] }] },
@@ -182,8 +179,7 @@ export const CHAPTERS: Chapter[] = [
   },
   // the close: her desk at the hall's east end, the exhibitions wall either side of the palm window
   { id: "desk", eyebrow: "Her desk", stop: "Her desk", room: "Her desk", space: "gallery",
-    body: "If a painting stayed with you, ask us about it.",
-    // TODO_COPY: the exhibitions wall's caption ("Eighteen exhibitions and art fairs, 2005–2018" and the venues)
+    // heading, line and button are drawn by components/Desk.tsx (copy locked 27 Oct)
     cta: { label: "Ask about a painting", href: "/enquire" },
     view: "desk", dusk: 0.58 },
 ];

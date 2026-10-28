@@ -2,8 +2,6 @@
 
 import { forwardRef, useEffect, useImperativeHandle, useLayoutEffect, useRef, useState } from "react";
 import { motion, gsap, Flip, reducedMotion } from "@/lib/motion";
-import { SHOW } from "@/lib/works";
-import { NOW_SHOWING_CONFIRMED } from "@/lib/site";
 
 export type HeroRect = { left: number; top: number; width: number; height: number };
 export type PreloaderHandle = { finish(): void };
@@ -70,7 +68,6 @@ const Preloader = forwardRef<PreloaderHandle, Props>(function Preloader(props, r
     sign.current!.append(b1, b2);
     nodes.current = { b1, b2 };
     try { setAgain(sessionStorage.getItem(SEEN) === "1"); } catch { /* private mode */ }
-    setShowing(NOW_SHOWING_CONFIRMED && Date.now() < Date.parse(`${SHOW.until}T23:59:59+05:30`));
     return () => {
       owned.current.forEach((a) => a.kill());
       removeEventListener("resize", place);

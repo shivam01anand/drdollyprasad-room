@@ -7,15 +7,15 @@ import { CHAPTERS } from "@/lib/chapters";
 /**
  * The room map: one compact list of the rooms, in walking order, with a "you are here" mark.
  * Rooms are read from CHAPTERS (the `room` field, consecutive chapters with the same room
- * make one room), so it follows the hang without edits. Featured works and the exhibitions
- * plan are not rooms and are left out.
+ * make one room), so it follows the hang without edits. The exhibitions plan
+ * is not a room and is left out.
  */
 export type RoomStop = { name: string; first: number; last: number };
 
 export function roomsOfWalk(): RoomStop[] {
   const out: RoomStop[] = [];
   CHAPTERS.forEach((c, i) => {
-    if (c.slot === "featured" || c.id === "featured" || c.id === "plan") return;
+    if (c.id === "plan") return;
     const name = c.room || c.stop;
     const prev = out[out.length - 1];
     if (prev && prev.name === name && prev.last === i - 1) prev.last = i;
