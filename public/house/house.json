@@ -773,7 +773,7 @@
     1.55,
     -1.3721
    ],
-   "fov": 40.0
+   "fov": 40
   },
   "faithvia": {
    "eye": [
@@ -812,7 +812,7 @@
     1.5,
     4.2922
    ],
-   "fov": 40.0
+   "fov": 40
   },
   "redwall": {
    "eye": [
@@ -1102,7 +1102,7 @@
   },
   "n:faith": {
    "eye": [
-    -4.0,
+    -4,
     1.55,
     -3.7
    ],
@@ -1111,7 +1111,7 @@
     1.3,
     -1.3
    ],
-   "fov": 62.0
+   "fov": 62
   },
   "n:streetvia": {
    "eye": [
@@ -1137,7 +1137,7 @@
     1.3,
     4.8
    ],
-   "fov": 62.0
+   "fov": 62
   },
   "n:redwall": {
    "eye": [
@@ -1330,22 +1330,22 @@
    "target": [
     3.6,
     1.6,
-    0.0
+    0
    ],
-   "fov": 40.0
+   "fov": 40
   },
   "n:recent": {
    "eye": [
-    3.0,
+    3,
     1.55,
     -3.9
    ],
    "target": [
-    3.0,
+    3,
     1.35,
-    0.0
+    0
    ],
-   "fov": 62.0
+   "fov": 62
   },
   "faithn": {
    "eye": [
@@ -1356,9 +1356,9 @@
    "target": [
     -2.95,
     1.62,
-    -6.0
+    -6
    ],
-   "fov": 40.0
+   "fov": 40
   },
   "n:faithn": {
    "eye": [
@@ -1369,9 +1369,9 @@
    "target": [
     -2.95,
     1.35,
-    -6.0
+    -6
    ],
-   "fov": 62.0
+   "fov": 62
   },
   "faithturn": {
    "eye": [
@@ -1384,7 +1384,7 @@
     1.55,
     -3.6
    ],
-   "fov": 40.0
+   "fov": 40
   },
   "bandhvia": {
    "eye": [
@@ -1393,11 +1393,11 @@
     0.6
    ],
    "target": [
-    -1.0,
+    -1,
     1.55,
     1.5
    ],
-   "fov": 40.0
+   "fov": 40
   },
   "bandh": {
    "eye": [
@@ -1410,7 +1410,7 @@
     1.62,
     -0.35
    ],
-   "fov": 40.0
+   "fov": 40
   },
   "n:bandh": {
    "eye": [
@@ -1423,7 +1423,7 @@
     1.45,
     -0.35
    ],
-   "fov": 62.0
+   "fov": 62
   },
   "streetturn": {
    "eye": [
@@ -1432,24 +1432,24 @@
     1.5
    ],
    "target": [
-    1.0,
+    1,
     1.55,
     1.6
    ],
-   "fov": 40.0
+   "fov": 40
   },
   "gatdhall": {
    "eye": [
-    5.0,
+    5,
     1.62,
     2.4
    ],
    "target": [
-    5.0,
+    5,
     1.55,
     8.8
    ],
-   "fov": 40.0
+   "fov": 40
   },
   "n:gatdhall": {
    "eye": [
@@ -1462,20 +1462,20 @@
     1.25,
     8.77
    ],
-   "fov": 62.0
+   "fov": 62
   },
   "hallwest": {
    "eye": [
-    13.0,
+    13,
     1.62,
     4.6
    ],
    "target": [
-    6.0,
+    6,
     1.62,
     4.4
    ],
-   "fov": 40.0
+   "fov": 40
   },
   "portraitsw": {
    "eye": [
@@ -1488,7 +1488,7 @@
     1.55,
     0.53
    ],
-   "fov": 40.0
+   "fov": 40
   },
   "n:portraitsw": {
    "eye": [
@@ -1501,11 +1501,11 @@
     1.25,
     0.53
    ],
-   "fov": 62.0
+   "fov": 62
   },
   "desk": {
    "eye": [
-    12.0,
+    12,
     1.62,
     4.65
    ],
@@ -1514,11 +1514,11 @@
     1.7,
     4.65
    ],
-   "fov": 40.0
+   "fov": 40
   },
   "n:desk": {
    "eye": [
-    14.0,
+    14,
     1.55,
     4.65
    ],
@@ -1527,7 +1527,7 @@
     1.55,
     4.65
    ],
-   "fov": 62.0
+   "fov": 62
   }
  },
  "anchors": {
@@ -1770,27 +1770,116 @@
   "T": 0.45
  },
  "props": [
-  "Prop_charpai_aangan",
   "Prop_potted_plant_04_tc_1",
   "Prop_potted_plant_04_tc_2",
   "Prop_potted_plant_02_3",
   "Prop_potted_plant_04_tc_4",
   "Prop_potted_plant_04_tc_5",
   "Prop_wooden_bowl_01_6",
-  "Prop_brass_diya_lantern_7",
   "Prop_wooden_stool_02_8",
   "Prop_brass_vase_03_9",
   "Prop_lamp",
   "Prop_deepa",
-  "Prop_can_0",
-  "Prop_can_1",
-  "Prop_can_2",
   "Prop_wheel",
-  "Prop_charpai_red",
-  "Prop_brass_pot_01_17",
-  "Prop_brass_pot_01_18",
-  "Prop_ceramic_pot_19",
   "Prop_galBench0",
   "Prop_galBench1"
+ ],
+ "frieze": [
+  {
+   "room": "Onset of Spring",
+   "side": "E",
+   "plane": 7.198,
+   "u0": -5.35,
+   "u1": -0.3,
+   "space": "aangan"
+  },
+  {
+   "room": "Onset of Spring",
+   "side": "S",
+   "plane": -0.002,
+   "u0": 0.54,
+   "u1": 2.39,
+   "space": "aangan"
+  },
+  {
+   "room": "Onset of Spring",
+   "side": "S",
+   "plane": -0.002,
+   "u0": 4.81,
+   "u1": 6.81,
+   "space": "aangan"
+  },
+  {
+   "room": "Faith",
+   "side": "N",
+   "plane": -5.998,
+   "u0": -5.25,
+   "u1": -0.75,
+   "space": "quiet"
+  },
+  {
+   "room": "Faith",
+   "side": "S",
+   "plane": -0.802,
+   "u0": -3.47,
+   "u1": -0.75,
+   "space": "quiet"
+  },
+  {
+   "room": "Bandh Darwaze",
+   "side": "N",
+   "plane": -0.348,
+   "u0": -3.47,
+   "u1": -0.75,
+   "space": "red"
+  },
+  {
+   "room": "Gone Are The Days",
+   "side": "S",
+   "plane": 4.798,
+   "u0": -5.3,
+   "u1": -0.75,
+   "space": "red"
+  },
+  {
+   "room": "Gone Are The Days",
+   "side": "S",
+   "plane": 8.848,
+   "u0": 1.45,
+   "u1": 8.95,
+   "y0": 2.52,
+   "y1": 2.78,
+   "space": "gallery"
+  },
+  {
+   "room": "Gone Are The Days",
+   "side": "S",
+   "plane": 8.848,
+   "u0": 10.65,
+   "u1": 17.15,
+   "y0": 2.52,
+   "y1": 2.78,
+   "space": "gallery"
+  },
+  {
+   "room": "Portraits",
+   "side": "N",
+   "plane": 0.452,
+   "u0": 4.95,
+   "u1": 11.25,
+   "y0": 2.52,
+   "y1": 2.78,
+   "space": "gallery"
+  },
+  {
+   "room": "Portraits",
+   "side": "N",
+   "plane": 0.452,
+   "u0": 12.55,
+   "u1": 17.75,
+   "y0": 2.52,
+   "y1": 2.78,
+   "space": "gallery"
+  }
  ]
 }

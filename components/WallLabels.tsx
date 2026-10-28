@@ -216,7 +216,8 @@ export default function WallLabels({ room, active, live, onOpen }: {
         const q = asideAt.get(id);
         if (q) { n.style.transform = `translate3d(${Math.round(q.x)}px, ${Math.round(q.y)}px, 0)`; continue; }
         const f = rects.get(id);
-        if (!f) continue;
+        // its canvas is not wholly in view: the card waits off screen, never parked in the corner
+        if (!f) { n.style.transform = "translate3d(-9999px, -9999px, 0)"; continue; }
         const p = spot(side, f, n.offsetWidth, n.offsetHeight, centred);
         n.style.transform = `translate3d(${Math.round(p.x)}px, ${Math.round(p.y)}px, 0)`;
       }
