@@ -4,7 +4,7 @@ import { useCallback, useEffect, useLayoutEffect, useRef, useState } from "react
 import Lenis from "lenis";
 import "lenis/dist/lenis.css";
 import type { Room } from "@/lib/room/Room";
-import { motion, gsap, scrambleTo, reducedMotion } from "@/lib/motion";
+import { motion, gsap, settleText, reducedMotion } from "@/lib/motion";
 import Preloader, { type PreloaderHandle } from "./Preloader";
 import Lightbox, { type LightboxHandle } from "./Lightbox";
 import Cursor, { roomCursorLabel } from "./Cursor";
@@ -105,7 +105,7 @@ export default function Studio({ dims }: { dims: Dims }) {
       if (now === last || !clockRef.current) return;
       last = now;
       tw?.kill();
-      tw = scrambleTo(clockRef.current, now, { speed: 1, duration: 1 });
+      tw = settleText(clockRef.current, now);
     };
     t();
     const i = setInterval(t, 5_000);
@@ -407,7 +407,8 @@ export default function Studio({ dims }: { dims: Dims }) {
         clearTimeout(timeout);
         setLoaded(true);
         measure();
-        if (process.env.NODE_ENV !== "production") devSwitches();
+        // ?qa=1: the screenshot driver's handle (window.__studio.go) in production builds too
+        if (process.env.NODE_ENV !== "production" || new URLSearchParams(location.search).has("qa")) devSwitches();
       });
     }).catch((e) => { clearTimeout(timeout); fail(e); });
 
@@ -577,7 +578,7 @@ export default function Studio({ dims }: { dims: Dims }) {
     const hud = hudRef.current!;
     const tweens: { kill(): void }[] = [];
     hud.querySelectorAll<HTMLElement>("[data-hud-text]").forEach((el) =>
-      tweens.push(scrambleTo(el, el.dataset.hudText!, { speed: 2, duration: 0.8 })));
+      tweens.push(settleText(el, el.dataset.hudText!)));
     const quick = reducedMotion();
     tweens.push(gsap.to(hud.querySelectorAll(".hud-pill"),
       { yPercent: 0, autoAlpha: 1, duration: quick ? 0 : 0.5, ease: "genEase", stagger: { amount: quick ? 0 : 0.5 } }));
@@ -607,9 +608,9 @@ export default function Studio({ dims }: { dims: Dims }) {
       tl.add(() => { next.dataset.on = "1"; });
       tl.fromTo(next, { autoAlpha: 0, y: 10 }, { autoAlpha: 1, y: 0, duration: reduce ? 0 : 0.55, ease: "power2.out" });
       const eyebrow = next.querySelector<HTMLElement>("[data-eyebrow]");
-      if (eyebrow) tl.add(scrambleTo(eyebrow, eyebrow.dataset.eyebrow!, { speed: 2, duration: 0.8 }), "<");
+      if (eyebrow) tl.add(settleText(eyebrow, eyebrow.dataset.eyebrow!), "<");
       next.querySelectorAll<HTMLElement>("[data-line]").forEach((ln, i) =>
-        tl.add(scrambleTo(ln, ln.dataset.line!, { speed: 0.6, duration: 1.1, anagram: true }), `<+${i === 0 ? 0.1 : 0.07}`));
+        tl.add(settleText(ln, ln.dataset.line!), `<+${i === 0 ? 0.1 : 0.07}`));
     }
     return () => {
       tl.kill();
@@ -707,6 +708,18 @@ export default function Studio({ dims }: { dims: Dims }) {
     }, 120);
     return () => clearInterval(t);
   }, [ready, failed, active]);
+
+  // on a slow device a fade still ends on time: no lag smoothing while the studio is open,
+  // so a label or card is never caught half-faded (QC, 28 Oct)
+  useEffect(() => {
+    gsap.ticker.lagSmoothing(0);
+    return () => gsap.ticker.lagSmoothing(500, 33);
+  }, []);
+
+  // arriving in a series room draws its village-line frieze (once per visit)
+  useEffect(() => {
+    if (ready && near) roomRef.current?.drawFrieze(CHAPTERS[active]?.room, CHAPTERS[active]?.space);
+  }, [ready, near, active]);
 
   // the page knows when a panel (About her, Her desk) is up, and when the next-room step shows:
   // wall labels and the scroll hint step back so one thing speaks at a time (globals.css)

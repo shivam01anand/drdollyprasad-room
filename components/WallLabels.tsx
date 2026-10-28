@@ -4,7 +4,7 @@ import { useEffect, useRef } from "react";
 import { CHAPTERS } from "@/lib/chapters";
 import { BY_ID, details, quoted, statusLabel } from "@/lib/works";
 import { askPath } from "@/lib/studio-ask";
-import { gsap, reducedMotion, scrambleTo } from "@/lib/motion";
+import { gsap, reducedMotion, settleText } from "@/lib/motion";
 import type { Room } from "@/lib/room/Room";
 
 /**
@@ -207,7 +207,7 @@ export default function WallLabels({ room, active, live, onOpen }: {
           reveal.fromTo(n, { autoAlpha: 0, y: 6 }, { autoAlpha: 1, y: 0, duration: quick ? 0 : 0.45, ease: "power2.out" }, at);
           if (!quick)
             n.querySelectorAll<HTMLElement>("[data-cap]").forEach((t, i) =>
-              reveal!.add(scrambleTo(t, t.dataset.cap!, { speed: 2, duration: 0.7 }), at + i * 0.06));
+              reveal!.add(settleText(t, t.dataset.cap!), at + i * 0.06));
         }
       }
       // the cards stay on the wall while the view sways

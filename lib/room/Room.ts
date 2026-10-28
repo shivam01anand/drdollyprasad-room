@@ -313,6 +313,7 @@ export class Room {
     this.buildSky();
     this.buildLights();
     this.buildItems();
+    this.buildFrieze();
     this.buildPost();
     this.resize();
     this.syncBakeAO();
@@ -711,6 +712,59 @@ export class Room {
   /* --- physics ------------------------------------------------------------ */
 
   /** where every object rests, and its collider's centre — measured once */
+  /* ---- the village-line frieze (BORDER_SPEC A): Kajal ink on the plaster above the paintings,
+     drawn left to right once per room, the first time the walk arrives there ---- */
+  private friezes: { key: string; reveal: { value: number } }[] = [];
+  private friezeDrawn = new Set<string>();
+  private buildFrieze() {
+    const strips = this.info.frieze ?? [];
+    if (!strips.length) return;
+    const mask = new THREE.TextureLoader().load("/house/frieze.png");
+    mask.colorSpace = THREE.SRGBColorSpace;
+    mask.wrapS = THREE.RepeatWrapping;
+    this.owned.push(mask);
+    const REPEAT = 12;   // metres per repeat of the line
+    const turn = { N: 0, S: Math.PI, E: -Math.PI / 2, W: Math.PI / 2 } as const;
+    for (const f of strips) {
+      const y0 = f.y0 ?? 2.7, y1 = f.y1 ?? 3.0, len = f.u1 - f.u0;
+      const map = mask.clone();
+      map.repeat.set(len / REPEAT, 1);
+      map.needsUpdate = true;
+      const reveal = { value: this.opts.reducedMotion ? 1 : 0 };
+      const mat = new THREE.MeshBasicMaterial({ color: 0x211b18, map, transparent: true, depthWrite: false,
+        opacity: this.narrow ? 0.8 : 0.55, polygonOffset: true, polygonOffsetFactor: -2, fog: false, toneMapped: false });
+      mat.onBeforeCompile = (sh) => {
+        sh.uniforms.uReveal = reveal;
+        sh.vertexShader = sh.vertexShader.replace("#include <common>", "#include <common>\nvarying float vStrip;")
+          .replace("#include <uv_vertex>", "#include <uv_vertex>\nvStrip = uv.x;");
+        sh.fragmentShader = sh.fragmentShader.replace("#include <common>", "#include <common>\nuniform float uReveal;\nvarying float vStrip;")
+          .replace("void main() {", "void main() {\n  if (vStrip > uReveal) discard;");
+      };
+      const geo = new THREE.PlaneGeometry(len, y1 - y0);
+      const mesh = new THREE.Mesh(geo, mat);
+      const u = (f.u0 + f.u1) / 2, y = (y0 + y1) / 2;
+      if (f.side === "N" || f.side === "S") mesh.position.set(u, y, f.plane); else mesh.position.set(f.plane, y, u);
+      mesh.rotation.y = turn[f.side];
+      mesh.renderOrder = 2;
+      mesh.matrixAutoUpdate = false;
+      mesh.updateMatrix();
+      mesh.userData.noAO = true;
+      this.world.add(mesh);
+      this.owned.push(geo, mat, map);
+      this.friezes.push({ key: `${f.room}|${f.space}`, reveal });
+    }
+  }
+
+  /** the walk has arrived in a room (a series, in one space of the house): draw its frieze, once per visit */
+  drawFrieze(room: string | undefined, space: string | undefined) {
+    const key = `${room}|${space}`;
+    if (!room || this.friezeDrawn.has(key)) return;
+    this.friezeDrawn.add(key);
+    const mine = this.friezes.filter((f) => f.key === key);
+    if (!mine.length || this.opts.reducedMotion) { mine.forEach((f) => (f.reveal.value = 1)); return; }
+    gsap.to(mine.map((f) => f.reveal), { value: 1, duration: 2.4, ease: "power2.out", stagger: 0.35 });
+  }
+
   private buildItems() {
     const box = new THREE.Box3();
     for (const s of this.parts.props) {

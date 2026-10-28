@@ -762,5 +762,9 @@ html[data-room="off"] .village{display:none}
   animation:next-in .5s var(--ease) both;transition:background-color .18s var(--ease)}
 .next-room:hover{background:var(--oxide);border-color:var(--oxide);color:#F5F4F0}
 @keyframes next-in{from{opacity:0;transform:translateY(8px)}}
-@media (max-width:760px){ .next-room{right:auto;left:var(--gut);bottom:18px;height:44px} .next-name{display:none} }
+@media (max-width:760px){ .next-room{right:auto;left:var(--gut);bottom:18px;height:44px;background:var(--page);color:var(--ink);border-color:var(--rule);
+  box-shadow:0 6px 18px -8px rgba(33,27,24,.5)} .next-name{display:none}
+  /* the name stays legible over a bright ceiling or a dark beam */
+  .hud .brand{text-shadow:0 0 8px rgba(var(--wash),.95),0 0 20px rgba(var(--wash),.85),0 0 34px rgba(var(--wash),.6)}
+  html[data-hud="light"] .hud .brand{text-shadow:0 0 8px rgba(33,27,24,.9),0 0 20px rgba(33,27,24,.75),0 0 34px rgba(33,27,24,.5)} }
 html[data-room="off"] .hud-map{display:none}

@@ -39,6 +39,8 @@ export type HouseInfo = {
   /** axis-aligned boxes, [x0, y0, z0, x1, y1, z1] */
   colliders: number[][];
   plan: Record<string, number[] | number>;
+  /** the village-line frieze: strips on the hung walls of each series room (u along x for N/S walls, z for E/W) */
+  frieze?: { room: string; space: string; side: "N" | "S" | "E" | "W"; plane: number; u0: number; u1: number; y0?: number; y1?: number }[];
 };
 
 export const HOUSE_DIR = "/house";

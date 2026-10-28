@@ -3,7 +3,7 @@
 import { paintingProperties, track } from "@/lib/analytics";
 
 import { forwardRef, useEffect, useImperativeHandle, useRef } from "react";
-import { motion, gsap, Flip, scrambleTo, reducedMotion } from "@/lib/motion";
+import { motion, gsap, Flip, settleText, reducedMotion } from "@/lib/motion";
 import { BY_ID, LARGE, WORKS, quoted, workPath, type Work } from "@/lib/works";
 import { askPath } from "@/lib/studio-ask";
 import { XL } from "@/lib/xl";
@@ -277,9 +277,9 @@ const Lightbox = forwardRef<LightboxHandle, { dims: Dims; onOpenChange(open: boo
         own(gsap.fromTo(card.current, { autoAlpha: 0, y: 14 }, { autoAlpha: 1, y: 0, duration: reduce ? 0 : 0.5, ease: "power2.out" }));
       }
       own(gsap.fromTo([title.current, meta.current], { autoAlpha: 1 }, { autoAlpha: 1, duration: 0 }));
-      own(scrambleTo(title.current!, quoted(w.title), { anagram: true, speed: 0.6, duration: 1, delay: 0.4 }));
+      own(settleText(title.current!, quoted(w.title)));
       dl.querySelectorAll<HTMLElement>("dd").forEach((dd, k) =>
-        own(scrambleTo(dd, dd.dataset.v!, { anagram: true, speed: 0.6, duration: 1, delay: 0.45 + k * 0.05 })));
+        own(settleText(dd, dd.dataset.v!)));
       own(gsap.fromTo(ask.current, { autoAlpha: 0, y: 12 }, { autoAlpha: 1, y: 0, duration: reduce ? 0 : 0.6, delay: reduce ? 0 : 0.7 }));
 
       if (LARGE.has(id)) {
