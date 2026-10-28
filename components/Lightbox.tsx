@@ -4,7 +4,8 @@ import { paintingProperties, track } from "@/lib/analytics";
 
 import { forwardRef, useEffect, useImperativeHandle, useRef } from "react";
 import { motion, gsap, Flip, scrambleTo, reducedMotion } from "@/lib/motion";
-import { BY_ID, LARGE, WORKS, enquiry, quoted, workPath, type Work } from "@/lib/works";
+import { BY_ID, LARGE, WORKS, quoted, workPath, type Work } from "@/lib/works";
+import { askPath } from "@/lib/studio-ask";
 import { XL } from "@/lib/xl";
 import { roomsFor, type RoomView } from "@/lib/rooms";
 import { CloseLook } from "@/lib/closelook";
@@ -61,7 +62,7 @@ const Lightbox = forwardRef<LightboxHandle, { dims: Dims; onOpenChange(open: boo
 
     const fields = (w: Work): [string, string][] => [
       ["Series", w.series],
-      ["Year", w.year ?? "—"],
+      ["Year", w.year ?? "Not recorded"],
       ["Medium", w.medium],
       // a size only where she has stated one
       ...(w.size ? [["Size", w.size] as [string, string]] : []),
@@ -172,7 +173,7 @@ const Lightbox = forwardRef<LightboxHandle, { dims: Dims; onOpenChange(open: boo
     const buildViews = (w: Work, src: string) => {
       const v = views.current!;
       const d = dims[w.id];
-      rooms.current = d ? roomsFor(w, d.w / d.h) : [];
+      rooms.current = d ? roomsFor(w, d.w / d.h, { withPilot: true }) : [];
       v.replaceChildren();
       v.hidden = rooms.current.length === 0;
       if (!rooms.current.length) return;
@@ -228,7 +229,7 @@ const Lightbox = forwardRef<LightboxHandle, { dims: Dims; onOpenChange(open: boo
       const d = dims[id];
       if (d) { i.width = d.w; i.height = d.h; }
       i.src = from?.currentSrc || `/art/works/${id}.jpg`;
-      i.alt = `${w.title} — ${w.medium.toLowerCase()}`;
+      i.alt = `${w.title}, ${w.medium.toLowerCase()}`;
       i.dataset.flipId = id;
       title.current!.textContent = "";
       const dl = meta.current!;
@@ -243,8 +244,8 @@ const Lightbox = forwardRef<LightboxHandle, { dims: Dims; onOpenChange(open: boo
       buildViews(w, i.src);
       if (hint.current) hint.current.textContent = matchMedia("(pointer: coarse)").matches
         ? "Tap to look closer" : "Click to look closer · scroll to zoom";
-      ask.current!.href = enquiry(w);
-      ask.current!.textContent = w.status === "Sold" ? "Ask about her work →" : "Enquire about this work →";
+      ask.current!.href = askPath(w.id);
+      ask.current!.dataset.analyticsSource = "studio_lightbox";
       clearTimeout(shareTimer.current);
       if (shareBtn.current) shareBtn.current.textContent = "Share";
       if (!r.open) r.showModal();
@@ -526,7 +527,7 @@ const Lightbox = forwardRef<LightboxHandle, { dims: Dims; onOpenChange(open: boo
             <div className="lb-views" ref={views} role="group" aria-label="Ways to see this work" hidden />
             <p className="lab lb-hint" ref={hint} />
             <div className="lb-actions">
-              <a className="pill pill-solid" ref={ask} href="#">Enquire →</a>
+              <a className="pill pill-solid" ref={ask} href="/enquire">Ask about this painting</a>
               <button type="button" className="pill" ref={shareBtn} onClick={share} aria-live="polite">Share</button>
             </div>
             <div className="lb-step" role="group" aria-label="Her other works">

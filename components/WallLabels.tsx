@@ -3,6 +3,7 @@
 import { useEffect, useRef } from "react";
 import { CHAPTERS } from "@/lib/chapters";
 import { BY_ID, details, quoted, statusLabel } from "@/lib/works";
+import { askPath } from "@/lib/studio-ask";
 import { gsap, reducedMotion, scrambleTo } from "@/lib/motion";
 import type { Room } from "@/lib/room/Room";
 
@@ -239,12 +240,13 @@ export default function WallLabels({ room, active, live, onOpen }: {
         const line = [w.medium, details(w)].filter(Boolean).join(" · ");
         const status = statusLabel(w);
         return (
-          <button type="button" className="wall-label" data-label={id} key={id} tabIndex={-1}
-                  data-cursor="View" onClick={() => onOpen(id)}>
+          <div className="wall-label" data-label={id} key={id} data-cursor="View" onClick={() => onOpen(id)}>
             <span className="cap-title" data-cap={quoted(w.title)}>{quoted(w.title)}</span>
             <span className="cap-details" data-cap={line}>{line}</span>
             <span className={`cap-status is-${w.status.toLowerCase()}`} data-cap={status}>{status}</span>
-          </button>
+            <a className="cap-ask" href={askPath(id)} tabIndex={-1} data-analytics-source="studio_wall_label"
+               onClick={(e) => e.stopPropagation()}>Ask about this painting</a>
+          </div>
         );
       })}
       {ASIDES.map((a) => (

@@ -58,9 +58,9 @@ export default function Works({ dims }: { dims: Dims }) {
               const width = Math.round(ar >= 1 ? capped : capped * ar);
               return (
                 <figure className="work" key={w.id} style={{ width }}>
-                  <a href={workPath(w.id)} data-work={w.id} aria-label={`${w.title} — open`} data-cursor="View">
+                  <a href={workPath(w.id)} data-work={w.id} aria-label={`Open ${w.title}`} data-cursor="View">
                     {/* eslint-disable-next-line @next/next/no-img-element */}
-                    <img src={`/art/works/${w.id}.jpg`} alt={`${w.title} — ${w.medium.toLowerCase()}`}
+                    <img src={`/art/works/${w.id}.jpg`} alt={`${w.title}, ${w.medium.toLowerCase()}`}
                          width={d.w} height={d.h} loading="lazy" decoding="async" data-flip-id={w.id} />
                   </a>
                   <figcaption>
@@ -79,9 +79,12 @@ export default function Works({ dims }: { dims: Dims }) {
 }
 
 /** her approved introduction (the Sacred Fragments catalogue, Oct 2026) */
-const STATEMENT =
-  "Dr. Dolly Prasad’s art is the everyday held sacred. A\u00A0painter, she catches the hues of " +
-  "India in its waiting and its wishing, its worship and its whispers.";
+const STATEMENT = (
+  <>
+    Dr. Dolly Prasad’s art is the everyday held <span className="red">sacred</span>. A{"\u00A0"}painter, she catches the hues of
+    India in its waiting and its wishing, its worship and its whispers.
+  </>
+);
 
 /**
  * Her statement, her biography verbatim, and the way to reach her.
@@ -102,7 +105,7 @@ export function Contact() {
           </p>
           <p className="about">
             Being a doctor, professionally, the hospital became her fountain of manifestation, of life
-            affirmation, at its highest intensity. Her paintings speak of various shades of life — some refined,
+            affirmation, at its highest intensity. Her paintings speak of various shades of life, some refined,
             some sublime, some just raw. But the quintessential humane element remains intact.
           </p>
         </div>
