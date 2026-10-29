@@ -1,0 +1,113 @@
+{
+ "temple-bells": {
+  "side": "S",
+  "centre": [
+   1.6,
+   1.6,
+   -0.0255
+  ]
+ },
+ "sacred-tree": {
+  "side": "N",
+  "centre": [
+   -4.2452864600335944,
+   1.62,
+   -5.9745
+  ],
+  "lightY": 3.38,
+  "lightOut": 0.95,
+  "late": false
+ },
+ "prayer-and-scripture": {
+  "side": "N",
+  "centre": [
+   -3.006664652567976,
+   1.62,
+   -5.9745
+  ],
+  "lightY": 3.38,
+  "lightOut": 0.95,
+  "late": false,
+  "w": 0.9172436149312378,
+  "h": 1.219
+ },
+ "offering-of-light": {
+  "side": "N",
+  "centre": [
+   -1.711378192534381,
+   1.62,
+   -5.9745
+  ],
+  "lightY": 3.38,
+  "lightOut": 0.95,
+  "late": false,
+  "w": 0.9133293051359517,
+  "h": 1.219
+ },
+ "priest-with-flame": {
+  "side": "S",
+  "centre": [
+   -3.1,
+   1.62,
+   -0.8255
+  ],
+  "lightY": 3.38,
+  "lightOut": 0.95,
+  "late": false
+ },
+ "newspaper-reader": {
+  "side": "E",
+  "centre": [
+   -0.4755,
+   1.6,
+   -1.98
+  ],
+  "lightY": 3.38,
+  "lightOut": 0.95,
+  "late": false
+ },
+ "three-veiled-women": {
+  "side": "N",
+  "centre": [
+   6.614,
+   1.55,
+   0.5275
+  ],
+  "lightY": 4.45,
+  "lightOut": 1.75,
+  "late": true
+ },
+ "red-turban-portrait": {
+  "centre": [
+   14.09,
+   1.965,
+   0.5275
+  ],
+  "w": 0.762,
+  "h": 0.753442780748663
+ },
+ "weathered-door-ring": {
+  "w": 0.30231386623164763,
+  "h": 0.3048
+ },
+ "red-and-teal-door-lock": {
+  "w": 0.3048,
+  "h": 0.2886075
+ },
+ "teal-door-bolt": {
+  "w": 0.289861185770751,
+  "h": 0.3048
+ },
+ "carved-door-knocker": {
+  "w": 0.29194125,
+  "h": 0.3048
+ },
+ "shree-420-and-milk-cans": {
+  "side": "E",
+  "centre": [
+   -0.4875,
+   1.62,
+   3.92
+  ]
+ }
+}

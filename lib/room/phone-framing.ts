@@ -3,7 +3,9 @@ import type { HouseInfo, V3 } from "./house";
 import { fieldOfView } from "./rig";
 
 type View = HouseInfo["cams"][string];
+/** a chapter's space (house.json plan key); the older room names still map */
 const ROOMS: Record<string, string> = {
+  aangan: "aangan", quiet: "quiet", red: "red", gallery: "gallery",
   "The courtyard": "aangan", "The Quiet Room": "quiet", "The Red Room": "red", "The gallery": "gallery",
 };
 const NORMALS: Record<string, [number, number]> = { N: [0, 1], S: [0, -1], E: [-1, 0], W: [1, 0] };

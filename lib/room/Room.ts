@@ -278,6 +278,9 @@ export class Room {
     // the things that tumble live in the scene, not in the house that tilts under them
     house.scene.updateMatrixWorld(true);
     for (const pr of this.parts.props) this.scene.attach(pr.group);
+    // the framed photograph on its easel in the Red Room is not one of her works: it is not shown (QC, 29 Oct)
+    const pressEasel = house.scene.getObjectByName("Deco_pressGroup");
+    if (pressEasel) pressEasel.visible = false;
     // the paintings
     const textures = new Map(artPairs);
     const flat = flatRelief();
@@ -313,6 +316,7 @@ export class Room {
     this.buildSky();
     this.buildLights();
     this.buildItems();
+    this.buildFrieze();
     this.buildPost();
     this.resize();
     this.syncBakeAO();
@@ -711,6 +715,59 @@ export class Room {
   /* --- physics ------------------------------------------------------------ */
 
   /** where every object rests, and its collider's centre — measured once */
+  /* ---- the village-line frieze (BORDER_SPEC A): Kajal ink on the plaster above the paintings,
+     drawn left to right once per room, the first time the walk arrives there ---- */
+  private friezes: { key: string; reveal: { value: number } }[] = [];
+  private friezeDrawn = new Set<string>();
+  private buildFrieze() {
+    const strips = this.info.frieze ?? [];
+    if (!strips.length) return;
+    const mask = new THREE.TextureLoader().load("/house/frieze.png");
+    mask.colorSpace = THREE.SRGBColorSpace;
+    mask.wrapS = THREE.RepeatWrapping;
+    this.owned.push(mask);
+    const REPEAT = 12;   // metres per repeat of the line
+    const turn = { N: 0, S: Math.PI, E: -Math.PI / 2, W: Math.PI / 2 } as const;
+    for (const f of strips) {
+      const y0 = f.y0 ?? 2.7, y1 = f.y1 ?? 3.0, len = f.u1 - f.u0;
+      const map = mask.clone();
+      map.repeat.set(len / REPEAT, 1);
+      map.needsUpdate = true;
+      const reveal = { value: this.opts.reducedMotion ? 1 : 0 };
+      const mat = new THREE.MeshBasicMaterial({ color: 0x211b18, map, transparent: true, depthWrite: false,
+        opacity: this.narrow ? 0.8 : 0.55, polygonOffset: true, polygonOffsetFactor: -2, fog: false, toneMapped: false });
+      mat.onBeforeCompile = (sh) => {
+        sh.uniforms.uReveal = reveal;
+        sh.vertexShader = sh.vertexShader.replace("#include <common>", "#include <common>\nvarying float vStrip;")
+          .replace("#include <uv_vertex>", "#include <uv_vertex>\nvStrip = uv.x;");
+        sh.fragmentShader = sh.fragmentShader.replace("#include <common>", "#include <common>\nuniform float uReveal;\nvarying float vStrip;")
+          .replace("void main() {", "void main() {\n  if (vStrip > uReveal) discard;");
+      };
+      const geo = new THREE.PlaneGeometry(len, y1 - y0);
+      const mesh = new THREE.Mesh(geo, mat);
+      const u = (f.u0 + f.u1) / 2, y = (y0 + y1) / 2;
+      if (f.side === "N" || f.side === "S") mesh.position.set(u, y, f.plane); else mesh.position.set(f.plane, y, u);
+      mesh.rotation.y = turn[f.side];
+      mesh.renderOrder = 2;
+      mesh.matrixAutoUpdate = false;
+      mesh.updateMatrix();
+      mesh.userData.noAO = true;
+      this.world.add(mesh);
+      this.owned.push(geo, mat, map);
+      this.friezes.push({ key: `${f.room}|${f.space}`, reveal });
+    }
+  }
+
+  /** the walk has arrived in a room (a series, in one space of the house): draw its frieze, once per visit */
+  drawFrieze(room: string | undefined, space: string | undefined) {
+    const key = `${room}|${space}`;
+    if (!room || this.friezeDrawn.has(key)) return;
+    this.friezeDrawn.add(key);
+    const mine = this.friezes.filter((f) => f.key === key);
+    if (!mine.length || this.opts.reducedMotion) { mine.forEach((f) => (f.reveal.value = 1)); return; }
+    gsap.to(mine.map((f) => f.reveal), { value: 1, duration: 2.4, ease: "power2.out", stagger: 0.35 });
+  }
+
   private buildItems() {
     const box = new THREE.Box3();
     for (const s of this.parts.props) {
@@ -856,25 +913,59 @@ export class Room {
   playIntro() {
     if (this.introPlayed || !this.ready) return;
     this.introPlayed = true;
-    const reduce = this.opts.reducedMotion;
-    if (!reduce) {
-      let seed = 5;
-      const rnd = () => ((seed = (seed * 16807) % 2147483647) / 2147483647) - 0.5;
-      const tl = gsap.timeline({ onUpdate: () => this.invalidate(true), onComplete: () => this.settle() });
-      this.bodies.forEach((b, i) => {
-        const g = b.group, at = 0.2 + i * 0.07;
-        tl.fromTo(g.position, { y: b.restPos.y + 2 }, { y: b.restPos.y, duration: 1.2, ease: "bounce.out" }, at);
-        tl.fromTo(g.rotation,
-          { x: b.restRot.x + rnd() * 0.5, z: b.restRot.z + rnd() * 0.5 },
-          { x: b.restRot.x, z: b.restRot.z, duration: 1.2, ease: "power2.out" }, at);
-      });
-      this.dropTl = tl;
-      const ms = tl.duration() * 1000 + 120;
-      this.keepAlive(ms, true);
-    }
+    // One wall at a time (29 Oct): the house is already framed on the first stop when the welcome
+    // crossfades away; no dolly, nothing dropping in
     this.rig.playIntro(startPose(this.info, this.narrow), () => {
+      this.wake = 2;
       this.opts.onIntroFinished();
-    }, reduce ? 0 : 1.15);
+    }, 0, true);
+  }
+
+  /**
+   * One stop: a short walk (within a room) or a cut (the page dips to Kajal around it).
+   * `onArrive` fires when the camera is there.
+   */
+  goStop(index: number, kind: "walk" | "cut", onArrive: () => void, duration = 0.7) {
+    const p = index / Math.max(1, CHAPTERS.length - 1);
+    this.prepareChapter(index);
+    this.wake = 2;
+    if (!this.rig?.isEnabled) { onArrive(); return; }
+    if (kind === "cut") { this.rig.jumpTo(p); onArrive(); return; }
+    this.rig.goTo(p, duration, () => { this.wake = 2; onArrive(); });
+  }
+
+  /**
+   * Each stop's works in the order they hang left to right on screen at that stop's framing, so
+   * the numbers on the pins and in the dock's strip read as the wall does.
+   */
+  wallOrder(): string[][] {
+    const piv = new THREE.Group();
+    piv.rotation.order = "YXZ";
+    const cam = new THREE.PerspectiveCamera(40, this.rig.camera.aspect, 0.05, 120);
+    piv.add(cam);
+    const v = new THREE.Vector3();
+    return CHAPTERS.map((c, i) => {
+      const ids = c.labels ?? [];
+      const s = this.rig.shot(i);
+      if (!s || ids.length < 2) return [...ids];
+      piv.position.set(...s.pivot); piv.rotation.set(...s.pivotRot);
+      cam.position.set(...s.cam); cam.rotation.set(...s.camRot);
+      cam.fov = s.fov ?? this.rig.fovBase; cam.updateProjectionMatrix();
+      piv.updateMatrixWorld(true);
+      const at = new Map(ids.map((id) => {
+        const a = this.info.art[id];
+        const p = a ? v.set(...a.centre).project(cam) : v.set(0, 0, 0);
+        return [id, { x: p.x, y: p.y }] as const;
+      }));
+      // read as a wall is read: the top row left to right, then the next row (a two-row hang)
+      const byTop = [...ids].sort((a, b) => at.get(b)!.y - at.get(a)!.y);
+      const rows: string[][] = [];
+      for (const id of byTop) {
+        const row = rows[rows.length - 1];
+        if (row && at.get(row[0])!.y - at.get(id)!.y < 0.18) row.push(id); else rows.push([id]);
+      }
+      return rows.flatMap((r) => r.sort((a, b) => at.get(a)!.x - at.get(b)!.x));
+    });
   }
 
   /** where Twenty Paise is on screen before the camera moves — the
@@ -1356,7 +1447,7 @@ export class Room {
   /** Labels only need new projected positions when the camera or viewport changes. */
   get viewVersion() { return this.viewRevision; }
   /** the camera has arrived where the scroll put it, and the house is at rest */
-  get landed() { return this.ready && !!this.rig && this.rig.isEnabled && this.rig.travel < 0.0015 && !this.rearranged; }
+  get landed() { return this.ready && !!this.rig && this.rig.isEnabled && !this.rig.stepping && this.rig.travel < 0.0015 && !this.rearranged; }
 
   /** every canvas on screen, framed, in CSS pixels (a label must cover none of them) */
   artRects() {

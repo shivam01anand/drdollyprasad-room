@@ -197,7 +197,7 @@ export type RoomView = { room: Room; at: Hang; trueSize: boolean };
 
 /** the rooms a work can be seen in: its own, else the generic ones if she has stated its size */
 export function roomsFor(work: Work, aspect: number, opts: { pilot?: boolean } = {}): RoomView[] {
-  // the hallway pilot is shown on the website's painting pages only (not in the studio)
+  // the hallway pilot first where one was made (the website's painting page and the studio's lightbox, rooms[0])
   const pilot = opts.pilot ? PILOT.find((r) => r.work === work.id) : undefined;
   const own = TAILORED.find((r) => r.work === work.id);
   const stated = work.inches ? work.inches * 2.54 : 0;

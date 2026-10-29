@@ -1,7 +1,6 @@
 import { aim, type Pose } from "./room/rig";
 import type { HouseInfo, V3 } from "./room/house";
 import { phoneGroupView } from "./room/phone-framing";
-import { NOW } from "./site";
 
 /**
  * One chapter model owns the copy and the camera, so the two can never drift
@@ -10,9 +9,11 @@ import { NOW } from "./site";
  * every move from one room to the next passes through a doorway
  * (scripts/house/pathcheck.py proves it).
  *
- * The journey: the Aangan, the courtyard garden, opens on "Woman with
- * Poppies"; through the arch into the Quiet Room; through its door into the
- * Red Room by the lane; then up, out of the house, for Featured and the plan.
+ * The journey (re-hung by series, 27 Oct 2026): the Aangan opens on "Woman
+ * with Poppies" and her at her easel, then Onset of Spring; through the arch into
+ * the Quiet Room (Faith); through its door into the Red Room (Bandh Darwaze,
+ * then Gone Are The Days), on along the gallery's south wall; back along its
+ * north wall (Portraits); her desk at its east end.
  */
 export type Chapter = {
   id: string;
@@ -26,8 +27,6 @@ export type Chapter = {
   quote?: string;
   /** rendered as verse, one line per line */
   verse?: string;
-  /** the section is content of its own (the featured slider) */
-  slot?: "featured";
   /** the header sits on dark material in this framing: light ink. Only until the room is drawn (or
    *  if it fails): then the header reads its ink from the frame itself (Studio, Room.readLumaBehind) */
   ink?: "light";
@@ -46,8 +45,16 @@ export type Chapter = {
   labelSide?: "left" | "right" | "below";
   /** the stop's short name, for the phone's dock and the list of stops */
   stop: string;
-  /** where in the house it is */
-  room?: string;
+  /** the room of the walk it belongs to (the menu's name) */
+  room?: RoomName;
+  /** the house's space it stands in (house.json plan): the phone frames a group inside it */
+  space?: "aangan" | "quiet" | "red" | "gallery";
+  /** About her: press and film ids, in order */
+  press?: string[];
+  /** a call to action under the copy */
+  cta?: { label: string; href: string };
+  /** wide screens also frame the whole hang (the Blender view crops or crowds it) */
+  frameGroup?: boolean;
 };
 
 /** her poem, verbatim; its opening two lines were withdrawn (Shubham, with her agreement, 18 Oct 2026): do not restore */
@@ -60,118 +67,122 @@ I put them on canvas
 I don’t paint
 Am not a painter`;
 
+/** the rooms of the walk, in order: the menu's names (the door belongs to "About her") */
+export const ROOMS = ["About her", "Onset of Spring", "Faith", "Bandh Darwaze", "Gone Are The Days", "Portraits", "Her desk"] as const;
+export type RoomName = (typeof ROOMS)[number];
+
+/** the room lines (locked by Shubham, 27 Oct 2026): ours, never presented as hers */
+export const ROOM_LINE: Partial<Record<RoomName, string>> = {
+  "Onset of Spring": "Some thoughts only need company.",
+  Faith: "Where prayer is part of an ordinary day.",
+  "Bandh Darwaze": "Weathered doors, still guarding what they hold.",
+  "Gone Are The Days": "A twenty paise world, still in motion.",
+  Portraits: "A whole life, folded into one glance.",
+};
+
+/** About her: the press and films, in this order (lib/press.ts ids) */
+export const ABOUT_PRESS = ["ihc-press-01", "tv-ncr-2010", "delhi-times", "ihc-press-06", "ihc-press-03", "tv-archive"];
+
+/*
+ * The re-hang (27 Oct 2026): each series together, walked in Shubham's order.
+ * The courtyard: Woman with Poppies at the door, her at her easel, Onset of Spring on the east and
+ * south walls (Threads of Faith by the front door). The Quiet Room: Faith, all seven. The Red
+ * Room: Bandh Darwaze on the north wall, Gone Are The Days on the south and east; the gallery's
+ * south wall goes on with Gone Are The Days, its north wall is Portraits, its east end her desk.
+ */
 export const CHAPTERS: Chapter[] = [
-  { id: "presence", eyebrow: "“Woman with Poppies”", stop: "Woman with Poppies", room: "The courtyard", view: "presence", labels: ["woman-with-poppies"] },
+  { id: "presence", eyebrow: "“Woman with Poppies”", stop: "Woman with Poppies", room: "About her", space: "aangan",
+    view: "presence", labels: ["woman-with-poppies"] },
+  // About her: her, at her easel, painting; the press and films beside (copy locked 27 Oct)
+  // her words and the press are drawn by components/AboutHer.tsx (copy locked 27 Oct)
+  { id: "about", eyebrow: "About her", stop: "About her", room: "About her", space: "aangan",
+    // a sheet over a still view: the door's own framing, so arriving here moves no camera (29 Oct)
+    press: ABOUT_PRESS, view: "presence", dusk: 0.04 },
   {
     id: "floral",
-    eyebrow: "Recent work · 2024–",
-    stop: "Recent work",
-    room: "The courtyard",
+    eyebrow: "Onset of Spring · 2024 to 2026",
+    stop: "Onset of Spring",
+    room: "Onset of Spring",
+    space: "aangan",
+    body: ROOM_LINE["Onset of Spring"],
     // her own words, written for "Petals of Thought"
     quote:
       "Sometimes thoughts don’t need words… they just sit quietly, like a flower beside you. " +
       "A pause, a breath, a space where the mind softens and listens.",
+    // from her easel, back past the door before turning to the east wall
+    via: "presence",
     view: "floral",
+    dusk: 0.08,
     labels: ["child-among-flowers", "woman-with-red-flower", "woman-with-bird"],
   },
-  { id: "canopy", eyebrow: "“Under Canopy of Greens” · 2025", stop: "Under Canopy of Greens", room: "The courtyard", view: "canopy", dusk: 0.04, labels: ["boy-with-bananas"],
-    labelSide: "left",
-    // her own words for the painting
-    quote: "A young boy stands quietly beneath the shelter of large banana leaves. The bananas on his head look like a natural crown from the earth." },
-  // her corner by the banana: she paints at her easel, her statement beside her
-  { id: "easel", eyebrow: "Artist’s statement", stop: "At her easel", room: "The courtyard", verse: POEM, view: "easel",
-    via: "easelvia", dusk: 0.12,
-    // the canvas she is working on, from her own photograph (scripts/figure/make.py)
-    asides: [{ anchor: "easel", title: "On her easel", line: "A new painting, in progress", size: [1.28, 1.06] }] },
-  // from the easel the walk turns to the arch and goes straight through it into the Quiet Room
-  { id: "bodhi", eyebrow: "“Buddha Under the Bodhi Tree” · c. 2005–2015", stop: "Buddha Under the Bodhi Tree", room: "The Quiet Room",
-    view: "bodhi", via: "threshold", dusk: 0.22, labels: ["monk-and-green-buddha"] },
-  {
-    id: "faith",
-    eyebrow: "“Threads of Faith” · 2026",
-    via: "faithvia",
-    stop: "Threads of Faith",
-    room: "The Quiet Room",
-    // her own words for the painting, then where it is showing
-    quote: "Every thread representing a hope, desire, promise, or prayer.",
-    body: "Showing at Sacred Fragments: A Journey Home, New Delhi, 18–21 October 2026.",
-    // gone by itself after 21 Oct 2026 23:59 IST, the same date as the Now showing line (NOW.until)
-    bodyUntil: NOW.until,
-    view: "faith",
-    dusk: 0.28,
-    labels: ["monks-and-blue-buddha", "temple-bells"],
-  },
+  { id: "recent", eyebrow: "“Threads of Faith” · “Under Canopy of Greens”", stop: "Threads of Faith · Under Canopy of Greens",
+    room: "Onset of Spring", space: "aangan", view: "recent", dusk: 0.12, labels: ["temple-bells", "boy-with-bananas"],
+    // her own words for "Threads of Faith"
+    quote: "Every thread representing a hope, desire, promise, or prayer." },
+  // through the arch into the Quiet Room
+  { id: "bodhi", eyebrow: "Faith · 2005 to 2015", stop: "Buddha Under the Bodhi Tree", room: "Faith", space: "quiet",
+    body: ROOM_LINE.Faith, view: "bodhi", via: "threshold", dusk: 0.2, labels: ["monk-and-green-buddha"] },
+  { id: "faithn", eyebrow: "“The Peepal Shrine” · “Gayatri” · “Vakratunda”", stop: "The Peepal Shrine · Gayatri · Vakratunda",
+    room: "Faith", space: "quiet", view: "faithn", dusk: 0.24, labelSide: "below",
+    labels: ["sacred-tree", "prayer-and-scripture", "offering-of-light"] },
+  { id: "faith", eyebrow: "“The Aarti” · “The Blue Buddha” · “The Newspaper Reader”", stop: "The Aarti · The Blue Buddha",
+    room: "Faith", space: "quiet", view: "faith", via: "faithturn", dusk: 0.28, labelSide: "below",
+    labels: ["priest-with-flame", "monks-and-blue-buddha", "newspaper-reader"] },
+  // through the Quiet Room's door into the Red Room: the doors on its north wall
+  { id: "bandh", eyebrow: "Bandh Darwaze · 2018", stop: "Bandh Darwaze", room: "Bandh Darwaze", space: "red",
+    body: ROOM_LINE["Bandh Darwaze"], view: "bandh", via: "bandhvia", dusk: 0.34, labelSide: "below",
+    labels: ["weathered-door-ring", "red-and-teal-door-lock", "teal-door-bolt", "carved-door-knocker"] },
   {
     id: "street",
-    eyebrow: "Gone Are The Days · c. 2016–2018",
-    stop: "Gone Are The Days",
-    room: "The Red Room",
-    // a portrait screen faces Threads of Faith: it turns to the passage before going through
-    via: "streetvia",
-    // the framed print on its easel is 0.64 × 0.48 m (scripts/house/build.py press_easel)
-    asides: [{ anchor: "press", title: "The artist, in conversation", line: "Beside “The Bullocks”, at her exhibition", size: [0.64, 0.48] }],
+    eyebrow: "Gone Are The Days · 2016 to 2018",
+    stop: "The Bullocks · Terracotta · Shree 420",
+    room: "Gone Are The Days",
+    space: "red",
+    via: "streetturn",
+    body: ROOM_LINE["Gone Are The Days"],
+    // (the framed photograph on its easel is hidden: not one of her works, QC 29 Oct)
     // her own words (her studio page, drdollyprasad.wordpress.com, 2018)
     quote:
       "The shades that touched me, the live frames that seemed to tell a story larger than the " +
       "attention they seemed to draw.",
     ink: "light",
     view: "street",
-    dusk: 0.38,
-    labels: ["terracotta-pots", "bulls-and-wheel"],
+    dusk: 0.4,
+    labels: ["bulls-and-wheel", "terracotta-pots", "shree-420-and-milk-cans"],
   },
-  { id: "redwall", eyebrow: "“Shree 420” · “Three Women in Red”", stop: "Shree 420 · Three Women", room: "The Red Room", view: "redwall",
-    via: "redvia", dusk: 0.45, labels: ["shree-420-and-milk-cans", "three-veiled-women"] },
-  // through the Red Room's east doorway: the gallery hall, where the rest of her work hangs as an
-  // exhibition hangs, one line at eye level, a series to a wall (scripts/house/build.py)
-  { id: "gallery", ink: "light", eyebrow: "The gallery", stop: "The gallery", room: "The gallery",
-    view: "gallery", via: "galleryvia", dusk: 0.5 },
-  { id: "rupaya", eyebrow: "Gone Are The Days · c. 2016–2018", stop: "Twenty Paise · Mother India", room: "The gallery",
-    view: "rupaya", dusk: 0.5, labelSide: "below",
-    labels: ["rickshaw-puller-and-coin", "postbox-and-stamps", "mother-india-and-kettles"] },
-  { id: "cartman", eyebrow: "Gone Are The Days · c. 2016–2018", stop: "The Cycle Rickshaw-wala · The Cart-Man", room: "The gallery",
-    view: "cartman", dusk: 0.5, labelSide: "below", labels: ["cycle-rickshaw", "rickshaw-rest-framed"] },
-  { id: "panels", eyebrow: "Gone Are The Days · c. 2016–2018", stop: "The small panels", room: "The gallery",
-    view: "panels", dusk: 0.52, labelSide: "below",
+  // through the Red Room's east doorway: the gallery's south wall goes on with the series
+  { id: "gatdhall", eyebrow: "Gone Are The Days · 2016 to 2018", stop: "Twenty Paise · The Cart-Man", room: "Gone Are The Days",
+    space: "gallery", view: "gatdhall", via: "galleryvia", dusk: 0.46, labelSide: "below",
+    labels: ["rickshaw-puller-and-coin", "postbox-and-stamps", "mother-india-and-kettles", "cycle-rickshaw", "rickshaw-rest-framed"] },
+  { id: "panels", eyebrow: "Gone Are The Days · 2016 to 2018", stop: "The small panels", room: "Gone Are The Days", space: "gallery",
+    view: "panels", dusk: 0.5, labelSide: "below",
     labels: ["horse-cart-and-autorickshaw", "coins-and-clay-bank", "rickshaw-and-autorickshaw", "carriage-and-autorickshaw",
       "rickshaw-rest", "bullock-cart-and-truck"] },
-  // Faith, either side of the window onto the palm court
-  { id: "shrine", eyebrow: "Faith · c. 2005–2015", stop: "The Peepal Shrine · The Aarti", room: "The gallery",
-    view: "shrine", dusk: 0.52, labelSide: "below", labels: ["sacred-tree", "priest-with-flame"] },
-  { id: "gayatri", eyebrow: "Faith · c. 2005–2015", stop: "Gayatri · Vakratunda", room: "The gallery",
-    view: "gayatri", dusk: 0.53, labelSide: "below", labels: ["prayer-and-scripture", "offering-of-light"] },
+  // back along the hall to the north wall
+  { id: "portraitsw", ink: "light", eyebrow: "Portraits · 2005 to 2015", stop: "The Doodhwala · Three Women in Red", room: "Portraits",
+    space: "gallery", view: "portraitsw", via: "hallwest", dusk: 0.52, labelSide: "below",
+    body: ROOM_LINE.Portraits,
+    labels: ["milkman-on-bicycle", "three-veiled-women", "mother-and-child", "boy-and-kettle", "man-among-metal-pans"] },
   {
     id: "portraits",
     ink: "light",
-    eyebrow: "Portraits · c. 2005–2015",
-    stop: "Portraits",
-    room: "The gallery",
-    // her own page's words about her, as written there (drdollyprasad.wordpress.com)
-    body: "Play of emotions, be it on the faces around her or on the canvas, have always fascinated her.",
+    eyebrow: "Portraits · 2005 to 2015",
+    stop: "The Turbans · The Boatmen",
+    room: "Portraits",
+    space: "gallery",
+    frameGroup: true,
+    // (no line here: only the locked room line, on the room's first wall; QC 29 Oct)
     view: "portraits",
     dusk: 0.54,
     labelSide: "below",
     labels: ["red-turban-portrait", "elder-woman-portrait", "yellow-turban-portrait", "patterned-turban-portrait", "riverside-figures"],
   },
-  { id: "kadhai", eyebrow: "Portraits · c. 2005–2015", stop: "The Chai Boy · The Kadhai Seller", room: "The gallery",
-    view: "kadhai", dusk: 0.55, labelSide: "below", labels: ["boy-and-kettle", "man-among-metal-pans"] },
-  { id: "doodhwala", eyebrow: "Portraits · c. 2005–2015", stop: "Mother and Son · The Doodhwala", room: "The gallery",
-    view: "doodhwala", dusk: 0.55, labelSide: "below", labels: ["milkman-on-bicycle", "newspaper-reader", "mother-and-child"] },
-  { id: "featured", eyebrow: "Featured", stop: "Featured works", slot: "featured", view: "featured", dusk: 0.45 },
-  {
-    id: "plan",
-    eyebrow: "Eighteen exhibitions and art fairs · 2005–2018",
-    stop: "Exhibitions",
-    body:
-      "Triveni Kala Sangam · India Habitat Centre · ICCR · Travancore Art Gallery · " +
-      "Lalit Kala Akademi · Nehru Art Gallery, Bombay.",
-    // the close of her studio page (drdollyprasad.wordpress.com, 2018)
-    quote:
-      "Each of these paintings reminds me I have yet to pick up many more hues to fill up some " +
-      "empty lines, some yet to be filled up nooks. I hope it would be a life-long unraveling " +
-      "with these tinges, an affair to last a lifetime…",
-    view: "plan",
-    dusk: 0.4,
-  },
+  // the close: her desk at the hall's east end, the exhibitions wall either side of the palm window
+  // (behind the sheet, a settled, calm view: her at her easel, not the gallery's palm doorway; consultant, 29 Oct)
+  { id: "desk", eyebrow: "Her desk", stop: "Her desk", room: "Her desk", space: "aangan",
+    // heading, line and button are drawn by components/Desk.tsx (copy locked 27 Oct)
+    cta: { label: "Ask about a painting", href: "/enquire" },
+    view: "easel", dusk: 0.58 },
 ];
 
 /**
@@ -229,18 +240,11 @@ export function resolveWalk(info: HouseInfo, narrow = false, aspect = 390 / 844)
       let vc = c.via ? cam(info, c.via, narrow) : undefined;
       // Turn toward the floral wall before stepping back to see its full hang.
       if (narrow && c.id === "floral") vc = info.cams.floral;
-      if (narrow && c.id === "faith" && vc) vc = {
-        ...vc, eye: [vc.eye[0], 1.55, vc.eye[2]], target: [vc.target[0], 1.4, vc.target[2]],
-      };
-      // The wider phone view approaches the Red Room through the door's centre.
-      if (narrow && c.id === "street" && vc) vc = {
-        ...vc, eye: [-4.6, 1.55, -2.2], target: [-4.3, 1.4, 0.2],
-      };
       const v = vc ? viewPose(vc, prev, NARROW_BACK) : null;
       if (v) prev = v.pivotRot[1];
       vias.push(v);
     }
-    const group = narrow ? phoneGroupView(info, c.view, c.labels ?? [], c.room, aspect) : null;
+    const group = narrow || c.frameGroup ? phoneGroupView(info, c.view, c.labels ?? [], c.space, aspect) : null;
     const p = viewPose(group ?? cam(info, c.view, narrow), prev, NARROW_BACK);
     if (group) p.fov = group.fov;
     prev = p.pivotRot[1];
@@ -257,14 +261,10 @@ export const messPose = (info: HouseInfo) => viewPose(info.cams.mess);
 /** portrait screens get their own framings */
 export const isNarrow = (aspect: number) => aspect < 0.85;
 
-/** Bandh Darwaze I–IV hang on the Red Room's north wall, seen from the Shree 420 stop (unlabelled) */
-const BANDH_WALL = ["weathered-door-ring", "red-and-teal-door-lock", "teal-door-bolt", "carved-door-knocker"];
+/** every work in the order the walk passes it, wall by wall */
+export const WALK_ORDER: string[] = CHAPTERS.flatMap((c) => c.labels ?? []);
 
-/** every work in the order the walk passes it, wall by wall (Bandh Darwaze with Shree 420) */
-export const WALK_ORDER: string[] = CHAPTERS.flatMap((c) => [...(c.labels ?? []), ...(c.id === "redwall" ? BANDH_WALL : [])]);
-
-/** the stop a work is seen at: the chapter that labels it, or the wall it hangs on; -1 if none */
+/** the stop a work is seen at: the chapter that labels it; -1 if none */
 export function stopOf(id: string) {
-  const i = CHAPTERS.findIndex((c) => c.labels?.includes(id));
-  return i >= 0 ? i : BANDH_WALL.includes(id) ? CHAPTERS.findIndex((c) => c.id === "redwall") : -1;
+  return CHAPTERS.findIndex((c) => c.labels?.includes(id));
 }
