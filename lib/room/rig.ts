@@ -113,9 +113,11 @@ export class Rig {
    * unbroken dolly with a small rise, position leading and rotation
    * following by a few hundredths, as the original does.
    */
-  playIntro(start: Pose, onDone: () => void, delay = 0) {
+  playIntro(start: Pose, onDone: () => void, delay = 0, instant = false) {
     this.introTl?.kill();
-    if (this.reduced) {
+    // One wall at a time (29 Oct): the house opens already framed on the first stop, under the
+    // welcome's crossfade; no move in
+    if (this.reduced || instant) {
       assign(this.pose, this.shots[0]);
       this.lens.fov = this.shots[0].fov ?? this.baseFov;
       this.enabled = true;
@@ -176,6 +178,35 @@ export class Rig {
       this.lastProgress = this.camProgress;
     }
   }
+
+  /**
+   * One stop, by a short tween of the walk's progress (a move within a room, 0.7 s). The
+   * per-frame update sees the target and the camera agree, so it only draws the timeline.
+   * `onArrive` fires when the tween completes.
+   */
+  goTo(progress: number, duration: number, onArrive: () => void) {
+    this.moveTw?.kill();
+    const o = { p: this.camProgress };
+    const to = Math.min(1, Math.max(0, progress));
+    if (!this.enabled || this.reduced || duration <= 0) { this.jumpTo(to); onArrive(); return; }
+    this.moveTw = gsap.to(o, {
+      p: to, duration, ease: "power1.inOut",
+      onUpdate: () => { this.scrollTarget = this.scrollSmooth = this.camProgress = o.p; },
+      onComplete: () => { this.moveTw = undefined; onArrive(); },
+    });
+  }
+  /** a cut: straight to a stop (under the veil) */
+  jumpTo(progress: number) {
+    this.moveTw?.kill();
+    this.moveTw = undefined;
+    this.syncScroll(progress);
+  }
+  private moveTw?: gsap.core.Tween;
+  /** a stop-to-stop tween is running */
+  get stepping() { return !!this.moveTw; }
+  /** a chapter's framing, for working out what is where on screen */
+  shot(i: number): Pose | undefined { return this.shots[i]; }
+  get fovBase() { return this.baseFov; }
 
   /** 0 at the first chapter's shot, 1 at the last */
   scroll(progress: number) {
@@ -265,7 +296,9 @@ export class Rig {
     // 60 cm from a padlock does not swing by a fifth of a metre
     const dist = mix(p.cam[2], m.cam[2]);
     const amt = THREE.MathUtils.clamp(dist / 2.6, 0.2, 1) * (1 - k * 0.6);
-    const e = this.ptrSmooth.x * amt * this.lookGain, t = this.ptrSmooth.y * amt * this.lookGain;
+    // (a mouse's sway is half what it was: the wall holds still under its names, 29 Oct)
+    const sway = this.touch ? 1 : 0.5;
+    const e = this.ptrSmooth.x * amt * this.lookGain * sway, t = this.ptrSmooth.y * amt * this.lookGain * sway;
     this.pivot.position.set(mix(p.pivot[0], m.pivot[0]), mix(p.pivot[1], m.pivot[1]), mix(p.pivot[2], m.pivot[2]));
     this.pivot.rotation.set(mix(p.pivotRot[0], m.pivotRot[0]), mix(p.pivotRot[1], m.pivotRot[1]), mix(p.pivotRot[2], m.pivotRot[2]));
     // the head turns; the body barely moves (a finger's wider look must not walk the camera into a wall)
@@ -282,12 +315,13 @@ export class Rig {
   /** how far the camera still has to travel to where the scroll says (pointer drift aside) */
   get travel() { return Math.abs(this.camProgress - this.scrollTarget); }
   get isEnabled() { return this.enabled; }
-  get isMoving() { return !!this.introTl?.isActive() || this.travel > 0.0001; }
+  get isMoving() { return !!this.introTl?.isActive() || !!this.moveTw || this.travel > 0.0001; }
   /** how far the camera has travelled from the scroll target — 0 once it has landed */
   get settling() { return Math.abs(this.camProgress - this.scrollTarget) + Math.abs(this.ptrSmooth.x) + Math.abs(this.ptrSmooth.y); }
 
   dispose() {
     this.introTl?.kill();
+    this.moveTw?.kill();
     this.messTl?.kill();
     this.scrollTl.kill();
   }

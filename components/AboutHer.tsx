@@ -1,6 +1,6 @@
 "use client";
 
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import { PRESS_ALL, type PressItem } from "@/lib/press";
 import { askPath } from "@/lib/studio-ask";
 
@@ -18,7 +18,7 @@ const ORDER = ["ihc-press-01", "tv-ncr-2010", "delhi-times", "ihc-press-06", "ih
 const ITEMS: PressItem[] = ORDER.map((id) => PRESS_ALL.find((p) => p.id === id)).filter((p): p is PressItem => !!p);
 
 /** a clip is a poster until it is tapped; only then is the video fetched. Muted: sound is her visitor's to turn on. */
-function Clip({ item }: { item: PressItem }) {
+function Clip({ item, eager }: { item: PressItem; eager: boolean }) {
   const [on, setOn] = useState(false);
   return (
     <div className="wp-clip">
@@ -29,7 +29,7 @@ function Clip({ item }: { item: PressItem }) {
       ) : (
         <button type="button" className="wp-play" onClick={() => setOn(true)} aria-label={`Play: ${item.card ?? item.title}`}>
           {/* eslint-disable-next-line @next/next/no-img-element */}
-          <img src={item.poster} alt={item.alt} loading="lazy" decoding="async" />
+          <img src={item.poster} alt={item.alt} loading={eager ? "eager" : "lazy"} decoding="async" />
           <span className="wp-play-dot" aria-hidden="true"><svg viewBox="0 0 24 24"><path d="M9 6.5v11l9-5.5-9-5.5Z" /></svg></span>
         </button>
       )}
@@ -38,6 +38,9 @@ function Clip({ item }: { item: PressItem }) {
 }
 
 export default function AboutHer({ open }: { open: boolean }) {
+  // the press loads as soon as the sheet is first opened (a lazy image in a hidden sheet stayed blank, QC 29 Oct)
+  const [seen, setSeen] = useState(false);
+  useEffect(() => { if (open) setSeen(true); }, [open]);
   return (
     <section className="walk-panel about-her" data-on={open ? "1" : "0"} inert={!open} aria-hidden={!open}
              aria-label={HEADING} data-lenis-prevent="">
@@ -50,9 +53,9 @@ export default function AboutHer({ open }: { open: boolean }) {
       <ul className="wp-press">
         {ITEMS.map((it) => (
           <li key={it.id} className={`wp-item is-${it.kind}`}>
-            {it.kind === "video" ? <Clip item={it} /> : (
+            {it.kind === "video" ? <Clip item={it} eager={seen} /> : (
               // eslint-disable-next-line @next/next/no-img-element
-              <img src={it.sm ?? it.src} alt={it.alt} loading="lazy" decoding="async" />
+              <img src={it.sm ?? it.src} alt={it.alt} loading={seen ? "eager" : "lazy"} decoding="async" />
             )}
             <p className="wp-cap">{it.card ?? it.title}</p>
           </li>

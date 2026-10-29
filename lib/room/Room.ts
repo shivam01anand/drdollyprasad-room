@@ -278,6 +278,9 @@ export class Room {
     // the things that tumble live in the scene, not in the house that tilts under them
     house.scene.updateMatrixWorld(true);
     for (const pr of this.parts.props) this.scene.attach(pr.group);
+    // the framed photograph on its easel in the Red Room is not one of her works: it is not shown (QC, 29 Oct)
+    const pressEasel = house.scene.getObjectByName("Deco_pressGroup");
+    if (pressEasel) pressEasel.visible = false;
     // the paintings
     const textures = new Map(artPairs);
     const flat = flatRelief();
@@ -910,25 +913,59 @@ export class Room {
   playIntro() {
     if (this.introPlayed || !this.ready) return;
     this.introPlayed = true;
-    const reduce = this.opts.reducedMotion;
-    if (!reduce) {
-      let seed = 5;
-      const rnd = () => ((seed = (seed * 16807) % 2147483647) / 2147483647) - 0.5;
-      const tl = gsap.timeline({ onUpdate: () => this.invalidate(true), onComplete: () => this.settle() });
-      this.bodies.forEach((b, i) => {
-        const g = b.group, at = 0.2 + i * 0.07;
-        tl.fromTo(g.position, { y: b.restPos.y + 2 }, { y: b.restPos.y, duration: 1.2, ease: "bounce.out" }, at);
-        tl.fromTo(g.rotation,
-          { x: b.restRot.x + rnd() * 0.5, z: b.restRot.z + rnd() * 0.5 },
-          { x: b.restRot.x, z: b.restRot.z, duration: 1.2, ease: "power2.out" }, at);
-      });
-      this.dropTl = tl;
-      const ms = tl.duration() * 1000 + 120;
-      this.keepAlive(ms, true);
-    }
+    // One wall at a time (29 Oct): the house is already framed on the first stop when the welcome
+    // crossfades away; no dolly, nothing dropping in
     this.rig.playIntro(startPose(this.info, this.narrow), () => {
+      this.wake = 2;
       this.opts.onIntroFinished();
-    }, reduce ? 0 : 1.15);
+    }, 0, true);
+  }
+
+  /**
+   * One stop: a short walk (within a room) or a cut (the page dips to Kajal around it).
+   * `onArrive` fires when the camera is there.
+   */
+  goStop(index: number, kind: "walk" | "cut", onArrive: () => void, duration = 0.7) {
+    const p = index / Math.max(1, CHAPTERS.length - 1);
+    this.prepareChapter(index);
+    this.wake = 2;
+    if (!this.rig?.isEnabled) { onArrive(); return; }
+    if (kind === "cut") { this.rig.jumpTo(p); onArrive(); return; }
+    this.rig.goTo(p, duration, () => { this.wake = 2; onArrive(); });
+  }
+
+  /**
+   * Each stop's works in the order they hang left to right on screen at that stop's framing, so
+   * the numbers on the pins and in the dock's strip read as the wall does.
+   */
+  wallOrder(): string[][] {
+    const piv = new THREE.Group();
+    piv.rotation.order = "YXZ";
+    const cam = new THREE.PerspectiveCamera(40, this.rig.camera.aspect, 0.05, 120);
+    piv.add(cam);
+    const v = new THREE.Vector3();
+    return CHAPTERS.map((c, i) => {
+      const ids = c.labels ?? [];
+      const s = this.rig.shot(i);
+      if (!s || ids.length < 2) return [...ids];
+      piv.position.set(...s.pivot); piv.rotation.set(...s.pivotRot);
+      cam.position.set(...s.cam); cam.rotation.set(...s.camRot);
+      cam.fov = s.fov ?? this.rig.fovBase; cam.updateProjectionMatrix();
+      piv.updateMatrixWorld(true);
+      const at = new Map(ids.map((id) => {
+        const a = this.info.art[id];
+        const p = a ? v.set(...a.centre).project(cam) : v.set(0, 0, 0);
+        return [id, { x: p.x, y: p.y }] as const;
+      }));
+      // read as a wall is read: the top row left to right, then the next row (a two-row hang)
+      const byTop = [...ids].sort((a, b) => at.get(b)!.y - at.get(a)!.y);
+      const rows: string[][] = [];
+      for (const id of byTop) {
+        const row = rows[rows.length - 1];
+        if (row && at.get(row[0])!.y - at.get(id)!.y < 0.18) row.push(id); else rows.push([id]);
+      }
+      return rows.flatMap((r) => r.sort((a, b) => at.get(a)!.x - at.get(b)!.x));
+    });
   }
 
   /** where Twenty Paise is on screen before the camera moves — the
@@ -1410,7 +1447,7 @@ export class Room {
   /** Labels only need new projected positions when the camera or viewport changes. */
   get viewVersion() { return this.viewRevision; }
   /** the camera has arrived where the scroll put it, and the house is at rest */
-  get landed() { return this.ready && !!this.rig && this.rig.isEnabled && this.rig.travel < 0.0015 && !this.rearranged; }
+  get landed() { return this.ready && !!this.rig && this.rig.isEnabled && !this.rig.stepping && this.rig.travel < 0.0015 && !this.rearranged; }
 
   /** every canvas on screen, framed, in CSS pixels (a label must cover none of them) */
   artRects() {

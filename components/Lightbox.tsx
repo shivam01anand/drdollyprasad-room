@@ -173,7 +173,7 @@ const Lightbox = forwardRef<LightboxHandle, { dims: Dims; onOpenChange(open: boo
     const buildViews = (w: Work, src: string) => {
       const v = views.current!;
       const d = dims[w.id];
-      rooms.current = d ? roomsFor(w, d.w / d.h, { withPilot: true }) : [];
+      rooms.current = d ? roomsFor(w, d.w / d.h, { pilot: true }).slice(0, 1) : [];
       v.replaceChildren();
       v.hidden = rooms.current.length === 0;
       if (!rooms.current.length) return;

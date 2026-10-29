@@ -94,9 +94,8 @@ export const CHAPTERS: Chapter[] = [
   // About her: her, at her easel, painting; the press and films beside (copy locked 27 Oct)
   // her words and the press are drawn by components/AboutHer.tsx (copy locked 27 Oct)
   { id: "about", eyebrow: "About her", stop: "About her", room: "About her", space: "aangan",
-    press: ABOUT_PRESS, view: "easel", dusk: 0.04,
-    // the canvas she is working on, from her own photograph (scripts/figure/make.py)
-    asides: [{ anchor: "easel", title: "On her easel", line: "A new painting, in progress", size: [1.28, 1.06] }] },
+    // a sheet over a still view: the door's own framing, so arriving here moves no camera (29 Oct)
+    press: ABOUT_PRESS, view: "presence", dusk: 0.04 },
   {
     id: "floral",
     eyebrow: "Onset of Spring · 2024 to 2026",
@@ -139,8 +138,7 @@ export const CHAPTERS: Chapter[] = [
     space: "red",
     via: "streetturn",
     body: ROOM_LINE["Gone Are The Days"],
-    // the framed print on its easel is 0.64 × 0.48 m (scripts/house/build.py press_easel)
-    asides: [{ anchor: "press", title: "The artist, in conversation", line: "Beside “The Bullocks”, at her exhibition", size: [0.64, 0.48] }],
+    // (the framed photograph on its easel is hidden: not one of her works, QC 29 Oct)
     // her own words (her studio page, drdollyprasad.wordpress.com, 2018)
     quote:
       "The shades that touched me, the live frames that seemed to tell a story larger than the " +
@@ -170,18 +168,18 @@ export const CHAPTERS: Chapter[] = [
     stop: "The Turbans · The Boatmen",
     room: "Portraits",
     space: "gallery",
-    // her own page's words about her, as written there (drdollyprasad.wordpress.com)
-    body: "Play of emotions, be it on the faces around her or on the canvas, have always fascinated her.",
+    // (no line here: only the locked room line, on the room's first wall; QC 29 Oct)
     view: "portraits",
     dusk: 0.54,
     labelSide: "below",
     labels: ["red-turban-portrait", "elder-woman-portrait", "yellow-turban-portrait", "patterned-turban-portrait", "riverside-figures"],
   },
   // the close: her desk at the hall's east end, the exhibitions wall either side of the palm window
-  { id: "desk", eyebrow: "Her desk", stop: "Her desk", room: "Her desk", space: "gallery",
+  // (behind the sheet, a settled, calm view: her at her easel, not the gallery's palm doorway; consultant, 29 Oct)
+  { id: "desk", eyebrow: "Her desk", stop: "Her desk", room: "Her desk", space: "aangan",
     // heading, line and button are drawn by components/Desk.tsx (copy locked 27 Oct)
     cta: { label: "Ask about a painting", href: "/enquire" },
-    view: "desk", dusk: 0.58 },
+    view: "easel", dusk: 0.58 },
 ];
 
 /**

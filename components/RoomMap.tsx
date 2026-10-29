@@ -24,6 +24,8 @@ export function roomsOfWalk(): RoomStop[] {
   return out;
 }
 
+const works = (r: RoomStop) => CHAPTERS.slice(r.first, r.last + 1).reduce((n, c) => n + (c.labels?.length ?? 0), 0);
+
 export default function RoomMap({ open, active, onClose, onGo, onWorks }: {
   open: boolean;
   active: number;
@@ -47,7 +49,7 @@ export default function RoomMap({ open, active, onClose, onGo, onWorks }: {
       const onKey = (e: KeyboardEvent) => { if (e.key === "Escape") onClose(); };
       const onDown = (e: PointerEvent) => {
         const t = e.target as Element;
-        if (!el.contains(t) && !t.closest(".map-btn")) onClose();
+        if (!el.contains(t) && !t.closest(".map-btn, .sd-pos, .sd-all")) onClose();
       };
       addEventListener("keydown", onKey);
       addEventListener("pointerdown", onDown, true);
@@ -67,7 +69,8 @@ export default function RoomMap({ open, active, onClose, onGo, onWorks }: {
                     onClick={() => { onClose(); onGo(r.first); }}>
               <span className="rmap-dot" aria-hidden="true" />
               <span className="rmap-name">{r.name}</span>
-              {i === here && <span className="rmap-here">You are here</span>}
+              {i === here ? <span className="rmap-here">You are here</span>
+                : works(r) > 0 && <span className="rmap-n">{works(r)} {works(r) === 1 ? "work" : "works"}</span>}
             </button>
           </li>
         ))}
