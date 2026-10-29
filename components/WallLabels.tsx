@@ -204,7 +204,7 @@ export default function WallLabels({ room, active, live, onOpen }: {
           n.dataset.on = "1";
           n.dataset.side = side;
           const at = k++ * 0.12;
-          reveal.fromTo(n, { autoAlpha: 0, y: 6 }, { autoAlpha: 1, y: 0, duration: quick ? 0 : 0.45, ease: "power2.out" }, at);
+          reveal.fromTo(n, { autoAlpha: 0 }, { autoAlpha: 1, duration: quick ? 0 : 0.45, ease: "power2.out" }, at);
           if (!quick)
             n.querySelectorAll<HTMLElement>("[data-cap]").forEach((t, i) =>
               reveal!.add(settleText(t, t.dataset.cap!), at + i * 0.06));

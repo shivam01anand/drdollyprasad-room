@@ -256,7 +256,8 @@ html[data-gliding="1"]{scroll-snap-type:none}
 /* a close group's cards say what each work is and whether it is free; the rest is a tap away */
 .wall-labels[data-dense="1"] .cap-details{display:none}
 .wall-labels[data-dense="1"] .cap-status{margin-top:2px}
-.wall-label{position:absolute;left:0;top:0;display:flex;flex-direction:column;gap:1px;max-width:214px;
+/* until the walk places it, a card waits off screen (never parked at the top-left) */
+.wall-label{position:absolute;left:0;top:0;transform:translate3d(-9999px,-9999px,0);display:flex;flex-direction:column;gap:1px;max-width:214px;
   padding:9px 12px 10px;margin:0;border:0;border-radius:1px;background:#F5F4F0;text-align:left;font:inherit;
   box-shadow:0 1px 1px rgba(48,32,22,.14),0 8px 16px -10px rgba(48,32,22,.45);
   cursor:pointer;pointer-events:auto;visibility:hidden;opacity:0;will-change:transform}
