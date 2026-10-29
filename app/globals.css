@@ -867,3 +867,17 @@ html[data-panel] .wall-labels{visibility:hidden;opacity:0}
 @media (max-width:760px){ .hud::before{height:80px} }
 .hud .brand,html[data-hud] .hud .brand,html[data-hud] .hud .brand-target .pre-big{color:#211B18;text-shadow:0 0 12px rgba(245,244,240,.8)}
 .hud-top{position:relative;z-index:1}
+
+/* QC polish (29 Oct): tap targets, one-line name, scrim, names never missing */
+.brand-target{flex-direction:row;align-items:baseline;gap:.28em;min-width:0;min-height:0;white-space:nowrap}
+.brand{padding:12px 14px 12px 0;margin:-12px 0 -12px 0}
+.hud .brand-target .pre-big{white-space:nowrap}
+.hud::before{height:140px;background:linear-gradient(180deg,rgba(245,244,240,.86) 0%,rgba(245,244,240,.5) 55%,rgba(245,244,240,0) 100%)}
+.sd-pos{min-height:44px;margin:-6px 0;box-sizing:border-box}
+.rmap-all{padding:14px 0 12px;min-height:44px}
+@media (max-width:760px){
+  .brand{padding:13px 18px 13px 0;margin:-13px 0}
+  .hud::before{height:96px;background:linear-gradient(180deg,rgba(245,244,240,.88) 0%,rgba(245,244,240,.55) 55%,rgba(245,244,240,0) 100%)}
+  .hud .brand{text-shadow:0 0 6px rgba(245,244,240,.95),0 0 16px rgba(245,244,240,.8),0 0 28px rgba(245,244,240,.55)}
+  .sd-all{min-height:44px;margin:-6px -8px -6px 0;padding:0 8px;box-sizing:border-box}
+}

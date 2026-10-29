@@ -141,6 +141,12 @@ export default function WallLabels({ room, stop, arrived, live, phone, order, on
           mode = [...out.values()].every(Boolean) ? "cards" : "pins";
           cb.current.onStrip(mode === "pins");
         }
+        // a caption that cannot place after all (a crowded wall): the numbered strip, so no name is ever missing
+        if (mode === "cards" && [...out.values()].some((q) => !q)) {
+          mode = "pins";
+          cb.current.onStrip(true);
+          if (revealed) { revealed = false; const on = [...el.querySelectorAll<HTMLElement>("[data-label]")]; on.forEach((n) => (n.dataset.on = "0")); gsap.set(on, { autoAlpha: 0 }); }
+        }
         if (mode === "cards") {
           for (const [id, q] of out) cards.get(id)!.style.transform = q ? `translate3d(${Math.round(q.x)}px, ${Math.round(q.y)}px, 0)` : OFF;
           // what is not her work (her photograph on its easel): beside it, clear of everything, or not at all
