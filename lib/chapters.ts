@@ -53,6 +53,8 @@ export type Chapter = {
   press?: string[];
   /** a call to action under the copy */
   cta?: { label: string; href: string };
+  /** wide screens also frame the whole hang (the Blender view crops or crowds it) */
+  frameGroup?: boolean;
 };
 
 /** her poem, verbatim; its opening two lines were withdrawn (Shubham, with her agreement, 18 Oct 2026): do not restore */
@@ -168,6 +170,7 @@ export const CHAPTERS: Chapter[] = [
     stop: "The Turbans · The Boatmen",
     room: "Portraits",
     space: "gallery",
+    frameGroup: true,
     // (no line here: only the locked room line, on the room's first wall; QC 29 Oct)
     view: "portraits",
     dusk: 0.54,
@@ -241,7 +244,7 @@ export function resolveWalk(info: HouseInfo, narrow = false, aspect = 390 / 844)
       if (v) prev = v.pivotRot[1];
       vias.push(v);
     }
-    const group = narrow ? phoneGroupView(info, c.view, c.labels ?? [], c.space, aspect) : null;
+    const group = narrow || c.frameGroup ? phoneGroupView(info, c.view, c.labels ?? [], c.space, aspect) : null;
     const p = viewPose(group ?? cam(info, c.view, narrow), prev, NARROW_BACK);
     if (group) p.fov = group.fov;
     prev = p.pivotRot[1];

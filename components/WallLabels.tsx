@@ -84,12 +84,23 @@ export default function WallLabels({ room, stop, arrived, live, phone, order, on
       return out;
     };
 
+    // ?qa=1: why a caption did not fit (window.__labels)
+    type QA = { why: Record<string, string>; frames?: number };
+    const qa: QA | null = /[?&]qa=1/.test(location.search) ? { why: {} } : null;
+    if (qa) (window as unknown as { __labels: QA }).__labels = qa;
     /** each caption's spot: centred below its frame, else above, else right, else left; or null */
     const placeCards = (R: Room) => {
       const vw = innerWidth, bottom = dockTop() - 10, gut = 16;
-      const frames = R.artRects();
-      const her = R.anchorRect("dolly", 0.85, 1.35);
+      // the paintings that can be in view: this wall's and its neighbours' (every canvas in front of the
+      // camera would include ones behind walls, in other rooms, and block captions that are clear)
+      const near = [stop - 1, stop, stop + 1]
+        .filter((i) => i === stop || CHAPTERS[i]?.space === CHAPTERS[stop]?.space)
+        .flatMap((i) => CHAPTERS[i]?.labels ?? []);
+      const frames = near.map((id) => R.artRect(id)).filter((r): r is Rect => !!r);
+      // her, at her easel: only where she can be seen (the courtyard), not projected through walls
+      const her = CHAPTERS[stop]?.space === "aangan" ? R.anchorRect("dolly", 0.85, 1.35) : null;
       if (her) frames.push(her);
+      if (qa) qa.frames = frames.length;
       const avoid = chrome();
       const taken: Rect[] = [];
       const out = new Map<string, { x: number; y: number } | null>();
@@ -105,6 +116,7 @@ export default function WallLabels({ room, stop, arrived, live, phone, order, on
             && !frames.some((o) => overlaps(r, o)) && !taken.some((o) => overlaps(r, o)) && !avoid.some((o) => overlaps(r, o));
         });
         out.set(id, q ?? null);
+        if (qa) qa.why[id] = q ? "ok" : `none (frame ${Math.round(f.x0)},${Math.round(f.y0)}-${Math.round(f.x1)},${Math.round(f.y1)}; bottom ${Math.round(bottom)})`;
         if (q) taken.push({ x0: q.x, y0: q.y, x1: q.x + w, y1: q.y + h });
       }
       return { out, taken, frames, avoid };

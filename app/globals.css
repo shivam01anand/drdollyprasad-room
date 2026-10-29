@@ -749,7 +749,7 @@ html[data-walk="stops"] .stage canvas{touch-action:none}
 }
 
 /* the dock */
-.sdock{position:fixed;z-index:160;left:50%;bottom:24px;transform:translateX(-50%);width:min(760px,calc(100vw - 48px));
+.sdock{position:fixed;z-index:160;left:50%;bottom:24px;transform:translateX(-50%);width:min(820px,calc(100vw - 48px));
   display:grid;grid-template-columns:44px minmax(0,1fr) auto auto;grid-template-areas:"prev where dots next" "prev line dots next" "strip strip strip strip";
   align-items:center;column-gap:16px;padding:12px 14px 12px 16px;
   background:rgba(245,244,240,.96);border:1px solid #D9D5CC;border-radius:16px;color:#211B18;
@@ -861,3 +861,9 @@ html[data-panel] .wall-labels{visibility:hidden;opacity:0}
 .rmap-n{margin-left:auto;font-size:12px;color:#6A615B}
 .village{z-index:3}
 @media (max-width:760px){ .village{display:none} }
+/* the name always reads: a gentle Khadi scrim at the top, the name always in Kajal (consultant, 29 Oct) */
+.hud::before{content:"";position:absolute;inset:0 0 auto 0;height:130px;pointer-events:none;
+  background:linear-gradient(180deg,rgba(245,244,240,.8) 0%,rgba(245,244,240,.45) 55%,rgba(245,244,240,0) 100%)}
+@media (max-width:760px){ .hud::before{height:80px} }
+.hud .brand,html[data-hud] .hud .brand,html[data-hud] .hud .brand-target .pre-big{color:#211B18;text-shadow:0 0 12px rgba(245,244,240,.8)}
+.hud-top{position:relative;z-index:1}
