@@ -1,6 +1,5 @@
 import { aim, type Pose } from "./room/rig";
 import type { HouseInfo, V3 } from "./room/house";
-import { phoneGroupView } from "./room/phone-framing";
 
 /**
  * One chapter model owns the copy and the camera, so the two can never drift
@@ -93,11 +92,6 @@ export const ABOUT_PRESS = ["ihc-press-01", "tv-ncr-2010", "delhi-times", "ihc-p
 export const CHAPTERS: Chapter[] = [
   { id: "presence", eyebrow: "“Woman with Poppies”", stop: "Woman with Poppies", room: "About her", space: "aangan",
     view: "presence", labels: ["woman-with-poppies"] },
-  // About her: her, at her easel, painting; the press and films beside (copy locked 27 Oct)
-  // her words and the press are drawn by components/AboutHer.tsx (copy locked 27 Oct)
-  { id: "about", eyebrow: "About her", stop: "About her", room: "About her", space: "aangan",
-    // a sheet over a still view: the door's own framing, so arriving here moves no camera (29 Oct)
-    press: ABOUT_PRESS, view: "presence", dusk: 0.04 },
   {
     id: "floral",
     eyebrow: "Onset of Spring · 2024 to 2026",
@@ -185,18 +179,6 @@ export const CHAPTERS: Chapter[] = [
     view: "easel", dusk: 0.58 },
 ];
 
-/**
- * The afternoon goes as you go in: the evening the walk has reached at
- * camera progress p (0…1), eased within each step as the camera is.
- */
-export function duskAt(p: number) {
-  const x = Math.min(1, Math.max(0, p)) * (CHAPTERS.length - 1);
-  const i = Math.min(CHAPTERS.length - 2, Math.floor(x));
-  const k = x - i, s = k * k * (3 - 2 * k);
-  const a = CHAPTERS[i].dusk ?? 0, b = CHAPTERS[i + 1].dusk ?? 0;
-  return a + (b - a) * s;
-}
-
 /** the painting the preloader shows, and the first the house frames */
 export const HERO_ID = "woman-with-poppies";
 
@@ -219,52 +201,5 @@ export function viewPose(v: { eye: V3; target: V3 }, prevYaw?: number, back = 1)
   return aim(v.target, yaw, len * back, 0, orbit);
 }
 
-/** portrait screens keep the framings: the rig widens the lens instead
- *  (stepping back would put the camera through the wall behind it) */
-const NARROW_BACK = 1;
-
-/** a portrait screen has its own framing of a view where Blender made one ("n:<view>") */
-const cam = (info: HouseInfo, view: string, narrow: boolean) => (narrow && info.cams[`n:${view}`]) || info.cams[view];
-
-/**
- * The walk as the rig needs it: one pose per chapter, and for each step
- * between two chapters the pose it passes through, or null. Yaw is unwrapped
- * along the whole path, through the passing poses too.
- */
-export function resolveWalk(info: HouseInfo, narrow = false, aspect = 390 / 844): { shots: Pose[]; vias: (Pose | null)[] } {
-  let prev: number | undefined;
-  const shots: Pose[] = [], vias: (Pose | null)[] = [];
-  CHAPTERS.forEach((c, i) => {
-    if (i > 0) {
-      // a passing pose the house has (an older build may not): otherwise straight on
-      let vc = c.via ? cam(info, c.via, narrow) : undefined;
-      // Turn toward the floral wall before stepping back to see its full hang.
-      if (narrow && c.id === "floral") vc = info.cams.floral;
-      const v = vc ? viewPose(vc, prev, NARROW_BACK) : null;
-      if (v) prev = v.pivotRot[1];
-      vias.push(v);
-    }
-    const group = narrow || c.frameGroup ? phoneGroupView(info, c.view, c.labels ?? [], c.space, aspect) : null;
-    const p = viewPose(group ?? cam(info, c.view, narrow), prev, NARROW_BACK);
-    if (group) p.fov = group.fov;
-    prev = p.pivotRot[1];
-    shots.push(p);
-  });
-  return { shots, vias };
-}
-
-/** the establishing shot: the hero's wall, from the courtyard's far side */
-export const startPose = (info: HouseInfo, narrow = false) => viewPose(cam(info, "start", narrow));
 /** rearrange: the dollhouse view, high over the house */
 export const messPose = (info: HouseInfo) => viewPose(info.cams.mess);
-
-/** portrait screens get their own framings */
-export const isNarrow = (aspect: number) => aspect < 0.85;
-
-/** every work in the order the walk passes it, wall by wall */
-export const WALK_ORDER: string[] = CHAPTERS.flatMap((c) => c.labels ?? []);
-
-/** the stop a work is seen at: the chapter that labels it; -1 if none */
-export function stopOf(id: string) {
-  return CHAPTERS.findIndex((c) => c.labels?.includes(id));
-}

@@ -1,6 +1,6 @@
 "use client";
 
-import { useCallback, useEffect, useRef, useState } from "react";
+import { useCallback, useEffect, useMemo, useRef, useState } from "react";
 import type { Room } from "@/lib/room/Room";
 import { motion, gsap, reducedMotion } from "@/lib/motion";
 import Preloader, { type PreloaderHandle } from "./Preloader";
@@ -9,45 +9,40 @@ import Cursor, { roomCursorLabel } from "./Cursor";
 import WallLabels from "./WallLabels";
 import Until from "./Until";
 import RoomMap from "./RoomMap";
-import Dock, { roomAt } from "./Dock";
-import AboutHer from "./AboutHer";
+import Dock from "./Dock";
+import KnowMore, { OpeningCard } from "./AboutHer";
 import Desk from "./Desk";
 import { WORKS_FILTER, type WorksFilter } from "./Works";
 import * as music from "@/lib/music";
-import { CHAPTERS, ROOM_LINE, WALK_ORDER, stopOf, type RoomName } from "@/lib/chapters";
+import { CHAPTERS } from "@/lib/chapters";
+import { stopsFor, isPhoneLayout, roomsOf, isSeries, roomLine, WALK_ORDER, stopOfWork, type Stop } from "@/lib/stops";
 import { activeVariant } from "@/lib/room/variants";
 import { BY_ID } from "@/lib/works";
 import { paintingProperties, track } from "@/lib/analytics";
 
 type Dims = Record<string, { w: number; h: number }>;
-type Method = "next" | "prev" | "swipe" | "wheel" | "key" | "map" | "strip" | "link" | "qa";
+type Method = "next" | "prev" | "swipe" | "wheel" | "key" | "map" | "strip" | "link" | "qa" | "enter";
 
-const N = CHAPTERS.length;
 const clamp01 = (v: number) => Math.min(1, Math.max(0, v));
-const progressOf = (i: number) => i / Math.max(1, N - 1);
-const LABEL_ORDER = CHAPTERS.map((c) => [...(c.labels ?? [])]);
-/** a framing that the camera passes through on its way in (a doorway, a turn): such a step is a cut */
-const turns = (to: number) => !!CHAPTERS[to]?.via;
+const HOME = "/";
 
 /**
- * The studio, one wall at a time (UX spec Option A, 29 Oct 2026). The visitor is always at one
- * stop; every input (a swipe in any direction, one wheel or trackpad flick, an arrow key, the
- * dock's Previous and Next, a room in the list, a name in the strip) moves exactly one stop or
- * goes straight to one. Within a room the camera makes one short move (0.7 s); between rooms
- * the page dips to Kajal and cuts (0.6 s). Scroll no longer drives the camera: the house is a
- * fixed stage, and the page under it (every painting, then contact) scrolls as a page.
+ * The studio, painting first (art direction V3, 29 Oct 2026). The visitor is always at one stop:
+ * on a phone one painting (the small panels in stacked pairs), on a wide screen a group of at most
+ * three. Every input (a swipe, one wheel flick, an arrow key, Previous and Next, a room in the
+ * list) moves exactly one stop or goes straight to one. Along a wall the camera trucks (0.5 s);
+ * to the next wall of a room it turns (0.6 s); between rooms the page dips to Kajal with the
+ * room's name and the village line drawing under it (under 1 s). "← Home" is always top left.
  */
 export default function Studio({ dims }: { dims: Dims }) {
   const canvasRef = useRef<HTMLCanvasElement>(null);
   const stageRef = useRef<HTMLDivElement>(null);
-  const hudRef = useRef<HTMLDivElement>(null);
-  const copyRef = useRef<HTMLDivElement>(null);
-  const villageRef = useRef<HTMLDivElement>(null);
+  const hudRef = useRef<HTMLElement>(null);
   const veilRef = useRef<HTMLDivElement>(null);
   const preRef = useRef<PreloaderHandle>(null);
   const lbRef = useRef<LightboxHandle>(null);
   const roomRef = useRef<Room | null>(null);
-  /** every reason input is held: the lightbox, the room list */
+  /** every reason input is held: the lightbox, the room list, Know more */
   const holds = useRef(new Set<string>());
   const hold = useCallback((reason: string, on: boolean) => {
     if (on) holds.current.add(reason); else holds.current.delete(reason);
@@ -59,20 +54,26 @@ export default function Studio({ dims }: { dims: Dims }) {
   const [loaded, setLoaded] = useState(false);
   const [failed, setFailed] = useState(false);
   const [ready, setReady] = useState(false);
-  /** the welcome has begun to fade: the dock and the names come with the house */
   const [entered, setEntered] = useState(false);
-  /** the house is taking a long time: the dock shows the names over the welcome */
   const [slow, setSlow] = useState(false);
   const [mode, setMode] = useState<"light" | "dark">(activeVariant().startDark ? "dark" : "light");
   const [mapOpen, setMapOpen] = useState(false);
+  const [more, setMore] = useState(false);
   const [playing, setPlaying] = useState(false);
   const [stop, setStop] = useState(0);
   const [arrived, setArrived] = useState(true);
-  const [orders, setOrders] = useState<string[][]>(LABEL_ORDER);
+  /** the walk: a phone's (painting by painting) or a wide screen's (groups) */
+  const [walkPhone, setWalkPhone] = useState(false);
+  /** the phone's chrome (≤ 760 px wide) */
   const [phone, setPhone] = useState(false);
   const [stripWanted, setStripWanted] = useState(false);
   const [below, setBelow] = useState(false);
   const [pulse, setPulse] = useState(false);
+  const [letter, setLetter] = useState<{ room: string; line: string } | null>(null);
+  const stops = useMemo(() => stopsFor(walkPhone), [walkPhone]);
+  const stopsRef = useRef<Stop[]>(stops);
+  stopsRef.current = stops;
+  const N = stops.length;
   const stopRef = useRef(0);
   const moving = useRef(false);
   const queued = useRef<number | null>(null);
@@ -80,7 +81,6 @@ export default function Studio({ dims }: { dims: Dims }) {
 
   useEffect(() => music.onChange(setPlaying), []);
   // Music is on by default, at low volume, and starts on the visitor's first tap, key or click
-  // (a browser starts sound only from a real gesture). A stored "off" is respected.
   useEffect(() => {
     const events = ["pointerup", "touchend", "keydown", "click"] as const;
     const off = () => events.forEach((e) => removeEventListener(e, wake, true));
@@ -98,27 +98,39 @@ export default function Studio({ dims }: { dims: Dims }) {
     const q = matchMedia("(max-width: 760px)");
     const on = () => setPhone(q.matches);
     on();
+    setWalkPhone(isPhoneLayout(innerWidth, innerHeight));
     q.addEventListener("change", on);
     return () => q.removeEventListener("change", on);
   }, []);
 
   useEffect(() => {
     if (!ready || failed) return;
-    const chapter = CHAPTERS[stop];
+    const s = stops[stop];
+    if (!s) return;
     const timer = setTimeout(() => track("studio_chapter_viewed", {
-      chapter_id: chapter.id, chapter_name: chapter.stop, room: chapter.room, chapter_number: stop + 1,
+      chapter_id: s.id, chapter_name: s.works.map((id) => BY_ID.get(id)?.title).join(" · ") || s.chapter.stop,
+      room: s.room, chapter_number: stop + 1,
     }), 700);
     return () => clearTimeout(timer);
-  }, [stop, ready, failed]);
+  }, [stop, ready, failed, stops]);
 
   /* ------------------------------------------------------------------------
      Moving: the only way from one stop to another.
   ------------------------------------------------------------------------ */
+  const letterT = useRef(0);
   const arrive = useCallback((to: number) => {
     moving.current = false;
     setArrived(true);
     performance.mark?.("step-arrive");
-    roomRef.current?.drawFrieze(CHAPTERS[to]?.room, CHAPTERS[to]?.space);
+    const S = stopsRef.current, s = S[to];
+    roomRef.current?.drawFrieze(s?.room, s?.space);
+    // the room's line, as lettering on the wall at its first painting, for 3 s
+    const run = roomsOf(S).find((r) => r.first === to);
+    clearTimeout(letterT.current);
+    if (run && isSeries(run) && roomLine(run.name)) {
+      setLetter({ room: run.name, line: roomLine(run.name)! });
+      letterT.current = window.setTimeout(() => setLetter(null), 3000);
+    } else setLetter(null);
     const after = afterArrive.current;
     afterArrive.current = null;
     after?.();
@@ -129,55 +141,60 @@ export default function Studio({ dims }: { dims: Dims }) {
 
   const moveRef = useRef<(to: number, method: Method) => void>(() => {});
   moveRef.current = (to: number, method: Method) => {
+    const S = stopsRef.current;
     const from = stopRef.current;
-    to = Math.max(0, Math.min(N - 1, to));
+    to = Math.max(0, Math.min(S.length - 1, to));
     if (to === from) { afterArrive.current?.(); afterArrive.current = null; return; }
     if (moving.current) { if (queued.current === null) queued.current = to; return; }
     const r = roomRef.current;
     const live = !!r && r.introDone;
-    const sameRoom = CHAPTERS[to].room === CHAPTERS[from].room;
-    const still = CHAPTERS[to].view === CHAPTERS[from].view;
     const quick = reducedMotion();
-    const kind: "still" | "walk" | "cut" = still ? "still"
-      : sameRoom && Math.abs(to - from) === 1 && !turns(Math.max(to, from)) && !quick ? "walk" : "cut";
+    const kind = live && !quick ? r!.moveKind(from, to) : "cut";
     track("studio_step", { from, to, method });
     performance.mark?.("step-start");
     stopRef.current = to;
     moving.current = true;
+    clearTimeout(letterT.current);
+    setLetter(null);
     setStop(to);
     setArrived(false);
-    if (!live || kind === "still") {
-      if (live) r!.goStop(to, "cut", () => {});
-      // (a sheet over the same view: the next frame has it)
-      requestAnimationFrame(() => arrive(to));
-      return;
-    }
-    if (kind === "walk") { r!.goStop(to, "walk", () => arrive(to), 0.7); return; }
-    // a cut: a dip to Kajal, the room's name on it when the room changes, and out
+    if (!live) { requestAnimationFrame(() => arrive(to)); return; }
+    if (kind === "truck") { r!.goStop(to, "walk", () => arrive(to), 0.5); return; }
+    if (kind === "turn") { r!.goStop(to, "walk", () => arrive(to), 0.6); return; }
+    // a cut: a dip to Kajal; a new room says its name, with the village line drawn under it
     const veil = veilRef.current!;
-    const name = veil.querySelector<HTMLElement>(".veil-name");
-    if (name) name.textContent = sameRoom ? "" : roomAt(to).name;
-    gsap.killTweensOf(veil);
-    gsap.timeline()
-      .to(veil, { autoAlpha: 1, duration: quick ? 0 : 0.22, ease: "power1.in" })
-      .add(() => r!.goStop(to, "cut", () => {}))
-      .to(veil, { autoAlpha: 0, duration: quick ? 0 : 0.32, ease: "power1.out" }, quick ? undefined : "+=0.06")
+    const newRoom = S[to].room !== S[from].room;
+    const runs = roomsOf(S), series = runs.filter(isSeries);
+    const run = runs.find((x) => to >= x.first && to <= x.last);
+    const n = run ? series.findIndex((x) => x.name === run.name) : -1;
+    const kicker = veil.querySelector<HTMLElement>(".veil-kicker")!, name = veil.querySelector<HTMLElement>(".veil-name")!;
+    const border = veil.querySelector<HTMLElement>(".veil-border")!;
+    kicker.textContent = newRoom && n >= 0 ? `Room ${n + 1} of ${series.length}` : "";
+    name.textContent = newRoom ? S[to].room : "";
+    veil.dataset.room = newRoom ? "1" : "0";
+    gsap.killTweensOf([veil, border]);
+    const tl = gsap.timeline();
+    tl.to(veil, { autoAlpha: 1, duration: quick ? 0 : 0.22, ease: "power1.in" })
+      .add(() => r!.goStop(to, "cut", () => {}));
+    if (newRoom && !quick) {
+      tl.fromTo(border, { clipPath: "inset(0 100% 0 0)" }, { clipPath: "inset(0 0% 0 0)", duration: 0.4, ease: "power1.inOut" }, ">")
+        .to({}, { duration: 0.05 });
+    } else tl.to({}, { duration: quick ? 0 : 0.06 });
+    tl.to(veil, { autoAlpha: 0, duration: quick ? 0 : 0.3, ease: "power1.out" })
       .add(() => arrive(to));
   };
 
-  const goWorks = useCallback(() => {
-    const el = document.getElementById("works");
-    if (el) scrollTo({ top: el.offsetTop, behavior: reducedMotion() ? "auto" : "smooth" });
-  }, []);
+  const goHome = useCallback(() => { location.assign(HOME); }, []);
 
-  /** one stop on (+1) or back (−1); past the desk, the page of all her paintings */
+  /** one stop on (+1) or back (−1); past the desk, home */
   const step = useCallback((d: 1 | -1, method: Method) => {
     if (holds.current.size) return;
+    const last = stopsRef.current.length - 1;
     const base = moving.current ? (queued.current ?? stopRef.current) : stopRef.current;
-    if (d > 0 && base >= N - 1) { if (!moving.current) goWorks(); return; }
-    if (moving.current) { if (queued.current === null) queued.current = Math.max(0, Math.min(N - 1, base + d)); return; }
+    if (d > 0 && base >= last) { if (!moving.current && method !== "wheel" && method !== "swipe") goHome(); return; }
+    if (moving.current) { if (queued.current === null) queued.current = Math.max(0, Math.min(last, base + d)); return; }
     moveRef.current(stopRef.current + d, method);
-  }, [goWorks]);
+  }, [goHome]);
 
   /* ------------------------------------------------------------------------
      The room, and the one loop that draws it.
@@ -218,7 +235,6 @@ export default function Studio({ dims }: { dims: Dims }) {
     const timeout = setTimeout(() => fail(new Error("timed out")), 60_000);
     const slowT = setTimeout(() => { if (!killed) setSlow(true); }, 6_000);
 
-    const order = () => { if (room && !dead) setOrders(room.wallOrder()); };
     import("@/lib/room/Room").then(({ Room }) => {
       if (killed || dead) return;
       const r = new Room();
@@ -241,34 +257,46 @@ export default function Studio({ dims }: { dims: Dims }) {
           lbRef.current?.open(id, null, WALK_ORDER);
         },
         onHoverArt: (id) => roomCursorLabel(id ? "View" : null),
+        // a turned phone: the other walk, at the same painting
+        onLayout: (p, index) => {
+          stopsRef.current = stopsFor(p);
+          stopRef.current = index;
+          moving.current = false; queued.current = null;
+          setWalkPhone(p);
+          setStop(index);
+          setArrived(true);
+        },
       }).then(() => {
         if (killed || dead) return;
         clearTimeout(timeout);
         clearTimeout(slowT);
         setLoaded(true);
-        order();
         if (process.env.NODE_ENV !== "production" || new URLSearchParams(location.search).has("qa")) devSwitches();
       });
     }).catch((e) => { clearTimeout(timeout); fail(e); });
 
-    /* ?qa=1: the screenshot driver's handle. go(id) lands on a stop at once; step(±1) is a real step. */
+    /* ?qa=1: the screenshot driver's handle. go(i) lands on a stop at once; step(±1) is a real step. */
     const devSwitches = () => {
       const q = new URLSearchParams(location.search);
       (window as unknown as { __studio?: object }).__studio = {
-        go(id: string) {
-          const i = CHAPTERS.findIndex((c) => c.id === id);
-          if (i < 0) return false;
+        go(i: number | string) {
+          const S = stopsRef.current;
+          const k = typeof i === "number" ? i : S.findIndex((s) => s.id === i);
+          if (k < 0 || k >= S.length) return false;
           moving.current = false; queued.current = null;
-          stopRef.current = i;
-          setStop(i);
+          stopRef.current = k;
+          setStop(k);
           setArrived(false);
-          room?.goStop(i, "cut", () => {});
-          requestAnimationFrame(() => arrive(i));
-          return i;
+          room?.goStop(k, "cut", () => {});
+          requestAnimationFrame(() => arrive(k));
+          return k;
         },
         step: (d: 1 | -1) => step(d, "qa"),
         get stop() { return stopRef.current; },
+        get stops() { return stopsRef.current.map((s) => ({ id: s.id, room: s.room, works: s.works })); },
         get moving() { return moving.current; },
+        measure: () => room?.measureStops(),
+        more: (on: boolean) => setMore(on),
         mode: (m: "light" | "dark") => setMode(m),
         music,
       };
@@ -279,39 +307,12 @@ export default function Studio({ dims }: { dims: Dims }) {
     const onContextLost = (e: Event) => { e.preventDefault(); fail(new Error("WebGL context lost")); };
     canvas.addEventListener("webglcontextlost", onContextLost);
 
-    /* The header's ink: light where the room behind the name is dark, dark where it is light,
-       read from the frame as drawn, every little while and once on arriving. */
-    let inkAt = 0, wasLanded = false, inkLight: boolean | null = null, inkStop = -1;
-    const ink = () => {
-      const r = room;
-      if (!r || dead || !r.introDone || scrollY > innerHeight * 0.5) return;
-      const now = performance.now();
-      const landed = r.landed, came = landed && !wasLanded;
-      wasLanded = landed;
-      if (!came && now - inkAt < 400) return;
-      inkAt = now;
-      const b = document.querySelector<HTMLElement>(".hud .brand")?.getBoundingClientRect();
-      if (!b || !b.width) return;
-      const at = stopRef.current;
-      r.readLumaBehind("ink", { x0: b.left, y0: b.top, x1: b.right, y1: b.bottom }, (l) => {
-        inkStop = at;
-        const light = inkLight === null ? l < 0.5 : inkLight ? l < 0.56 : l < 0.44;
-        if (light !== inkLight) { inkLight = light; html.dataset.hud = light ? "light" : "dark"; }
-      }, came || at !== inkStop);
-    };
-    gsap.ticker.add(ink);
-
-    // a turned phone or a resized window: the pins' numbers follow the new framings
-    let rt = 0;
-    const onResize = () => { clearTimeout(rt); rt = window.setTimeout(order, 250); };
-    addEventListener("resize", onResize);
-
     // the collage below and the lightbox share one click path
     const onDocClick = (e: MouseEvent) => {
       if (e.defaultPrevented || e.button !== 0 || e.metaKey || e.ctrlKey || e.shiftKey || e.altKey) return;
       const t = e.target as HTMLElement;
       const link = t.closest<HTMLAnchorElement>('a[href^="#"]');
-      if (link && link.getAttribute("href")!.length > 1 && !link.closest(".brand")) {
+      if (link && link.getAttribute("href")!.length > 1) {
         const el = document.querySelector<HTMLElement>(link.getAttribute("href")!);
         if (el) { e.preventDefault(); scrollTo({ top: el.offsetTop, behavior: reduce ? "auto" : "smooth" }); return; }
       }
@@ -329,15 +330,12 @@ export default function Studio({ dims }: { dims: Dims }) {
       killed = true;
       clearTimeout(timeout);
       clearTimeout(slowT);
-      clearTimeout(rt);
       gsap.ticker.remove(frame);
-      gsap.ticker.remove(ink);
       canvas.removeEventListener("webglcontextlost", onContextLost);
       history.scrollRestoration = prevRestoration;
       for (const k of ["room", "hud"] as const) {
         if (prevData[k] === undefined) delete html.dataset[k]; else html.dataset[k] = prevData[k];
       }
-      removeEventListener("resize", onResize);
       document.removeEventListener("click", onDocClick);
       room?.dispose();
       if (roomRef.current === room) roomRef.current = null;
@@ -355,14 +353,13 @@ export default function Studio({ dims }: { dims: Dims }) {
   const onPreDone = useCallback(() => {}, []);
   useEffect(() => { if (failed) setEntered(true); }, [failed]);
 
-  // a watchdog for the visible tab: if the welcome has not gone well after loading, end it
   useEffect(() => {
     if (!loaded || ready || failed) return;
     const t = window.setTimeout(() => preRef.current?.finish(), 8_000);
     return () => clearTimeout(t);
   }, [loaded, ready, failed]);
 
-  // the dock's Next asks once to be pressed, a second after the house appears
+  // the way in asks once to be pressed, a second after the house appears
   useEffect(() => {
     if (!ready || failed) return;
     const a = window.setTimeout(() => setPulse(true), 1000);
@@ -379,9 +376,8 @@ export default function Studio({ dims }: { dims: Dims }) {
     const html = document.documentElement;
     const inHouse = () => scrollY < 4;
     const own = (t: EventTarget | null) => !!(t as Element | null)?.closest?.(
-      ".sdock, .rmap, .walk-panel, .lb, .hud a, .hud button, .studio-exit, .wall-pin, .wall-label, #works, .contact");
+      ".vdock, .ocard, .rmap, .walk-panel, .lb, .vhead, .plaque, #works, .contact");
 
-    // wheel and trackpad: one flick, one stop; held until the move ends and the wheel is quiet
     let acc = 0, locked = false, quietT = 0;
     const release = () => {
       if (moving.current) { quietT = window.setTimeout(release, 60); return; }
@@ -390,12 +386,12 @@ export default function Studio({ dims }: { dims: Dims }) {
     const onWheel = (e: WheelEvent) => {
       if (!inHouse() || holds.current.size || e.ctrlKey) return;
       const t = e.target as Element | null;
-      const sideways = Math.abs(e.deltaX) > Math.abs(e.deltaY);
-      if (t?.closest?.(".rmap, .walk-panel, .lb") || (sideways && t?.closest?.(".sd-strip"))) return;
+      if (t?.closest?.(".rmap, .walk-panel, .lb")) return;
       e.preventDefault();
       clearTimeout(quietT);
       quietT = window.setTimeout(release, 250);
       if (locked) return;
+      const sideways = Math.abs(e.deltaX) > Math.abs(e.deltaY);
       const unit = e.deltaMode === 1 ? 16 : e.deltaMode === 2 ? innerHeight : 1;
       acc += (sideways ? e.deltaX : e.deltaY) * unit;
       if (Math.abs(acc) >= 60) {
@@ -404,7 +400,6 @@ export default function Studio({ dims }: { dims: Dims }) {
         step(d, "wheel");
       }
     };
-    // back up from the page below: the inertia that brought it here is not a step
     let lastY = scrollY;
     const onScroll = () => {
       const y = scrollY;
@@ -418,7 +413,6 @@ export default function Studio({ dims }: { dims: Dims }) {
       setBelow(y > 40);
       roomRef.current?.setVisible(y < vh);
     };
-
     const onKey = (e: KeyboardEvent) => {
       if (e.defaultPrevented || e.metaKey || e.ctrlKey || e.altKey || !inHouse() || holds.current.size) return;
       const t = e.target as HTMLElement | null;
@@ -429,8 +423,6 @@ export default function Studio({ dims }: { dims: Dims }) {
       e.preventDefault();
       if (!e.repeat) step(next ? 1 : -1, "key");
     };
-
-    // a finger: a swipe either way is one stop (left or up is on); a tap is the room's
     const sw = { on: false, x: 0, y: 0, t: 0 };
     const onTouchStart = (e: TouchEvent) => {
       sw.on = false;
@@ -438,11 +430,7 @@ export default function Studio({ dims }: { dims: Dims }) {
       const t = e.touches[0];
       Object.assign(sw, { on: true, x: t.clientX, y: t.clientY, t: performance.now() });
     };
-    const onTouchMove = (e: TouchEvent) => {
-      if (!sw.on) return;
-      // the house never scrolls away under a finger, nor pulls to refresh
-      if (e.cancelable) e.preventDefault();
-    };
+    const onTouchMove = (e: TouchEvent) => { if (sw.on && e.cancelable) e.preventDefault(); };
     const onTouchEnd = (e: TouchEvent) => {
       if (!sw.on) return;
       sw.on = false;
@@ -454,14 +442,14 @@ export default function Studio({ dims }: { dims: Dims }) {
       if (!far && !(v > 0.4 && Math.max(Math.abs(dx), Math.abs(dy)) > 24)) return;
       step((across ? dx : dy) < 0 ? 1 : -1, "swipe");
     };
-
     addEventListener("wheel", onWheel, { passive: false, capture: true });
     addEventListener("scroll", onScroll, { passive: true });
     addEventListener("keydown", onKey);
     document.addEventListener("touchstart", onTouchStart, { passive: true });
     document.addEventListener("touchmove", onTouchMove, { passive: false });
     document.addEventListener("touchend", onTouchEnd, { passive: true });
-    document.addEventListener("touchcancel", () => { sw.on = false; }, { passive: true });
+    const onCancel = () => { sw.on = false; };
+    document.addEventListener("touchcancel", onCancel, { passive: true });
     html.dataset.walk = "stops";
     onScroll();
     return () => {
@@ -472,6 +460,7 @@ export default function Studio({ dims }: { dims: Dims }) {
       document.removeEventListener("touchstart", onTouchStart);
       document.removeEventListener("touchmove", onTouchMove);
       document.removeEventListener("touchend", onTouchEnd);
+      document.removeEventListener("touchcancel", onCancel);
       delete html.dataset.walk;
     };
   }, [inputOn, step]);
@@ -481,27 +470,12 @@ export default function Studio({ dims }: { dims: Dims }) {
     if (loaded && !failed) roomRef.current?.setMode(mode);
   }, [mode, loaded, failed]);
 
-  // her words for a stop (not the room's line, which the dock carries): one fixed panel, desktop
-  useEffect(() => {
-    const slot = copyRef.current;
-    if (!slot) return;
-    const panels = [...slot.querySelectorAll<HTMLElement>(".copy-panel")];
-    const quick = reducedMotion();
-    for (const p of panels) {
-      const on = arrived && ready && p.dataset.i === String(stop);
-      if ((p.dataset.on === "1") === on) continue;
-      p.dataset.on = on ? "1" : "0";
-      gsap.to(p, { autoAlpha: on ? 1 : 0, duration: quick ? 0 : on ? 0.25 : 0.12, ease: "power1.out", overwrite: true });
-    }
-  }, [stop, arrived, ready]);
-
-  // the village line along the foot follows the walk (CSS reads --walk)
-  useEffect(() => { villageRef.current?.style.setProperty("--walk", String(progressOf(stop))); }, [stop]);
-
   const [lbOpen, setLbOpen] = useState(false);
   const onLightbox = useCallback((open: boolean) => { hold("lightbox", open); setLbOpen(open); }, [hold]);
   useEffect(() => { hold("map", mapOpen); }, [mapOpen, hold]);
+  useEffect(() => { hold("more", more); }, [more, hold]);
   const closeMap = useCallback(() => setMapOpen(false), []);
+  const closeMore = useCallback(() => setMore(false), []);
   const openWork = useCallback((id: string, source: string) => {
     const w = BY_ID.get(id);
     if (w) track("painting_clicked", { ...paintingProperties(w), source });
@@ -509,104 +483,105 @@ export default function Studio({ dims }: { dims: Dims }) {
   }, []);
   const showWorks = (f: WorksFilter) => {
     dispatchEvent(new CustomEvent(WORKS_FILTER, { detail: f }));
-    setTimeout(goWorks, 60);
+    setTimeout(() => {
+      const el = document.getElementById("works");
+      if (el) scrollTo({ top: el.offsetTop, behavior: reducedMotion() ? "auto" : "smooth" });
+    }, 60);
   };
   const goStop = useCallback((i: number) => {
-    // the room list holds input while it is open: let go first
     hold("map", false);
     setMapOpen(false);
     if (scrollY > 4) scrollTo({ top: 0 });
     moveRef.current(i, "map");
   }, [hold]);
+  const enter = useCallback(() => {
+    hold("more", false);
+    setMore(false);
+    if (stopRef.current === 0) moveRef.current(1, "enter");
+  }, [hold]);
 
-  const here = CHAPTERS[stop]?.id;
-  const panel = arrived && (here === "about" || here === "desk") ? here : "";
+  const here = stops[stop]?.id;
+  const opening = here === "presence";
+  const panel = arrived && here === "desk" ? "desk" : opening ? "about" : "";
   useEffect(() => {
     const d = document.documentElement.dataset;
     if (panel) d.panel = panel; else delete d.panel;
     return () => { delete document.documentElement.dataset.panel; };
   }, [panel]);
 
-  // a link to one painting (its page's "See it in her studio", or /#work=<id>): go to its wall, open it there
+  // a link to one painting (its page's "See it in her studio", or /#work=<id>): go to it, open it there
   useEffect(() => {
     if (!ready || failed) return;
     const hash = location.hash;
-    if (hash === "#works") { setTimeout(goWorks, 300); return; }
+    if (hash === "#works") { setTimeout(() => showWorks("all"), 300); return; }
     const m = /^#work=([a-z0-9-]+)$/.exec(hash);
     if (!m || !BY_ID.has(m[1])) return;
     const id = m[1];
     history.replaceState(null, "", location.pathname + location.search);
-    const i = stopOf(id);
+    const i = stopOfWork(stopsRef.current, id);
     if (i < 0) { lbRef.current?.open(id, null, WALK_ORDER); return; }
     afterArrive.current = () => lbRef.current?.open(id, null, WALK_ORDER);
     moveRef.current(i, "link");
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [ready, failed]);
 
-  const dockOn = (entered || slow) && !failed && !below && !lbOpen;
-  const order = orders[stop] ?? LABEL_ORDER[stop];
+  const live = (entered || slow) && !failed && !below && !lbOpen;
+  const dockOn = live && !opening;
 
   return (
     <>
       <div className="stage" ref={stageRef} aria-hidden="true">
         <canvas ref={canvasRef} />
       </div>
-      {/* the room dims under About her's sheet; the dip to Kajal between rooms */}
-      <div className="stage-dim" data-on={here === "about" && arrived ? "1" : "0"} aria-hidden="true" />
-      <div className="stage-veil" ref={veilRef} aria-hidden="true"><span className="veil-name" /></div>
+      {/* a faint vignette over the house (never over the dock or the sheets) */}
+      <div className="vignette" aria-hidden="true" />
+      <div className="stage-dim" data-on={more ? "1" : "0"} aria-hidden="true" />
+      <div className="stage-veil" ref={veilRef} aria-hidden="true" data-room="0">
+        <div className="veil-in">
+          <span className="veil-kicker" />
+          <span className="veil-name" />
+          <i className="veil-border" />
+        </div>
+      </div>
 
       <Preloader ref={preRef} pct={pct} loaded={loaded} failed={failed} slow={slow && !loaded}
                  onLift={onLift} onDone={onPreDone} />
 
-      {/* always on screen, from the first frame: the way back to the website */}
-      <a className="studio-exit" href="/" aria-label="Exit the studio and go back to the website">
-        <svg viewBox="0 0 24 24" aria-hidden="true"><path d="M6 6l12 12M18 6L6 18" /></svg>
-        <span>Exit the studio</span>
-      </a>
-
-      <header className="hud" ref={hudRef} inert={!entered} data-state={entered ? "live" : "pre"}>
-        <div className="hud-top">
-          <a className="brand" href="#top" aria-label="Dr Dolly Prasad, back to the door"
-             onClick={(e) => { e.preventDefault(); if (scrollY > 4) scrollTo({ top: 0, behavior: "smooth" }); else goStop(0); }}>
-            <div data-brand-target className="brand-target" />
-          </a>
-          <span className="mask hud-map"><button type="button" className="pill hud-pill map-btn" aria-expanded={mapOpen} aria-haspopup="dialog"
-                  onClick={() => setMapOpen((o) => !o)}>
-            <svg viewBox="0 0 24 24" aria-hidden="true"><path d="M4 6.5h16M4 12h16M4 17.5h16" /></svg>The rooms</button></span>
-          <button type="button" className="diya-btn music-btn" aria-pressed={playing}
+      {/* always on screen, from the first frame: the way home, the rooms, the music */}
+      <header className="vhead" ref={hudRef} data-state={entered ? "live" : "pre"}>
+        <a className="vh-home" href={HOME} aria-label="Leave the studio and go to the home page">
+          <svg viewBox="0 0 24 24" aria-hidden="true"><path d="M19 12H6M11 6.5L5.5 12l5.5 5.5" /></svg>
+          <span>Home</span>
+        </a>
+        <div className="vh-right">
+          {!failed && (
+            <button type="button" className="vh-rooms map-btn" aria-expanded={mapOpen} aria-haspopup="dialog" inert={!entered}
+                    onClick={() => setMapOpen((o) => !o)}>
+              Rooms <svg viewBox="0 0 12 12" aria-hidden="true"><path d="M2 4l4 4 4-4" /></svg>
+            </button>
+          )}
+          <button type="button" className="vh-music music-btn" aria-pressed={playing} inert={!entered}
                   aria-label={playing ? "Pause the music" : "Play the music"} onClick={() => music.toggle()}>
-            <svg viewBox="0 0 32 32" aria-hidden="true">
-              <path d="M12 22.5V9.5l11-2.5v12.5" className="dish-line" />
-              <circle cx="9.5" cy="22.5" r="2.8" className="dish" />
-              <circle cx="20.5" cy="19.5" r="2.8" className="dish" />
-              {!playing && <path d="M6 6l20 20" className="dish-line" />}
+            <svg viewBox="0 0 24 24" aria-hidden="true">
+              {playing
+                ? <path d="M6 9v6M10 6v12M14 8v8M18 10v4" />
+                : <path d="M6 12h12" />}
             </svg>
           </button>
         </div>
       </header>
 
-      {/* her words at a stop, where there are any (the room's line is in the dock) */}
-      <div className="copy" ref={copyRef} aria-hidden="true">
-        {CHAPTERS.map((c, i) => {
-          const body = c.body && c.body !== ROOM_LINE[c.room as RoomName] ? c.body : undefined;
-          if (!body && !c.quote && !c.verse) return null;
-          return (
-            <div className="copy-panel" data-i={i} data-on="0" key={c.id}>
-              {c.verse && <p className="poem">{c.verse.split("\n").map((ln, k) => <span className="poem-line" key={k}>{ln}</span>)}</p>}
-              {body && (c.bodyUntil ? <Until until={c.bodyUntil}><p className="lede">{body}</p></Until> : <p className="lede">{body}</p>)}
-              {c.quote && <blockquote className="quote">“{c.quote}”</blockquote>}
-            </div>
-          );
-        })}
+      {/* the room's line, as lettering at the top of the wall on its first painting (ours, never hers) */}
+      <div className="wall-letter" data-on={letter && arrived && live ? "1" : "0"} aria-hidden="true">
+        {letter && <><span className="wl-room">{letter.room}</span><span className="wl-line">{letter.line}</span></>}
       </div>
 
-      <div className="village" ref={villageRef} aria-hidden="true" />
+      <OpeningCard open={live && opening} onEnter={enter} onMore={() => setMore(true)} />
+      <KnowMore open={entered && more} onClose={closeMore} onEnter={enter} />
+      <Desk open={live && panel === "desk"} />
 
-      <AboutHer open={entered && panel === "about"} />
-      <Desk open={entered && panel === "desk"} />
-
-      <WallLabels room={roomRef} stop={stop} arrived={arrived && ready} live={ready && !failed} phone={phone}
-                  order={order} onOpen={(id) => openWork(id, "studio_wall_label")} onStrip={setStripWanted} />
+      <WallLabels room={roomRef} stops={stops} stop={stop} arrived={arrived && ready} live={ready && !failed && !more} phone={phone}
+                  onOpen={(id) => openWork(id, "studio_wall_label")} onStrip={setStripWanted} />
 
       {failed && (
         <p className="room-off lab" role="status">
@@ -614,7 +589,7 @@ export default function Studio({ dims }: { dims: Dims }) {
         </p>
       )}
 
-      {/* the house: one screen. Each stop's words, for assistive tech and search */}
+      {/* the house: one screen. Each wall's words, for assistive tech and search */}
       <main className="chapters" id="top">
         <section className="sec" aria-label="The studio">
           {CHAPTERS.map((c) => (c.body || c.verse || c.quote) ? (
@@ -628,10 +603,11 @@ export default function Studio({ dims }: { dims: Dims }) {
         </section>
       </main>
 
-      <Dock stop={stop} order={order} strip={phone || stripWanted} visible={dockOn} pulse={pulse} roomsOpen={mapOpen}
+      <Dock stops={stops} stop={stop} phone={phone} strip={stripWanted} visible={dockOn} pulse={pulse}
             onPrev={() => step(-1, "prev")} onNext={() => step(1, "next")}
-            onOpen={(id) => openWork(id, "studio_strip")} onRooms={() => setMapOpen((o) => !o)} />
-      <RoomMap open={mapOpen} active={stop} onClose={closeMap} onGo={goStop} onWorks={() => { closeMap(); showWorks("all"); }} />
+            onOpen={(id) => openWork(id, "studio_dock")} />
+      <RoomMap stops={stops} open={mapOpen} active={stop} onClose={closeMap} onGo={goStop}
+               onWorks={() => { closeMap(); showWorks("all"); }} />
       <Lightbox ref={lbRef} dims={dims} onOpenChange={onLightbox} />
       <Cursor live={ready || failed} />
     </>

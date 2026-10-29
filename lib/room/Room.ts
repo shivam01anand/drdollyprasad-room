@@ -13,7 +13,10 @@ import { loadHouse, loadHouseInfo, assemble, BakedLight, ROOF, type HouseInfo, t
 import { paintMaterial, flatRelief, galleryLight } from "./paint";
 import { ReliefBuilder } from "./relief-builder";
 import { activeVariant, NIGHT } from "./variants";
-import { CHAPTERS, resolveWalk, isNarrow, startPose, messPose, duskAt, HERO_ID } from "../chapters";
+import { messPose, HERO_ID } from "../chapters";
+import { stopsFor, isPhoneLayout, bandFor, duskAt, mapStop, type Stop } from "../stops";
+import { stopPose } from "./phone-framing";
+import type { Pose } from "./rig";
 
 export type RoomOpts = {
   manifestUrl: string;
@@ -26,6 +29,8 @@ export type RoomOpts = {
   onHoverArt?(id: string | null): void;
   /** the physics engine failed to load: leave rearrange */
   onRearrangeError?(error: unknown): void;
+  /** a turned phone or a resized window changed the walk (phone ↔ wide): its stops and where you are now */
+  onLayout?(phone: boolean, index: number): void;
 };
 
 type Tier = { small: boolean; dpr: number; msaa: number; ao: boolean; shadow: number; phone: boolean };
@@ -106,6 +111,8 @@ const tmpC = new THREE.Color();
 const DEEPA_WICK = 0.14;
 /** a canvas's frame beyond its edge: the lip and the shadow gap (build.py float_frame) */
 const FRAME = 0.025;
+/** the pools' strength against the spec's 0.35 (tuned on screenshots, 29 Oct) */
+const POOL_K = 1;
 /** each wall's outward normal on the floor plane, three's (x, z) */
 const SIDE_OUT: Record<string, [number, number]> = { N: [0, 1], S: [0, -1], E: [-1, 0], W: [1, 0] };
 // Reuse the welcome's full-resolution photo instead of downloading it twice.
@@ -173,6 +180,10 @@ export class Room {
   private viewRevision = 0;
   private viewport = { left: 0, top: 0, width: 0, height: 0 };
   private narrow = false;
+  /** the walk's stops for this screen (lib/stops.ts): a phone's or a wide screen's */
+  private stops: Stop[] = [];
+  /** the gallery light's pools (buildPools) */
+  private pools?: { mat: THREE.MeshBasicMaterial };
   private renderSize = { w: 0, h: 0 };
   private resizeTimer = 0;
   private lastFlame = -Infinity;
@@ -255,9 +266,10 @@ export class Room {
     this.info = house.info;
 
     const aspect = (canvas.clientWidth || innerWidth) / Math.max(1, canvas.clientHeight || innerHeight);
-    this.narrow = isNarrow(aspect);
-    const walk = resolveWalk(this.info, this.narrow, aspect);
-    this.rig = new Rig(walk.shots, startPose(this.info, this.narrow), messPose(this.info), aspect, opts.reducedMotion, walk.vias);
+    const W0 = canvas.clientWidth || innerWidth, H0 = canvas.clientHeight || innerHeight;
+    this.narrow = isPhoneLayout(W0, H0);
+    this.stops = stopsFor(this.narrow);
+    this.rig = new Rig(this.shotsFor(W0, H0), messPose(this.info), aspect, opts.reducedMotion);
     this.scene.add(this.rig.pivot, this.world);
 
     const anisotropy = Math.min(8, renderer.capabilities.getMaxAnisotropy());
@@ -317,6 +329,7 @@ export class Room {
     this.buildLights();
     this.buildItems();
     this.buildFrieze();
+    this.buildPools();
     this.buildPost();
     this.resize();
     this.syncBakeAO();
@@ -407,7 +420,7 @@ export class Room {
   prepareChapter(index: number) {
     if (index === this.artPriority) return;
     this.artPriority = index;
-    const wanted = [index, index + 1, index - 1, index + 2].flatMap((i) => CHAPTERS[i]?.labels ?? []);
+    const wanted = [index, index + 1, index - 1, index + 2, index + 3].flatMap((i) => this.stops[i]?.works ?? []);
     const rank = (mesh: THREE.Mesh) => {
       const at = wanted.indexOf(mesh.userData.artId);
       return at < 0 ? wanted.length : at;
@@ -719,6 +732,92 @@ export class Room {
      drawn left to right once per room, the first time the walk arrives there ---- */
   private friezes: { key: string; reveal: { value: number } }[] = [];
   private friezeDrawn = new Set<string>();
+  /**
+   * Gallery light (art direction V3 §4.1): a warm pool on the wall behind each painting and a soft
+   * contact shadow under its frame. Both lie on the wall, behind the canvas (the depth test keeps
+   * them off it): the painting itself is never tinted, filtered or covered.
+   */
+  private buildPools() {
+    const size = 128;
+    const grad = (paint: (g: CanvasRenderingContext2D) => void) => {
+      const c = document.createElement("canvas");
+      c.width = c.height = size;
+      const g = c.getContext("2d")!;
+      paint(g);
+      const t = new THREE.CanvasTexture(c);
+      t.colorSpace = THREE.SRGBColorSpace;
+      this.owned.push(t);
+      return t;
+    };
+    // a radial falloff, brightest a little above the middle (the lamp is above the painting)
+    const pool = grad((g) => {
+      const r = g.createRadialGradient(size / 2, size * 0.46, 0, size / 2, size / 2, size / 2);
+      r.addColorStop(0, "rgba(255,255,255,1)");
+      r.addColorStop(0.45, "rgba(255,255,255,.55)");
+      r.addColorStop(1, "rgba(255,255,255,0)");
+      g.fillStyle = r;
+      g.fillRect(0, 0, size, size);
+    });
+    // the frame's shadow: dark at its top edge, gone 6 cm below, soft at the ends
+    const shade = grad((g) => {
+      const v = g.createLinearGradient(0, 0, 0, size);
+      v.addColorStop(0, "rgba(255,255,255,1)");
+      v.addColorStop(0.35, "rgba(255,255,255,.45)");
+      v.addColorStop(1, "rgba(255,255,255,0)");
+      g.fillStyle = v;
+      g.fillRect(0, 0, size, size);
+      g.globalCompositeOperation = "destination-in";
+      const h = g.createLinearGradient(0, 0, size, 0);
+      h.addColorStop(0, "rgba(0,0,0,0)");
+      h.addColorStop(0.12, "rgba(0,0,0,1)");
+      h.addColorStop(0.88, "rgba(0,0,0,1)");
+      h.addColorStop(1, "rgba(0,0,0,0)");
+      g.fillStyle = h;
+      g.fillRect(0, 0, size, size);
+    });
+    const poolMat = new THREE.MeshBasicMaterial({ color: 0xffd6a0, map: pool, transparent: true, opacity: 0.35 * POOL_K,
+      blending: THREE.AdditiveBlending, depthWrite: false, fog: false, polygonOffset: true, polygonOffsetFactor: -1 });
+    const shadeMat = new THREE.MeshBasicMaterial({ color: 0x211b18, map: shade, transparent: true, opacity: 0.25,
+      depthWrite: false, fog: false, polygonOffset: true, polygonOffsetFactor: -1 });
+    const quad = new THREE.PlaneGeometry(1, 1);
+    this.owned.push(poolMat, shadeMat, quad);
+    this.pools = { mat: poolMat };
+    const turn = { N: 0, S: Math.PI, E: -Math.PI / 2, W: Math.PI / 2 } as Record<string, number>;
+    const ray = new THREE.Raycaster();
+    const n = new THREE.Vector3(), o = new THREE.Vector3();
+    for (const [id, a] of Object.entries(this.info.art)) {
+      if (a.study || !SIDE_OUT[a.side]) continue;
+      const [nx, nz] = SIDE_OUT[a.side];
+      n.set(nx, 0, nz);
+      // the wall's face behind the canvas, found by looking for it (not every canvas stands as proud)
+      o.set(...a.centre).addScaledVector(n, 0.02);
+      ray.set(o, n.clone().negate());
+      ray.far = 0.4;
+      const hit = ray.intersectObjects(this.parts.statics, false)[0];
+      const back = hit ? hit.distance - 0.02 - 0.004 : 0.02;
+      const at = (dy: number, w: number, h: number, mat: THREE.Material, name: string) => {
+        const m = new THREE.Mesh(quad, mat);
+        m.name = name;
+        m.position.set(a.centre[0] - nx * back, a.centre[1] + dy, a.centre[2] - nz * back);
+        m.rotation.y = turn[a.side];
+        m.scale.set(w, h, 1);
+        m.renderOrder = 1;
+        m.userData.noAO = true;
+        m.matrixAutoUpdate = false;
+        m.updateMatrix();
+        this.world.add(m);
+      };
+      at(0.15, a.w * 2.2, a.h * 1.8, poolMat, `pool:${id}`);
+      const fw = a.w + 2 * FRAME, fh = a.h / 2 + FRAME;
+      at(-fh - 0.05, fw + 0.06, 0.12, shadeMat, `shade:${id}`);
+    }
+    // the walls a little lower away from the pools (key to fill about 2.5 : 1)
+    for (const role of ["wall", "wallShade"] as const) {
+      const m = this.lib?.get(role);
+      if (m && !m.userData.dimmed) { m.userData.dimmed = true; m.lightMapIntensity *= 0.9; }
+    }
+  }
+
   private buildFrieze() {
     const strips = this.info.frieze ?? [];
     if (!strips.length) return;
@@ -915,58 +1014,102 @@ export class Room {
     this.introPlayed = true;
     // One wall at a time (29 Oct): the house is already framed on the first stop when the welcome
     // crossfades away; no dolly, nothing dropping in
-    this.rig.playIntro(startPose(this.info, this.narrow), () => {
+    this.rig.playIntro(() => {
       this.wake = 2;
       this.opts.onIntroFinished();
-    }, 0, true);
+    });
   }
 
   /**
    * One stop: a short walk (within a room) or a cut (the page dips to Kajal around it).
    * `onArrive` fires when the camera is there.
    */
-  goStop(index: number, kind: "walk" | "cut", onArrive: () => void, duration = 0.7) {
-    const p = index / Math.max(1, CHAPTERS.length - 1);
+  goStop(index: number, kind: "walk" | "cut", onArrive: () => void, duration = 0.5) {
     this.prepareChapter(index);
     this.wake = 2;
-    if (!this.rig?.isEnabled) { onArrive(); return; }
-    if (kind === "cut") { this.rig.jumpTo(p); onArrive(); return; }
-    this.rig.goTo(p, duration, () => { this.wake = 2; onArrive(); });
+    if (!this.rig?.isEnabled) { this.rig?.jumpTo(index); onArrive(); return; }
+    if (kind === "cut") { this.rig.jumpTo(index); onArrive(); return; }
+    this.rig.goTo(index, duration, () => { this.wake = 2; onArrive(); });
+  }
+
+  /** each stop's camera on this screen: square on its paintings, framed in its band (lib/stops.ts) */
+  private shotsFor(W: number, H: number): Pose[] {
+    let prev: number | undefined;
+    return this.stops.map((s) => {
+      const cam = this.info.cams[s.cam] ?? this.info.cams[s.cam.replace(/^n:/, "")];
+      const p = stopPose(cam, W, H, bandFor(s, W, H), prev);
+      prev = p.pivotRot[1];
+      return p;
+    });
   }
 
   /**
-   * Each stop's works in the order they hang left to right on screen at that stop's framing, so
-   * the numbers on the pins and in the dock's strip read as the wall does.
+   * How the camera goes from one stop to the next (art direction V3 §1): along the same wall, a
+   * 0.5 s truck; to another wall of the same room and space with at most a quarter turn, 0.6 s;
+   * anything else is a cut under the veil.
    */
-  wallOrder(): string[][] {
-    const piv = new THREE.Group();
-    piv.rotation.order = "YXZ";
-    const cam = new THREE.PerspectiveCamera(40, this.rig.camera.aspect, 0.05, 120);
-    piv.add(cam);
-    const v = new THREE.Vector3();
-    return CHAPTERS.map((c, i) => {
-      const ids = c.labels ?? [];
-      const s = this.rig.shot(i);
-      if (!s || ids.length < 2) return [...ids];
-      piv.position.set(...s.pivot); piv.rotation.set(...s.pivotRot);
-      cam.position.set(...s.cam); cam.rotation.set(...s.camRot);
-      cam.fov = s.fov ?? this.rig.fovBase; cam.updateProjectionMatrix();
-      piv.updateMatrixWorld(true);
-      const at = new Map(ids.map((id) => {
-        const a = this.info.art[id];
-        const p = a ? v.set(...a.centre).project(cam) : v.set(0, 0, 0);
-        return [id, { x: p.x, y: p.y }] as const;
-      }));
-      // read as a wall is read: the top row left to right, then the next row (a two-row hang)
-      const byTop = [...ids].sort((a, b) => at.get(b)!.y - at.get(a)!.y);
-      const rows: string[][] = [];
-      for (const id of byTop) {
-        const row = rows[rows.length - 1];
-        if (row && at.get(row[0])!.y - at.get(id)!.y < 0.18) row.push(id); else rows.push([id]);
-      }
-      return rows.flatMap((r) => r.sort((a, b) => at.get(a)!.x - at.get(b)!.x));
-    });
+  moveKind(from: number, to: number): "truck" | "turn" | "cut" {
+    const a = this.stops[from], b = this.stops[to];
+    const pa = this.rig?.shot(from), pb = this.rig?.shot(to);
+    if (!a || !b || !pa || !pb || Math.abs(from - to) !== 1) return "cut";
+    if (a.room !== b.room || a.space !== b.space) return "cut";
+    if (a.wall === b.wall) return "truck";
+    let dy = Math.abs(pa.pivotRot[1] - pb.pivotRot[1]) % (2 * Math.PI);
+    if (dy > Math.PI) dy = 2 * Math.PI - dy;
+    const far = Math.hypot(pa.pivot[0] - pb.pivot[0], pa.pivot[2] - pb.pivot[2]);
+    return dy <= Math.PI / 2 + 0.02 && far < 6.5 ? "turn" : "cut";
   }
+
+  /**
+   * QC (?qa=1): each stop's paintings on screen from its own camera, as shares of the screen,
+   * and how much of any other canvas in the same space cuts in. Puts the camera back after.
+   */
+  measureStops() {
+    type R = { x0: number; x1: number; y0: number; y1: number };
+    const out: { id: string; works: ({ id: string; w: number; h: number } & R)[]; group: number;
+      band: { t: number; b: number; l: number; r: number }; intrude: { id: string; w: number }[] }[] = [];
+    const here = Math.round(this.rig.index);
+    const W = this.viewport.width || innerWidth, H = this.viewport.height || innerHeight;
+    const inSpace = (id: string, space: string | undefined) => {
+      const b = space ? this.info.plan[space] : undefined;
+      const c = this.info.art[id]?.centre;
+      if (!Array.isArray(b) || !c) return false;
+      return c[0] > b[0] - 0.12 && c[0] < b[1] + 0.12 && -c[2] > b[2] - 0.12 && -c[2] < b[3] + 0.12;
+    };
+    this.stops.forEach((s, i) => {
+      this.rig.jumpTo(i);
+      this.rig.update(0);
+      this.rig.camera.updateMatrixWorld(true);
+      const band = bandFor(s, W, H);
+      const rect = (id: string): R | null => {
+        const r = this.artRect(id);
+        if (!r) return null;
+        return { x0: Math.max(0, r.x0 - this.viewport.left), x1: Math.min(W, r.x1 - this.viewport.left),
+          y0: Math.max(0, r.y0 - this.viewport.top), y1: Math.min(H, r.y1 - this.viewport.top) };
+      };
+      const works = s.works.map((id) => {
+        const r = rect(id) ?? { x0: 0, x1: 0, y0: 0, y1: 0 };
+        return { id, w: (r.x1 - r.x0) / W, h: (r.y1 - r.y0) / Math.max(1, H - band.t - band.b), ...r };
+      });
+      const gx0 = Math.min(...works.map((w) => w.x0)), gx1 = Math.max(...works.map((w) => w.x1));
+      const intrude = Object.keys(this.info.art)
+        .filter((id) => !s.works.includes(id) && !this.info.art[id].study && inSpace(id, s.space))
+        .map((id) => {
+          const r = rect(id);
+          const seen = r && r.x1 > r.x0 && r.y1 > r.y0 && r.y0 < H - band.b && r.y1 > band.t;
+          return { id, w: seen ? (r!.x1 - r!.x0) / W : 0 };
+        })
+        .filter((x) => x.w > 0.005);
+      out.push({ id: s.id, works, group: works.length ? (gx1 - gx0) / W : 0, band, intrude });
+    });
+    this.rig.jumpTo(here);
+    this.rig.update(0);
+    this.wake = 2;
+    return out;
+  }
+
+  /** the stops this screen walks */
+  get walk() { return this.stops; }
 
   /** where Twenty Paise is on screen before the camera moves — the
    *  preloader puts its photograph exactly there */
@@ -987,8 +1130,6 @@ export class Room {
     return { left: x0, top: y0, width: x1 - x0, height: y1 - y0 };
   }
 
-  scroll(p: number) { this.prepareChapter(Math.round(p * (CHAPTERS.length - 1))); this.rig?.scroll(p); }
-  syncScroll(p: number) { this.prepareChapter(Math.round(p * (CHAPTERS.length - 1))); this.rig?.syncScroll(p); this.wake = 2; }
 
   /** stop drawing while an opaque section covers the room */
   setVisible(v: boolean) {
@@ -1290,9 +1431,16 @@ export class Room {
     this.composer.setSize(w, h);
     const aspect = w / Math.max(1, h);
     this.rig.setAspect(aspect);
-    this.narrow = isNarrow(aspect);
-    const walk = resolveWalk(this.info, this.narrow, aspect);
-    this.rig.setShots(walk.shots, walk.vias);
+    const phone = isPhoneLayout(w, h);
+    let index = Math.round(this.rig.index);
+    if (phone !== this.narrow) {
+      // the walk itself changes (painting by painting or groups): stay with the same painting
+      index = mapStop(this.stops, index, stopsFor(phone));
+      this.narrow = phone;
+      this.stops = stopsFor(phone);
+      this.rig.setShots(this.shotsFor(w, h), index);
+      this.opts.onLayout?.(phone, index);
+    } else this.rig.setShots(this.shotsFor(w, h), index);
     this.wake = 2;
   };
 
@@ -1317,7 +1465,7 @@ export class Room {
       const rect = this.canvas.getBoundingClientRect();
       this.viewport = { left: rect.left, top: rect.top, width: rect.width, height: rect.height };
     }
-    const walk = duskAt(this.rig.progress);
+    const walk = duskAt(this.stops, this.rig.index);
     if (Math.abs(walk - this.eve.walk) > 1e-4) {
       this.eve.walk = walk;
       this.applyEve();

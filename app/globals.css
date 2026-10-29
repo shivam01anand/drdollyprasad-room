@@ -881,3 +881,182 @@ html[data-panel] .wall-labels{visibility:hidden;opacity:0}
   .hud .brand{text-shadow:0 0 6px rgba(245,244,240,.95),0 0 16px rgba(245,244,240,.8),0 0 28px rgba(245,244,240,.55)}
   .sd-all{min-height:44px;margin:-6px -8px -6px 0;padding:0 8px;box-sizing:border-box}
 }
+
+/* =============================================================================
+   Art direction V3 (29 Oct 2026): "Paintings first". One painting (phone) or one group (wide)
+   per stop, a caption dock, a labelled way home, quiet gallery light. Kajal #211B18, Khadi
+   #F5F4F0, red #D4202A only for "sacred" and the Sold dot.
+   ========================================================================== */
+.studio-exit,.hud,.sdock,.copy,.village,.wall-pin{display:none!important}
+
+/* the vignette: a faint fall-off over the house only */
+.vignette{position:fixed;inset:0;z-index:1;pointer-events:none;
+  background:radial-gradient(ellipse 75% 70% at 50% 42%,transparent 55%,rgba(33,27,24,.28))}
+html[data-room="off"] .vignette{display:none}
+
+/* the header: "← Home" top left; Rooms and the music top right; nothing else */
+.vhead{position:fixed;z-index:200;left:0;right:0;top:0;display:flex;justify-content:space-between;align-items:center;
+  padding:calc(6px + env(safe-area-inset-top,0px)) 12px 6px;pointer-events:none;transition:opacity .2s linear}
+.vhead a,.vhead button{pointer-events:auto}
+.vhead[data-state="pre"] .vh-right{visibility:hidden}
+.vh-right{display:flex;align-items:center;gap:4px}
+.vh-home,.vh-rooms,.vh-music{position:relative;isolation:isolate;display:inline-flex;align-items:center;justify-content:center;gap:8px;
+  height:44px;border:0;background:none;cursor:pointer;color:#211B18;text-decoration:none;font:500 13px/1 var(--sans);letter-spacing:.01em}
+.vh-home::before,.vh-rooms::before,.vh-music::before{content:"";position:absolute;inset:5px 0;z-index:-1;border-radius:17px;
+  background:rgba(245,244,240,.94);border:1px solid #D9D5CC;box-shadow:0 4px 14px -8px rgba(33,27,24,.4);transition:background-color .18s ease,border-color .18s ease}
+.vh-home{padding:0 15px 0 12px}
+.vh-rooms{padding:0 14px 0 15px;gap:6px}
+.vh-music{width:44px}
+.vh-music::before{inset:5px;border-radius:50%}
+.vh-home svg{width:16px;height:16px;fill:none;stroke:currentColor;stroke-width:1.7;stroke-linecap:round;stroke-linejoin:round}
+.vh-rooms svg{width:10px;height:10px;fill:none;stroke:currentColor;stroke-width:1.6}
+.vh-music svg{width:16px;height:16px;fill:none;stroke:currentColor;stroke-width:1.7;stroke-linecap:round}
+.vh-home:hover::before,.vh-rooms:hover::before,.vh-music:hover::before{background:#211B18;border-color:#211B18}
+.vh-home:hover,.vh-rooms:hover,.vh-music:hover{color:#F5F4F0}
+.vh-home:focus-visible,.vh-rooms:focus-visible,.vh-music:focus-visible{outline:2px solid #211B18;outline-offset:-2px;border-radius:20px}
+@media (min-width:761px){ .vhead{padding:13px 24px} }
+
+/* the dip between rooms: "ROOM 3 OF 5", the room, the village line drawing under it */
+.stage-veil{z-index:190}
+.veil-in{display:flex;flex-direction:column;align-items:center;gap:12px}
+.veil-kicker{font:500 11px/1 var(--sans);letter-spacing:.2em;text-transform:uppercase;color:rgba(245,244,240,.6)}
+.veil-kicker:empty{display:none}
+.veil-name{font-family:var(--serif);font-weight:500;font-size:40px;line-height:1.05;color:#F5F4F0}
+.veil-border{display:block;width:160px;height:20px;background:#F5F4F0;opacity:.85;
+  -webkit-mask:url(/site/borders/border-phone@2x.png) center bottom / auto 100% no-repeat;mask:url(/site/borders/border-phone@2x.png) center bottom / auto 100% no-repeat;
+  clip-path:inset(0 100% 0 0)}
+.stage-veil[data-room="0"] .veil-border{display:none}
+@media (min-width:761px){ .veil-name{font-size:46px} .veil-border{width:200px;height:24px} }
+
+/* the room's line, lettered on the wall above its first painting (ours, never hers) */
+.wall-letter{position:fixed;z-index:3;left:0;right:0;top:68px;display:flex;flex-direction:column;align-items:center;gap:6px;
+  padding:0 24px;text-align:center;color:rgba(33,27,24,.75);pointer-events:none;opacity:0;transition:opacity .45s ease}
+.wall-letter[data-on="1"]{opacity:1}
+.wl-room{font:500 11px/1 var(--sans);letter-spacing:.2em;text-transform:uppercase}
+.wl-line{font-family:var(--serif);font-weight:500;font-size:17px;line-height:1.25}
+@media (min-width:761px){ .wall-letter{top:80px} .wl-line{font-size:20px} }
+
+/* wall plaques: lettering under the painting, no box */
+.plaque{position:absolute;left:0;top:0;transform:translate3d(-9999px,-9999px,0);display:flex;flex-direction:column;align-items:center;gap:3px;
+  max-width:230px;min-height:44px;padding:4px 8px;border:0;background:none;cursor:pointer;text-align:center;visibility:hidden;opacity:0;pointer-events:auto;
+  color:#211B18;text-shadow:0 0 10px rgba(245,240,230,.55)}
+.pl-title{font:500 12px/1.3 var(--sans);letter-spacing:.005em}
+.pl-status{font:400 10.5px/1.3 var(--sans);color:#5E5650}
+.pl-status::before,.vd-dot::before{content:"";display:inline-block;width:6px;height:6px;border-radius:50%;background:#8A817A;margin-right:6px;vertical-align:1px}
+.pl-status.is-sold::before,.vd-dot.is-sold::before{background:#D4202A}
+.pl-status.is-available::before,.vd-dot.is-available::before{background:#3B5D62}
+.plaque:focus-visible{outline:2px solid #211B18;outline-offset:2px}
+html[data-panel="desk"] .wall-labels{visibility:hidden}
+html[data-panel="about"] .wall-labels{visibility:visible;opacity:1}
+
+/* the dock: a caption for the painting in front of you */
+.vdock{position:fixed;z-index:160;left:0;right:0;bottom:0;box-sizing:border-box;min-height:166px;
+  display:grid;grid-template-columns:44px minmax(0,1fr) auto;grid-template-areas:"cap cap cap" "prog prog prog" "strip strip strip" "prev . next";
+  align-content:end;row-gap:12px;padding:18px 20px calc(16px + env(safe-area-inset-bottom,0px));
+  background:#F5F4F0;border-radius:18px 18px 0 0;color:#211B18;box-shadow:0 -12px 30px -22px rgba(33,27,24,.55);
+  transition:opacity .35s var(--ease),transform .35s var(--ease),visibility 0s linear 0s}
+.vdock[data-on="0"]{opacity:0;visibility:hidden;transform:translateY(16px);transition:opacity .25s ease,transform .25s ease,visibility 0s linear .25s}
+.vd-cap{grid-area:cap;min-width:0;animation:vd-rise .15s ease-out both}
+@keyframes vd-rise{from{opacity:0;transform:translateY(6px)}to{opacity:1;transform:none}}
+.vd-row1{display:flex;align-items:baseline;justify-content:space-between;gap:14px;min-width:0}
+.vd-title{min-width:0;padding:0;border:0;background:none;cursor:pointer;text-align:left;color:#211B18;
+  font-family:var(--serif);font-weight:600;font-size:23px;line-height:1.15;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.vd-closer{flex:none;min-height:44px;margin:-12px -4px -12px 0;padding:0 4px;border:0;background:none;cursor:pointer;color:#211B18;
+  font:500 13px/1 var(--sans);text-decoration:underline;text-decoration-thickness:1px;text-underline-offset:4px}
+.vd-closer:hover,.vd-title:hover{color:#6A615B}
+.vd-row2{margin:5px 0 0;font:400 12.5px/1.35 var(--sans);color:#6A615B;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.vd-pair{align-items:flex-start}
+.vd-pair ul{list-style:none;margin:0;padding:0;display:flex;flex-direction:column;gap:3px;min-width:0}
+.vd-pair li{display:flex;align-items:baseline;gap:10px;min-width:0}
+.vd-pair .vd-title{font-size:19px}
+.vd-pair .vd-dot{flex:none;font:400 11.5px/1 var(--sans);color:#6A615B}
+.vd-pair .vd-closer{margin-top:-8px}
+.vd-progress{grid-area:prog;display:flex;gap:4px}
+.vd-progress i{flex:1;height:2px;background:#D9D5CC}
+.vd-progress i[data-on="1"]{background:#211B18}
+.vd-prev{grid-area:prev;width:44px;height:44px;border-radius:50%;border:1.4px solid #211B18;background:transparent;color:#211B18;
+  display:grid;place-items:center;cursor:pointer;padding:0}
+.vd-prev:disabled{opacity:.3;cursor:default}
+.vd-prev svg,.vd-next svg{width:20px;height:20px;fill:none;stroke:currentColor;stroke-width:1.7;stroke-linecap:round;stroke-linejoin:round}
+.vd-prev:not(:disabled):hover{background:#211B18;color:#F5F4F0}
+.vd-next{grid-area:next;justify-self:end;display:inline-flex;align-items:center;gap:14px;height:44px;padding:0 18px 0 22px;border-radius:22px;border:0;
+  background:#211B18;color:#F5F4F0;font:500 14px/1 var(--sans);cursor:pointer;white-space:nowrap;min-width:0;max-width:100%}
+.vd-next-t{overflow:hidden;text-overflow:ellipsis}
+.vd-next:hover{background:#3A302B}
+.vd-next svg{flex:none}
+.vd-next[data-pulse="1"]{animation:sd-pulse .6s ease-in-out 2}
+.vd-strip{grid-area:strip;list-style:none;margin:0;padding:0;display:flex;flex-wrap:wrap;gap:6px 18px}
+.vd-strip button{display:flex;align-items:baseline;gap:8px;min-height:44px;padding:0;border:0;background:none;cursor:pointer;color:#211B18}
+.vd-stitle{font:500 13px/1.2 var(--sans)}
+.vd-strip .vd-dot{font:400 11.5px/1 var(--sans);color:#6A615B}
+@media (min-width:761px){
+  .vdock{left:50%;right:auto;bottom:24px;width:720px;min-height:0;transform:translateX(-50%);border-radius:16px;border:1px solid #D9D5CC;
+    background:rgba(245,244,240,.96);box-shadow:0 14px 40px -24px rgba(33,27,24,.55);padding:14px 16px;
+    grid-template-columns:44px auto minmax(60px,1fr) auto;grid-template-areas:"prev cap prog next" "strip strip strip strip";column-gap:20px;row-gap:8px;align-items:center}
+  .vdock[data-on="0"]{transform:translate(-50%,16px)}
+  .vd-cap{display:flex;flex-direction:column;gap:2px}
+  .vd-room{font-family:var(--serif);font-weight:600;font-size:24px;line-height:1.1;white-space:nowrap}
+  .vd-row2{margin:0;font-size:13px}
+  .vd-strip{padding:2px 0 0 64px}
+}
+
+/* the opening card: the dock of the first stop (phone: a sheet; wide: a card on the left) */
+.ocard{position:fixed;z-index:165;left:0;right:0;bottom:0;box-sizing:border-box;min-height:336px;
+  display:flex;flex-direction:column;justify-content:flex-end;padding:22px 22px calc(18px + env(safe-area-inset-bottom,0px));
+  background:#F5F4F0;border-radius:18px 18px 0 0;color:#211B18;box-shadow:0 -12px 30px -22px rgba(33,27,24,.55);
+  transition:opacity .35s var(--ease),transform .35s var(--ease),visibility 0s linear 0s}
+.ocard[data-on="0"]{opacity:0;visibility:hidden;transform:translateY(16px);transition:opacity .25s ease,transform .25s ease,visibility 0s linear .25s}
+.oc-who{display:flex;align-items:center;gap:12px;margin-bottom:14px}
+.oc-who img{width:52px;height:52px;border-radius:50%;object-fit:cover;flex:none}
+.oc-name{margin:0;font-family:var(--serif);font-weight:600;font-size:19px;line-height:1.15}
+.oc-meta{margin:2px 0 0;font:400 12px/1.3 var(--sans);color:#6A615B}
+.oc-h{margin:0 0 10px;font-family:var(--serif);font-weight:600;font-size:28px;line-height:1.1;letter-spacing:0;color:#211B18;text-wrap:balance}
+.oc-p{margin:0 0 18px;font:400 14px/1.5 var(--sans);color:#3A302B;text-wrap:pretty}
+.oc-actions{display:flex;align-items:center;gap:22px;margin-bottom:14px}
+.oc-enter{display:inline-flex;align-items:center;gap:14px;height:48px;padding:0 20px 0 24px;border-radius:24px;border:0;cursor:pointer;
+  background:#211B18;color:#F5F4F0;font:500 15px/1 var(--sans);white-space:nowrap}
+.oc-enter svg{width:20px;height:20px;fill:none;stroke:currentColor;stroke-width:1.7;stroke-linecap:round;stroke-linejoin:round}
+.oc-enter:hover{background:#3A302B}
+.oc-more{min-height:44px;padding:0;border:0;background:none;cursor:pointer;color:#211B18;
+  font:500 14px/1 var(--sans);text-decoration:underline;text-decoration-thickness:1px;text-underline-offset:5px}
+.oc-more:hover{color:#6A615B}
+.oc-cred{margin:0;font:400 11.5px/1.4 var(--sans);color:#6A615B}
+@media (min-width:761px){
+  .ocard{left:40px;right:auto;bottom:auto;top:calc(70px + (100svh - 170px) / 2);transform:translateY(-50%);width:400px;min-height:0;
+    padding:28px 30px 26px;border-radius:18px;border:1px solid #D9D5CC;box-shadow:0 24px 60px -34px rgba(33,27,24,.6)}
+  .ocard[data-on="0"]{transform:translateY(calc(-50% + 16px))}
+  .oc-h{font-size:34px}
+  .oc-p{font-size:15px}
+}
+
+/* Know more: the full text and the press, a sheet that slides up */
+.walk-panel.knowmore{z-index:180;left:0;right:0;top:56px;bottom:0;width:auto;max-height:none;box-sizing:border-box;
+  padding:26px 22px calc(24px + env(safe-area-inset-bottom,0px));border:0;border-radius:18px 18px 0 0;background:#F5F4F0;
+  box-shadow:0 -16px 40px -20px rgba(33,27,24,.5);transform:translateY(30px);transition:opacity .3s var(--ease),transform .3s var(--ease),visibility 0s linear .3s}
+.walk-panel.knowmore[data-on="1"]{transform:none;transition-delay:0s}
+.knowmore .wp-h{font-weight:600;padding-right:48px}
+.km-close{position:absolute;top:10px;right:10px;width:44px;height:44px;border-radius:50%;border:0;background:none;color:#211B18;cursor:pointer;display:grid;place-items:center}
+.km-close svg{width:20px;height:20px;fill:none;stroke:currentColor;stroke-width:1.7;stroke-linecap:round}
+.km-close:hover{background:rgba(33,27,24,.08)}
+.km-foot{display:flex;align-items:center;flex-wrap:wrap;gap:12px 24px;margin-top:6px}
+@media (min-width:761px){
+  .walk-panel.knowmore{left:40px;right:auto;top:76px;bottom:24px;width:min(560px,calc(100vw - 80px));border:1px solid #D9D5CC;border-radius:18px;padding:30px 32px}
+}
+
+/* her desk: the close of the walk */
+.desk-actions{display:flex;flex-wrap:wrap;gap:10px;margin:0 0 14px}
+.desk-ask{min-height:44px}
+.desk-home{display:inline-flex;align-items:center;height:44px;padding:0 20px;border-radius:22px;border:1.4px solid #211B18;color:#211B18;
+  font:500 14px/1 var(--sans);text-decoration:none;box-sizing:border-box}
+.desk-home:hover{background:#211B18;color:#F5F4F0}
+.walk-panel.desk{border-radius:18px;border:1px solid #D9D5CC;background:#F5F4F0;box-shadow:0 20px 50px -30px rgba(33,27,24,.6)}
+.desk-all{display:inline-block;padding:12px 0;margin:-12px 0}
+
+/* the room list, under the header on the right; red is not a "you are here" colour */
+.rmap{top:62px;right:12px;bottom:auto;left:auto;width:min(300px,calc(100vw - 24px));border-radius:14px;z-index:195}
+@media (min-width:761px){ .rmap{top:72px;right:24px} }
+@media (max-width:760px){ .rmap{top:58px;bottom:auto;left:auto;right:12px;width:min(300px,calc(100vw - 24px));max-height:calc(100svh - 80px)} }
+.rmap li button[aria-current="location"] .rmap-dot{background:#211B18;border-color:#211B18}
+.rmap-here{color:#6A615B}
+.stage-dim{z-index:170}
+.stage-dim[data-on="1"]{opacity:.4}

@@ -5,9 +5,7 @@ import { PRESS_ALL, type PressItem } from "@/lib/press";
 import { askPath } from "@/lib/studio-ask";
 
 /**
- * The entrance panel (chapter id "about"): who she is, then the press, in the walk's own style.
- * Shown by Studio.tsx while that chapter is the one in view; it renders nothing for the walk until
- * lib/chapters.ts has a chapter with that id.
+ * About her: the opening card and its "Know more" sheet (who she is, then the press).
  *
  * Copy locked by Shubham, 27 Oct 2026 (ours, never hers).
  */
@@ -37,13 +35,53 @@ function Clip({ item, eager }: { item: PressItem; eager: boolean }) {
   );
 }
 
-export default function AboutHer({ open }: { open: boolean }) {
+/**
+ * The opening (art direction V3 §2): Woman with Poppies above, and a compact card about her. The
+ * card is the dock on this stop: "Enter the studio" walks in; "Know more" opens the full text and
+ * the press (KnowMore). Copy locked by Shubham, 27 Oct 2026 (ours, never hers).
+ */
+export function OpeningCard({ open, onEnter, onMore }: { open: boolean; onEnter(): void; onMore(): void }) {
+  return (
+    <section className="ocard" data-on={open ? "1" : "0"} inert={!open} aria-hidden={!open} aria-label="About her">
+      <div className="oc-who">
+        {/* eslint-disable-next-line @next/next/no-img-element */}
+        <img src="/site/dolly.jpg" alt="Dr Dolly Prasad" width={52} height={52} decoding="async" />
+        <div>
+          <p className="oc-name">Dr Dolly Prasad</p>
+          <p className="oc-meta">Paintings · New Delhi</p>
+        </div>
+      </div>
+      <h2 className="oc-h">{HEADING}</h2>
+      <p className="oc-p">Dr Dolly Prasad is a New Delhi artist who holds the everyday <span className="red">sacred</span>.</p>
+      <div className="oc-actions">
+        <button type="button" className="oc-enter" onClick={onEnter}>
+          <span>Enter the studio</span>
+          <svg viewBox="0 0 24 24" aria-hidden="true"><path d="M5 12h13M13 6.5l5.5 5.5-5.5 5.5" /></svg>
+        </button>
+        <button type="button" className="oc-more" onClick={onMore} aria-haspopup="dialog">Know more</button>
+      </div>
+      <p className="oc-cred">Eighteen exhibitions and art fairs, 2005–2018</p>
+    </section>
+  );
+}
+
+/** "Know more": the full text, the credentials and the press, in the locked order */
+export default function KnowMore({ open, onClose, onEnter }: { open: boolean; onClose(): void; onEnter(): void }) {
   // the press loads as soon as the sheet is first opened (a lazy image in a hidden sheet stayed blank, QC 29 Oct)
   const [seen, setSeen] = useState(false);
   useEffect(() => { if (open) setSeen(true); }, [open]);
+  useEffect(() => {
+    if (!open) return;
+    const onKey = (e: KeyboardEvent) => { if (e.key === "Escape") onClose(); };
+    addEventListener("keydown", onKey);
+    return () => removeEventListener("keydown", onKey);
+  }, [open, onClose]);
   return (
-    <section className="walk-panel about-her" data-on={open ? "1" : "0"} inert={!open} aria-hidden={!open}
-             aria-label={HEADING} data-lenis-prevent="">
+    <section className="walk-panel about-her knowmore" data-on={open ? "1" : "0"} inert={!open} aria-hidden={!open}
+             role="dialog" aria-label={HEADING} data-lenis-prevent="">
+      <button type="button" className="km-close" onClick={onClose} aria-label="Close">
+        <svg viewBox="0 0 24 24" aria-hidden="true"><path d="M6 6l12 12M18 6L6 18" /></svg>
+      </button>
       <h2 className="wp-h">{HEADING}</h2>
       <p className="wp-p">
         Dr Dolly Prasad is a New Delhi artist who holds the everyday <span className="red">sacred</span>. For her, the ordinary is
@@ -61,7 +99,13 @@ export default function AboutHer({ open }: { open: boolean }) {
           </li>
         ))}
       </ul>
-      <a className="wp-link" href={askPath()} data-analytics-source="studio_about">Ask about a painting</a>
+      <div className="km-foot">
+        <button type="button" className="oc-enter" onClick={onEnter}>
+          <span>Enter the studio</span>
+          <svg viewBox="0 0 24 24" aria-hidden="true"><path d="M5 12h13M13 6.5l5.5 5.5-5.5 5.5" /></svg>
+        </button>
+        <a className="wp-link" href={askPath()} data-analytics-source="studio_about">Ask about a painting</a>
+      </div>
     </section>
   );
 }

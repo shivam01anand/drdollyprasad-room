@@ -1,128 +1,151 @@
 "use client";
 
 import { useEffect, useMemo, useRef } from "react";
-import { CHAPTERS, ROOM_LINE, type RoomName } from "@/lib/chapters";
-import { BY_ID, quoted, statusLabel } from "@/lib/works";
-import { roomsOfWalk } from "./RoomMap";
+import { BY_ID, quoted, statusLabel, type Work } from "@/lib/works";
+import { roomsOf, isSeries, type Stop } from "@/lib/stops";
 
 /**
- * The dock (UX spec "One wall at a time", 29 Oct 2026): always on screen in the house, built
- * from the works list (never from the 3D scene), so the names are there before the house is.
- * Where you are ("Faith · Room 2 of 5 · 7 works"), the room's line on its first wall, the
- * works on this wall (numbered as the pins on the paintings), and Previous / Next.
+ * The dock (art direction V3 §4.3, 29 Oct 2026). A caption for what is in front of you, not a
+ * strip of chips: built from the works list (never from the 3D scene), so the names are there
+ * before the house is.
+ *
+ * Phone: the painting's title (Cormorant), "Look closer"; "Faith · 6 of 7 · ● Available"; a
+ * hairline with one segment per work in the room; Previous and Next.
+ * Wide screen: one row: Previous, the room and the wall, the hairline, Next (the wall plaques
+ * carry the names; if one cannot be placed, the names come into the dock as a strip).
+ * Red is only ever the Sold dot.
  */
-const WALK = roomsOfWalk();
-/** the series rooms: the only ones counted ("About her" and "Her desk" are not) */
-const SERIES = WALK.filter((r) => r.name !== "About her" && r.name !== "Her desk");
-const worksIn = (r: { first: number; last: number }) =>
-  CHAPTERS.slice(r.first, r.last + 1).reduce((n, c) => n + (c.labels?.length ?? 0), 0);
+export const roomAt = (stops: Stop[], i: number) => {
+  const runs = roomsOf(stops);
+  return runs.find((r) => i >= r.first && i <= r.last) ?? runs[0];
+};
 
-export const roomAt = (stop: number) => WALK.find((r) => stop >= r.first && stop <= r.last) ?? WALK[0];
-
-/** the Next button's words for a stop */
-export function nextLabel(stop: number) {
-  if (stop >= CHAPTERS.length - 1) return "See all her paintings";
-  const here = roomAt(stop), next = roomAt(stop + 1);
-  if (CHAPTERS[stop + 1].id === "about") return "About her";
-  if (next === here) return "Next wall";
-  if (next.name === "Her desk") return "Her desk";
-  return `Next room: ${next.name}`;
+/** the Next button's words */
+export function nextLabel(stops: Stop[], i: number) {
+  if (i >= stops.length - 1) return "Back to home";
+  const here = stops[i].room, next = stops[i + 1].room;
+  if (next === here) return "Next";
+  if (next === "Her desk") return "Her desk";
+  return `Next room: ${next}`;
 }
 
-export default function Dock({ stop, order, strip, visible, pulse, roomsOpen, onPrev, onNext, onOpen, onRooms }: {
+const dotOf = (w: Work) => (w.status === "Sold" ? "sold" : w.status === "Available" ? "available" : "other");
+
+export default function Dock({ stops, stop, phone, strip, visible, pulse, onPrev, onNext, onOpen }: {
+  stops: Stop[];
   stop: number;
-  /** this wall's works, left to right as they hang */
-  order: string[];
-  /** desktop: show the strip of names (a dense wall, or a wall whose labels did not all fit) */
+  /** the phone's caption dock, or the wide screen's one row */
+  phone: boolean;
+  /** wide screen: a plaque could not be placed, so the names come into the dock */
   strip: boolean;
   visible: boolean;
   /** a one-time nudge on Next, once the house is there */
   pulse: boolean;
-  roomsOpen: boolean;
   onPrev(): void;
   onNext(): void;
   onOpen(id: string): void;
-  onRooms(): void;
 }) {
   const root = useRef<HTMLElement>(null);
-  const stripRef = useRef<HTMLOListElement>(null);
-  const room = roomAt(stop);
-  const series = SERIES.findIndex((r) => r.name === room.name);
-  const walls = room.last - room.first + 1;
-  const wall = stop - room.first + 1;
-  const line = stop === room.first ? ROOM_LINE[room.name as RoomName] : undefined;
-  const meta = room.name === "About her" ? "Entrance"
-    : room.name === "Her desk" ? "The end of the walk"
-    : `Room ${series + 1} of ${SERIES.length} · ${worksIn(room)} works`;
-  const items = useMemo(() => order.filter((id) => BY_ID.has(id)), [order]);
+  const s = stops[stop];
+  const runs = useMemo(() => roomsOf(stops), [stops]);
+  const room = runs.find((r) => stop >= r.first && stop <= r.last) ?? runs[0];
+  const series = runs.filter(isSeries);
+  const works = (s?.works ?? []).map((id) => BY_ID.get(id)).filter((w): w is Work => !!w);
+  const desk = s?.id === "desk";
 
-  // the page knows how tall the dock is: sheets, the map and the labels keep clear of it
+  // the page knows how tall the dock is: sheets and plaques keep clear of it
   useEffect(() => {
     const el = root.current;
     if (!el) return;
-    const set = () => {
-      // (its layout box, not its rect: the rise-in transform must not count)
-      document.documentElement.style.setProperty("--dock-h", `${Math.round(innerHeight - el.offsetTop)}px`);
-    };
+    const set = () => document.documentElement.style.setProperty("--dock-h", `${Math.round(innerHeight - el.offsetTop)}px`);
     const ro = new ResizeObserver(set);
     ro.observe(el);
     addEventListener("resize", set);
     set();
     return () => { ro.disconnect(); removeEventListener("resize", set); };
   }, []);
-  // a new wall: its first work at the strip's start
-  useEffect(() => { stripRef.current?.scrollTo({ left: 0 }); }, [stop]);
+
+  // the caption rises in on each step (0.15 s, 6 px)
+  const capKey = s?.id ?? "";
+
+  // where you are: "Faith · 6 of 7" (phone, by work) or "Room 2 of 5 · Wall 2 of 3" (wide, by stop)
+  const roomWorks = room.works;
+  const idx = works.map((w) => roomWorks.indexOf(w.id) + 1).filter((n) => n > 0);
+  const nOf = idx.length > 1 ? `${idx[0]} and ${idx[idx.length - 1]} of ${roomWorks.length}` : idx.length ? `${idx[0]} of ${roomWorks.length}` : "";
+  const walls = room.last - room.first + 1, wall = stop - room.first + 1;
+  const seriesN = series.findIndex((r) => r.name === room.name);
+
+  const segments = phone
+    ? roomWorks.map((id) => (s?.works.includes(id) ? 1 : 0))
+    : Array.from({ length: walls }, (_, k) => (k === wall - 1 ? 1 : 0));
 
   return (
-    <nav className="sdock" ref={root} aria-label="Walk through the studio" data-on={visible ? "1" : "0"}
-         data-strip={items.length && strip ? "1" : "0"} data-items={items.length} inert={!visible}>
-      <div className="sd-where">
-        <button type="button" className="sd-pos" onClick={onRooms} aria-haspopup="dialog" aria-expanded={roomsOpen}>
-          <span className="sd-room">{room.name}</span>
-          <span className="sd-meta">{meta}{walls > 1 && <span className="sd-wallof"> · Wall {wall} of {walls}</span>}</span>
-        </button>
-        <button type="button" className="sd-all" onClick={onRooms} aria-haspopup="dialog" aria-expanded={roomsOpen}>
-          All rooms <svg viewBox="0 0 12 12" aria-hidden="true"><path d="M2 4l4 4 4-4" /></svg>
-        </button>
-      </div>
-      {line && <p className="sd-line">{line}</p>}
-      {items.length > 0 && (
-        <ol className="sd-strip" ref={stripRef} aria-label="On this wall">
-          {items.map((id, i) => {
-            const w = BY_ID.get(id)!;
-            return (
-              <li key={id}>
-                <button type="button" className="sd-chip" onClick={() => onOpen(id)} aria-label={`${i + 1}. ${quoted(w.title)}, ${statusLabel(w)}. Open`}>
-                  <span className="sd-thumb">
-                    {/* eslint-disable-next-line @next/next/no-img-element */}
-                    <img src={`/site/thumbs/sm/${id}.jpg`} alt="" width={40} height={40} decoding="async" />
-                    <span className="sd-n" aria-hidden="true">{i + 1}</span>
-                  </span>
-                  <span className="sd-text">
-                    <span className="sd-title">{quoted(w.title)}</span>
-                    <span className={`sd-status is-${w.status.toLowerCase()}`}>{statusLabel(w)}</span>
-                  </span>
-                </button>
-              </li>
-            );
-          })}
+    <nav className="vdock" ref={root} aria-label="Walk through the studio" data-on={visible ? "1" : "0"}
+         data-layout={phone ? "phone" : "wide"} data-pair={works.length > 1 ? "1" : "0"} inert={!visible}>
+      {phone ? (
+        <div className="vd-cap" key={capKey}>
+          {desk ? (
+            <div className="vd-row1"><span className="vd-title">Her desk</span></div>
+          ) : works.length === 1 ? (
+            <div className="vd-row1">
+              <button type="button" className="vd-title" onClick={() => onOpen(works[0].id)}>{quoted(works[0].title)}</button>
+              <button type="button" className="vd-closer" onClick={() => onOpen(works[0].id)}>Look closer</button>
+            </div>
+          ) : (
+            <div className="vd-row1 vd-pair">
+              <ul>
+                {works.map((w) => (
+                  <li key={w.id}>
+                    <button type="button" className="vd-title" onClick={() => onOpen(w.id)}>{quoted(w.title)}</button>
+                    <span className={`vd-dot is-${dotOf(w)}`}>{statusLabel(w)}</span>
+                  </li>
+                ))}
+              </ul>
+              <button type="button" className="vd-closer" onClick={() => onOpen(works[0].id)}>Look closer</button>
+            </div>
+          )}
+          <p className="vd-row2">
+            {desk ? "The end of the walk" : <>
+              {room.name}{nOf && <> · {nOf}</>}
+              {works.length === 1 && <> · <span className={`vd-dot is-${dotOf(works[0])}`}>{statusLabel(works[0])}</span></>}
+            </>}
+          </p>
+        </div>
+      ) : (
+        <div className="vd-cap" key={capKey}>
+          <span className="vd-room">{room.name}</span>
+          <span className="vd-row2">
+            {desk ? "The end of the walk" : <>
+              {seriesN >= 0 ? `Room ${seriesN + 1} of ${series.length}` : room.name === "About her" ? "Entrance" : ""}
+              {walls > 1 && <> · Wall {wall} of {walls}</>}
+            </>}
+          </span>
+        </div>
+      )}
+      {!desk && segments.length > 1 && (
+        <div className="vd-progress" aria-hidden="true">
+          {segments.map((on, k) => <i key={k} data-on={on ? "1" : "0"} />)}
+        </div>
+      )}
+      {!phone && strip && works.length > 0 && (
+        <ol className="vd-strip" aria-label="On this wall">
+          {works.map((w) => (
+            <li key={w.id}>
+              <button type="button" onClick={() => onOpen(w.id)}>
+                <span className="vd-stitle">{quoted(w.title)}</span>
+                <span className={`vd-dot is-${dotOf(w)}`}>{statusLabel(w)}</span>
+              </button>
+            </li>
+          ))}
         </ol>
       )}
-      <div className="sd-nav">
-        <button type="button" className="sd-prev" onClick={onPrev} disabled={stop === 0} aria-label="Previous wall">
-          <svg viewBox="0 0 24 24" aria-hidden="true"><path d="M14.5 5.5L8 12l6.5 6.5" /></svg>
-        </button>
-        <div className="sd-dots" aria-hidden="true">
-          <span className="sd-dotrow">
-            {Array.from({ length: walls }, (_, k) => <i key={k} data-on={k === wall - 1 ? "1" : "0"} />)}
-          </span>
-          {walls > 1 && <span className="sd-wall">Wall {wall} of {walls}</span>}
-        </div>
-        <button type="button" className="sd-next" data-pulse={pulse ? "1" : "0"} onClick={onNext}>
-          <span className="sd-next-t">{nextLabel(stop)}</span>
-          <svg viewBox="0 0 24 24" aria-hidden="true"><path d="M5 12h13M13 6.5l5.5 5.5-5.5 5.5" /></svg>
-        </button>
-      </div>
+      <button type="button" className="vd-prev" onClick={onPrev} disabled={stop === 0} aria-label="Previous">
+        <svg viewBox="0 0 24 24" aria-hidden="true"><path d="M14.5 5.5L8 12l6.5 6.5" /></svg>
+      </button>
+      <button type="button" className="vd-next" data-pulse={pulse ? "1" : "0"} onClick={onNext}>
+        <span className="vd-next-t">{nextLabel(stops, stop)}</span>
+        <svg viewBox="0 0 24 24" aria-hidden="true"><path d="M5 12h13M13 6.5l5.5 5.5-5.5 5.5" /></svg>
+      </button>
     </nav>
   );
 }
