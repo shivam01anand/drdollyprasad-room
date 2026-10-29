@@ -148,6 +148,18 @@ for (const { wall, desk, phone } of hang.walls) {
   }
 }
 
+// whole-wall establishing views (review mocks and the Rooms overview): every work on one wall
+for (const { wall, desk } of hang.walls) {
+  const ids = desk.flat();
+  if (ids.length < 2 || new Set(ids.map((id) => house.art[id].side)).size > 1) continue;
+  for (const kind of ["phone", "desk"]) {
+    const L = LAYOUTS[kind];
+    const { cam, fill } = frame(ids, L, L.band, kind === "phone" ? { w: 0.9, h: 0.8 } : { w: 0.8, h: 0.8 });
+    house.cams[`${kind === "phone" ? "n:" : ""}w:${wall}`] = cam;
+    rows.push({ kind, id: `w:${wall}`, group: fill.group, each: fill.each, d: fill.d, clamped: fill.clamped });
+  }
+}
+
 for (const kind of ["phone", "desk"]) {
   const list = rows.filter((r) => r.kind === kind);
   console.log(`\n${kind}: ${stops[kind].length} stops`);

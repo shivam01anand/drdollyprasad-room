@@ -1108,6 +1108,16 @@ export class Room {
     return out;
   }
 
+  /** QA and review mocks: frame any house cam (e.g. "n:w:faithn", a whole wall) in the stop's band */
+  qaView(key: string, stopIndex: number) {
+    const cam = this.info.cams[key];
+    if (!cam) return false;
+    const W = this.viewport.width || innerWidth, H = this.viewport.height || innerHeight;
+    this.rig.hold(stopPose(cam, W, H, bandFor(this.stops[stopIndex], W, H)));
+    this.wake = 3;
+    return true;
+  }
+
   /** the stops this screen walks */
   get walk() { return this.stops; }
 

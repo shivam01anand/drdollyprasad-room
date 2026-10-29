@@ -164,6 +164,14 @@ export class Rig {
     this.at.i = index;
   }
 
+  /** QA and review mocks: hold the camera on any pose (the next stop move takes over again) */
+  hold(p: Pose) {
+    this.moveTl?.kill();
+    this.moveTl = undefined;
+    assign(this.pose, p);
+    this.setLens(p);
+  }
+
   /** a stop-to-stop tween is running */
   get stepping() { return !!this.moveTl; }
   /** a stop's framing, for working out what is where on screen */

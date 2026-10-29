@@ -296,6 +296,7 @@ export default function Studio({ dims }: { dims: Dims }) {
         get stops() { return stopsRef.current.map((s) => ({ id: s.id, room: s.room, works: s.works })); },
         get moving() { return moving.current; },
         measure: () => room?.measureStops(),
+        view: (key: string) => room?.qaView(key, stopRef.current),
         more: (on: boolean) => setMore(on),
         mode: (m: "light" | "dark") => setMode(m),
         music,
