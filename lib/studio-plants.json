@@ -1,0 +1,135 @@
+{
+ "_": "Plants for the rooms (review mock, 29 Oct 2026). Three's floor axes (x, z). kinds: areca (the house's own Foliage_areca0, potted), rubber (Prop_potted_plant_02), small (Prop_potted_plant_04), tulsi, snake, pothos (a wall shelf: side = the wall it hangs on, y = shelf height). Checked against every stop by Room.plantClashes (?qa=1).",
+ "plants": [
+  {
+   "room": "Onset of Spring",
+   "kind": "pothos",
+   "at": [
+    7.198,
+    -3.72
+   ],
+   "side": "E",
+   "y": 2.2
+  },
+  {
+   "room": "Onset of Spring",
+   "kind": "snake",
+   "at": [
+    6.92,
+    -2.3
+   ],
+   "pot": "clay"
+  },
+  {
+   "room": "Faith",
+   "kind": "tulsi",
+   "at": [
+    -0.8,
+    -5.55
+   ]
+  },
+  {
+   "room": "Faith",
+   "kind": "areca",
+   "at": [
+    -5.1,
+    -1.15
+   ],
+   "pot": "brass",
+   "rot": 0.6
+  },
+  {
+   "room": "Bandh Darwaze",
+   "kind": "areca",
+   "at": [
+    -4.6,
+    0.15
+   ],
+   "pot": "terracotta",
+   "rot": 2.1
+  },
+  {
+   "room": "Bandh Darwaze",
+   "kind": "small",
+   "at": [
+    -1.84,
+    0.08
+   ],
+   "rot": 0.4
+  },
+  {
+   "room": "Gone Are The Days",
+   "kind": "small",
+   "at": [
+    -2.18,
+    4.42
+   ],
+   "rot": 1.0
+  },
+  {
+   "room": "Gone Are The Days",
+   "kind": "rubber",
+   "at": [
+    0.45,
+    8.4
+   ],
+   "rot": 2.4
+  },
+  {
+   "room": "Gone Are The Days",
+   "kind": "snake",
+   "at": [
+    5.37,
+    8.45
+   ],
+   "pot": "clay"
+  },
+  {
+   "room": "Gone Are The Days",
+   "kind": "areca",
+   "at": [
+    10.95,
+    8.22
+   ],
+   "pot": "terracotta",
+   "rot": 4.0
+  },
+  {
+   "room": "Portraits",
+   "kind": "pothos",
+   "at": [
+    4.3,
+    0.505
+   ],
+   "side": "N",
+   "y": 1.95
+  },
+  {
+   "room": "Portraits",
+   "kind": "snake",
+   "at": [
+    8.74,
+    0.88
+   ],
+   "pot": "clay"
+  },
+  {
+   "room": "Portraits",
+   "kind": "rubber",
+   "at": [
+    12.45,
+    0.95
+   ],
+   "rot": 0.3
+  },
+  {
+   "room": "Bandh Darwaze",
+   "kind": "rubber",
+   "at": [
+    -3.45,
+    0.22
+   ],
+   "rot": 1.4
+  }
+ ]
+}

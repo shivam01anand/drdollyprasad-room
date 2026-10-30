@@ -297,6 +297,7 @@ export default function Studio({ dims }: { dims: Dims }) {
         get moving() { return moving.current; },
         measure: () => room?.measureStops(),
         view: (key: string) => room?.qaView(key, stopRef.current),
+        plantClashes: (extra?: { key: string; stop: number; works: string[] }[]) => room?.plantClashes(extra),
         more: (on: boolean) => setMore(on),
         mode: (m: "light" | "dark") => setMode(m),
         music,

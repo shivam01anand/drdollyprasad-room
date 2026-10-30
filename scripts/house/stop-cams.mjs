@@ -101,7 +101,7 @@ function maxDistance(g) {
  * A camera for a group on a layout. `fit` says what share of the band the group may fill:
  * { w: share of the band's width, h: share of the band's height }.
  */
-function frame(ids, layout, band, fit) {
+function frame(ids, layout, band, fit, drop = 0) {
   const g = groupBox(ids);
   const bw = layout.W - band.l - band.r, bh = layout.H - band.t - band.b;
   // visible metres across the band: the group at fit.w of its width, unless that makes it too tall
@@ -117,6 +117,8 @@ function frame(ids, layout, band, fit) {
   // a standing viewer, a little below the centre of what they look at; square on when close
   const eyeY = Math.max(1.35, Math.min(g.centre[1], g.centre[1] - 0.05 * d));
   const eye = [g.centre[0] + g.normal[0] * d, eyeY, g.centre[2] + g.normal[1] * d];
+  // a slight tilt down (the gallery's whole walls on a wide screen: no skylight grid at the top)
+  if (drop) g.centre = [g.centre[0], g.centre[1] - drop, g.centre[2]];
   const fov = 2 * Math.atan(((Hf / 2) * (layout.H / bh)) / d);
   const r = (v) => Math.round(v * 1e4) / 1e4;
   return {
@@ -154,7 +156,8 @@ for (const { wall, desk } of hang.walls) {
   if (ids.length < 2 || new Set(ids.map((id) => house.art[id].side)).size > 1) continue;
   for (const kind of ["phone", "desk"]) {
     const L = LAYOUTS[kind];
-    const { cam, fill } = frame(ids, L, L.band, kind === "phone" ? { w: 0.9, h: 0.8 } : { w: 0.8, h: 0.8 });
+    const gallery = groupBox(ids).space === "gallery" && kind === "desk";
+    const { cam, fill } = frame(ids, L, L.band, kind === "phone" ? { w: 0.82, h: 0.8 } : gallery ? { w: 0.86, h: 0.8 } : { w: 0.72, h: 0.8 }, gallery ? 0.18 : 0);
     house.cams[`${kind === "phone" ? "n:" : ""}w:${wall}`] = cam;
     rows.push({ kind, id: `w:${wall}`, group: fill.group, each: fill.each, d: fill.d, clamped: fill.clamped });
   }

@@ -16,6 +16,8 @@ import { activeVariant, NIGHT } from "./variants";
 import { messPose, HERO_ID } from "../chapters";
 import { stopsFor, isPhoneLayout, bandFor, duskAt, mapStop, type Stop } from "../stops";
 import { stopPose } from "./phone-framing";
+import { buildPlants, type Plant } from "./plants";
+import PLANTS from "../studio-plants.json";
 import type { Pose } from "./rig";
 
 export type RoomOpts = {
@@ -184,6 +186,8 @@ export class Room {
   private stops: Stop[] = [];
   /** the gallery light's pools (buildPools) */
   private pools?: { mat: THREE.MeshBasicMaterial };
+  /** the rooms' plants (lib/studio-plants.json) */
+  private plants?: THREE.Group;
   private renderSize = { w: 0, h: 0 };
   private resizeTimer = 0;
   private lastFlame = -Infinity;
@@ -330,6 +334,7 @@ export class Room {
     this.buildItems();
     this.buildFrieze();
     this.buildPools();
+    this.buildRoomPlants();
     this.buildPost();
     this.resize();
     this.syncBakeAO();
@@ -737,6 +742,69 @@ export class Room {
    * contact shadow under its frame. Both lie on the wall, behind the canvas (the depth test keeps
    * them off it): the painting itself is never tinted, filtered or covered.
    */
+  private buildRoomPlants() {
+    if (new URLSearchParams(location.search).get("plants") === "0") return;
+    const { group, owned } = buildPlants((PLANTS as unknown as { plants: Plant[] }).plants,
+      (n) => this.world.getObjectByName(n) ?? this.scene.getObjectByName(n));
+    this.scene.add(group);
+    this.owned.push(...owned);
+    this.plants = group;
+  }
+
+  /**
+   * QC (?qa=1): any plant that, seen from a stop (or one of `extra` cams), covers one of that stop's
+   * paintings or the strip under it where its plaque goes. Puts the camera back after.
+   */
+  plantClashes(extra: { key: string; stop: number; works: string[] }[] = []) {
+    const out: { view: string; plant: string; art: string }[] = [];
+    if (!this.plants) return out;
+    // walls hide what is in another room: only a plant in the camera's own space can cover a painting
+    const spaceAt = (x: number, z: number) => Object.entries(this.info.plan).find(([, r]) =>
+      Array.isArray(r) && x > r[0] - 0.05 && x < r[1] + 0.05 && -z > r[2] - 0.05 && -z < r[3] + 0.05)?.[0];
+    const boxes = this.plants.children.map((g) => ({ name: g.name, box: new THREE.Box3().setFromObject(g), space: spaceAt(g.position.x, g.position.z) }));
+    const here = Math.round(this.rig.index);
+    const W = this.viewport.width || innerWidth, H = this.viewport.height || innerHeight;
+    const proj = (b: THREE.Box3) => {
+      let x0 = Infinity, y0 = Infinity, x1 = -Infinity, y1 = -Infinity;
+      for (const x of [b.min.x, b.max.x]) for (const y of [b.min.y, b.max.y]) for (const z of [b.min.z, b.max.z]) {
+        tmpV.set(x, y, z).applyMatrix4(this.rig.camera.matrixWorldInverse);
+        if (tmpV.z > -0.05) return null;   // behind or beside the eye: not in front of a painting
+        tmpV.applyMatrix4(this.rig.camera.projectionMatrix);
+        const px = (tmpV.x * 0.5 + 0.5) * W, py = (0.5 - tmpV.y * 0.5) * H;
+        x0 = Math.min(x0, px); x1 = Math.max(x1, px); y0 = Math.min(y0, py); y1 = Math.max(y1, py);
+      }
+      return { x0, y0, x1, y1 };
+    };
+    const check = (view: string, works: string[]) => {
+      this.rig.update(0);
+      this.rig.camera.updateMatrixWorld(true);
+      const eye = this.rig.camera.getWorldPosition(new THREE.Vector3());
+      const mine = spaceAt(eye.x, eye.z);
+      for (const { name, box, space } of boxes) {
+        if (space !== mine) continue;
+        const p = proj(box);
+        if (!p || p.x1 < 0 || p.x0 > W || p.y1 < 0 || p.y0 > H) continue;
+        for (const id of works) {
+          const r = this.artRect(id);
+          if (!r) continue;
+          const a = { x0: r.x0 - this.viewport.left, x1: r.x1 - this.viewport.left, y0: r.y0 - this.viewport.top, y1: r.y1 - this.viewport.top + (W > 760 ? 40 : 0) };
+          if (p.x0 < a.x1 && p.x1 > a.x0 && p.y0 < a.y1 && p.y1 > a.y0) out.push({ view, plant: name, art: id });
+        }
+      }
+    };
+    this.stops.forEach((s, i) => { this.rig.jumpTo(i); check(s.id, s.works); });
+    for (const e of extra) {
+      const cam = this.info.cams[e.key];
+      if (!cam) continue;
+      this.rig.hold(stopPose(cam, W, H, bandFor(this.stops[e.stop], W, H)));
+      check(e.key, e.works);
+    }
+    this.rig.jumpTo(here);
+    this.rig.update(0);
+    this.wake = 2;
+    return out;
+  }
+
   private buildPools() {
     const size = 128;
     const grad = (paint: (g: CanvasRenderingContext2D) => void) => {
