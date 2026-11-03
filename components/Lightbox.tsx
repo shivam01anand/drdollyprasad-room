@@ -3,8 +3,9 @@
 import { paintingProperties, track } from "@/lib/analytics";
 
 import { forwardRef, useEffect, useImperativeHandle, useRef } from "react";
-import { motion, gsap, Flip, scrambleTo, reducedMotion } from "@/lib/motion";
-import { BY_ID, LARGE, WORKS, enquiry, quoted, workPath, type Work } from "@/lib/works";
+import { motion, gsap, Flip, settleText, reducedMotion } from "@/lib/motion";
+import { BY_ID, LARGE, WORKS, quoted, workPath, type Work } from "@/lib/works";
+import { askPath } from "@/lib/studio-ask";
 import { XL } from "@/lib/xl";
 import { roomsFor, type RoomView } from "@/lib/rooms";
 import { CloseLook } from "@/lib/closelook";
@@ -61,7 +62,7 @@ const Lightbox = forwardRef<LightboxHandle, { dims: Dims; onOpenChange(open: boo
 
     const fields = (w: Work): [string, string][] => [
       ["Series", w.series],
-      ["Year", w.year ?? "—"],
+      ["Year", w.year ?? "Not recorded"],
       ["Medium", w.medium],
       // a size only where she has stated one
       ...(w.size ? [["Size", w.size] as [string, string]] : []),
@@ -99,22 +100,9 @@ const Lightbox = forwardRef<LightboxHandle, { dims: Dims; onOpenChange(open: boo
       i.src = src;
     };
 
-    /** the slideshow: the painting, then its room, and back, until the reader takes over */
+    /** (no slideshow: a timer kept so any older call to stop it is harmless) */
     const auto = useRef(0);
     const stopShow = () => { clearTimeout(auto.current); auto.current = 0; };
-    const playShow = (id: string) => {
-      stopShow();
-      const order = ["work", ...rooms.current.map((r) => r.room.id)];
-      if (order.length < 2 || reducedMotion()) return;
-      const tick = () => {
-        if (st.current.id !== id) return;
-        const k = order.indexOf(view.current);
-        const next = order[(k + 1) % order.length];
-        show(next);
-        auto.current = window.setTimeout(tick, next === "work" ? 4200 : 5600);
-      };
-      auto.current = window.setTimeout(tick, 3000);
-    };
     /** a swipe across the figure: the next way of seeing it, or the last */
     const stepView = (d: 1 | -1) => {
       const order = ["work", ...rooms.current.map((r) => r.room.id)];
@@ -172,7 +160,7 @@ const Lightbox = forwardRef<LightboxHandle, { dims: Dims; onOpenChange(open: boo
     const buildViews = (w: Work, src: string) => {
       const v = views.current!;
       const d = dims[w.id];
-      rooms.current = d ? roomsFor(w, d.w / d.h) : [];
+      rooms.current = d ? roomsFor(w, d.w / d.h, { pilot: true }).slice(0, 1) : [];
       v.replaceChildren();
       v.hidden = rooms.current.length === 0;
       if (!rooms.current.length) return;
@@ -228,7 +216,7 @@ const Lightbox = forwardRef<LightboxHandle, { dims: Dims; onOpenChange(open: boo
       const d = dims[id];
       if (d) { i.width = d.w; i.height = d.h; }
       i.src = from?.currentSrc || `/art/works/${id}.jpg`;
-      i.alt = `${w.title} — ${w.medium.toLowerCase()}`;
+      i.alt = `${w.title}, ${w.medium.toLowerCase()}`;
       i.dataset.flipId = id;
       title.current!.textContent = "";
       const dl = meta.current!;
@@ -243,8 +231,8 @@ const Lightbox = forwardRef<LightboxHandle, { dims: Dims; onOpenChange(open: boo
       buildViews(w, i.src);
       if (hint.current) hint.current.textContent = matchMedia("(pointer: coarse)").matches
         ? "Tap to look closer" : "Click to look closer · scroll to zoom";
-      ask.current!.href = enquiry(w);
-      ask.current!.textContent = w.status === "Sold" ? "Ask about her work →" : "Enquire about this work →";
+      ask.current!.href = askPath(w.id);
+      ask.current!.dataset.analyticsSource = "studio_lightbox";
       clearTimeout(shareTimer.current);
       if (shareBtn.current) shareBtn.current.textContent = "Share";
       if (!r.open) r.showModal();
@@ -257,11 +245,9 @@ const Lightbox = forwardRef<LightboxHandle, { dims: Dims; onOpenChange(open: boo
         const first = rooms.current[0];
         const save = (navigator as Navigator & { connection?: { saveData?: boolean } }).connection?.saveData;
         // turning through works, the reader is in charge: no slideshow then
-        if (first && !save && !swap) {
-          warm(first.room.src);
-          // and the slideshow begins: the work, then the work in its room
-          playShow(id);
-        }
+        // the painting stays in front of the reader (QC 3 Nov: the lightbox opens, and stays, on the painting);
+        // its room is one tap away on the second thumbnail, warmed here so it shows at once
+        if (first && !save && !swap) warm(first.room.src);
       };
       if (from && !reduce && !swap) {
         const state = Flip.getState(from);
@@ -276,9 +262,9 @@ const Lightbox = forwardRef<LightboxHandle, { dims: Dims; onOpenChange(open: boo
         own(gsap.fromTo(card.current, { autoAlpha: 0, y: 14 }, { autoAlpha: 1, y: 0, duration: reduce ? 0 : 0.5, ease: "power2.out" }));
       }
       own(gsap.fromTo([title.current, meta.current], { autoAlpha: 1 }, { autoAlpha: 1, duration: 0 }));
-      own(scrambleTo(title.current!, quoted(w.title), { anagram: true, speed: 0.6, duration: 1, delay: 0.4 }));
+      own(settleText(title.current!, quoted(w.title)));
       dl.querySelectorAll<HTMLElement>("dd").forEach((dd, k) =>
-        own(scrambleTo(dd, dd.dataset.v!, { anagram: true, speed: 0.6, duration: 1, delay: 0.45 + k * 0.05 })));
+        own(settleText(dd, dd.dataset.v!)));
       own(gsap.fromTo(ask.current, { autoAlpha: 0, y: 12 }, { autoAlpha: 1, y: 0, duration: reduce ? 0 : 0.6, delay: reduce ? 0 : 0.7 }));
 
       if (LARGE.has(id)) {
@@ -526,7 +512,7 @@ const Lightbox = forwardRef<LightboxHandle, { dims: Dims; onOpenChange(open: boo
             <div className="lb-views" ref={views} role="group" aria-label="Ways to see this work" hidden />
             <p className="lab lb-hint" ref={hint} />
             <div className="lb-actions">
-              <a className="pill pill-solid" ref={ask} href="#">Enquire →</a>
+              <a className="pill pill-solid" ref={ask} href="/enquire">Ask about this painting</a>
               <button type="button" className="pill" ref={shareBtn} onClick={share} aria-live="polite">Share</button>
             </div>
             <div className="lb-step" role="group" aria-label="Her other works">

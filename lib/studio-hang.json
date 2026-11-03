@@ -1,0 +1,22 @@
+{
+  "_": "Art direction V3 (29 Oct 2026): how each wall is walked. Authored here, framed by scripts/house/stop-cams.mjs (cams from house.json art), which writes lib/studio-stops.json and the s:/n:s: cams. desk = groups of at most 3 on a wide screen; phone = one painting a stop unless a wall lists its own pairs. Walls in walk order (lib/chapters.ts ids); works in walk order (a continuous walk round each room, left to right on a wall).",
+  "walls": [
+    { "wall": "presence", "desk": [["woman-with-poppies"]] },
+    { "wall": "floral", "desk": [["woman-with-bird", "woman-with-red-flower"], ["child-among-flowers"]] },
+    { "wall": "recent", "desk": [["boy-with-bananas"], ["temple-bells"]] },
+    { "wall": "bodhi", "desk": [["monk-and-green-buddha"]] },
+    { "wall": "faithn", "desk": [["sacred-tree", "prayer-and-scripture", "offering-of-light"]] },
+    { "wall": "faith", "desk": [["newspaper-reader"], ["monks-and-blue-buddha", "priest-with-flame"]] },
+    { "wall": "bandh", "desk": [["weathered-door-ring", "red-and-teal-door-lock"], ["teal-door-bolt", "carved-door-knocker"]] },
+    { "wall": "street", "desk": [["shree-420-and-milk-cans"], ["terracotta-pots", "bulls-and-wheel"]] },
+    { "wall": "gatdhall", "desk": [["rickshaw-puller-and-coin", "postbox-and-stamps", "mother-india-and-kettles"], ["cycle-rickshaw", "rickshaw-rest-framed"]] },
+    { "wall": "panels",
+      "desk": [["horse-cart-and-autorickshaw", "coins-and-clay-bank", "rickshaw-and-autorickshaw", "carriage-and-autorickshaw", "rickshaw-rest", "bullock-cart-and-truck"]],
+      "phone": [["horse-cart-and-autorickshaw", "carriage-and-autorickshaw"], ["coins-and-clay-bank", "rickshaw-rest"], ["rickshaw-and-autorickshaw", "bullock-cart-and-truck"]] },
+    { "wall": "portraitsw", "desk": [["milkman-on-bicycle", "three-veiled-women", "mother-and-child"], ["boy-and-kettle", "man-among-metal-pans"]] },
+    { "wall": "portraits",
+      "desk": [["red-turban-portrait", "elder-woman-portrait", "yellow-turban-portrait", "patterned-turban-portrait", "riverside-figures"]],
+      "phone": [["red-turban-portrait"], ["elder-woman-portrait"], ["yellow-turban-portrait"], ["patterned-turban-portrait"], ["riverside-figures"]] },
+    { "wall": "desk", "desk": [[]] }
+  ]
+}

@@ -33,12 +33,14 @@ export type HouseInfo = {
    *  `light`: where its gallery light hangs, when it has one */
   /** `lk`: the canvas's light scale, afternoon and evening: a painting is shown in a gallery's light, never washed out */
   art: Record<string, { w: number; h: number; side: string; centre: V3; late?: boolean; light?: V3; study?: boolean; lk?: [number, number] }>;
-  cams: Record<string, { eye: V3; target: V3; fov: number }>;
+  cams: Record<string, { eye: V3; target: V3; fov: number; span?: [number, number] }>;
   anchors: Record<string, V3>;
   sun: { toSun: V3 };
   /** axis-aligned boxes, [x0, y0, z0, x1, y1, z1] */
   colliders: number[][];
   plan: Record<string, number[] | number>;
+  /** the village-line frieze: strips on the hung walls of each series room (u along x for N/S walls, z for E/W) */
+  frieze?: { room: string; space: string; side: "N" | "S" | "E" | "W"; plane: number; u0: number; u1: number; y0?: number; y1?: number }[];
 };
 
 export const HOUSE_DIR = "/house";

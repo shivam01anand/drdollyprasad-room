@@ -62,6 +62,12 @@ type ScrambleOpts = {
   chars?: string;
 };
 
+/** the studio's words just arrive (QC 28 Oct: no scramble in the studio); a tween-shaped handle like scrambleTo's */
+export function settleText(el: Element, text: string) {
+  el.textContent = text;
+  return gsap.set(el, {});
+}
+
 /** type `text` into `el`; returns the tween so callers can own and kill it */
 export function scrambleTo(el: Element, text: string, o: ScrambleOpts = {}) {
   motion();

@@ -1,0 +1,206 @@
+{
+ "_": "Plants and furniture for the rooms (V3 bold, 2 Nov 2026). Shubham: greenery in matching pairs at the two ends of a wall or group, grounded, never between paintings; a bench centred under its group, a rug centred. Photographs (cut-outs by the Design agency, staged by scripts/house/stage_props.py into public/house/props + lib/studio-props.json) stand as camera-facing cards with their own floor shadow. One species per room (Design agency's elevated set, 3 Nov). To swap a plant in a room, change its one line in `kit` and stage the file (scripts/house/stage_props.py). Three's floor axes (x, z); side = the wall it stands against; light = the room's light at that spot (a multiplier on the photograph). Checked against every stop by Room.plantReport (?qa=1). Faith and Portraits stand on Kajal walls: their props a little brighter so they do not go muddy.",
+ "kit": {
+  "aangan": "01-monstera-master",
+  "faith": "04-olive-stone-master",
+  "gatd": "03-rubber-brass-master",
+  "portraits": "02-bird-paradise-master",
+  "bench": "06-bench-front",
+  "rug": "07-muted-oushak-jute-master"
+ },
+ "plants": [
+  {
+   "room": "Opening",
+   "kind": "cutout",
+   "img": "aangan",
+   "at": [
+    2.467,
+    -5.554
+   ],
+   "side": "N",
+   "h": 1.45,
+   "light": 0.8
+  },
+  {
+   "room": "Opening",
+   "kind": "cutout",
+   "img": "aangan",
+   "at": [
+    4.733,
+    -5.554
+   ],
+   "side": "N",
+   "h": 1.45,
+   "light": 0.8
+  },
+  {
+   "room": "Onset of Spring",
+   "kind": "cutout",
+   "img": "aangan",
+   "at": [
+    6.755,
+    -4.813
+   ],
+   "side": "E",
+   "h": 1.15,
+   "light": 0.8
+  },
+  {
+   "room": "Onset of Spring",
+   "kind": "cutout",
+   "img": "aangan",
+   "at": [
+    6.755,
+    -0.667
+   ],
+   "side": "E",
+   "h": 1.15,
+   "light": 0.8
+  },
+  {
+   "room": "Faith",
+   "kind": "cutout",
+   "img": "faith",
+   "at": [
+    -5.154,
+    -4.405
+   ],
+   "side": "W",
+   "h": 1.55,
+   "light": 0.9
+  },
+  {
+   "room": "Faith",
+   "kind": "cutout",
+   "img": "faith",
+   "at": [
+    -5.154,
+    -2.395
+   ],
+   "side": "W",
+   "h": 1.55,
+   "light": 0.9
+  },
+  {
+   "room": "Faith",
+   "kind": "rug",
+   "img": "rug",
+   "at": [
+    -3.05,
+    -3.4
+   ],
+   "side": "N",
+   "size": [
+    2.1,
+    1.4
+   ],
+   "light": 0.8
+  },
+  {
+   "room": "Bandh Darwaze",
+   "kind": "cutout",
+   "img": "bench",
+   "face": "wall",
+   "at": [
+    -1.835,
+    -0.15
+   ],
+   "side": "N",
+   "h": 0.5,
+   "light": 0.78
+  },
+  {
+   "room": "Gone Are The Days",
+   "kind": "cutout",
+   "img": "gatd",
+   "at": [
+    1.258,
+    8.353
+   ],
+   "side": "S",
+   "h": 1.5,
+   "light": 0.8
+  },
+  {
+   "room": "Gone Are The Days",
+   "kind": "cutout",
+   "img": "gatd",
+   "at": [
+    8.704,
+    8.353
+   ],
+   "side": "S",
+   "h": 1.5,
+   "light": 0.8
+  },
+  {
+   "room": "Portraits",
+   "kind": "cutout",
+   "img": "portraits",
+   "at": [
+    4.562,
+    0.948
+   ],
+   "side": "N",
+   "h": 1.6,
+   "light": 0.9
+  },
+  {
+   "room": "Portraits",
+   "kind": "cutout",
+   "img": "portraits",
+   "at": [
+    11.61,
+    0.948
+   ],
+   "side": "N",
+   "h": 1.6,
+   "light": 0.9
+  },
+  {
+   "room": "Portraits",
+   "kind": "cutout",
+   "img": "bench",
+   "face": "wall",
+   "at": [
+    15.07,
+    0.7475
+   ],
+   "side": "N",
+   "h": 0.5,
+   "light": 0.9,
+   "phone": false
+  },
+  {
+   "room": "Portraits",
+   "kind": "rug",
+   "img": "rug",
+   "at": [
+    15.07,
+    1.75
+   ],
+   "side": "N",
+   "size": [
+    2.2,
+    1.4
+   ],
+   "light": 0.8,
+   "phone": false
+  },
+  {
+   "room": "Her desk",
+   "kind": "rug",
+   "img": "rug",
+   "at": [
+    1.9,
+    -4.25
+   ],
+   "side": "N",
+   "size": [
+    1.9,
+    1.25
+   ],
+   "light": 0.7
+  }
+ ]
+}

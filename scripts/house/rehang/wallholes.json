@@ -1,0 +1,4 @@
+[{"id":"red-north","side":"N","plane":-0.35,"u0":-2.93,"u1":-0.47,"y1":0.85},
+ {"id":"red-east-pots","side":"E","plane":-0.45,"u0":-0.32,"u1":0.84,"y1":0.55},
+ {"id":"red-east-pot18","side":"E","plane":-0.45,"u0":4.08,"u1":4.62,"y1":0.5},
+ {"id":"red-west-cans","side":"W","plane":-5.6,"u0":2.04,"u1":3.17,"y1":0.95}]

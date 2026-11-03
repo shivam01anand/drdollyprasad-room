@@ -300,3 +300,13 @@
   .sband{overflow-x:clip}
   .sband .srow .s-works{margin-right:calc(-1 * max(0px, (100vw - 1360px - 2 * var(--gut)) / 2) - var(--gut));min-width:0}
 }
+
+/* ---- Collections: no grey box behind captions (Shubham, 3 Nov) ----
+   Cause: the global --lift3d shadow (10/18px and 28/54px blur) falls past the frame onto the caption line; in the phone
+   swipe rows (overflow-x:auto) it is cut by the row's edge into a hard-edged grey rectangle that the caption sits on.
+   Fix: on the collection pages the framed picture keeps a tight shadow that stays inside the gap above its caption,
+   so captions sit on the band's own ground (Khadi or Kajal), as on the Works page. Dark-band frames keep their own edge rule. */
+.story-open :is(img.framed,img.framed.thin),.chap-works :is(img.framed,img.framed.thin),.chv :is(img.framed,img.framed.thin),
+.sband :is(img.framed,img.framed.thin),.series-row :is(img.framed,img.framed.thin),.so-art :is(img.framed,img.framed.thin){
+  box-shadow:inset 0 0 0 1px rgba(0,0,0,.06),0 1px 2px rgba(33,27,24,.3),0 3px 6px -2px rgba(33,27,24,.22) !important}
+.chap-works figcaption,.chv-row figcaption,.so-art figcaption,.chv-room figcaption{background:none !important}

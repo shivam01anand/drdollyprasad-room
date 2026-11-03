@@ -50,6 +50,13 @@ export function galleryLight(a: { side: string; centre: [number, number, number]
   return new THREE.Vector3(a.centre[0] + nx * 0.95, Math.min(3.38, a.centre[1] + 1.9), a.centre[2] + nz * 0.95);
 }
 
+/** the varnish's light for the sheen: the same place over every canvas (0.95 m out, 1.76 m up), so all 42 read alike */
+export function sheenLight(a: { side: string; centre: [number, number, number] }) {
+  const out: Record<string, [number, number]> = { N: [0, 1], S: [0, -1], E: [-1, 0], W: [1, 0] };
+  const [nx, nz] = out[a.side] ?? [0, 1];
+  return new THREE.Vector3(a.centre[0] + nx * 0.95, a.centre[1] + 1.76, a.centre[2] + nz * 0.95);
+}
+
 /** the canvas: her painting, the bake on it, its relief and its varnish */
 export function paintMaterial(tex: THREE.Texture, baked: BakedLight, light: THREE.Vector3, relief: THREE.Texture,
   lk: [number, number] = [1, 1]) {

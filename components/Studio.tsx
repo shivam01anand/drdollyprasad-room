@@ -1,131 +1,208 @@
 "use client";
 
-import { useCallback, useEffect, useLayoutEffect, useRef, useState } from "react";
-import Lenis from "lenis";
-import "lenis/dist/lenis.css";
+import { useCallback, useEffect, useMemo, useRef, useState } from "react";
 import type { Room } from "@/lib/room/Room";
-import { motion, gsap, scrambleTo, reducedMotion } from "@/lib/motion";
+import { motion, gsap, reducedMotion } from "@/lib/motion";
 import Preloader, { type PreloaderHandle } from "./Preloader";
-import Featured from "./Featured";
 import Lightbox, { type LightboxHandle } from "./Lightbox";
 import Cursor, { roomCursorLabel } from "./Cursor";
 import WallLabels from "./WallLabels";
-import Stops from "./Stops";
 import Until from "./Until";
-import QuickIndex from "./QuickIndex";
+import RoomMap from "./RoomMap";
+import Dock from "./Dock";
+import KnowMore, { OpeningCard } from "./AboutHer";
+import Desk from "./Desk";
 import { WORKS_FILTER, type WorksFilter } from "./Works";
 import * as music from "@/lib/music";
-import { CHAPTERS, WALK_ORDER, stopOf } from "@/lib/chapters";
+import { CHAPTERS, DARK_ROOMS } from "@/lib/chapters";
+import { stopsFor, isPhoneLayout, roomsOf, isSeries, roomLine, WALK_ORDER, stopOfWork, type Stop } from "@/lib/stops";
 import { activeVariant } from "@/lib/room/variants";
-import { BY_ID, EMAIL, FEATURED } from "@/lib/works";
-import { rebaseWalkScroll, walkProgress } from "@/lib/walk-layout";
+import { BY_ID } from "@/lib/works";
 import { paintingProperties, track } from "@/lib/analytics";
 
 type Dims = Record<string, { w: number; h: number }>;
+type Method = "next" | "prev" | "swipe" | "wheel" | "key" | "map" | "strip" | "link" | "qa" | "enter";
 
 const clamp01 = (v: number) => Math.min(1, Math.max(0, v));
+const HOME = "/";
 
+/**
+ * The studio, painting first (art direction V3, 29 Oct 2026). The visitor is always at one stop:
+ * on a phone one painting (the small panels in stacked pairs), on a wide screen a group of at most
+ * three. Every input (a swipe, one wheel flick, an arrow key, Previous and Next, a room in the
+ * list) moves exactly one stop or goes straight to one. Along a wall the camera trucks (0.5 s);
+ * to the next wall of a room it turns (0.6 s); between rooms the page dips to Kajal with the
+ * room's name and the village line drawing under it (under 1 s). "← Home" is always top left.
+ */
 export default function Studio({ dims }: { dims: Dims }) {
   const canvasRef = useRef<HTMLCanvasElement>(null);
   const stageRef = useRef<HTMLDivElement>(null);
-  const hudRef = useRef<HTMLDivElement>(null);
-  const mainRef = useRef<HTMLElement>(null);
-  const copyRef = useRef<HTMLDivElement>(null);
+  const hudRef = useRef<HTMLElement>(null);
+  const veilRef = useRef<HTMLDivElement>(null);
   const preRef = useRef<PreloaderHandle>(null);
   const lbRef = useRef<LightboxHandle>(null);
   const roomRef = useRef<Room | null>(null);
-  const lenisRef = useRef<Lenis | null>(null);
-  // Every reason scrolling is held, in one place: the intro, lightbox and menu.
-  // Scroll runs only when none is left.
-  const locks = useRef(new Set<string>(["intro"]));
-  const lock = useCallback((reason: string, on: boolean) => {
-    if (on) locks.current.add(reason); else locks.current.delete(reason);
-    const l = lenisRef.current;
-    if (!l) return;
-    if (locks.current.size) l.stop(); else l.start();
+  /** every reason input is held: the lightbox, the room list, Know more */
+  const holds = useRef(new Set<string>());
+  const hold = useCallback((reason: string, on: boolean) => {
+    if (on) holds.current.add(reason); else holds.current.delete(reason);
+    if (holds.current.size) document.documentElement.dataset.hold = "1";
+    else delete document.documentElement.dataset.hold;
   }, []);
 
   const [pct, setPct] = useState(0);
   const [loaded, setLoaded] = useState(false);
   const [failed, setFailed] = useState(false);
   const [ready, setReady] = useState(false);
+  const [entered, setEntered] = useState(false);
+  const [slow, setSlow] = useState(false);
   const [mode, setMode] = useState<"light" | "dark">(activeVariant().startDark ? "dark" : "light");
-  /** one wall on or back (set by the scroll effect, which knows the stops) */
-  const stepRef = useRef<(d: 1 | -1) => void>(() => {});
-  /** the first visit's hint, on a phone: how to walk */
-  const [coach, setCoach] = useState(false);
-  /** the phone's sheet of stops */
-  const [stops, setStops] = useState(false);
-  /** the tanpura (lib/music.ts) */
+  const [mapOpen, setMapOpen] = useState(false);
+  const [more, setMore] = useState(false);
   const [playing, setPlaying] = useState(false);
+  const [stop, setStop] = useState(0);
+  const [arrived, setArrived] = useState(true);
+  /** the walk: a phone's (painting by painting) or a wide screen's (groups) */
+  const [walkPhone, setWalkPhone] = useState(false);
+  /** the phone's chrome (≤ 760 px wide) */
+  const [phone, setPhone] = useState(false);
+  const [stripWanted, setStripWanted] = useState(false);
+  const [below, setBelow] = useState(false);
+  const [pulse, setPulse] = useState(false);
+  const [letter, setLetter] = useState<{ room: string; line: string } | null>(null);
+  const stops = useMemo(() => stopsFor(walkPhone), [walkPhone]);
+  const stopsRef = useRef<Stop[]>(stops);
+  stopsRef.current = stops;
+  const N = stops.length;
+  const stopRef = useRef(0);
+  const moving = useRef(false);
+  const queued = useRef<number | null>(null);
+  const afterArrive = useRef<(() => void) | null>(null);
+
   useEffect(() => music.onChange(setPlaying), []);
-  // a visitor who chose music and came straight back in (no Step inside): the first
-  // touch or key brings it back, since a browser starts sound only from a gesture
+  // Music is on by default, at low volume, and starts on the visitor's first tap, key or click
   useEffect(() => {
-    if (!ready) return;
-    const wake = () => {
-      if (music.wanted() && !music.isPlaying()) music.start();
-      off();
+    const events = ["pointerup", "touchend", "keydown", "click"] as const;
+    const off = () => events.forEach((e) => removeEventListener(e, wake, true));
+    const wake = (e: Event) => {
+      if ((e.target as Element | null)?.closest?.(".music-btn")) return;
+      if (!music.wanted()) { off(); return; }
+      if (!music.isPlaying()) music.start();
+      setTimeout(() => { if (music.wake()) off(); }, 250);
     };
-    const off = () => { removeEventListener("pointerup", wake, true); removeEventListener("keydown", wake, true); };
-    if (music.wanted() && !music.isPlaying()) {
-      addEventListener("pointerup", wake, true);
-      addEventListener("keydown", wake, true);
-    }
+    if (music.wanted()) events.forEach((e) => addEventListener(e, wake, true));
     return off;
-  }, [ready]);
-  const [active, setActive] = useState(0);
-  const [loadEpoch, setLoadEpoch] = useState(0);
+  }, []);
+
+  useEffect(() => {
+    const q = matchMedia("(max-width: 760px)");
+    const on = () => setPhone(q.matches);
+    on();
+    setWalkPhone(isPhoneLayout(innerWidth, innerHeight));
+    q.addEventListener("change", on);
+    return () => q.removeEventListener("change", on);
+  }, []);
+
   useEffect(() => {
     if (!ready || failed) return;
-    const chapter = CHAPTERS[active];
-    if (!chapter) return;
+    const s = stops[stop];
+    if (!s) return;
     const timer = setTimeout(() => track("studio_chapter_viewed", {
-      chapter_id: chapter.id, chapter_name: chapter.stop, room: chapter.room, chapter_number: active + 1,
+      chapter_id: s.id, chapter_name: s.works.map((id) => BY_ID.get(id)?.title).join(" · ") || s.chapter.stop,
+      room: s.room, chapter_number: stop + 1,
     }), 700);
     return () => clearTimeout(timer);
-  }, [active, ready, failed]);
-  const ranOnce = useRef(false);
-  // once the header is live, scroll owns its inertness; before, React does
-  const hudLive = useRef(false);
-  useEffect(() => { hudLive.current = ready || failed; }, [ready, failed]);
-  const clockRef = useRef<HTMLSpanElement>(null);
-
-  // studio time — it is her studio, so it is her clock. Typed in by the
-  // scrambler once the header is up, and re-typed when the minute turns.
-  useEffect(() => {
-    if (!ready && !failed) return;
-    const f = new Intl.DateTimeFormat("en-GB", { hour: "2-digit", minute: "2-digit", hourCycle: "h23", timeZone: "Asia/Kolkata" });
-    let last = "";
-    let tw: { kill(): void } | null = null;
-    const t = () => {
-      const now = f.format(new Date());
-      if (now === last || !clockRef.current) return;
-      last = now;
-      tw?.kill();
-      tw = scrambleTo(clockRef.current, now, { speed: 1, duration: 1 });
-    };
-    t();
-    const i = setInterval(t, 5_000);
-    return () => { clearInterval(i); tw?.kill(); };
-  }, [ready, failed]);
+  }, [stop, ready, failed, stops]);
 
   /* ------------------------------------------------------------------------
-     The room, the scroll, and the one loop that drives both.
+     Moving: the only way from one stop to another.
+  ------------------------------------------------------------------------ */
+  const letterT = useRef(0);
+  const arrive = useCallback((to: number) => {
+    moving.current = false;
+    setArrived(true);
+    performance.mark?.("step-arrive");
+    const S = stopsRef.current, s = S[to];
+    roomRef.current?.drawFrieze(s?.room, s?.space);
+    // Kajal walls (Faith, Portraits): the lettering and plaques on them turn light
+    if (s) document.documentElement.dataset.wall = DARK_ROOMS.has(s.room) ? "dark" : "light";
+    // the room's line, as lettering on the wall at its first painting, for 3 s
+    const run = roomsOf(S).find((r) => r.first === to);
+    clearTimeout(letterT.current);
+    if (run && isSeries(run) && roomLine(run.name)) {
+      setLetter({ room: run.name, line: roomLine(run.name)! });
+      letterT.current = window.setTimeout(() => setLetter(null), 3000);
+    } else setLetter(null);
+    const after = afterArrive.current;
+    afterArrive.current = null;
+    after?.();
+    const q = queued.current;
+    queued.current = null;
+    if (q !== null && q !== to) moveRef.current(q, "next");
+  }, []);
+
+  const moveRef = useRef<(to: number, method: Method) => void>(() => {});
+  moveRef.current = (to: number, method: Method) => {
+    const S = stopsRef.current;
+    const from = stopRef.current;
+    to = Math.max(0, Math.min(S.length - 1, to));
+    if (to === from) { afterArrive.current?.(); afterArrive.current = null; return; }
+    if (moving.current) { if (queued.current === null) queued.current = to; return; }
+    const r = roomRef.current;
+    const live = !!r && r.introDone;
+    const quick = reducedMotion();
+    const kind = live && !quick ? r!.moveKind(from, to) : "cut";
+    track("studio_step", { from, to, method });
+    performance.mark?.("step-start");
+    stopRef.current = to;
+    moving.current = true;
+    clearTimeout(letterT.current);
+    setLetter(null);
+    setStop(to);
+    setArrived(false);
+    if (!live) { requestAnimationFrame(() => arrive(to)); return; }
+    if (kind === "truck") { r!.goStop(to, "walk", () => arrive(to), 0.5); return; }
+    if (kind === "turn") { r!.goStop(to, "walk", () => arrive(to), 0.6); return; }
+    // a cut: a dip to Kajal; a new room says its name, with the village line drawn under it
+    const veil = veilRef.current!;
+    const newRoom = S[to].room !== S[from].room;
+    const runs = roomsOf(S), series = runs.filter(isSeries);
+    const run = runs.find((x) => to >= x.first && to <= x.last);
+    const n = run ? series.findIndex((x) => x.name === run.name) : -1;
+    const kicker = veil.querySelector<HTMLElement>(".veil-kicker")!, name = veil.querySelector<HTMLElement>(".veil-name")!;
+    const border = veil.querySelector<HTMLElement>(".veil-border")!;
+    kicker.textContent = newRoom && n >= 0 ? `Room ${n + 1} of ${series.length}` : "";
+    name.textContent = newRoom ? S[to].room : "";
+    veil.dataset.room = newRoom ? "1" : "0";
+    gsap.killTweensOf([veil, border]);
+    const tl = gsap.timeline();
+    tl.to(veil, { autoAlpha: 1, duration: quick ? 0 : 0.22, ease: "power1.in" })
+      .add(() => r!.goStop(to, "cut", () => {}));
+    if (newRoom && !quick) {
+      tl.fromTo(border, { clipPath: "inset(0 100% 0 0)" }, { clipPath: "inset(0 0% 0 0)", duration: 0.4, ease: "power1.inOut" }, ">")
+        .to({}, { duration: 0.05 });
+    } else tl.to({}, { duration: quick ? 0 : 0.06 });
+    tl.to(veil, { autoAlpha: 0, duration: quick ? 0 : 0.3, ease: "power1.out" })
+      .add(() => arrive(to));
+  };
+
+  const goHome = useCallback(() => { location.assign(HOME); }, []);
+
+  /** one stop on (+1) or back (−1); past the desk, home */
+  const step = useCallback((d: 1 | -1, method: Method) => {
+    if (holds.current.size) return;
+    const last = stopsRef.current.length - 1;
+    const base = moving.current ? (queued.current ?? stopRef.current) : stopRef.current;
+    if (d > 0 && base >= last) { if (!moving.current && method !== "wheel" && method !== "swipe") goHome(); return; }
+    if (moving.current) { if (queued.current === null) queued.current = Math.max(0, Math.min(last, base + d)); return; }
+    moveRef.current(stopRef.current + d, method);
+  }, [goHome]);
+
+  /* ------------------------------------------------------------------------
+     The room, and the one loop that draws it.
   ------------------------------------------------------------------------ */
   useEffect(() => {
     motion();
-    // a replayed effect (Fast Refresh) builds a new engine: start its
-    // lifecycle, and its preloader, from the beginning
-    if (ranOnce.current) {
-      setLoaded(false);
-      setReady(false);
-      setFailed(false);
-      setPct(0);
-      setLoadEpoch((n) => n + 1);
-      hudLive.current = false;
-    }
-    ranOnce.current = true;
     const prevRestoration = history.scrollRestoration;
     const html = document.documentElement;
     const prevData = { room: html.dataset.room, hud: html.dataset.hud };
@@ -133,224 +210,16 @@ export default function Studio({ dims }: { dims: Dims }) {
     scrollTo(0, 0);
     const reduce = reducedMotion();
     const canvas = canvasRef.current!;
-    // the engine is its own chunk: it downloads alongside its textures
-    // instead of holding up the first paint of the counter
     let room: Room | null = null;
     let killed = false;
     let dead = false;
 
-    const lenis = new Lenis({ duration: 1.1, smoothWheel: !reduce });
-    lenisRef.current = lenis;
-    lock("intro", true);
-
-    // section geometry, measured when layout changes — never per scroll
-    let centers: number[] = [];
-    let worksTop = Infinity;
-    let featTop = Infinity, featBottom = -Infinity;
-    let vh = innerHeight;
-    let lastActive = -1;
-    let lastScroll = 0;
-    const camT = (s: number) => walkProgress(s, centers);
-
-    const apply = (s: number, sync = false) => {
-      lastScroll = s;
-      if (!dead) {
-        const t = camT(s);
-        if (sync) room?.syncScroll(t); else room?.scroll(t);
-      }
-      // the slider carries its own words: the fixed copy steps aside while
-      // it is substantially on screen, so two layers of text never meet
-      const copy = copyRef.current;
-      if (copy) {
-        const over = s + vh > featTop + vh * 0.2 && s < featBottom - vh * 0.2;
-        if ((copy.dataset.yield === "1") !== over) copy.dataset.yield = over ? "1" : "0";
-      }
-      // the chapter whose centre is nearest owns the copy
-      let idx = 0, best = Infinity;
-      centers.forEach((c, i) => { const d = Math.abs(c - s); if (d < best) { best = d; idx = i; } });
-      if (idx !== lastActive) {
-        lastActive = idx;
-        setActive(idx);
-        // the header's ink follows what it sits on: read from the room as drawn (ink, below); until
-        // the room is there, or if it fails, the chapter's own word for it
-        if (!room?.introDone || dead) document.documentElement.dataset.hud = CHAPTERS[idx]?.ink ?? "";
-      }
-
-      // past the plan, the live room shrinks into a held card …
-      const st = stageRef.current, hud = hudRef.current;
-      const end = centers.length ? centers[centers.length - 1] : Infinity;
-      const k = clamp01((s - end) / (vh * 0.85));
-      if (st) {
-        st.style.transform = k > 0 ? `scale(${1 - 0.2 * k})` : "";
-        st.style.borderRadius = k > 0 ? `${28 * k}px` : "";
-      }
-      // … and hands over to the collage
-      const past = clamp01((s - (worksTop - vh)) / (vh * 0.6));
-      if (hud) {
-        hud.style.opacity = String(1 - past);
-        if (hudLive.current) hud.inert = past > 0.5;
-      }
-      if (!dead) room?.setVisible(s < worksTop - 2);
-    };
-
-    const measure = () => {
-      const before = { centers, worksTop };
-      const oldHeight = vh;
-      vh = innerHeight;
-      const secs = [...(mainRef.current?.querySelectorAll<HTMLElement>(".sec") ?? [])];
-      centers = secs.map((el) => el.offsetTop + el.offsetHeight / 2 - vh / 2);
-      worksTop = document.getElementById("works")?.offsetTop ?? Infinity;
-      const feat = mainRef.current?.querySelector<HTMLElement>(".sec-featured");
-      if (feat) { featTop = feat.offsetTop; featBottom = feat.offsetTop + feat.offsetHeight; }
-      const changed = oldHeight !== vh || before.worksTop !== worksTop ||
-        before.centers.length !== centers.length || centers.some((c, i) => c !== before.centers[i]);
-      if (!changed) return;
-
-      const mapped = swipe.on ? lastScroll : rebaseWalkScroll(lastScroll, before, { centers, worksTop });
-      const y = Number.isFinite(mapped) ? Math.max(0, mapped) : lastScroll;
-      lenis.resize();
-      if (Math.abs(y - lastScroll) > 0.5) lenis.scrollTo(y, { immediate: true, force: true });
-      // Layout updates change the scroll coordinates, not the live camera pose.
-      // In particular, a font/image resize must never finish a moving camera.
-      apply(y);
-      if (heading >= 0) {
-        const target = heading < centers.length ? centers[heading] : worksTop;
-        const remaining = Math.max(0.1, (glideEndsAt - performance.now()) / 1000);
-        glideTo(target, heading, remaining);
-      }
-    };
-
-    // As on the live site, a wheel/trackpad stays under the visitor's control.
-    lenis.on("scroll", (l: Lenis) => apply(l.scroll));
-
-    /* On a phone the walk is in the hand. A finger on the house moves it:
-       drag up and the walk follows the finger toward the next wall (never
-       further), let go and it carries on there at a walking pace — or, for a
-       small nudge, settles back. A sideways swipe turns to the next wall (to
-       the left) or the last (to the right), the room turning under the finger
-       as it goes; so do the arrows at the screen's edges (stepRef). The
-       carousel keeps its own sideways drags; past the last stop the page is
-       the page again (the works, the contact) until a pull down from the top
-       of the works brings the walk back. */
-    const coarse = matchMedia("(pointer: coarse)").matches;
-    const swipe = { on: false, back: false, mode: "" as "" | "walk" | "look", x0: 0, y0: 0, t0: 0, s0: 0, from: 0, lastY: 0, lastT: 0, v: 0 };
-    let heading = -1;
-    let glideEndsAt = 0;
-    const nearestStop = (sc: number) => {
-      let k = 0, best = Infinity;
-      centers.forEach((c, i) => { const d = Math.abs(c - sc); if (d < best) { best = d; k = i; } });
-      return k;
-    };
-    const glideTo = (y: number, i: number, dur = 1.6) => {
-      heading = i;
-      const quick = reducedMotion();
-      glideEndsAt = performance.now() + (quick ? 0 : dur * 1000);
-      html.dataset.gliding = "1";
-      lenis.scrollTo(y, {
-        duration: quick ? 0 : dur, immediate: quick, force: true,
-        easing: (t: number) => 1 - Math.pow(1 - t, 3),
-        onComplete: () => { heading = -1; delete html.dataset.gliding; },
-      });
-    };
-    const ownTouch = (e: TouchEvent) => (e as TouchEvent & { lenisStopPropagation?: boolean }).lenisStopPropagation = true;
-    const onTouchStart = (e: TouchEvent) => {
-      swipe.on = false;
-      if (!coarse || e.touches.length !== 1 || locks.current.size || !centers.length) return;
-      const target = e.target as Element;
-      // the carousel, the sheet, the labels and the header keep their own touches
-      if (target.closest(".sec-featured, .sheet, .lb, .hud a, .hud button, .wall-label")) return;
-      const last = centers[centers.length - 1];
-      const inWalk = lastScroll <= last + 4;
-      const atWorks = !inWalk && Math.abs(lastScroll - worksTop) < 8;
-      if (!inWalk && !atWorks) return;
-      const t = e.touches[0], now = performance.now();
-      const from = heading >= 0 ? heading : nearestStop(lastScroll);
-      Object.assign(swipe, { on: true, back: atWorks, mode: "", x0: t.clientX, y0: t.clientY, t0: now, s0: lastScroll, from, lastY: t.clientY, lastT: now, v: 0 });
-    };
-    const onTouchMove = (e: TouchEvent) => {
-      if (!swipe.on) return;
-      const t = e.touches[0], now = performance.now();
-      const dx = t.clientX - swipe.x0, dy = t.clientY - swipe.y0;
-      if (!swipe.mode) {
-        if (Math.abs(dx) < 8 && Math.abs(dy) < 8) return;
-        swipe.mode = Math.abs(dx) > Math.abs(dy) * 1.2 && !swipe.back ? "look" : "walk";
-      }
-      if (swipe.back && dy < -6) { swipe.on = false; return; }
-      if (e.cancelable) e.preventDefault();
-      ownTouch(e);
-      if (swipe.mode === "look") {
-        // the head turns with the finger: a finger's width across the screen is a long look
-        room?.look(-dx / (innerWidth * 0.5), -dy / (innerHeight * 0.8));
-        return;
-      }
-      swipe.v = 0.7 * swipe.v + 0.3 * ((t.clientY - swipe.lastY) / Math.max(1, now - swipe.lastT));
-      swipe.lastY = t.clientY; swipe.lastT = now;
-      if (swipe.back) return;
-      // the page follows the finger, from this stop as far as the next one either way
-      const n = centers.length;
-      const lo = swipe.from > 0 ? centers[swipe.from - 1] : centers[0];
-      const hi = swipe.from < n - 1 ? centers[swipe.from + 1] : centers[n - 1];
-      const y = Math.min(hi, Math.max(lo, swipe.s0 - dy * 1.15));
-      heading = -1;
-      lenis.scrollTo(y, { immediate: true, force: true });
-    };
-    const onTouchEnd = (e: TouchEvent) => {
-      if (!swipe.on) return;
-      swipe.on = false;
-      if (swipe.mode === "look") {
-        room?.endLook();
-        ownTouch(e);
-        // a sideways swipe turns to the next wall, or back to the last
-        const t = e.changedTouches[0];
-        const dx = t.clientX - swipe.x0;
-        if (Math.abs(dx) > innerWidth * 0.16 && !swipe.back) {
-          const next = swipe.from + (dx < 0 ? 1 : -1), n = centers.length;
-          if (next >= 0 && next < n) glideTo(centers[next], next);
-          else if (next >= n) glideTo(worksTop, n);
-        }
-        return;
-      }
-      if (swipe.mode !== "walk") return;      // a tap: the room and the page have it
-      ownTouch(e);
-      const t = e.changedTouches[0];
-      const dy = t.clientY - swipe.y0, v = swipe.v;
-      const n = centers.length;
-      if (swipe.back) { if (dy > 40) glideTo(centers[n - 1], n - 1); return; }
-      // a real swipe goes on to the next stop; a nudge settles back where it was
-      const go = Math.abs(dy) > innerHeight * 0.12 || Math.abs(v) > 0.45;
-      const next = go ? swipe.from + (dy < 0 ? 1 : -1) : swipe.from;
-      if (next < 0) { glideTo(centers[0], 0, 0.9); return; }
-      if (next >= n) glideTo(worksTop, n);
-      else glideTo(centers[next], next, go ? 1.6 : 0.9);
-    };
-
-    // the edge arrows (and the keyboard's): one wall on, or one back
-    stepRef.current = (d: 1 | -1) => {
-      if (!centers.length || locks.current.size) return;
-      const n = centers.length;
-      const from = heading >= 0 ? heading : nearestStop(lastScroll);
-      const next = Math.max(0, Math.min(n, from + d));
-      if (next === from) return;
-      if (next >= n) glideTo(worksTop, n); else glideTo(centers[next], next);
-    };
-    if (coarse) {
-      document.addEventListener("touchstart", onTouchStart, { passive: true });
-      document.addEventListener("touchmove", onTouchMove, { passive: false });
-      document.addEventListener("touchend", onTouchEnd, { passive: true });
-      document.addEventListener("touchcancel", onTouchEnd, { passive: true });
-    }
-
-    const frame = (time: number) => {
-      if (document.hidden) return;
-      lenis.raf(time * 1000);
-      // the room keeps wall-clock deadlines, so it gets the wall clock
-      if (dead) return;
+    const frame = () => {
+      if (document.hidden || dead) return;
       try { room?.renderFrame(performance.now()); } catch (error) { fail(error); }
     };
     gsap.ticker.add(frame);
 
-    /* One terminal failure path: the room is torn down, the chapters
-       collapse, and the paintings below become the page. */
     const loadStarted = performance.now();
     track("studio_load_started");
     const fail = (why: unknown) => {
@@ -361,16 +230,12 @@ export default function Studio({ dims }: { dims: Dims }) {
       room?.dispose();
       if (roomRef.current === room) roomRef.current = null;
       room = null;
-      document.documentElement.dataset.room = "off";
-      document.documentElement.dataset.hud = "";            // (the page under it now: its own ink)
+      html.dataset.room = "off";
+      html.dataset.hud = "";
       setFailed(true);
-      // the room's own reasons end; an open lightbox keeps its hold
-      locks.current.delete("intro");
-      if (locks.current.size) lenis.stop(); else lenis.start();
-      requestAnimationFrame(measure);
     };
-
     const timeout = setTimeout(() => fail(new Error("timed out")), 60_000);
+    const slowT = setTimeout(() => { if (!killed) setSlow(true); }, 6_000);
 
     import("@/lib/room/Room").then(({ Room }) => {
       if (killed || dead) return;
@@ -383,9 +248,10 @@ export default function Studio({ dims }: { dims: Dims }) {
         onProgress: (p) => { if (!killed && !dead) setPct(Math.round(p * 100)); },
         onIntroFinished: () => {
           if (killed || dead) return;
+          // a visitor who moved on over the welcome (the house was slow) is where they went
+          if (stopRef.current !== 0) r.goStop(stopRef.current, "cut", () => {});
           track("studio_ready", { duration_ms: Math.round(performance.now() - loadStarted) });
           setReady(true);
-          lock("intro", false);
         },
         onArtwork: (id) => {
           const w = BY_ID.get(id);
@@ -393,104 +259,74 @@ export default function Studio({ dims }: { dims: Dims }) {
           lbRef.current?.open(id, null, WALK_ORDER);
         },
         onHoverArt: (id) => roomCursorLabel(id ? "View" : null),
+        // a turned phone: the other walk, at the same painting
+        onLayout: (p, index) => {
+          stopsRef.current = stopsFor(p);
+          stopRef.current = index;
+          moving.current = false; queued.current = null;
+          setWalkPhone(p);
+          setStop(index);
+          setArrived(true);
+        },
       }).then(() => {
         if (killed || dead) return;
         clearTimeout(timeout);
+        clearTimeout(slowT);
         setLoaded(true);
-        measure();
-        if (process.env.NODE_ENV !== "production") devSwitches();
+        if (process.env.NODE_ENV !== "production" || new URLSearchParams(location.search).has("qa")) devSwitches();
       });
     }).catch((e) => { clearTimeout(timeout); fail(e); });
 
-    /* development only: ?fast skips the preloader, ?shot=<chapter> lands on
-       a beat, ?mode=dark lights the diya */
+    /* ?qa=1: the screenshot driver's handle. go(i) lands on a stop at once; step(±1) is a real step. */
     const devSwitches = () => {
       const q = new URLSearchParams(location.search);
-      // a handle for the screenshot driver: land on any chapter, instantly
       (window as unknown as { __studio?: object }).__studio = {
-        go(id: string) {
-          const el = document.querySelector<HTMLElement>(`[data-chapter='${id}']`) ?? document.querySelector<HTMLElement>(id);
-          if (!el) return false;
-          const y = Math.max(0, el.offsetTop + el.offsetHeight / 2 - innerHeight / 2);
-          lenis.scrollTo(y, { immediate: true, force: true });
-          apply(y, true);
-          return y;
+        go(i: number | string) {
+          const S = stopsRef.current;
+          const k = typeof i === "number" ? i : S.findIndex((s) => s.id === i);
+          if (k < 0 || k >= S.length) return false;
+          moving.current = false; queued.current = null;
+          stopRef.current = k;
+          setStop(k);
+          setArrived(false);
+          room?.goStop(k, "cut", () => {});
+          requestAnimationFrame(() => arrive(k));
+          return k;
         },
-        top(y: number) { lenis.scrollTo(y, { immediate: true, force: true }); apply(y, true); },
+        step: (d: 1 | -1) => step(d, "qa"),
+        get stop() { return stopRef.current; },
+        get stops() { return stopsRef.current.map((s) => ({ id: s.id, room: s.room, works: s.works })); },
+        get moving() { return moving.current; },
+        measure: () => room?.measureStops(),
+        view: (key: string) => room?.qaView(key, stopRef.current),
+        plantClashes: (extra?: { key: string; stop: number; works: string[] }[]) => room?.plantClashes(extra),
+        plantReport: (extra?: { key: string; stop: number; works: string[] }[]) => room?.plantReport(extra),
+        movePlant: (name: string, x: number, z: number) => room?.movePlant(name, x, z),
+        pick: (x: number, y: number) => room?.qaPick(x, y),
+        get room() { return room; },
+        more: (on: boolean) => setMore(on),
         mode: (m: "light" | "dark") => setMode(m),
         music,
       };
       if (q.get("mode") === "dark") setMode("dark");
-      if (!q.has("fast") && !q.has("shot")) return;
-      requestAnimationFrame(() => {
-        preRef.current?.finish();
-        room?.rig.finishIntro();
-        const shot = q.get("shot");
-        if (!shot) return;
-        const go = () => {
-          const el = document.querySelector<HTMLElement>(`[data-chapter='${shot}']`) ?? document.querySelector<HTMLElement>(shot);
-          if (!el) return;
-          const y = el.offsetTop + el.offsetHeight / 2 - innerHeight / 2;
-          lenis.scrollTo(Math.max(0, y), { immediate: true, force: true });
-          apply(Math.max(0, y), true);
-        };
-        setTimeout(go, 400);
-      });
+      if (q.has("fast")) requestAnimationFrame(() => preRef.current?.finish());
     };
 
     const onContextLost = (e: Event) => { e.preventDefault(); fail(new Error("WebGL context lost")); };
     canvas.addEventListener("webglcontextlost", onContextLost);
 
-    /* The header's ink: light lettering where the room behind it is dark, dark where it is light,
-       read from the frame as drawn every little while as the walk goes (no chapter can know it: the
-       same wall sits behind the header on one screen and not on another), and once more on arriving. */
-    let inkAt = 0, wasLanded = false, inkLight: boolean | null = null, inkStop = -1;
-    const ink = () => {
-      const r = room;
-      if (!r || dead || !r.introDone || lastScroll > (centers[centers.length - 1] ?? Infinity) + 2) return;
-      const now = performance.now();
-      const landed = r.landed, arrived = landed && !wasLanded;
-      wasLanded = landed;
-      if (!arrived && now - inkAt < 400) return;
-      inkAt = now;
-      const b = document.querySelector<HTMLElement>(".hud .brand")?.getBoundingClientRect();
-      if (!b || !b.width) return;
-      const at = lastActive;
-      // (a frame is drawn for it on arriving, and whenever the walk is at a stop it has not read)
-      r.readLumaBehind("ink", { x0: b.left, y0: b.top, x1: b.right, y1: b.bottom }, (l) => {
-        inkStop = at;
-        // (a band between the two, so a wall of middling light never sets it flickering)
-        const light = inkLight === null ? l < 0.5 : inkLight ? l < 0.56 : l < 0.44;
-        if (light !== inkLight) { inkLight = light; html.dataset.hud = light ? "light" : "dark"; }
-        if (process.env.NODE_ENV !== "production") (window as unknown as { __ink?: object }).__ink = { l, light, at, t: performance.now() };
-      }, arrived || at !== inkStop);
-    };
-    gsap.ticker.add(ink);
-
-    const ro = new ResizeObserver(() => measure());
-    ro.observe(document.body);
-    addEventListener("resize", measure);
-    document.fonts?.ready.then(() => { if (!killed) measure(); });
-    measure();
-
-    // the works collage and the lightbox share one click path
+    // the collage below and the lightbox share one click path
     const onDocClick = (e: MouseEvent) => {
       if (e.defaultPrevented || e.button !== 0 || e.metaKey || e.ctrlKey || e.shiftKey || e.altKey) return;
       const t = e.target as HTMLElement;
-      // in-page links glide rather than jump
       const link = t.closest<HTMLAnchorElement>('a[href^="#"]');
-      if (link && link.getAttribute("href")!.length > 1 && !link.closest(".brand")) {
+      if (link && link.getAttribute("href")!.length > 1) {
         const el = document.querySelector<HTMLElement>(link.getAttribute("href")!);
-        if (el) {
-          e.preventDefault();
-          lenis.scrollTo(el, { duration: reduce ? 0 : 2.2, immediate: reduce, easing: (x: number) => 1 - Math.pow(1 - x, 4) });
-          return;
-        }
+        if (el) { e.preventDefault(); scrollTo({ top: el.offsetTop, behavior: reduce ? "auto" : "smooth" }); return; }
       }
       const a = t.closest<HTMLElement>("[data-work]");
       if (!a) return;
       e.preventDefault();
-      // in the collage, Previous / Next follow what it shows, as filtered
       const seq = a.closest("#works")
         ? [...document.querySelectorAll<HTMLElement>("#works [data-work]")].map((x) => x.dataset.work!)
         : undefined;
@@ -501,316 +337,259 @@ export default function Studio({ dims }: { dims: Dims }) {
     return () => {
       killed = true;
       clearTimeout(timeout);
+      clearTimeout(slowT);
       gsap.ticker.remove(frame);
-      gsap.ticker.remove(ink);
       canvas.removeEventListener("webglcontextlost", onContextLost);
       history.scrollRestoration = prevRestoration;
       for (const k of ["room", "hud"] as const) {
         if (prevData[k] === undefined) delete html.dataset[k]; else html.dataset[k] = prevData[k];
       }
-      ro.disconnect();
-      removeEventListener("resize", measure);
       document.removeEventListener("click", onDocClick);
+      room?.dispose();
+      if (roomRef.current === room) roomRef.current = null;
+    };
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, []);
+
+  // on a slow device a move or a fade still ends on time (wall clock): no lag smoothing in the studio
+  useEffect(() => {
+    gsap.ticker.lagSmoothing(0);
+    return () => gsap.ticker.lagSmoothing(500, 33);
+  }, []);
+
+  const onLift = useCallback(() => { setEntered(true); roomRef.current?.playIntro(); }, []);
+  const onPreDone = useCallback(() => {}, []);
+  useEffect(() => { if (failed) setEntered(true); }, [failed]);
+
+  useEffect(() => {
+    if (!loaded || ready || failed) return;
+    const t = window.setTimeout(() => preRef.current?.finish(), 8_000);
+    return () => clearTimeout(t);
+  }, [loaded, ready, failed]);
+
+  // the way in asks once to be pressed, a second after the house appears
+  useEffect(() => {
+    if (!ready || failed) return;
+    const a = window.setTimeout(() => setPulse(true), 1000);
+    const b = window.setTimeout(() => setPulse(false), 2400);
+    return () => { clearTimeout(a); clearTimeout(b); };
+  }, [ready, failed]);
+
+  /* ------------------------------------------------------------------------
+     Input: every gesture is one stop.
+  ------------------------------------------------------------------------ */
+  const inputOn = (entered || slow) && !failed;
+  useEffect(() => {
+    if (!inputOn) return;
+    const html = document.documentElement;
+    const inHouse = () => scrollY < 4;
+    const own = (t: EventTarget | null) => !!(t as Element | null)?.closest?.(
+      ".vdock, .ocard, .rmap, .walk-panel, .lb, .vhead, .plaque, #works, .contact");
+
+    let acc = 0, locked = false, quietT = 0;
+    const release = () => {
+      if (moving.current) { quietT = window.setTimeout(release, 60); return; }
+      acc = 0; locked = false;
+    };
+    const onWheel = (e: WheelEvent) => {
+      if (!inHouse() || holds.current.size || e.ctrlKey) return;
+      const t = e.target as Element | null;
+      if (t?.closest?.(".rmap, .walk-panel, .lb")) return;
+      e.preventDefault();
+      clearTimeout(quietT);
+      quietT = window.setTimeout(release, 250);
+      if (locked) return;
+      const sideways = Math.abs(e.deltaX) > Math.abs(e.deltaY);
+      const unit = e.deltaMode === 1 ? 16 : e.deltaMode === 2 ? innerHeight : 1;
+      acc += (sideways ? e.deltaX : e.deltaY) * unit;
+      if (Math.abs(acc) >= 60) {
+        const d = acc > 0 ? 1 : -1;
+        acc = 0; locked = true;
+        step(d, "wheel");
+      }
+    };
+    let lastY = scrollY;
+    const onScroll = () => {
+      const y = scrollY;
+      if (y < 4 && lastY >= 4) { locked = true; clearTimeout(quietT); quietT = window.setTimeout(release, 250); }
+      lastY = y;
+      const vh = innerHeight;
+      const k = clamp01(y / (vh * 0.85));
+      const st = stageRef.current, hud = hudRef.current;
+      if (st) { st.style.transform = k > 0 ? `scale(${1 - 0.2 * k})` : ""; st.style.borderRadius = k > 0 ? `${28 * k}px` : ""; }
+      if (hud) { hud.style.opacity = String(1 - clamp01(y / (vh * 0.5))); hud.inert = y > vh * 0.25; }
+      setBelow(y > 40);
+      roomRef.current?.setVisible(y < vh);
+    };
+    const onKey = (e: KeyboardEvent) => {
+      if (e.defaultPrevented || e.metaKey || e.ctrlKey || e.altKey || !inHouse() || holds.current.size) return;
+      const t = e.target as HTMLElement | null;
+      if (t?.closest?.("input, textarea, select, [contenteditable], dialog[open]")) return;
+      const next = ["ArrowRight", "ArrowDown", "PageDown"].includes(e.key) || (e.key === " " && !t?.closest?.("button, a"));
+      const prev = ["ArrowLeft", "ArrowUp", "PageUp"].includes(e.key);
+      if (!next && !prev) return;
+      e.preventDefault();
+      if (!e.repeat) step(next ? 1 : -1, "key");
+    };
+    const sw = { on: false, x: 0, y: 0, t: 0 };
+    const onTouchStart = (e: TouchEvent) => {
+      sw.on = false;
+      if (e.touches.length !== 1 || !inHouse() || holds.current.size || own(e.target)) return;
+      const t = e.touches[0];
+      Object.assign(sw, { on: true, x: t.clientX, y: t.clientY, t: performance.now() });
+    };
+    const onTouchMove = (e: TouchEvent) => { if (sw.on && e.cancelable) e.preventDefault(); };
+    const onTouchEnd = (e: TouchEvent) => {
+      if (!sw.on) return;
+      sw.on = false;
+      const t = e.changedTouches[0];
+      const dx = t.clientX - sw.x, dy = t.clientY - sw.y, dt = Math.max(1, performance.now() - sw.t);
+      const across = Math.abs(dx) > Math.abs(dy);
+      const v = (across ? Math.abs(dx) : Math.abs(dy)) / dt;
+      const far = across ? Math.abs(dx) > 40 : Math.abs(dy) > 60;
+      if (!far && !(v > 0.4 && Math.max(Math.abs(dx), Math.abs(dy)) > 24)) return;
+      step((across ? dx : dy) < 0 ? 1 : -1, "swipe");
+    };
+    addEventListener("wheel", onWheel, { passive: false, capture: true });
+    addEventListener("scroll", onScroll, { passive: true });
+    addEventListener("keydown", onKey);
+    document.addEventListener("touchstart", onTouchStart, { passive: true });
+    document.addEventListener("touchmove", onTouchMove, { passive: false });
+    document.addEventListener("touchend", onTouchEnd, { passive: true });
+    const onCancel = () => { sw.on = false; };
+    document.addEventListener("touchcancel", onCancel, { passive: true });
+    html.dataset.walk = "stops";
+    onScroll();
+    return () => {
+      clearTimeout(quietT);
+      removeEventListener("wheel", onWheel, { capture: true });
+      removeEventListener("scroll", onScroll);
+      removeEventListener("keydown", onKey);
       document.removeEventListener("touchstart", onTouchStart);
       document.removeEventListener("touchmove", onTouchMove);
       document.removeEventListener("touchend", onTouchEnd);
-      document.removeEventListener("touchcancel", onTouchEnd);
-      lenis.destroy();
-      room?.dispose();
-      if (roomRef.current === room) roomRef.current = null;
-      if (lenisRef.current === lenis) lenisRef.current = null;
+      document.removeEventListener("touchcancel", onCancel);
+      delete html.dataset.walk;
     };
-  }, []);
-
-  /* the preloader's callbacks are stable, so a re-render can never cut it off */
-  const getHeroRect = useCallback(() => roomRef.current?.heroRect() ?? null, []);
-  const onLift = useCallback(() => { roomRef.current?.playIntro(); }, []);
-  const onPreDone = useCallback(() => {}, []);
-
-  // a watchdog for the visible tab only: if the intro has not finished well
-  // after loading, land everything in its final state
-  useEffect(() => {
-    if (!loaded || ready || failed) return;
-    let t = 0;
-    const arm = () => {
-      clearTimeout(t);
-      t = window.setTimeout(() => {
-        if (document.hidden) { arm(); return; }
-        preRef.current?.finish();
-        roomRef.current?.rig.finishIntro();
-      }, 16_000);
-    };
-    arm();
-    const onVis = () => { if (!document.hidden) arm(); };
-    document.addEventListener("visibilitychange", onVis);
-    return () => { clearTimeout(t); document.removeEventListener("visibilitychange", onVis); };
-  }, [loaded, ready, failed]);
-
-  /* the header comes in once the camera has landed */
-  useLayoutEffect(() => {
-    const hud = hudRef.current;
-    if (!hud) return;
-    // the server-rendered header waits hidden (globals.css) so it never shows
-    // over the counter; from here the entrance tweens own it
-    if (!reducedMotion()) {
-      hud.querySelectorAll<HTMLElement>("[data-hud-text]").forEach((el) => { el.textContent = ""; });
-      gsap.set(hud.querySelectorAll(".hud-pill"), { yPercent: 300, autoAlpha: 0 });
-      gsap.set(hud.querySelectorAll(".diya-btn"), { yPercent: -180, autoAlpha: 0 });
-      // the hint shares a corner with the preloader's "New Delhi"; the
-      // chips would show as empty capsules while their text waits to type in
-      gsap.set(hud.querySelectorAll(".hud-hint, .hud-meta, .hud-mail"), { autoAlpha: 0 });
-    }
-    hud.dataset.state = "live";
-  }, []);
-
-  useEffect(() => {
-    if (!ready && !failed) return;
-    const hud = hudRef.current!;
-    const tweens: { kill(): void }[] = [];
-    hud.querySelectorAll<HTMLElement>("[data-hud-text]").forEach((el) =>
-      tweens.push(scrambleTo(el, el.dataset.hudText!, { speed: 2, duration: 0.8 })));
-    const quick = reducedMotion();
-    tweens.push(gsap.to(hud.querySelectorAll(".hud-pill"),
-      { yPercent: 0, autoAlpha: 1, duration: quick ? 0 : 0.5, ease: "genEase", stagger: { amount: quick ? 0 : 0.5 } }));
-    tweens.push(gsap.to(hud.querySelectorAll(".diya-btn"), { yPercent: 0, autoAlpha: 1, duration: quick ? 0 : 0.5, ease: "genEase", stagger: 0.08 }));
-    tweens.push(gsap.to(hud.querySelectorAll(".hud-meta, .hud-mail"), { autoAlpha: 1, duration: quick ? 0 : 0.35, ease: "power1.out" }));
-    tweens.push(gsap.to(hud.querySelector(".hud-hint"), { autoAlpha: 1, duration: quick ? 0 : 0.6, delay: quick ? 0 : 0.4 }));
-    return () => tweens.forEach((t) => t.kill());
-  }, [ready, failed]);
-
-  /* one panel of copy at a time, in one fixed slot that the header can
-     never overlap: the old panel goes, then the new one types in */
-  useEffect(() => {
-    const slot = copyRef.current;
-    if (!slot || !ready) return;
-    const panels = [...slot.querySelectorAll<HTMLElement>(".copy-panel")];
-    const next = panels.find((p) => p.dataset.i === String(active));
-    const showing = panels.filter((p) => p.dataset.on === "1" && p !== next);
-    const reduce = reducedMotion();
-    const tl = gsap.timeline();
-    if (showing.length) {
-      tl.to(showing, { autoAlpha: 0, y: -8, duration: reduce ? 0 : 0.25, ease: "power1.in" });
-      tl.add(() => showing.forEach((p) => (p.dataset.on = "0")));
-    }
-    slot.dataset.has = next ? "1" : "0";
-
-    if (next && next.dataset.on !== "1") {
-      tl.add(() => { next.dataset.on = "1"; });
-      tl.fromTo(next, { autoAlpha: 0, y: 10 }, { autoAlpha: 1, y: 0, duration: reduce ? 0 : 0.55, ease: "power2.out" });
-      const eyebrow = next.querySelector<HTMLElement>("[data-eyebrow]");
-      if (eyebrow) tl.add(scrambleTo(eyebrow, eyebrow.dataset.eyebrow!, { speed: 2, duration: 0.8 }), "<");
-      next.querySelectorAll<HTMLElement>("[data-line]").forEach((ln, i) =>
-        tl.add(scrambleTo(ln, ln.dataset.line!, { speed: 0.6, duration: 1.1, anagram: true }), `<+${i === 0 ? 0.1 : 0.07}`));
-    }
-    return () => {
-      tl.kill();
-      // an interrupted hand-over must not strand a half-faded or half-typed panel
-      for (const panel of panels) {
-        gsap.set(panel, { autoAlpha: 0, y: 0 });
-        panel.dataset.on = "0";
-        panel.querySelectorAll<HTMLElement>("[data-eyebrow], [data-line]").forEach((el) => {
-          el.textContent = el.dataset.eyebrow ?? el.dataset.line ?? "";
-        });
-      }
-    };
-  }, [active, ready]);
+  }, [inputOn, step]);
 
   useEffect(() => {
     document.documentElement.dataset.mode = mode;
     if (loaded && !failed) roomRef.current?.setMode(mode);
   }, [mode, loaded, failed]);
 
-  const go = (sel: string, center = false) => {
-    const el = document.querySelector<HTMLElement>(sel);
-    const l = lenisRef.current;
-    if (!el || !l) return;
-    const offset = center ? -(innerHeight - el.offsetHeight) / 2 : 0;
-    const quick = reducedMotion();
-    // a glide is a glide: snapping would catch it at every stop on the way
-    const html = document.documentElement;
-    html.dataset.gliding = "1";
-    l.scrollTo(el, { offset, duration: quick ? 0 : 2.2, immediate: quick, easing: (t: number) => 1 - Math.pow(1 - t, 4),
-      onComplete: () => { delete html.dataset.gliding; } });
-  };
-
-  const onLightbox = useCallback((open: boolean) => lock("lightbox", open), [lock]);
-  const closeStops = useCallback(() => {
-    // Menu destinations run in this same click. Release the sheet's scroll
-    // hold now: waiting for its React effect makes Lenis discard Contact.
-    lock("sheet", false);
-    setStops(false);
-  }, [lock]);
-
-  // the first visit on a phone: a hint, until the visitor walks (or it has been seen)
-  useEffect(() => {
-    if (!ready || failed || !matchMedia("(pointer: coarse)").matches) return;
-    try { if (localStorage.getItem("dp:coached") === "1") return; } catch { /* private mode */ }
-    const show = window.setTimeout(() => setCoach(true), 900);
-    const done = () => {
-      setCoach(false);
-      try { localStorage.setItem("dp:coached", "1"); } catch { /* private mode */ }
-      removeEventListener("touchstart", onTouch, true);
-    };
-    const onTouch = () => window.setTimeout(done, 400);
-    addEventListener("touchstart", onTouch, true);
-    const hide = window.setTimeout(done, 9000);
-    return () => { clearTimeout(show); clearTimeout(hide); removeEventListener("touchstart", onTouch, true); };
-  }, [ready, failed]);
-
-  // the keyboard walks too: ← and → a wall at a time
-  useEffect(() => {
-    if (!ready) return;
-    const onKey = (e: KeyboardEvent) => {
-      if (e.defaultPrevented || e.metaKey || e.ctrlKey || e.altKey) return;
-      if ((e.target as HTMLElement)?.closest?.("input, textarea, dialog[open], .sec-featured")) return;
-      if (e.key === "ArrowRight") { e.preventDefault(); stepRef.current(1); }
-      if (e.key === "ArrowLeft") { e.preventDefault(); stepRef.current(-1); }
-    };
-    addEventListener("keydown", onKey);
-    return () => removeEventListener("keydown", onKey);
-  }, [ready]);
-
-  useEffect(() => { lock("sheet", stops); }, [stops, lock]);
-  /** a stop of the walk, by its index: its section, centred */
-  /** the works, filtered, in the collage below the house */
+  const [lbOpen, setLbOpen] = useState(false);
+  const onLightbox = useCallback((open: boolean) => { hold("lightbox", open); setLbOpen(open); }, [hold]);
+  useEffect(() => { hold("map", mapOpen); }, [mapOpen, hold]);
+  useEffect(() => { hold("more", more); }, [more, hold]);
+  const closeMap = useCallback(() => setMapOpen(false), []);
+  const closeMore = useCallback(() => setMore(false), []);
+  const openWork = useCallback((id: string, source: string) => {
+    const w = BY_ID.get(id);
+    if (w) track("painting_clicked", { ...paintingProperties(w), source });
+    lbRef.current?.open(id, null, WALK_ORDER);
+  }, []);
   const showWorks = (f: WorksFilter) => {
     dispatchEvent(new CustomEvent(WORKS_FILTER, { detail: f }));
-    setTimeout(() => go("#works"), 60);
+    setTimeout(() => {
+      const el = document.getElementById("works");
+      if (el) scrollTo({ top: el.offsetTop, behavior: reducedMotion() ? "auto" : "smooth" });
+    }, 60);
   };
-  // the sheet holds the page still while it is open: move once it has let go
-  const goStop = (i: number) => {
-    roomRef.current?.prepareChapter(i);
-    setTimeout(() => go(`[data-chapter='${CHAPTERS[i].id}']`, true), 120);
-  };
-  // the chapter in view, for the header's "you are here"
-  const here = ready ? CHAPTERS[active]?.id : undefined;
+  const goStop = useCallback((i: number) => {
+    hold("map", false);
+    setMapOpen(false);
+    if (scrollY > 4) scrollTo({ top: 0 });
+    moveRef.current(i, "map");
+  }, [hold]);
+  const enter = useCallback(() => {
+    hold("more", false);
+    setMore(false);
+    if (stopRef.current === 0) moveRef.current(1, "enter");
+  }, [hold]);
 
-  // a link to one painting (its own page's "See it in her studio", or a shared /#work=<id>): once
-  // the house is open, walk to the wall it hangs on and open it there; /#works goes to the collage
+  const here = stops[stop]?.id;
+  const opening = here === "presence";
+  const panel = arrived && here === "desk" ? "desk" : opening ? "about" : "";
+  useEffect(() => {
+    const d = document.documentElement.dataset;
+    if (panel) d.panel = panel; else delete d.panel;
+    return () => { delete document.documentElement.dataset.panel; };
+  }, [panel]);
+
+  // a link to one painting (its page's "See it in her studio", or /#work=<id>): go to it, open it there
   useEffect(() => {
     if (!ready || failed) return;
     const hash = location.hash;
-    if (hash === "#works") { setTimeout(() => go("#works"), 300); return; }
+    if (hash === "#works") { setTimeout(() => showWorks("all"), 300); return; }
     const m = /^#work=([a-z0-9-]+)$/.exec(hash);
     if (!m || !BY_ID.has(m[1])) return;
     const id = m[1];
-    history.replaceState(null, "", location.pathname + location.search);   // a refresh starts at the door
-    const i = stopOf(id);
+    history.replaceState(null, "", location.pathname + location.search);
+    const i = stopOfWork(stopsRef.current, id);
     if (i < 0) { lbRef.current?.open(id, null, WALK_ORDER); return; }
-    goStop(i);
-    let tries = 0;
-    const t = window.setInterval(() => {
-      const r = roomRef.current;
-      const there = !!r && r.landed && Math.abs(r.at * (CHAPTERS.length - 1) - i) < 0.04;
-      if (there || ++tries > 80) {
-        clearInterval(t);
-        lbRef.current?.open(id, null, WALK_ORDER);
-      }
-    }, 150);
-    return () => clearInterval(t);
+    afterArrive.current = () => lbRef.current?.open(id, null, WALK_ORDER);
+    moveRef.current(i, "link");
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [ready, failed]);
+
+  const live = (entered || slow) && !failed && !below && !lbOpen;
+  const dockOn = live && !opening;
 
   return (
     <>
       <div className="stage" ref={stageRef} aria-hidden="true">
         <canvas ref={canvasRef} />
       </div>
-
-      <Preloader key={loadEpoch} ref={preRef} pct={pct} loaded={loaded} failed={failed}
-                 getHeroRect={getHeroRect} onLift={onLift} onDone={onPreDone} />
-
-      {/* always on screen, from the first frame: the way back to the website */}
-      <a className="studio-exit" href="/" aria-label="Exit the studio and go back to the website">
-        <svg viewBox="0 0 24 24" aria-hidden="true"><path d="M6 6l12 12M18 6L6 18" /></svg>
-        <span>Exit the studio</span>
-      </a>
-
-      {/* the header — line work and pills, as in the original */}
-      <header className="hud" ref={hudRef} inert={!ready && !failed} data-state="pre">
-        <div className="hud-top">
-          <a className="brand" href="#top" aria-label="Dr Dolly Prasad — back to the door"
-             onClick={(e) => {
-               e.preventDefault();
-               const quick = reducedMotion();
-               lenisRef.current?.scrollTo(0, { duration: quick ? 0 : 2.4, immediate: quick });
-             }}>
-            <div data-brand-target className="brand-target" />
-          </a>
-          <div className="hud-meta lab">
-            <span data-hud-text="New Delhi">New Delhi</span>
-            <span ref={clockRef} />
-          </div>
-          <a className="hud-mail lab" href={`mailto:${EMAIL}`} data-hud-text="↳ Write to me">↳ Write to me</a>
-          <button type="button" className="diya-btn music-btn" aria-pressed={playing}
-                  aria-label={playing ? "Pause the music" : "Play the music"} onClick={() => music.toggle()}>
-            <svg viewBox="0 0 32 32" aria-hidden="true">
-              <path d="M12 22.5V9.5l11-2.5v12.5" className="dish-line" />
-              <circle cx="9.5" cy="22.5" r="2.8" className="dish" />
-              <circle cx="20.5" cy="19.5" r="2.8" className="dish" />
-              {!playing && <path d="M6 6l20 20" className="dish-line" />}
-            </svg>
-          </button>
-          <button type="button" className="diya-btn" aria-pressed={mode === "dark"}
-                  aria-label={mode === "dark" ? "Put out the diya" : "Light the diya"}
-                  onClick={() => setMode(mode === "dark" ? "light" : "dark")}>
-            <svg viewBox="0 0 32 32" aria-hidden="true">
-              <path d="M16 6c2.6 3.1 3.6 5.4 3.6 7.2a3.6 3.6 0 0 1-7.2 0c0-1.8 1-4.1 3.6-7.2Z" className="flame" />
-              <path d="M5 19.5h22c-1 4.2-5.3 7-11 7s-10-2.8-11-7Z" className="dish" />
-            </svg>
-          </button>
+      {/* a faint vignette over the house (never over the dock or the sheets) */}
+      <div className="vignette" aria-hidden="true" />
+      <div className="stage-dim" data-on={more ? "1" : "0"} aria-hidden="true" />
+      <div className="stage-veil" ref={veilRef} aria-hidden="true" data-room="0">
+        <div className="veil-in">
+          <span className="veil-kicker" />
+          <span className="veil-name" />
+          <i className="veil-border" />
         </div>
-        <div className="hud-bottom">
-          <span className="lab hud-hint">Scroll ↓</span>
-          {/* the phone's dock: where you are in the house, the works, and the rest in a sheet */}
-          {ready && !failed && (
-            <div className="dock">
-              <button type="button" className="dock-where" disabled={!ready} onClick={() => setStops(true)}
-                      aria-label={`Stop ${active + 1} of ${CHAPTERS.length}: ${CHAPTERS[active]?.stop}. All stops`}>
-                <span className="lab dock-n">{String(active + 1).padStart(2, "0")}<i>/{String(CHAPTERS.length).padStart(2, "0")}</i></span>
-                <span className="dock-name" key={active}>{CHAPTERS[active]?.stop}</span>
-              </button>
-              <button type="button" className="dock-menu" disabled={!ready} aria-label="Menu" aria-expanded={stops}
-                      onClick={() => setStops(true)}>
-                <svg viewBox="0 0 24 24" aria-hidden="true"><path d="M5 8.5h14M5 15.5h14" /></svg>
-              </button>
-            </div>
+      </div>
+
+      <Preloader ref={preRef} pct={pct} loaded={loaded} failed={failed} slow={slow && !loaded}
+                 onLift={onLift} onDone={onPreDone} />
+
+      {/* always on screen, from the first frame: the way home, the rooms, the music */}
+      <header className="vhead" ref={hudRef} data-state={entered ? "live" : "pre"}>
+        <a className="vh-home" href={HOME} aria-label="Leave the studio and go to the home page">
+          <svg viewBox="0 0 24 24" aria-hidden="true"><path d="M19 12H6M11 6.5L5.5 12l5.5 5.5" /></svg>
+          <span>Home</span>
+        </a>
+        <div className="vh-right">
+          {!failed && (
+            <button type="button" className="vh-rooms map-btn" aria-expanded={mapOpen} aria-haspopup="dialog" inert={!entered}
+                    onClick={() => setMapOpen((o) => !o)}>
+              Rooms <svg viewBox="0 0 12 12" aria-hidden="true"><path d="M2 4l4 4 4-4" /></svg>
+            </button>
           )}
-          <nav className="hud-pills" aria-label="Site">
-            <span className="mask"><a className="pill hud-pill" href="/">← The website</a></span>
-            <span className="mask"><button type="button" className="pill hud-pill" aria-current={here === "featured" || undefined}
-                  onClick={() => go(failed ? "#works" : "[data-chapter='featured']")}>Works<span className="arr"> →</span></button></span>
-            {!failed && (
-              <span className="mask"><button type="button" className="pill hud-pill" aria-current={here === "plan" || undefined}
-                    onClick={() => go("[data-chapter='plan']", true)}>Exhibitions<span className="arr"> →</span></button></span>
-            )}
-            <span className="mask"><button type="button" className="pill hud-pill" onClick={() => go("#contact")}>Contact<span className="arr"> →</span></button></span>
-          </nav>
+          <button type="button" className="vh-music music-btn" aria-pressed={playing} inert={!entered}
+                  aria-label={playing ? "Pause the music" : "Play the music"} onClick={() => music.toggle()}>
+            <svg viewBox="0 0 24 24" aria-hidden="true">
+              {playing
+                ? <path d="M6 9v6M10 6v12M14 8v8M18 10v4" />
+                : <path d="M6 12h12" />}
+            </svg>
+          </button>
         </div>
       </header>
 
-      {/* the copy slot — fixed, below the header's reach */}
-      <div className="copy" ref={copyRef} data-has="0" aria-hidden="true">
-        {CHAPTERS.map((c, i) => (c.body || c.verse || c.quote) ? (
-          <div className="copy-panel" data-i={i} data-on="0" key={c.id}>
-            <div className="copy-head">
-              <div className="lab" data-eyebrow={c.eyebrow}>{c.eyebrow}</div>
-              {/* the label's place in the hang, as a catalogue numbers it */}
-              <div className="lab copy-idx">{String(i + 1).padStart(2, "0")} / {String(CHAPTERS.length).padStart(2, "0")}</div>
-            </div>
-            {c.verse && (
-              <p className="poem">
-                {c.verse.split("\n").map((ln, k) => <span className="poem-line" key={k} data-line={ln}>{ln}</span>)}
-              </p>
-            )}
-            {c.body && (c.bodyUntil ? <Until until={c.bodyUntil}><p className="lede">{c.body}</p></Until> : <p className="lede">{c.body}</p>)}
-            {c.quote && <blockquote className="quote">“{c.quote}”</blockquote>}
-          </div>
-        ) : null)}
+      {/* the room's line, as lettering at the top of the wall on its first painting (ours, never hers) */}
+      <div className="wall-letter" data-on={letter && arrived && live ? "1" : "0"} aria-hidden="true">
+        {letter && <><span className="wl-room">{letter.room}</span><span className="wl-line">{letter.line}</span></>}
       </div>
 
-      <WallLabels room={roomRef} active={active} live={ready && !failed}
-                  onOpen={(id) => lbRef.current?.open(id, null, WALK_ORDER)} />
+      <OpeningCard open={live && opening} onEnter={enter} onMore={() => setMore(true)} />
+      <KnowMore open={entered && more} onClose={closeMore} onEnter={enter} />
+      <Desk open={live && panel === "desk"} />
+
+      <WallLabels room={roomRef} stops={stops} stop={stop} arrived={arrived && ready} live={ready && !failed && !more} phone={phone}
+                  onOpen={(id) => openWork(id, "studio_wall_label")} onStrip={setStripWanted} />
 
       {failed && (
         <p className="room-off lab" role="status">
@@ -818,51 +597,25 @@ export default function Studio({ dims }: { dims: Dims }) {
         </p>
       )}
 
-      {/* one section per chapter — the same source as the camera */}
-      <main className="chapters" ref={mainRef} id="top">
-        {CHAPTERS.map((c) =>
-          c.slot === "featured" ? (
-            <section className="sec sec-featured" key={c.id} data-chapter={c.id} aria-label="Featured works">
-              <Featured dims={dims} onOpen={(id, img) => lbRef.current?.open(id, img, FEATURED)} />
-            </section>
-          ) : (
-            <section className="sec" key={c.id} data-chapter={c.id} aria-label={c.eyebrow}>
-              {(c.body || c.verse || c.quote) && (
-                <div className="chapter-text">
-                  <h2 className="lab">{c.eyebrow}</h2>
-                  {c.verse && <p className="poem">{c.verse}</p>}
-                  {c.body && (c.bodyUntil ? <Until until={c.bodyUntil}><p className="lede">{c.body}</p></Until> : <p className="lede">{c.body}</p>)}
-                  {c.quote && <blockquote className="quote">“{c.quote}”</blockquote>}
-                </div>
-              )}
-            </section>
-          )
-        )}
+      {/* the house: one screen. Each wall's words, for assistive tech and search */}
+      <main className="chapters" id="top">
+        <section className="sec" aria-label="The studio">
+          {CHAPTERS.map((c) => (c.body || c.verse || c.quote) ? (
+            <div className="chapter-text" key={c.id}>
+              <h2 className="lab">{c.eyebrow}</h2>
+              {c.verse && <p className="poem">{c.verse}</p>}
+              {c.body && (c.bodyUntil ? <Until until={c.bodyUntil}><p className="lede">{c.body}</p></Until> : <p className="lede">{c.body}</p>)}
+              {c.quote && <blockquote className="quote">“{c.quote}”</blockquote>}
+            </div>
+          ) : null)}
+        </section>
       </main>
 
-      {/* a phone's way to walk without knowing the gesture: an arrow at each edge */}
-      {ready && !failed && (
-        <div className="edge-nav" aria-hidden="false">
-          <button type="button" className="edge-btn is-prev" aria-label="The last wall" disabled={active === 0}
-                  onClick={() => stepRef.current(-1)}><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M14.5 5.5 8 12l6.5 6.5" /></svg></button>
-          <button type="button" className="edge-btn is-next" aria-label="The next wall"
-                  onClick={() => stepRef.current(1)}><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M9.5 5.5 16 12l-6.5 6.5" /></svg></button>
-        </div>
-      )}
-      {coach && (
-        <div className="coach" role="status">
-          <span className="coach-hand" aria-hidden="true" />
-          <span className="coach-text">Swipe up to walk through the house</span>
-          <span className="coach-sub lab">or swipe sideways · or tap ‹ ›</span>
-        </div>
-      )}
-
-      {!failed && (
-        <QuickIndex active={active} live={ready} onStop={goStop} onWorks={showWorks}
-                    onPlan={() => go("[data-chapter='plan']", true)} onContact={() => go("#contact")} />
-      )}
-      <Stops open={stops} active={active} onClose={closeStops} onGo={goStop}
-             onContact={() => go("#contact")} onWorks={showWorks} />
+      <Dock stops={stops} stop={stop} phone={phone} strip={stripWanted} visible={dockOn} pulse={pulse}
+            onPrev={() => step(-1, "prev")} onNext={() => step(1, "next")}
+            onOpen={(id) => openWork(id, "studio_dock")} />
+      <RoomMap stops={stops} open={mapOpen} active={stop} onClose={closeMap} onGo={goStop}
+               onWorks={() => { closeMap(); showWorks("all"); }} />
       <Lightbox ref={lbRef} dims={dims} onOpenChange={onLightbox} />
       <Cursor live={ready || failed} />
     </>

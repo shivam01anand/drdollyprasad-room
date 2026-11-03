@@ -1,7 +1,7 @@
 "use client";
 
 import { useEffect, useRef } from "react";
-import { motion, gsap, scrambleTo } from "@/lib/motion";
+import { motion, gsap, settleText } from "@/lib/motion";
 
 /**
  * The original's cursor: a thin ring that trails the pointer by 0.3 s and is
@@ -51,8 +51,8 @@ export default function Cursor({ live }: { live: boolean }) {
       tw?.kill();
       // a word leaves through its own letters, as in the original
       tw = label
-        ? scrambleTo(t, label, { speed: 0.6, duration: 1 })
-        : scrambleTo(t, "", { speed: 0.6, duration: 0.5, chars: was || undefined });
+        ? settleText(t, label)
+        : settleText(t, "");
     };
 
     const onMove = (e: PointerEvent) => {

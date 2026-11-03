@@ -2,25 +2,27 @@ import * as THREE from "three";
 import gsap from "gsap";
 
 /**
- * Camera rig — a pivot Group with the camera as its child, exactly the
- * original's arrangement. A pose is four triples (pivot position, pivot
- * rotation, and the camera's position and rotation in pivot space) that GSAP
- * tweens; update() copies them onto the real objects every frame. Rotating
- * the pivot while dollying the camera gives orbit-like arcs for free.
+ * Camera rig: a pivot Group with the camera as its child. A pose is four triples (pivot position,
+ * pivot rotation, and the camera's position and rotation in pivot space), a lens and a view offset
+ * (where on the screen the projection centre sits: the middle of the band between header and dock).
  *
- * The pivot rotates yaw-then-pitch (YXZ), so any pose is a plain "stand
- * here, look there" with a level horizon.
+ * Art direction V3 (29 Oct 2026): the visitor is always at one stop. A move to the next stop is
+ * one short tween of the whole pose (a truck along the wall, or a turn of at most a quarter in the
+ * same room); anything else is a cut under the page's veil. Scroll does not drive the camera.
+ *
+ * The pivot rotates yaw-then-pitch (YXZ), so any pose is a plain "stand here, look there" with a
+ * level horizon.
  */
 
 export type V3 = [number, number, number];
-export type Pose = { cam: V3; camRot: V3; pivot: V3; pivotRot: V3; fov?: number };
+/** off: the view window's shift, as fractions of the screen: [0.5 - band centre x / W, 0.5 - band centre y / H] */
+export type Pose = { cam: V3; camRot: V3; pivot: V3; pivotRot: V3; fov?: number; off?: [number, number] };
 const KEYS = ["cam", "camRot", "pivot", "pivotRot"] as const;
 
 /**
- * Look at `target` from `dist` metres away. yaw 0 looks toward the back wall
- * (−z), π/2 toward the left wall (−x), −π/2 toward the right wall (+x).
- * `orbit` lifts the camera over the target (−π/2 is straight down);
- * `pitch` tilts the view about the camera itself.
+ * Look at `target` from `dist` metres away. yaw 0 looks toward the back wall (−z), π/2 toward the
+ * left wall (−x), −π/2 toward the right wall (+x). `orbit` lifts the camera over the target (−π/2
+ * is straight down); `pitch` tilts the view about the camera itself.
  */
 export function aim(target: V3, yaw: number, dist: number, pitch = 0, orbit = 0): Pose {
   return { cam: [0, 0, dist], camRot: [pitch, 0, 0], pivot: [...target] as V3, pivotRot: [orbit, yaw, 0] };
@@ -30,6 +32,7 @@ export const clonePose = (p: Pose): Pose => ({
   cam: [...p.cam] as V3, camRot: [...p.camRot] as V3,
   pivot: [...p.pivot] as V3, pivotRot: [...p.pivotRot] as V3,
   ...(p.fov === undefined ? {} : { fov: p.fov }),
+  ...(p.off === undefined ? {} : { off: [...p.off] as [number, number] }),
 });
 
 export const fieldOfView = (aspect: number) => aspect > 4 / 3 ? 40
@@ -46,150 +49,135 @@ const follow = (x: number, target: number, k: number, dt: number) =>
 export class Rig {
   readonly pivot = new THREE.Group();
   readonly camera: THREE.PerspectiveCamera;
-  /** the live pose every timeline writes into */
+  /** the live pose every tween writes into */
   readonly pose: Pose;
 
   private shots: Pose[];
-  /** for each step between chapters, a pose it passes through without stopping, or null */
-  private vias: (Pose | null)[];
-  private scrollTl: gsap.core.Timeline;
-  private introTl?: gsap.core.Timeline;
-  private messTl?: gsap.core.Tween;
   private enabled = false;
   private reduced: boolean;
   private baseFov = 40;
-  private lens = { fov: 40 };
-
-  // David Lee's chain: the scroll fraction approaches its target with a
-  // ~100 ms time constant, the camera's own progress follows that at 10 % a
-  // frame. The copy lands before the camera does, and that lag is the weight.
-  private scrollTarget = 0;
-  private scrollSmooth = 0;
-  private camProgress = 0;
-  private lastProgress = -1;
+  private lens = { fov: 40, ox: 0, oy: 0 };
+  private appliedLens = { fov: -1, ox: NaN, oy: NaN, aspect: -1 };
+  /** the stop index, as a float while a move runs (the afternoon follows it) */
+  private at = { i: 0 };
+  private moveTl?: gsap.core.Timeline;
 
   private ptr = { x: 0, y: 0, on: false };
   private ptrSmooth = { x: 0, y: 0 };
   private touch = false;
+  /** how much a look turns the head: a mouse's small sway, or a finger's wider glance */
+  private lookGain = 1;
 
   /** rearrange: the dollhouse view, blended in by one scalar */
   private mess: Pose;
   private messK = { v: 0 };
+  private messTl?: gsap.core.Tween;
 
   private lastMatrix = new THREE.Matrix4();
   private lastProjection = new THREE.Matrix4();
 
-  constructor(shots: Pose[], start: Pose, mess: Pose, aspect: number, reduced: boolean, vias: (Pose | null)[] = []) {
+  constructor(shots: Pose[], mess: Pose, aspect: number, reduced: boolean) {
     this.shots = shots.map(clonePose);
-    this.vias = vias.map((v) => (v ? clonePose(v) : null));
     this.mess = clonePose(mess);
     this.reduced = reduced;
-    this.baseFov = this.lens.fov = fieldOfView(aspect);
+    this.baseFov = fieldOfView(aspect);
     this.pivot.rotation.order = "YXZ";
     this.camera = new THREE.PerspectiveCamera(40, aspect, 0.05, 120);
     this.pivot.add(this.camera);
-    // the camera waits at the establishing shot, so nothing is ever seen
-    // from a pose it then has to jump away from
-    this.pose = clonePose(reduced ? shots[0] : start);
-    this.scrollTl = this.buildScrollTimeline();
+    this.pose = clonePose(shots[0]);
+    this.setLens(shots[0]);
     this.setAspect(aspect);
     this.apply();
   }
 
+  private setLens(p: Pose) {
+    this.lens.fov = p.fov ?? this.baseFov;
+    this.lens.ox = p.off?.[0] ?? 0;
+    this.lens.oy = p.off?.[1] ?? 0;
+  }
+
   setAspect(aspect: number) {
-    // keep the horizontal field of a 4:3 frame on narrow viewports
-    // (capped: on a phone held upright the 4:3 rule asks for 93°, which is
-    // mostly ceiling and floor)
-    this.baseFov = this.lens.fov = fieldOfView(aspect);
-    this.camera.fov = this.lens.fov;
+    this.baseFov = fieldOfView(aspect);
     this.camera.aspect = aspect;
-    this.camera.updateProjectionMatrix();
+    this.appliedLens.aspect = -1;
+    this.applyLens();
   }
 
-  /**
-   * The room is shown, then the camera moves in on one painting. The
-   * establishing shot is square-on to the hero so the painting the
-   * preloader showed is exactly where the room has it; the move in is one
-   * unbroken dolly with a small rise, position leading and rotation
-   * following by a few hundredths, as the original does.
-   */
-  playIntro(start: Pose, onDone: () => void, delay = 0) {
-    this.introTl?.kill();
-    if (this.reduced) {
-      assign(this.pose, this.shots[0]);
-      this.lens.fov = this.shots[0].fov ?? this.baseFov;
-      this.enabled = true;
-      onDone();
-      return;
-    }
-    assign(this.pose, start);
-    this.lens.fov = start.fov ?? this.baseFov;
-    const end = this.shots[0];
-    const tl = gsap.timeline({ delay, onComplete: () => { this.enabled = true; onDone(); } });
-    KEYS.forEach((k, i) =>
-      tl.to(this.pose[k], { 0: end[k][0], 1: end[k][1], 2: end[k][2], duration: 2.6, ease: "power2.inOut" }, i * 0.04)
-    );
-    tl.to(this.lens, { fov: end.fov ?? this.baseFov, duration: 2.6, ease: "power2.inOut" }, 0);
-    this.introTl = tl;
+  /** the house opens already framed on the first stop, under the welcome's crossfade */
+  playIntro(onDone: () => void) {
+    const i = Math.round(this.at.i);
+    assign(this.pose, this.shots[i]);
+    this.setLens(this.shots[i]);
+    this.enabled = true;
+    onDone();
   }
 
-  /** finish the intro immediately — a backgrounded tab, or a reload mid-way */
-  finishIntro() {
-    if (this.introTl && this.introTl.progress() < 1) this.introTl.progress(1);
-  }
-
-  /**
-   * The paused timeline scroll drives. Explicit from-values make it
-   * independent of wherever the pose happens to be when it is built, so it
-   * can be rebuilt mid-page (a phone turned on its side) without a jump.
-   */
-  private buildScrollTimeline() {
-    // the original's 10 s segments and 0.5 s key offsets; each segment ends
-    // before the next begins, so a chapter's centre is exactly its framing
-    const seg = 10, offset = 0.5, span = seg + offset * (KEYS.length - 1);
-    const tl = gsap.timeline({ paused: true, defaults: { ease: "power3.inOut", duration: seg, immediateRender: false } });
-    const v3 = (p: Pose, k: (typeof KEYS)[number]) => ({ 0: p[k][0], 1: p[k][1], 2: p[k][2] });
-    this.shots.slice(1).forEach((s, i) => {
-      const from = this.shots[i], via = this.vias[i];
-      KEYS.forEach((k, j) => {
-        const at = i * span + j * offset;
-        if (!via) { tl.fromTo(this.pose[k], v3(from, k), v3(s, k), at); return; }
-        // through a doorway without stopping in it: gathering speed to the passing
-        // pose, carrying it through, easing out on the far side
-        tl.fromTo(this.pose[k], v3(from, k), { ...v3(via, k), ease: "power2.in", duration: seg / 2 }, at);
-        tl.fromTo(this.pose[k], v3(via, k), { ...v3(s, k), ease: "power2.out", duration: seg / 2 }, at + seg / 2);
-      });
-      tl.fromTo(this.lens, { fov: from.fov ?? this.baseFov },
-        { fov: s.fov ?? this.baseFov }, i * span);
-    });
-    return tl;   // (shots − 1) · 11.5 s
-  }
-
-  /** new framings (portrait ↔ landscape): rebuild and land where scroll is */
-  setShots(shots: Pose[], vias: (Pose | null)[] = []) {
+  /** new framings (a phone turned, a window resized): land on the stop at once */
+  setShots(shots: Pose[], index?: number) {
+    this.moveTl?.kill();
+    this.moveTl = undefined;
     this.shots = shots.map(clonePose);
-    this.vias = vias.map((v) => (v ? clonePose(v) : null));
-    this.scrollTl.kill();
-    this.scrollTl = this.buildScrollTimeline();
-    if (this.enabled) {
-      this.scrollTl.progress(this.camProgress);
-      this.lastProgress = this.camProgress;
-    }
+    const i = Math.max(0, Math.min(shots.length - 1, index ?? Math.round(this.at.i)));
+    this.at.i = i;
+    assign(this.pose, this.shots[i]);
+    this.setLens(this.shots[i]);
   }
 
-  /** 0 at the first chapter's shot, 1 at the last */
-  scroll(progress: number) {
-    this.scrollTarget = Math.min(1, Math.max(0, progress));
+  /**
+   * One stop, by a short tween of the whole pose (a truck along a wall, or a turn in the same
+   * room). The yaw takes the short way round. `onArrive` fires when the tween completes.
+   */
+  goTo(index: number, duration: number, onArrive: () => void) {
+    this.moveTl?.kill();
+    const to = this.shots[index];
+    if (!to) { onArrive(); return; }
+    if (!this.enabled || this.reduced || duration <= 0) { this.jumpTo(index); onArrive(); return; }
+    const end = clonePose(to);
+    let yaw = end.pivotRot[1];
+    const from = this.pose.pivotRot[1];
+    while (yaw - from > Math.PI) yaw -= 2 * Math.PI;
+    while (yaw - from < -Math.PI) yaw += 2 * Math.PI;
+    end.pivotRot[1] = yaw;
+    const ease = "power2.inOut";
+    const tl = gsap.timeline({ onComplete: () => {
+      this.moveTl = undefined;
+      // settle exactly (and unwrap nothing further): the stored shot is the truth
+      assign(this.pose, to);
+      this.setLens(to);
+      this.at.i = index;
+      onArrive();
+    } });
+    for (const k of KEYS) tl.to(this.pose[k], { 0: end[k][0], 1: end[k][1], 2: end[k][2], duration, ease }, 0);
+    tl.to(this.lens, { fov: end.fov ?? this.baseFov, ox: end.off?.[0] ?? 0, oy: end.off?.[1] ?? 0, duration, ease }, 0);
+    tl.to(this.at, { i: index, duration, ease }, 0);
+    this.moveTl = tl;
   }
 
-  /** after a resize or a restored scroll position, land without easing */
-  syncScroll(progress: number) {
-    this.scrollTarget = this.scrollSmooth = this.camProgress = Math.min(1, Math.max(0, progress));
-    if (!this.enabled) return;
-    if (this.reduced) { this.lastProgress = -1; return; }   // update() cuts to the chapter
-    this.scrollTl.progress(this.camProgress);
-    this.lastProgress = this.camProgress;
+  /** a cut: straight to a stop (under the veil) */
+  jumpTo(index: number) {
+    this.moveTl?.kill();
+    this.moveTl = undefined;
+    const s = this.shots[index];
+    if (!s) return;
+    assign(this.pose, s);
+    this.setLens(s);
+    this.at.i = index;
   }
+
+  /** QA and review mocks: hold the camera on any pose (the next stop move takes over again) */
+  hold(p: Pose) {
+    this.moveTl?.kill();
+    this.moveTl = undefined;
+    assign(this.pose, p);
+    this.setLens(p);
+  }
+
+  /** a stop-to-stop tween is running */
+  get stepping() { return !!this.moveTl; }
+  /** a stop's framing, for working out what is where on screen */
+  shot(i: number): Pose | undefined { return this.shots[i]; }
+  get count() { return this.shots.length; }
+  get fovBase() { return this.baseFov; }
 
   pointer(nx: number, ny: number) {
     if (this.touch || this.reduced) return;
@@ -203,11 +191,6 @@ export class Rig {
   dropPointer() { this.ptr.on = false; }
   touched() { this.touch = true; this.ptr.on = false; this.lookGain = 2.6; }
 
-  /** how much a look turns the head: a mouse's small sway, or a finger's wider glance */
-  private lookGain = 1;
-  /** a walking pace: no step from one wall to the next is quicker than this */
-  private static STEP_S = 2.6;
-
   setMess(on: boolean) {
     this.messTl?.kill();
     this.messTl = gsap.to(this.messK, { v: on ? 1 : 0, duration: this.reduced ? 0 : 0.9, ease: "power1.inOut" });
@@ -215,32 +198,6 @@ export class Rig {
 
   /** advance one frame; returns true if the camera moved */
   update(dt: number) {
-    if (this.enabled && this.reduced) {
-      // no travel: each chapter is a still view, changed in a cut
-      const last = this.shots.length - 1;
-      const index = Math.round(this.scrollTarget * last);
-      if (index / last !== this.lastProgress) {
-        assign(this.pose, this.shots[index]);
-        this.lens.fov = this.shots[index].fov ?? this.baseFov;
-        this.scrollSmooth = this.camProgress = this.lastProgress = index / last;
-      }
-    } else if (this.enabled) {
-      // the camera walks: it follows the scroll softly, and never faster than one
-      // step in STEP_S as it arrives (a long jump — the list of stops — covers the
-      // walls on the way quickly, so it is there in a few seconds, not a crawl)
-      this.scrollSmooth = follow(this.scrollSmooth, this.scrollTarget, 0.08, dt);
-      const want = follow(this.camProgress, this.scrollSmooth, 0.05, dt) - this.camProgress;
-      const step = 1 / Math.max(1, this.shots.length - 1);
-      const far = Math.abs(this.scrollSmooth - this.camProgress);
-      // all but the last wall of a long jump goes quickly; the arrival is always at a walk
-      const vmax = Math.max(step / Rig.STEP_S, far - step * 0.6) * (dt / 1000);
-      this.camProgress += THREE.MathUtils.clamp(want, -vmax, vmax);
-      if (Math.abs(this.camProgress - this.scrollTarget) < 1e-5) this.camProgress = this.scrollTarget;
-      if (this.camProgress !== this.lastProgress) {
-        this.scrollTl.progress(this.camProgress);
-        this.lastProgress = this.camProgress;
-      }
-    }
     const tx = this.ptr.on ? this.ptr.x : 0, ty = this.ptr.on ? this.ptr.y : 0;
     this.ptrSmooth.x = follow(this.ptrSmooth.x, tx, this.ptr.on ? 0.15 : 0.06, dt);
     this.ptrSmooth.y = follow(this.ptrSmooth.y, ty, this.ptr.on ? 0.15 : 0.06, dt);
@@ -258,37 +215,49 @@ export class Rig {
     return moved;
   }
 
+  /** the lens and the band's offset, applied only when they change */
+  private applyLens() {
+    const a = this.appliedLens, l = this.lens, c = this.camera;
+    if (a.fov === l.fov && a.ox === l.ox && a.oy === l.oy && a.aspect === c.aspect) return;
+    a.fov = l.fov; a.ox = l.ox; a.oy = l.oy; a.aspect = c.aspect;
+    c.fov = l.fov;
+    // the projection centre at the band's middle: a window over the full frame, shifted (ratios only)
+    if (l.ox || l.oy) c.setViewOffset(c.aspect, 1, l.ox * c.aspect, l.oy, c.aspect, 1);
+    else c.clearViewOffset();
+    c.updateProjectionMatrix();
+  }
+
   private apply() {
     const p = this.pose, m = this.mess, k = this.messK.v;
     const mix = (a: number, b: number) => a + (b - a) * k;
-    // parallax, added after the pose; scaled down on close-ups so a shot
-    // 60 cm from a padlock does not swing by a fifth of a metre
+    // parallax, added after the pose; scaled down on close-ups so a shot 60 cm from a padlock does
+    // not swing by a fifth of a metre
     const dist = mix(p.cam[2], m.cam[2]);
     const amt = THREE.MathUtils.clamp(dist / 2.6, 0.2, 1) * (1 - k * 0.6);
-    const e = this.ptrSmooth.x * amt * this.lookGain, t = this.ptrSmooth.y * amt * this.lookGain;
+    // (a mouse's sway is half what it was: the wall holds still under its names, 29 Oct)
+    const sway = this.touch ? 1 : 0.5;
+    const e = this.ptrSmooth.x * amt * this.lookGain * sway, t = this.ptrSmooth.y * amt * this.lookGain * sway;
     this.pivot.position.set(mix(p.pivot[0], m.pivot[0]), mix(p.pivot[1], m.pivot[1]), mix(p.pivot[2], m.pivot[2]));
     this.pivot.rotation.set(mix(p.pivotRot[0], m.pivotRot[0]), mix(p.pivotRot[1], m.pivotRot[1]), mix(p.pivotRot[2], m.pivotRot[2]));
     // the head turns; the body barely moves (a finger's wider look must not walk the camera into a wall)
     const shift = 0.2 / this.lookGain;
     this.camera.position.set(mix(p.cam[0], m.cam[0]) - shift * e, mix(p.cam[1], m.cam[1]) + shift * t, dist);
     this.camera.rotation.set(mix(p.camRot[0], m.camRot[0]) - 0.1 * t, mix(p.camRot[1], m.camRot[1]) - 0.1 * e, mix(p.camRot[2], m.camRot[2]));
-    if (this.camera.fov !== this.lens.fov) {
-      this.camera.fov = this.lens.fov;
-      this.camera.updateProjectionMatrix();
-    }
+    this.applyLens();
   }
 
-  get progress() { return this.camProgress; }
-  /** how far the camera still has to travel to where the scroll says (pointer drift aside) */
-  get travel() { return Math.abs(this.camProgress - this.scrollTarget); }
+  /** 0 at the first stop, 1 at the last (fractional during a move) */
+  get progress() { return this.at.i / Math.max(1, this.shots.length - 1); }
+  /** the stop index, fractional during a move */
+  get index() { return this.at.i; }
+  get travel() { return this.moveTl ? 1 : 0; }
   get isEnabled() { return this.enabled; }
-  get isMoving() { return !!this.introTl?.isActive() || this.travel > 0.0001; }
-  /** how far the camera has travelled from the scroll target — 0 once it has landed */
-  get settling() { return Math.abs(this.camProgress - this.scrollTarget) + Math.abs(this.ptrSmooth.x) + Math.abs(this.ptrSmooth.y); }
+  get isMoving() { return !!this.moveTl; }
+  /** how far the camera is from rest (pointer drift aside) */
+  get settling() { return (this.moveTl ? 1 : 0) + Math.abs(this.ptrSmooth.x) + Math.abs(this.ptrSmooth.y); }
 
   dispose() {
-    this.introTl?.kill();
+    this.moveTl?.kill();
     this.messTl?.kill();
-    this.scrollTl.kill();
   }
 }

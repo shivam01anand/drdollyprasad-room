@@ -17,7 +17,8 @@ const D3 = 146.83;
 const hz = (semi: number) => D3 * Math.pow(2, semi / 12);
 /** seconds a chord lasts */
 const BAR = 7;
-const LEVEL = 0.42;
+/** low: it sits under the room, it never leads (on by default, from the first gesture) */
+const LEVEL = 0.2;
 
 /** the progression: the bass (semitones from D3, an octave below sounding with it), the pad's
  *  voicing, and the chord's pitch classes (0 = D) for the piano */
@@ -275,6 +276,12 @@ export function wanted() {
 }
 
 export const isPlaying = () => playing;
+/** the browser may have left the context suspended (a start before any real gesture): a later gesture wakes it */
+export function wake() {
+  if (!ctx || !playing) return false;
+  if (ctx.state === "suspended") void ctx.resume();
+  return ctx.state === "running";
+}
 export function onChange(fn: (on: boolean) => void) { listeners.add(fn); return () => { listeners.delete(fn); }; }
 const emit = () => listeners.forEach((f) => f(playing));
 

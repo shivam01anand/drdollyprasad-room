@@ -13,7 +13,15 @@ import { loadHouse, loadHouseInfo, assemble, BakedLight, ROOF, type HouseInfo, t
 import { paintMaterial, flatRelief, galleryLight } from "./paint";
 import { ReliefBuilder } from "./relief-builder";
 import { activeVariant, NIGHT } from "./variants";
-import { CHAPTERS, resolveWalk, isNarrow, startPose, messPose, duskAt, HERO_ID } from "../chapters";
+import { messPose, HERO_ID } from "../chapters";
+import { stopsFor, isPhoneLayout, bandFor, duskAt, mapStop, type Stop } from "../stops";
+import { stopPose } from "./phone-framing";
+import { sheenLight } from "./paint";
+import { mergeGeometries } from "three/examples/jsm/utils/BufferGeometryUtils.js";
+import { buildPlants, type Plant, type PropAsset } from "./plants";
+import PROPS from "../studio-props.json";
+import PLANTS from "../studio-plants.json";
+import type { Pose } from "./rig";
 
 export type RoomOpts = {
   manifestUrl: string;
@@ -26,6 +34,8 @@ export type RoomOpts = {
   onHoverArt?(id: string | null): void;
   /** the physics engine failed to load: leave rearrange */
   onRearrangeError?(error: unknown): void;
+  /** a turned phone or a resized window changed the walk (phone ↔ wide): its stops and where you are now */
+  onLayout?(phone: boolean, index: number): void;
 };
 
 type Tier = { small: boolean; dpr: number; msaa: number; ao: boolean; shadow: number; phone: boolean };
@@ -106,6 +116,17 @@ const tmpC = new THREE.Color();
 const DEEPA_WICK = 0.14;
 /** a canvas's frame beyond its edge: the lip and the shadow gap (build.py float_frame) */
 const FRAME = 0.025;
+/** Portraits east, lower row: their picture lights hide on phone while a top-row portrait is in view */
+const LOW_ROW = new Set(["patterned-turban-portrait", "riverside-figures"]);
+/** wall colours (linear): Kajal #211B18 as a matt limewash, a little lifted so the grain reads; Khadi #F5F4F0. base = the plaster's own mean luminance */
+const WALL_TONES = { kajal: 0x3a302a, khadi: 0xe9e6de, base: 0.6 };
+/** each plaster role's own mean luminance (its tint over the photograph's mean), so its grain survives the recolour */
+const TONE_BASE: Record<string, number> = { wall: 0.6, wallShade: 0.47, field: 0.085, panel: 0.6 };
+
+/** the picture-light photograph's width / height (public/house/props/06-picture-light-master.webp) */
+const FIXTURE_ASPECT = 1400 / 306;
+/** the pools' strength against the spec's 0.35 (tuned on screenshots, 29 Oct) */
+const POOL_K = 1;
 /** each wall's outward normal on the floor plane, three's (x, z) */
 const SIDE_OUT: Record<string, [number, number]> = { N: [0, 1], S: [0, -1], E: [-1, 0], W: [1, 0] };
 // Reuse the welcome's full-resolution photo instead of downloading it twice.
@@ -173,6 +194,12 @@ export class Room {
   private viewRevision = 0;
   private viewport = { left: 0, top: 0, width: 0, height: 0 };
   private narrow = false;
+  /** the walk's stops for this screen (lib/stops.ts): a phone's or a wide screen's */
+  private stops: Stop[] = [];
+  /** the gallery light's pools (buildPools) */
+  private pools?: { mat: THREE.MeshBasicMaterial };
+  /** the rooms' plants (lib/studio-plants.json) */
+  private plants?: THREE.Group;
   private renderSize = { w: 0, h: 0 };
   private resizeTimer = 0;
   private lastFlame = -Infinity;
@@ -255,9 +282,10 @@ export class Room {
     this.info = house.info;
 
     const aspect = (canvas.clientWidth || innerWidth) / Math.max(1, canvas.clientHeight || innerHeight);
-    this.narrow = isNarrow(aspect);
-    const walk = resolveWalk(this.info, this.narrow, aspect);
-    this.rig = new Rig(walk.shots, startPose(this.info, this.narrow), messPose(this.info), aspect, opts.reducedMotion, walk.vias);
+    const W0 = canvas.clientWidth || innerWidth, H0 = canvas.clientHeight || innerHeight;
+    this.narrow = isPhoneLayout(W0, H0);
+    this.stops = stopsFor(this.narrow);
+    this.rig = new Rig(this.shotsFor(W0, H0), messPose(this.info), aspect, opts.reducedMotion);
     this.scene.add(this.rig.pivot, this.world);
 
     const anisotropy = Math.min(8, renderer.capabilities.getMaxAnisotropy());
@@ -272,12 +300,18 @@ export class Room {
     const edge = new THREE.MeshStandardMaterial({ color: 0x9e958a, roughness: 0.95 });
     this.owned.push(edge);
     this.parts = assemble(house, lib, this.baked, edge);
+    this.roomWalls();
+    this.slimSmallFrames();
+    this.splitLongTriangles("Static_concrete", 2);
     for (const m of this.parts.ceilings) this.ceiling.add(m);
     for (const r of this.parts.roofs) this.ceiling.add(r);
     this.world.add(house.scene, this.ceiling);
     // the things that tumble live in the scene, not in the house that tilts under them
     house.scene.updateMatrixWorld(true);
     for (const pr of this.parts.props) this.scene.attach(pr.group);
+    // the framed photograph on its easel in the Red Room is not one of her works: it is not shown (QC, 29 Oct)
+    const pressEasel = house.scene.getObjectByName("Deco_pressGroup");
+    if (pressEasel) pressEasel.visible = false;
     // the paintings
     const textures = new Map(artPairs);
     const flat = flatRelief();
@@ -291,7 +325,7 @@ export class Room {
       // a study (the canvas on her easel) is painted like the rest, but it is not a work to open
       const pickable = !this.info.art[id]?.study;
       if (this.info.art[id]?.late) {
-        mesh.material = paintMaterial(ground, this.baked, galleryLight(this.info.art[id]), flat, this.info.art[id]?.lk);
+        mesh.material = paintMaterial(ground, this.baked, sheenLight(this.info.art[id]), flat, this.info.art[id]?.lk);
         if (pickable) this.art.push(mesh);
         continue;
       }
@@ -303,7 +337,7 @@ export class Room {
       tex.needsUpdate = true;
       // paint, not a print: the varnish under its gallery light now, the brushwork's
       // relief read once the room is open (reliefs())
-      mesh.material = paintMaterial(tex, this.baked, galleryLight(this.info.art[id]), flat, this.info.art[id]?.lk);
+      mesh.material = paintMaterial(tex, this.baked, sheenLight(this.info.art[id]), flat, this.info.art[id]?.lk);
       if (pickable) this.art.push(mesh);
     }
 
@@ -313,6 +347,9 @@ export class Room {
     this.buildSky();
     this.buildLights();
     this.buildItems();
+    this.buildFrieze();
+    this.buildPools();
+    this.buildRoomPlants();
     this.buildPost();
     this.resize();
     this.syncBakeAO();
@@ -391,7 +428,7 @@ export class Room {
         (mesh.material as THREE.MeshStandardMaterial).map = tex;
         this.textureUploads.push(() => this.renderer?.initTexture(tex));
         this.invalidate();
-        void this.addRelief(mesh, 384);
+        void this.addRelief(mesh, this.tier.small ? 512 : 768);
       }).catch(() => { /* the warm ground stays */ }).finally(() => {
         this.artLoads--;
         this.pumpArt();
@@ -403,7 +440,7 @@ export class Room {
   prepareChapter(index: number) {
     if (index === this.artPriority) return;
     this.artPriority = index;
-    const wanted = [index, index + 1, index - 1, index + 2].flatMap((i) => CHAPTERS[i]?.labels ?? []);
+    const wanted = [index, index + 1, index - 1, index + 2, index + 3].flatMap((i) => this.stops[i]?.works ?? []);
     const rank = (mesh: THREE.Mesh) => {
       const at = wanted.indexOf(mesh.userData.artId);
       return at < 0 ? wanted.length : at;
@@ -711,6 +748,586 @@ export class Room {
   /* --- physics ------------------------------------------------------------ */
 
   /** where every object rests, and its collider's centre — measured once */
+  /* ---- the village-line frieze (BORDER_SPEC A): Kajal ink on the plaster above the paintings,
+     drawn left to right once per room, the first time the walk arrives there ---- */
+  private friezes: { key: string; reveal: { value: number } }[] = [];
+  private friezeDrawn = new Set<string>();
+  /**
+   * Gallery light (art direction V3 §4.1): a warm pool on the wall behind each painting and a soft
+   * contact shadow under its frame. Both lie on the wall, behind the canvas (the depth test keeps
+   * them off it): the painting itself is never tinted, filtered or covered.
+   */
+  private buildRoomPlants() {
+    if (new URLSearchParams(location.search).get("plants") === "0") return;
+    const P = PLANTS as unknown as { kit: Record<string, string>; plants: Plant[] };
+    const { group, owned } = buildPlants(P.plants, (n) => this.world.getObjectByName(n) ?? this.scene.getObjectByName(n),
+      P.kit, PROPS as unknown as Record<string, PropAsset>);
+    this.scene.add(group);
+    this.owned.push(...owned);
+    this.plants = group;
+    // props marked phone: false (the Portraits bench and rug) would fill the lower third of a phone's single-painting view
+    this.laptopOnly = P.plants.flatMap((p, i) => (p.phone === false ? [group.getObjectByName(`prop:${p.img}:${i}`)] : []))
+      .filter((o): o is THREE.Object3D => !!o);
+    // the courtyard's two wall sconces hang just over Under Canopy of Greens: on a phone's single-painting
+    // view they read as two dark lamps cut by the header (QC 3 Nov), so the phone walk goes without them
+    this.world.traverse((o) => { if (/^Deco_studio\d(Arm|Shade)/.test(o.name)) this.laptopOnly.push(o); });
+    for (const o of this.laptopOnly) o.visible = !this.narrow;
+  }
+  private laptopOnly: THREE.Object3D[] = [];
+  private lowLights: THREE.Object3D[] = [];
+
+  /**
+   * QC (?qa=1): any plant that, seen from a stop (or one of `extra` cams), covers one of that stop's
+   * paintings or the strip under it where its plaque goes. Puts the camera back after.
+   */
+  plantClashes(extra: { key: string; stop: number; works: string[] }[] = []) {
+    const out: { view: string; plant: string; art: string }[] = [];
+    if (!this.plants) return out;
+    // walls hide what is in another room: only a plant in the camera's own space can cover a painting
+    const spaceAt = (x: number, z: number) => Object.entries(this.info.plan).find(([, r]) =>
+      Array.isArray(r) && x > r[0] - 0.05 && x < r[1] + 0.05 && -z > r[2] - 0.05 && -z < r[3] + 0.05)?.[0];
+    const boxes = this.plants.children.map((g) => ({ name: g.name, box: new THREE.Box3().setFromObject(g), space: spaceAt(g.position.x, g.position.z) }));
+    const here = Math.round(this.rig.index);
+    const W = this.viewport.width || innerWidth, H = this.viewport.height || innerHeight;
+    const proj = (b: THREE.Box3) => {
+      let x0 = Infinity, y0 = Infinity, x1 = -Infinity, y1 = -Infinity;
+      for (const x of [b.min.x, b.max.x]) for (const y of [b.min.y, b.max.y]) for (const z of [b.min.z, b.max.z]) {
+        tmpV.set(x, y, z).applyMatrix4(this.rig.camera.matrixWorldInverse);
+        if (tmpV.z > -0.05) return null;   // behind or beside the eye: not in front of a painting
+        tmpV.applyMatrix4(this.rig.camera.projectionMatrix);
+        const px = (tmpV.x * 0.5 + 0.5) * W, py = (0.5 - tmpV.y * 0.5) * H;
+        x0 = Math.min(x0, px); x1 = Math.max(x1, px); y0 = Math.min(y0, py); y1 = Math.max(y1, py);
+      }
+      return { x0, y0, x1, y1 };
+    };
+    const check = (view: string, works: string[]) => {
+      this.rig.update(0);
+      this.rig.camera.updateMatrixWorld(true);
+      const eye = this.rig.camera.getWorldPosition(new THREE.Vector3());
+      const mine = spaceAt(eye.x, eye.z);
+      for (const { name, box, space } of boxes) {
+        if (space !== mine) continue;
+        const p = proj(box);
+        if (!p || p.x1 < 0 || p.x0 > W || p.y1 < 0 || p.y0 > H) continue;
+        for (const id of works) {
+          const r = this.artRect(id);
+          if (!r) continue;
+          const a = { x0: r.x0 - this.viewport.left, x1: r.x1 - this.viewport.left, y0: r.y0 - this.viewport.top, y1: r.y1 - this.viewport.top + (W > 760 ? 40 : 0) };
+          if (p.x0 < a.x1 && p.x1 > a.x0 && p.y0 < a.y1 && p.y1 > a.y0) out.push({ view, plant: name, art: id });
+        }
+      }
+    };
+    this.stops.forEach((s, i) => { this.rig.jumpTo(i); check(s.id, s.works); });
+    for (const e of extra) {
+      const cam = this.info.cams[e.key];
+      if (!cam) continue;
+      this.rig.hold(stopPose(cam, W, H, bandFor(this.stops[e.stop], W, H)));
+      check(e.key, e.works);
+    }
+    this.rig.jumpTo(here);
+    this.rig.update(0);
+    this.wake = 2;
+    return out;
+  }
+
+  /**
+   * QC (?qa=1): for every stop (and `extra` cams), each plant's sampled points on screen: how many are
+   * in the frame, how many fall on a painting (or the strip under it where its plaque goes) and
+   * their screen box. Points, not boxes: a palm's box is mostly air.
+   */
+  plantReport(extra: { key: string; stop: number; works: string[] }[] = []) {
+    type V = { view: string; works: string[]; band: { t: number; b: number; l: number; r: number }; arts: Record<string, number[]>;
+      plants: Record<string, { n: number; inFrame: number; onArt: string[]; box: number[] | null }> };
+    const out: V[] = [];
+    if (!this.plants) return out;
+    const spaceAt = (x: number, z: number) => Object.entries(this.info.plan).find(([, r]) =>
+      Array.isArray(r) && x > r[0] - 0.05 && x < r[1] + 0.05 && -z > r[2] - 0.05 && -z < r[3] + 0.05)?.[0];
+    this.plants.updateMatrixWorld(true);
+    const samples = this.plants.children.map((g) => {
+      const pts: THREE.Vector3[] = [];
+      if (g.userData.samples) return { name: g.name, pts, space: spaceAt(g.position.x, g.position.z), g };
+      g.traverse((o) => {
+        const m = o as THREE.Mesh;
+        if (!m.isMesh) return;
+        const pos = m.geometry.getAttribute("position");
+        if (!pos) return;
+        const im = o as THREE.InstancedMesh;
+        if (im.isInstancedMesh) {
+          const mi = new THREE.Matrix4();
+          for (let i = 0; i < im.count; i += 1) {
+            im.getMatrixAt(i, mi);
+            for (let v = 0; v < pos.count; v += Math.max(1, Math.floor(pos.count / 4)))
+              pts.push(new THREE.Vector3().fromBufferAttribute(pos, v).applyMatrix4(mi).applyMatrix4(im.matrixWorld));
+          }
+        } else {
+          const step = Math.max(1, Math.floor(pos.count / 300));
+          for (let v = 0; v < pos.count; v += step) pts.push(new THREE.Vector3().fromBufferAttribute(pos, v).applyMatrix4(m.matrixWorld));
+        }
+      });
+      return { name: g.name, pts, space: spaceAt(g.position.x, g.position.z), g };
+    });
+    const here = Math.round(this.rig.index);
+    const W = this.viewport.width || innerWidth, H = this.viewport.height || innerHeight;
+    const check = (view: string, works: string[], band: V["band"]) => {
+      this.rig.update(0);
+      this.rig.camera.updateMatrixWorld(true);
+      for (const sm of samples) if (sm.g.userData.samples) { sm.g.userData.aim?.(this.rig.camera); sm.pts = sm.g.userData.samples(); }
+      this.rig.update(0);
+      this.rig.camera.updateMatrixWorld(true);
+      const eye = this.rig.camera.getWorldPosition(new THREE.Vector3());
+      const mine = spaceAt(eye.x, eye.z);
+      const arts: Record<string, number[]> = {};
+      for (const id of Object.keys(this.info.art)) {
+        if (this.info.art[id].study) continue;
+        const c = this.info.art[id].centre;
+        if (spaceAt(c[0] + 0.1 * (SIDE_OUT[this.info.art[id].side]?.[0] ?? 0), c[2] + 0.1 * (SIDE_OUT[this.info.art[id].side]?.[1] ?? 0)) !== mine) continue;
+        const r = this.artRect(id);
+        if (!r) continue;
+        const a = [r.x0 - this.viewport.left, r.y0 - this.viewport.top, r.x1 - this.viewport.left, r.y1 - this.viewport.top];
+        if (a[2] < 0 || a[0] > W || a[3] < 0 || a[1] > H) continue;
+        arts[id] = a;
+      }
+      const plants: V["plants"] = {};
+      for (const { name, pts, space } of samples) {
+        if (space !== mine) continue;
+        let inFrame = 0; const on = new Set<string>();
+        let x0 = Infinity, y0 = Infinity, x1 = -Infinity, y1 = -Infinity;
+        for (const p of pts) {
+          tmpV.copy(p).applyMatrix4(this.rig.camera.matrixWorldInverse);
+          if (tmpV.z > -0.05) continue;
+          tmpV.applyMatrix4(this.rig.camera.projectionMatrix);
+          const px = (tmpV.x * 0.5 + 0.5) * W, py = (0.5 - tmpV.y * 0.5) * H;
+          if (px < 0 || px > W || py < band.t || py > H - band.b) continue;
+          inFrame++;
+          x0 = Math.min(x0, px); x1 = Math.max(x1, px); y0 = Math.min(y0, py); y1 = Math.max(y1, py);
+          for (const [id, a] of Object.entries(arts)) {
+            // the canvas and its frame, and the plaque's strip under it (phone too: the plaque is on the wall)
+            const onCanvas = px > a[0] - 4 && px < a[2] + 4 && py > a[1] - 4 && py < a[3] + 4;
+            // the plaque: centred under the frame, at most 220 px wide (WallLabels)
+            const mid = (a[0] + a[2]) / 2, ph = Math.min(110, (a[2] - a[0]) / 2) + 6;
+            const onPlaque = px > mid - ph && px < mid + ph && py >= a[3] && py < a[3] + (W > 760 ? 44 : 34);
+            if (onCanvas || onPlaque) on.add(id);
+          }
+        }
+        plants[name] = { n: pts.length, inFrame, onArt: [...on], box: inFrame ? [x0, y0, x1, y1].map(Math.round) : null };
+      }
+      out.push({ view, works, band, arts, plants });
+    };
+    this.stops.forEach((s, i) => { this.rig.jumpTo(i); check(s.id, s.works, bandFor(s, W, H)); });
+    for (const e of extra) {
+      const cam = this.info.cams[e.key];
+      if (!cam) continue;
+      const band = bandFor(this.stops[e.stop], W, H);
+      this.rig.hold(stopPose(cam, W, H, band));
+      check(e.key, e.works, band);
+    }
+    this.rig.jumpTo(here);
+    this.rig.update(0);
+    this.wake = 2;
+    return out;
+  }
+
+  /**
+   * The walls in the brand's colours, room by room (Shubham, 3 Nov): Faith (the Quiet Room) and
+   * Portraits in Kajal limewash, Bandh Darwaze (the Red Room) and the Gone Are The Days hall in Khadi,
+   * the courtyard in its warm plaster. The plaster's own grain and the baked light stay; only its
+   * colour changes, by where the wall stands. Paintings are another material: never touched.
+   */
+  private roomWalls() {
+    const k = WALL_TONES;
+    // wall: the Quiet and Red Rooms; field: the Red Room's street wall; panel: the gallery's hanging walls
+    for (const role of ["wall", "wallShade", "field", "panel"] as const) {
+      const m = this.lib?.get(role) as THREE.MeshStandardMaterial | undefined;
+      if (!m || m.userData.toned) continue;
+      m.userData.toned = true;
+      const before = m.onBeforeCompile.bind(m), key = m.customProgramCacheKey.bind(m);
+      m.onBeforeCompile = (sh, r) => {
+        before(sh, r);
+        sh.uniforms.uKajal = { value: new THREE.Color(k.kajal) };
+        sh.uniforms.uKhadi = { value: new THREE.Color(k.khadi) };
+        sh.vertexShader = sh.vertexShader
+          .replace("#include <common>", "#include <common>\nvarying vec3 vToneP;")
+          .replace("#include <worldpos_vertex>", "#include <worldpos_vertex>\nvToneP = (modelMatrix * vec4(transformed, 1.0)).xyz;");
+        sh.fragmentShader = sh.fragmentShader
+          .replace("#include <common>", `#include <common>
+            varying vec3 vToneP; uniform vec3 uKajal; uniform vec3 uKhadi;
+            float inR(vec3 p, float x0, float x1, float z0, float z1) {
+              return step(x0 - 0.06, p.x) * step(p.x, x1 + 0.06) * step(z0 - 0.06, p.z) * step(p.z, z1 + 0.06);
+            }
+            float toneKajal(vec3 p) { return max(inR(p, -5.6, -0.45, -6.0, -0.8), inR(p, 0.0, 18.6, 0.45, 4.6)); }
+            float toneBandh(vec3 p) { return inR(p, -5.6, -0.45, -0.35, 4.8); }`)
+          // on Kajal the baked spot cones read as hard-edged discs: take most of the bake from a blurred (mip) read
+          .replace("vec3 bakedIrr = mix( lightMapIrradiance, lmNight, uNight );", `vec3 bakedIrr = mix( lightMapIrradiance, lmNight, uNight );
+            {
+              float kj = toneKajal(vToneP);
+              if (kj > 0.0) {
+                vec3 sD = texture2D( lightMap, vLightMapUv, 4.5 ).rgb * lightMapIntensity;
+                vec3 sN = texture2D( uLmNight, vLightMapUv, 4.5 ).rgb * uLmNightK;
+                bakedIrr = mix( bakedIrr, mix( sD, sN, uNight ), 0.9 * kj );
+              }
+            }`)
+          // the Red Room's baked light is warm (its old red walls bounced it): on Khadi, take most of the colour out
+          .replace("#include <opaque_fragment>", `#include <opaque_fragment>
+            {
+              float bd = toneBandh(vToneP) * (1.0 - toneKajal(vToneP));
+              float L = dot(gl_FragColor.rgb, vec3(0.2126, 0.7152, 0.0722));
+              gl_FragColor.rgb = mix(gl_FragColor.rgb, vec3(L) * vec3(1.0, 0.996, 0.98), 0.92 * bd);
+            }`)
+          .replace("#include <map_fragment>", `#include <map_fragment>
+            {
+              // the room this wall face belongs to (house.json plan, three's x and z)
+              float kajal = toneKajal(vToneP);
+              float khadi = max(inR(vToneP, -5.6, -0.45, -0.35, 4.8), inR(vToneP, 0.0, 18.6, 4.6, 8.85));
+              float grain = clamp(1.0 + 0.6 * (dot(diffuseColor.rgb, vec3(0.2126, 0.7152, 0.0722)) / ${(TONE_BASE[role] ?? k.base).toFixed(3)} - 1.0), 0.8, 1.2);
+              diffuseColor.rgb = mix(diffuseColor.rgb, uKajal * grain, kajal);
+              diffuseColor.rgb = mix(diffuseColor.rgb, uKhadi * grain, khadi * (1.0 - kajal));
+            }`);
+      };
+      m.customProgramCacheKey = () => `${key()}|tones3`;
+      m.needsUpdate = true;
+    }
+  }
+
+  /**
+   * The Bandh Darwaze doors are 30 cm canvases in the same 25 mm moulding as a 1.5 m one, which reads
+   * as heavy black bars (QC, 3 Nov). For canvases under 45 cm, halve the moulding's face: every frame
+   * vertex outside the canvas moves halfway back toward the canvas edge. The canvas itself is untouched.
+   */
+  private slimSmallFrames() {
+    const frame = this.parts.statics.find((m) => m.name.startsWith("Static_artFrame"));
+    const pos = frame?.geometry.getAttribute("position") as THREE.BufferAttribute | undefined;
+    if (!frame || !pos) return;
+    frame.updateMatrixWorld(true);
+    const inv = frame.matrixWorld.clone().invert(), w2l = (v: THREE.Vector3) => v.applyMatrix4(inv);
+    const l2w = frame.matrixWorld, v = new THREE.Vector3();
+    for (const a of Object.values(this.info.art)) {
+      if (a.study || Math.min(a.w, a.h) >= 0.45 || !SIDE_OUT[a.side]) continue;
+      const ns = a.side === "N" || a.side === "S";
+      const [cx, cy, cz] = a.centre;
+      for (let i = 0; i < pos.count; i++) {
+        v.fromBufferAttribute(pos, i).applyMatrix4(l2w);
+        const du = ns ? v.x - cx : v.z - cz, dn = ns ? v.z - cz : v.x - cx, dy = v.y - cy;
+        if (Math.abs(dn) > 0.08 || Math.abs(du) > a.w / 2 + 0.04 || Math.abs(dy) > a.h / 2 + 0.04) continue;
+        const su = Math.abs(du) > a.w / 2 + 0.002 ? Math.sign(du) * (a.w / 2 + (Math.abs(du) - a.w / 2) * 0.5) : du;
+        const sy = Math.abs(dy) > a.h / 2 + 0.002 ? Math.sign(dy) * (a.h / 2 + (Math.abs(dy) - a.h / 2) * 0.5) : dy;
+        if (ns) v.x = cx + su; else v.z = cz + su;
+        v.y = cy + sy;
+        w2l(v);
+        pos.setXYZ(i, v.x, v.y, v.z);
+      }
+    }
+    pos.needsUpdate = true;
+    frame.geometry.computeBoundingSphere();
+  }
+
+  /** QA (?qa=1): what the camera sees at a point of the canvas (0..1 from the top left), nearest first */
+  qaPick(px: number, py: number) {
+    const ray = new THREE.Raycaster();
+    this.rig.camera.updateMatrixWorld(true);
+    ray.setFromCamera(new THREE.Vector2(px * 2 - 1, 1 - py * 2), this.rig.camera);
+    return ray.intersectObjects(this.scene.children, true).slice(0, 6).map((h) => {
+      const path: string[] = [];
+      for (let o: THREE.Object3D | null = h.object; o && path.length < 4; o = o.parent) path.push(o.name || o.type);
+      return { path: path.join(" < "), d: +h.distance.toFixed(2), p: h.point.toArray().map((v) => +v.toFixed(2)), vis: h.object.visible };
+    });
+  }
+
+  /**
+   * The concrete plinths run as single triangles up to 8 m long. Where one passes behind the camera and is
+   * clipped, some GPUs (SwiftShader certainly) mis-interpolate its depth and a dashed line of it shows
+   * through the walls in front (QC 3 Nov, Blooming Innocence on phone). Halving every edge longer than
+   * `max` metres removes the slivers; every attribute is interpolated, so the surface looks the same.
+   */
+  private splitLongTriangles(name: string, max: number) {
+    const mesh = this.parts.statics.find((m) => m.name === name);
+    if (!mesh) return;
+    const src = mesh.geometry.index ? mesh.geometry.toNonIndexed() : mesh.geometry;
+    const names = Object.keys(src.attributes);
+    const attrs = names.map((n) => src.getAttribute(n) as THREE.BufferAttribute);
+    const P = names.indexOf("position");
+    const out: number[][] = names.map(() => []);
+    type V = number[][];
+    const get = (i: number): V => attrs.map((a) => Array.from({ length: a.itemSize }, (_, k) => a.array[i * a.itemSize + k]));
+    const mid = (p: V, q: V): V => p.map((arr, j) => arr.map((v, k) => (v + q[j][k]) / 2));
+    const len = (p: V, q: V) => Math.hypot(p[P][0] - q[P][0], p[P][1] - q[P][1], p[P][2] - q[P][2]);
+    const split = (a: V, b: V, c: V, depth: number): void => {
+      const ab = len(a, b), bc = len(b, c), ca = len(c, a), L = Math.max(ab, bc, ca);
+      if (L <= max || depth > 10) { for (const v of [a, b, c]) v.forEach((arr, j) => out[j].push(...arr)); return; }
+      if (L === ab) { const m = mid(a, b); split(a, m, c, depth + 1); split(m, b, c, depth + 1); }
+      else if (L === bc) { const m = mid(b, c); split(a, b, m, depth + 1); split(a, m, c, depth + 1); }
+      else { const m = mid(c, a); split(a, b, m, depth + 1); split(m, b, c, depth + 1); }
+    };
+    for (let i = 0; i < src.attributes.position.count; i += 3) split(get(i), get(i + 1), get(i + 2), 0);
+    const geo = new THREE.BufferGeometry();
+    names.forEach((n, j) => {
+      const a = attrs[j];
+      const Ctor = a.array.constructor as new (v: number[]) => THREE.TypedArray;
+      geo.setAttribute(n, new THREE.BufferAttribute(new Ctor(out[j]), a.itemSize, a.normalized));
+    });
+    geo.computeBoundingSphere();
+    geo.computeBoundingBox();
+    if (src !== mesh.geometry) src.dispose();
+    mesh.geometry.dispose();
+    mesh.geometry = geo;
+  }
+
+  /** QA: move one plant (by its group name) to try a placement without a reload */
+  movePlant(name: string, x: number, z: number) {
+    const g = this.plants?.getObjectByName(name);
+    if (!g) return false;
+    g.position.set(x, 0, z);
+    g.updateMatrixWorld(true);
+    this.wake = 2;
+    return true;
+  }
+
+  private buildPools() {
+    const size = 128;
+    const grad = (paint: (g: CanvasRenderingContext2D) => void) => {
+      const c = document.createElement("canvas");
+      c.width = c.height = size;
+      const g = c.getContext("2d")!;
+      paint(g);
+      const t = new THREE.CanvasTexture(c);
+      t.colorSpace = THREE.SRGBColorSpace;
+      this.owned.push(t);
+      return t;
+    };
+    // a radial falloff, brightest a little above the middle (the lamp is above the painting)
+    const pool = grad((g) => {
+      const r = g.createRadialGradient(size / 2, size * 0.46, 0, size / 2, size / 2, size / 2);
+      r.addColorStop(0, "rgba(255,255,255,1)");
+      r.addColorStop(0.45, "rgba(255,255,255,.55)");
+      r.addColorStop(1, "rgba(255,255,255,0)");
+      g.fillStyle = r;
+      g.fillRect(0, 0, size, size);
+    });
+    // the frame's shadow: dark at its top edge, gone 6 cm below, soft at the ends
+    const shade = grad((g) => {
+      const v = g.createLinearGradient(0, 0, 0, size);
+      v.addColorStop(0, "rgba(255,255,255,1)");
+      v.addColorStop(0.35, "rgba(255,255,255,.45)");
+      v.addColorStop(1, "rgba(255,255,255,0)");
+      g.fillStyle = v;
+      g.fillRect(0, 0, size, size);
+      g.globalCompositeOperation = "destination-in";
+      const h = g.createLinearGradient(0, 0, size, 0);
+      h.addColorStop(0, "rgba(0,0,0,0)");
+      h.addColorStop(0.12, "rgba(0,0,0,1)");
+      h.addColorStop(0.88, "rgba(0,0,0,1)");
+      h.addColorStop(1, "rgba(0,0,0,0)");
+      g.fillStyle = h;
+      g.fillRect(0, 0, size, size);
+    });
+    const poolTex = new THREE.TextureLoader().load("/house/props/09-warm-light-pool-master.webp");
+    poolTex.colorSpace = THREE.SRGBColorSpace;
+    this.owned.push(poolTex);
+    void pool;
+    const poolMat = new THREE.MeshBasicMaterial({ color: 0xfff0dc, map: poolTex, transparent: true, opacity: 0.35 * POOL_K,
+      blending: THREE.AdditiveBlending, depthWrite: false, fog: false, polygonOffset: true, polygonOffsetFactor: -1 });
+    const shadeMat = new THREE.MeshBasicMaterial({ color: 0x211b18, map: shade, transparent: true, opacity: 0.25,
+      depthWrite: false, fog: false, polygonOffset: true, polygonOffsetFactor: -1 });
+    const quad = new THREE.PlaneGeometry(1, 1);
+    this.owned.push(poolMat, shadeMat, quad);
+    this.pools = { mat: poolMat };
+    const turn = { N: 0, S: Math.PI, E: -Math.PI / 2, W: Math.PI / 2 } as Record<string, number>;
+    const ray = new THREE.Raycaster();
+    const n = new THREE.Vector3(), o = new THREE.Vector3();
+    for (const [id, a] of Object.entries(this.info.art)) {
+      if (a.study || !SIDE_OUT[a.side]) continue;
+      const [nx, nz] = SIDE_OUT[a.side];
+      n.set(nx, 0, nz);
+      // the wall's face behind the canvas, found by looking for it (not every canvas stands as proud)
+      o.set(...a.centre).addScaledVector(n, 0.02);
+      ray.set(o, n.clone().negate());
+      ray.far = 0.4;
+      const hit = ray.intersectObjects(this.parts.statics, false)[0];
+      const back = hit ? hit.distance - 0.02 - 0.004 : 0.02;
+      const at = (dy: number, w: number, h: number, mat: THREE.Material, name: string) => {
+        const m = new THREE.Mesh(quad, mat);
+        m.name = name;
+        m.position.set(a.centre[0] - nx * back, a.centre[1] + dy, a.centre[2] - nz * back);
+        m.rotation.y = turn[a.side];
+        m.scale.set(w, h, 1);
+        m.renderOrder = 1;
+        m.userData.noAO = true;
+        m.matrixAutoUpdate = false;
+        m.updateMatrix();
+        this.world.add(m);
+      };
+      at(0.15, a.w * 2.2, a.h * 1.8, poolMat, `pool:${id}`);
+      const fw = a.w + 2 * FRAME, fh = a.h / 2 + FRAME;
+      at(-fh - 0.05, fw + 0.06, 0.12, shadeMat, `shade:${id}`);
+    }
+    this.buildPictureLights(grad);
+    // the walls a little lower away from the pools (key to fill about 2.5 : 1)
+    for (const role of ["wall", "wallShade"] as const) {
+      const m = this.lib?.get(role);
+      if (m && !m.userData.dimmed) { m.userData.dimmed = true; m.lightMapIntensity *= 0.9; }
+    }
+  }
+
+  /**
+   * A picture light over every painting (Shubham, 2 Nov): the photographed brass fixture just above
+   * the frame, 50 % of its width, a warm bulb strip under it, and its 2700 K wash falling down the wall
+   * round the frame, brightest at the top. The wash lies on the wall behind the canvas (the depth test
+   * keeps it off the paint): her colours are never tinted.
+   */
+  private buildPictureLights(grad: (paint: (g: CanvasRenderingContext2D) => void) => THREE.Texture) {
+    const size = 128;
+    const wash = grad((g) => {
+      // a soft oval, brightest a third of the way down (the frame's top half), gone at its edges: no cone, no beam
+      g.save();
+      g.translate(size / 2, size * 0.36);
+      g.scale(1, 1.25);
+      const r = g.createRadialGradient(0, 0, 0, 0, 0, size * 0.5);
+      r.addColorStop(0, "rgba(255,255,255,1)");
+      r.addColorStop(0.35, "rgba(255,255,255,.7)");
+      r.addColorStop(0.7, "rgba(255,255,255,.22)");
+      r.addColorStop(1, "rgba(255,255,255,0)");
+      g.fillStyle = r;
+      g.fillRect(-size, -size, size * 2, size * 2);
+      g.restore();
+      // the plane's top edge sits at the fixture: fade into it, so the wash has no hard line across the wall (QC 3 Nov)
+      g.save();
+      g.globalCompositeOperation = "destination-in";
+      const top = g.createLinearGradient(0, 0, 0, size * 0.3);
+      top.addColorStop(0, "rgba(0,0,0,0)");
+      top.addColorStop(1, "rgba(0,0,0,1)");
+      g.fillStyle = top;
+      g.fillRect(0, 0, size, size);
+      g.restore();
+    });
+    const fixture = new THREE.TextureLoader().load("/house/props/06-picture-light-master.webp");
+    fixture.colorSpace = THREE.SRGBColorSpace;
+    fixture.anisotropy = 4;
+    this.owned.push(fixture);
+    const brass = new THREE.MeshBasicMaterial({ map: fixture, transparent: true, alphaTest: 0.3, color: 0xe6dccb, fog: false, side: THREE.DoubleSide });
+    const bulb = new THREE.MeshBasicMaterial({ color: 0xffe0a8, fog: false });
+    const washMat = new THREE.MeshBasicMaterial({ color: 0xffc47e, map: wash, transparent: true, opacity: 0.3,
+      blending: THREE.AdditiveBlending, depthWrite: false, fog: false, polygonOffset: true, polygonOffsetFactor: -1 });
+    this.owned.push(brass, bulb, washMat);
+    const bars: THREE.BufferGeometry[] = [], strips: THREE.BufferGeometry[] = [], lowBars: THREE.BufferGeometry[] = [], lowStrips: THREE.BufferGeometry[] = [], washes: THREE.BufferGeometry[] = [], darkWashes: THREE.BufferGeometry[] = [];
+    const washDark = washMat.clone();
+    washDark.opacity = 0.55;
+    // Bandh Darwaze is Khadi: a 2700 K wash at full warmth turns its walls peach (QC 3 Nov); there it is paler and softer
+    const washKhadi = washMat.clone();
+    washKhadi.color.set(0xffe9d2);
+    washKhadi.opacity = 0.2;
+    this.owned.push(washDark, washKhadi);
+    const khadiWashes: THREE.BufferGeometry[] = [];
+    const turn = { N: 0, S: Math.PI, E: -Math.PI / 2, W: Math.PI / 2 } as Record<string, number>;
+    const ray = new THREE.Raycaster();
+    const n = new THREE.Vector3(), o = new THREE.Vector3(), m = new THREE.Matrix4(), q = new THREE.Quaternion();
+    for (const [id, a] of Object.entries(this.info.art)) {
+      if (a.study || !SIDE_OUT[a.side]) continue;
+      const low = LOW_ROW.has(id);
+      const [nx, nz] = SIDE_OUT[a.side];
+      n.set(nx, 0, nz);
+      o.set(...a.centre).addScaledVector(n, 0.02);
+      ray.set(o, n.clone().negate());
+      ray.far = 0.4;
+      const hit = ray.intersectObjects(this.parts.statics, false)[0];
+      const back = hit ? hit.distance - 0.02 : 0.045;          // canvas centre to the wall's face
+      const fw = a.w + 2 * FRAME, top = a.centre[1] + a.h / 2 + FRAME;
+      const L = Math.min(0.75, Math.max(0.24, fw * 0.5));
+      q.setFromAxisAngle(new THREE.Vector3(0, 1, 0), turn[a.side]);
+      // in the painting's own axes: x along the wall, y up, z out of the wall (0 = the wall's face)
+      const place = (geo: THREE.BufferGeometry, x: number, y: number, z: number) => {
+        m.compose(new THREE.Vector3(a.centre[0], 0, a.centre[2]).addScaledVector(n, -back)
+          .add(new THREE.Vector3(x, y, z).applyQuaternion(q)), q, new THREE.Vector3(1, 1, 1));
+        geo.applyMatrix4(m);
+        return geo;
+      };
+      const by = top + 0.075, bz = 0.1;
+      // the fixture: the Design agency's photographed brass picture light, square to the wall, its bar over the frame
+      const fh2 = L / FIXTURE_ASPECT;
+      (low ? lowBars : bars).push(place(new THREE.PlaneGeometry(L, fh2), 0, by - 0.012 + fh2 / 2 - 0.02, bz - 0.04));
+      (low ? lowStrips : strips).push(place(new THREE.BoxGeometry(L * 0.86, 0.005, 0.012), 0, by - 0.03, bz - 0.04));
+      const wh = Math.min(a.h * 0.95 + 0.45, 1.8), ww = fw * 1.5;
+      // on a Kajal wall the wash must read clearly: stronger there
+      const [cx, , cz] = a.centre;
+      const dark = (cx > -5.66 && cx < -0.39 && cz > -6.06 && cz < -0.74) || (cx > -0.06 && cx < 18.66 && cz > 0.39 && cz < 4.6);
+      const bandh = cx > -5.66 && cx < -0.39 && cz > -0.41 && cz < 4.86;
+      (dark ? darkWashes : bandh ? khadiWashes : washes).push(place(new THREE.PlaneGeometry(ww, wh), 0, by - 0.03 - wh / 2, 0.003));
+    }
+    const add = (geos: THREE.BufferGeometry[], mat: THREE.Material, name: string, order = 0) => {
+      const flat = geos.map((g) => (g.index ? g.toNonIndexed() : g));
+      const geo = mergeGeometries(flat, false);
+      geos.forEach((g) => g.dispose());
+      flat.forEach((g) => g.dispose());
+      if (!geo) return;
+      this.owned.push(geo);
+      const mesh = new THREE.Mesh(geo, mat);
+      mesh.name = name;
+      mesh.renderOrder = order;
+      mesh.userData.noAO = true;
+      mesh.castShadow = false;
+      this.world.add(mesh);
+    };
+    add(bars, brass, "picture-lights");
+    add(strips, bulb, "picture-light-bulbs");
+    // the lower row's fixtures, kept apart so they can step aside on phone (see renderFrame)
+    add(lowBars, brass, "picture-lights-low");
+    add(lowStrips, bulb, "picture-light-bulbs-low");
+    this.lowLights = ["picture-lights-low", "picture-light-bulbs-low"].map((k) => this.world.getObjectByName(k)).filter((o): o is THREE.Object3D => !!o);
+    add(washes, washMat, "picture-light-wash", 1);
+    add(darkWashes, washDark, "picture-light-wash-kajal", 1);
+    add(khadiWashes, washKhadi, "picture-light-wash-khadi", 1);
+  }
+
+  private buildFrieze() {
+    const strips = this.info.frieze ?? [];
+    if (!strips.length) return;
+    const mask = new THREE.TextureLoader().load("/house/frieze.png");
+    mask.colorSpace = THREE.SRGBColorSpace;
+    mask.wrapS = THREE.RepeatWrapping;
+    this.owned.push(mask);
+    const REPEAT = 12;   // metres per repeat of the line
+    const turn = { N: 0, S: Math.PI, E: -Math.PI / 2, W: Math.PI / 2 } as const;
+    for (const f of strips) {
+      const y0 = f.y0 ?? 2.7, y1 = f.y1 ?? 3.0, len = f.u1 - f.u0;
+      const map = mask.clone();
+      map.repeat.set(len / REPEAT, 1);
+      map.needsUpdate = true;
+      const reveal = { value: this.opts.reducedMotion ? 1 : 0 };
+      // the village border in Kajal on light walls, in Khadi on the Kajal rooms' walls
+      const fu = (f.u0 + f.u1) / 2, fx = f.side === "N" || f.side === "S" ? fu : f.plane, fz = f.side === "N" || f.side === "S" ? f.plane : fu;
+      const onKajal = (fx > -5.66 && fx < -0.39 && fz > -6.06 && fz < -0.74) || (fx > -0.06 && fx < 18.66 && fz > 0.39 && fz < 4.6);
+      const mat = new THREE.MeshBasicMaterial({ color: onKajal ? 0xf5f4f0 : 0x211b18, map, transparent: true, depthWrite: false,
+        opacity: onKajal ? 0.35 : this.narrow ? 0.8 : 0.55, polygonOffset: true, polygonOffsetFactor: -2, fog: false, toneMapped: false });
+      mat.onBeforeCompile = (sh) => {
+        sh.uniforms.uReveal = reveal;
+        sh.vertexShader = sh.vertexShader.replace("#include <common>", "#include <common>\nvarying float vStrip;")
+          .replace("#include <uv_vertex>", "#include <uv_vertex>\nvStrip = uv.x;");
+        sh.fragmentShader = sh.fragmentShader.replace("#include <common>", "#include <common>\nuniform float uReveal;\nvarying float vStrip;")
+          .replace("void main() {", "void main() {\n  if (vStrip > uReveal) discard;");
+      };
+      const geo = new THREE.PlaneGeometry(len, y1 - y0);
+      const mesh = new THREE.Mesh(geo, mat);
+      const u = (f.u0 + f.u1) / 2, y = (y0 + y1) / 2;
+      if (f.side === "N" || f.side === "S") mesh.position.set(u, y, f.plane); else mesh.position.set(f.plane, y, u);
+      mesh.rotation.y = turn[f.side];
+      mesh.renderOrder = 2;
+      mesh.matrixAutoUpdate = false;
+      mesh.updateMatrix();
+      mesh.userData.noAO = true;
+      this.world.add(mesh);
+      this.owned.push(geo, mat, map);
+      this.friezes.push({ key: `${f.room}|${f.space}`, reveal });
+    }
+  }
+
+  /** the walk has arrived in a room (a series, in one space of the house): draw its frieze, once per visit */
+  drawFrieze(room: string | undefined, space: string | undefined) {
+    const key = `${room}|${space}`;
+    if (!room || this.friezeDrawn.has(key)) return;
+    this.friezeDrawn.add(key);
+    const mine = this.friezes.filter((f) => f.key === key);
+    if (!mine.length || this.opts.reducedMotion) { mine.forEach((f) => (f.reveal.value = 1)); return; }
+    gsap.to(mine.map((f) => f.reveal), { value: 1, duration: 2.4, ease: "power2.out", stagger: 0.35 });
+  }
+
   private buildItems() {
     const box = new THREE.Box3();
     for (const s of this.parts.props) {
@@ -856,26 +1473,114 @@ export class Room {
   playIntro() {
     if (this.introPlayed || !this.ready) return;
     this.introPlayed = true;
-    const reduce = this.opts.reducedMotion;
-    if (!reduce) {
-      let seed = 5;
-      const rnd = () => ((seed = (seed * 16807) % 2147483647) / 2147483647) - 0.5;
-      const tl = gsap.timeline({ onUpdate: () => this.invalidate(true), onComplete: () => this.settle() });
-      this.bodies.forEach((b, i) => {
-        const g = b.group, at = 0.2 + i * 0.07;
-        tl.fromTo(g.position, { y: b.restPos.y + 2 }, { y: b.restPos.y, duration: 1.2, ease: "bounce.out" }, at);
-        tl.fromTo(g.rotation,
-          { x: b.restRot.x + rnd() * 0.5, z: b.restRot.z + rnd() * 0.5 },
-          { x: b.restRot.x, z: b.restRot.z, duration: 1.2, ease: "power2.out" }, at);
-      });
-      this.dropTl = tl;
-      const ms = tl.duration() * 1000 + 120;
-      this.keepAlive(ms, true);
-    }
-    this.rig.playIntro(startPose(this.info, this.narrow), () => {
+    // One wall at a time (29 Oct): the house is already framed on the first stop when the welcome
+    // crossfades away; no dolly, nothing dropping in
+    this.rig.playIntro(() => {
+      this.wake = 2;
       this.opts.onIntroFinished();
-    }, reduce ? 0 : 1.15);
+    });
   }
+
+  /**
+   * One stop: a short walk (within a room) or a cut (the page dips to Kajal around it).
+   * `onArrive` fires when the camera is there.
+   */
+  goStop(index: number, kind: "walk" | "cut", onArrive: () => void, duration = 0.5) {
+    this.prepareChapter(index);
+    this.wake = 2;
+    if (!this.rig?.isEnabled) { this.rig?.jumpTo(index); onArrive(); return; }
+    if (kind === "cut") { this.rig.jumpTo(index); onArrive(); return; }
+    this.rig.goTo(index, duration, () => { this.wake = 2; onArrive(); });
+  }
+
+  /** each stop's camera on this screen: square on its paintings, framed in its band (lib/stops.ts) */
+  private shotsFor(W: number, H: number): Pose[] {
+    let prev: number | undefined;
+    return this.stops.map((s) => {
+      const cam = this.info.cams[s.cam] ?? this.info.cams[s.cam.replace(/^n:/, "")];
+      const p = stopPose(cam, W, H, bandFor(s, W, H), prev);
+      prev = p.pivotRot[1];
+      return p;
+    });
+  }
+
+  /**
+   * How the camera goes from one stop to the next (art direction V3 §1): along the same wall, a
+   * 0.5 s truck; to another wall of the same room and space with at most a quarter turn, 0.6 s;
+   * anything else is a cut under the veil.
+   */
+  moveKind(from: number, to: number): "truck" | "turn" | "cut" {
+    const a = this.stops[from], b = this.stops[to];
+    const pa = this.rig?.shot(from), pb = this.rig?.shot(to);
+    if (!a || !b || !pa || !pb || Math.abs(from - to) !== 1) return "cut";
+    if (a.room !== b.room || a.space !== b.space) return "cut";
+    if (a.wall === b.wall) return "truck";
+    let dy = Math.abs(pa.pivotRot[1] - pb.pivotRot[1]) % (2 * Math.PI);
+    if (dy > Math.PI) dy = 2 * Math.PI - dy;
+    const far = Math.hypot(pa.pivot[0] - pb.pivot[0], pa.pivot[2] - pb.pivot[2]);
+    return dy <= Math.PI / 2 + 0.02 && far < 6.5 ? "turn" : "cut";
+  }
+
+  /**
+   * QC (?qa=1): each stop's paintings on screen from its own camera, as shares of the screen,
+   * and how much of any other canvas in the same space cuts in. Puts the camera back after.
+   */
+  measureStops() {
+    type R = { x0: number; x1: number; y0: number; y1: number };
+    const out: { id: string; works: ({ id: string; w: number; h: number } & R)[]; group: number;
+      band: { t: number; b: number; l: number; r: number }; intrude: { id: string; w: number }[] }[] = [];
+    const here = Math.round(this.rig.index);
+    const W = this.viewport.width || innerWidth, H = this.viewport.height || innerHeight;
+    const inSpace = (id: string, space: string | undefined) => {
+      const b = space ? this.info.plan[space] : undefined;
+      const c = this.info.art[id]?.centre;
+      if (!Array.isArray(b) || !c) return false;
+      return c[0] > b[0] - 0.12 && c[0] < b[1] + 0.12 && -c[2] > b[2] - 0.12 && -c[2] < b[3] + 0.12;
+    };
+    this.stops.forEach((s, i) => {
+      this.rig.jumpTo(i);
+      this.rig.update(0);
+      this.rig.camera.updateMatrixWorld(true);
+      const band = bandFor(s, W, H);
+      const rect = (id: string): R | null => {
+        const r = this.artRect(id);
+        if (!r) return null;
+        return { x0: Math.max(0, r.x0 - this.viewport.left), x1: Math.min(W, r.x1 - this.viewport.left),
+          y0: Math.max(0, r.y0 - this.viewport.top), y1: Math.min(H, r.y1 - this.viewport.top) };
+      };
+      const works = s.works.map((id) => {
+        const r = rect(id) ?? { x0: 0, x1: 0, y0: 0, y1: 0 };
+        return { id, w: (r.x1 - r.x0) / W, h: (r.y1 - r.y0) / Math.max(1, H - band.t - band.b), ...r };
+      });
+      const gx0 = Math.min(...works.map((w) => w.x0)), gx1 = Math.max(...works.map((w) => w.x1));
+      const intrude = Object.keys(this.info.art)
+        .filter((id) => !s.works.includes(id) && !this.info.art[id].study && inSpace(id, s.space))
+        .map((id) => {
+          const r = rect(id);
+          const seen = r && r.x1 > r.x0 && r.y1 > r.y0 && r.y0 < H - band.b && r.y1 > band.t;
+          return { id, w: seen ? (r!.x1 - r!.x0) / W : 0 };
+        })
+        .filter((x) => x.w > 0.005);
+      out.push({ id: s.id, works, group: works.length ? (gx1 - gx0) / W : 0, band, intrude });
+    });
+    this.rig.jumpTo(here);
+    this.rig.update(0);
+    this.wake = 2;
+    return out;
+  }
+
+  /** QA and review mocks: frame any house cam (e.g. "n:w:faithn", a whole wall) in the stop's band */
+  qaView(key: string, stopIndex: number) {
+    const cam = this.info.cams[key];
+    if (!cam) return false;
+    const W = this.viewport.width || innerWidth, H = this.viewport.height || innerHeight;
+    this.rig.hold(stopPose(cam, W, H, bandFor(this.stops[stopIndex], W, H)));
+    this.wake = 3;
+    return true;
+  }
+
+  /** the stops this screen walks */
+  get walk() { return this.stops; }
 
   /** where Twenty Paise is on screen before the camera moves — the
    *  preloader puts its photograph exactly there */
@@ -896,8 +1601,6 @@ export class Room {
     return { left: x0, top: y0, width: x1 - x0, height: y1 - y0 };
   }
 
-  scroll(p: number) { this.prepareChapter(Math.round(p * (CHAPTERS.length - 1))); this.rig?.scroll(p); }
-  syncScroll(p: number) { this.prepareChapter(Math.round(p * (CHAPTERS.length - 1))); this.rig?.syncScroll(p); this.wake = 2; }
 
   /** stop drawing while an opaque section covers the room */
   setVisible(v: boolean) {
@@ -1199,9 +1902,17 @@ export class Room {
     this.composer.setSize(w, h);
     const aspect = w / Math.max(1, h);
     this.rig.setAspect(aspect);
-    this.narrow = isNarrow(aspect);
-    const walk = resolveWalk(this.info, this.narrow, aspect);
-    this.rig.setShots(walk.shots, walk.vias);
+    const phone = isPhoneLayout(w, h);
+    let index = Math.round(this.rig.index);
+    if (phone !== this.narrow) {
+      // the walk itself changes (painting by painting or groups): stay with the same painting
+      index = mapStop(this.stops, index, stopsFor(phone));
+      this.narrow = phone;
+      for (const o of this.laptopOnly) o.visible = !phone;
+      this.stops = stopsFor(phone);
+      this.rig.setShots(this.shotsFor(w, h), index);
+      this.opts.onLayout?.(phone, index);
+    } else this.rig.setShots(this.shotsFor(w, h), index);
     this.wake = 2;
   };
 
@@ -1226,7 +1937,15 @@ export class Room {
       const rect = this.canvas.getBoundingClientRect();
       this.viewport = { left: rect.left, top: rect.top, width: rect.width, height: rect.height };
     }
-    const walk = duskAt(this.rig.progress);
+    if (this.lowLights.length) {
+      // Portraits east hangs in two rows. On phone, a top-row portrait is framed alone; the lower row's
+      // brass fixtures would sit in the bottom of its view (QC 3 Nov), so they step aside while the
+      // camera is up at the top row (eye above 1.5 m on that wall) and come back for the lower row.
+      const c = this.rig.camera.getWorldPosition(tmpV);
+      const hide = this.narrow && c.y > 1.5 && c.x > 13.4 && c.x < 16.9 && c.z > 0.6 && c.z < 3.2;
+      if (this.lowLights[0].visible === hide) { for (const o of this.lowLights) o.visible = !hide; draw = true; }
+    }
+    const walk = duskAt(this.stops, this.rig.index);
     if (Math.abs(walk - this.eve.walk) > 1e-4) {
       this.eve.walk = walk;
       this.applyEve();
@@ -1356,7 +2075,7 @@ export class Room {
   /** Labels only need new projected positions when the camera or viewport changes. */
   get viewVersion() { return this.viewRevision; }
   /** the camera has arrived where the scroll put it, and the house is at rest */
-  get landed() { return this.ready && !!this.rig && this.rig.isEnabled && this.rig.travel < 0.0015 && !this.rearranged; }
+  get landed() { return this.ready && !!this.rig && this.rig.isEnabled && !this.rig.stepping && this.rig.travel < 0.0015 && !this.rearranged; }
 
   /** every canvas on screen, framed, in CSS pixels (a label must cover none of them) */
   artRects() {
