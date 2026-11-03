@@ -1060,3 +1060,8 @@ html[data-panel="about"] .wall-labels{visibility:visible;opacity:1}
 .rmap-here{color:#6A615B}
 .stage-dim{z-index:170}
 .stage-dim[data-on="1"]{opacity:.4}
+
+/* the Kajal rooms (Faith, Portraits): light lettering on the dark limewash */
+html[data-wall="dark"] .plaque{color:#F5F4F0;text-shadow:0 0 10px rgba(20,15,12,.7)}
+html[data-wall="dark"] .pl-status{color:#CFC8BE}
+html[data-wall="dark"] .wall-letter{color:rgba(245,244,240,.82)}

@@ -69,6 +69,8 @@ Am not a painter`;
 /** the rooms of the walk, in order: the menu's names (the door belongs to "About her") */
 export const ROOMS = ["About her", "Onset of Spring", "Faith", "Bandh Darwaze", "Gone Are The Days", "Portraits", "Her desk"] as const;
 export type RoomName = (typeof ROOMS)[number];
+/** the rooms on Kajal walls (Shubham, 3 Nov): their wall lettering and plaques turn light */
+export const DARK_ROOMS: ReadonlySet<string> = new Set<RoomName>(["Faith", "Portraits"]);
 
 /** the room lines (locked by Shubham, 27 Oct 2026): ours, never presented as hers */
 export const ROOM_LINE: Partial<Record<RoomName, string>> = {

@@ -16,7 +16,10 @@ import { activeVariant, NIGHT } from "./variants";
 import { messPose, HERO_ID } from "../chapters";
 import { stopsFor, isPhoneLayout, bandFor, duskAt, mapStop, type Stop } from "../stops";
 import { stopPose } from "./phone-framing";
-import { buildPlants, type Plant } from "./plants";
+import { sheenLight } from "./paint";
+import { mergeGeometries } from "three/examples/jsm/utils/BufferGeometryUtils.js";
+import { buildPlants, type Plant, type PropAsset } from "./plants";
+import PROPS from "../studio-props.json";
 import PLANTS from "../studio-plants.json";
 import type { Pose } from "./rig";
 
@@ -113,6 +116,13 @@ const tmpC = new THREE.Color();
 const DEEPA_WICK = 0.14;
 /** a canvas's frame beyond its edge: the lip and the shadow gap (build.py float_frame) */
 const FRAME = 0.025;
+/** wall colours (linear): Kajal #211B18 as a matt limewash, a little lifted so the grain reads; Khadi #F5F4F0. base = the plaster's own mean luminance */
+const WALL_TONES = { kajal: 0x3a302a, khadi: 0xe9e6de, base: 0.6 };
+/** each plaster role's own mean luminance (its tint over the photograph's mean), so its grain survives the recolour */
+const TONE_BASE: Record<string, number> = { wall: 0.6, wallShade: 0.47, field: 0.085, panel: 0.6 };
+
+/** the picture-light photograph's width / height (public/house/props/06-picture-light-master.webp) */
+const FIXTURE_ASPECT = 1400 / 306;
 /** the pools' strength against the spec's 0.35 (tuned on screenshots, 29 Oct) */
 const POOL_K = 1;
 /** each wall's outward normal on the floor plane, three's (x, z) */
@@ -288,6 +298,7 @@ export class Room {
     const edge = new THREE.MeshStandardMaterial({ color: 0x9e958a, roughness: 0.95 });
     this.owned.push(edge);
     this.parts = assemble(house, lib, this.baked, edge);
+    this.roomWalls();
     for (const m of this.parts.ceilings) this.ceiling.add(m);
     for (const r of this.parts.roofs) this.ceiling.add(r);
     this.world.add(house.scene, this.ceiling);
@@ -310,7 +321,7 @@ export class Room {
       // a study (the canvas on her easel) is painted like the rest, but it is not a work to open
       const pickable = !this.info.art[id]?.study;
       if (this.info.art[id]?.late) {
-        mesh.material = paintMaterial(ground, this.baked, galleryLight(this.info.art[id]), flat, this.info.art[id]?.lk);
+        mesh.material = paintMaterial(ground, this.baked, sheenLight(this.info.art[id]), flat, this.info.art[id]?.lk);
         if (pickable) this.art.push(mesh);
         continue;
       }
@@ -322,7 +333,7 @@ export class Room {
       tex.needsUpdate = true;
       // paint, not a print: the varnish under its gallery light now, the brushwork's
       // relief read once the room is open (reliefs())
-      mesh.material = paintMaterial(tex, this.baked, galleryLight(this.info.art[id]), flat, this.info.art[id]?.lk);
+      mesh.material = paintMaterial(tex, this.baked, sheenLight(this.info.art[id]), flat, this.info.art[id]?.lk);
       if (pickable) this.art.push(mesh);
     }
 
@@ -413,7 +424,7 @@ export class Room {
         (mesh.material as THREE.MeshStandardMaterial).map = tex;
         this.textureUploads.push(() => this.renderer?.initTexture(tex));
         this.invalidate();
-        void this.addRelief(mesh, 384);
+        void this.addRelief(mesh, this.tier.small ? 512 : 768);
       }).catch(() => { /* the warm ground stays */ }).finally(() => {
         this.artLoads--;
         this.pumpArt();
@@ -744,8 +755,9 @@ export class Room {
    */
   private buildRoomPlants() {
     if (new URLSearchParams(location.search).get("plants") === "0") return;
-    const { group, owned } = buildPlants((PLANTS as unknown as { plants: Plant[] }).plants,
-      (n) => this.world.getObjectByName(n) ?? this.scene.getObjectByName(n));
+    const P = PLANTS as unknown as { kit: Record<string, string>; plants: Plant[] };
+    const { group, owned } = buildPlants(P.plants, (n) => this.world.getObjectByName(n) ?? this.scene.getObjectByName(n),
+      P.kit, PROPS as unknown as Record<string, PropAsset>);
     this.scene.add(group);
     this.owned.push(...owned);
     this.plants = group;
@@ -805,6 +817,155 @@ export class Room {
     return out;
   }
 
+  /**
+   * QC (?qa=1): for every stop (and `extra` cams), each plant's sampled points on screen: how many are
+   * in the frame, how many fall on a painting (or the strip under it where its plaque goes) and
+   * their screen box. Points, not boxes: a palm's box is mostly air.
+   */
+  plantReport(extra: { key: string; stop: number; works: string[] }[] = []) {
+    type V = { view: string; works: string[]; band: { t: number; b: number; l: number; r: number }; arts: Record<string, number[]>;
+      plants: Record<string, { n: number; inFrame: number; onArt: string[]; box: number[] | null }> };
+    const out: V[] = [];
+    if (!this.plants) return out;
+    const spaceAt = (x: number, z: number) => Object.entries(this.info.plan).find(([, r]) =>
+      Array.isArray(r) && x > r[0] - 0.05 && x < r[1] + 0.05 && -z > r[2] - 0.05 && -z < r[3] + 0.05)?.[0];
+    this.plants.updateMatrixWorld(true);
+    const samples = this.plants.children.map((g) => {
+      const pts: THREE.Vector3[] = [];
+      if (g.userData.samples) return { name: g.name, pts, space: spaceAt(g.position.x, g.position.z), g };
+      g.traverse((o) => {
+        const m = o as THREE.Mesh;
+        if (!m.isMesh) return;
+        const pos = m.geometry.getAttribute("position");
+        if (!pos) return;
+        const im = o as THREE.InstancedMesh;
+        if (im.isInstancedMesh) {
+          const mi = new THREE.Matrix4();
+          for (let i = 0; i < im.count; i += 1) {
+            im.getMatrixAt(i, mi);
+            for (let v = 0; v < pos.count; v += Math.max(1, Math.floor(pos.count / 4)))
+              pts.push(new THREE.Vector3().fromBufferAttribute(pos, v).applyMatrix4(mi).applyMatrix4(im.matrixWorld));
+          }
+        } else {
+          const step = Math.max(1, Math.floor(pos.count / 300));
+          for (let v = 0; v < pos.count; v += step) pts.push(new THREE.Vector3().fromBufferAttribute(pos, v).applyMatrix4(m.matrixWorld));
+        }
+      });
+      return { name: g.name, pts, space: spaceAt(g.position.x, g.position.z), g };
+    });
+    const here = Math.round(this.rig.index);
+    const W = this.viewport.width || innerWidth, H = this.viewport.height || innerHeight;
+    const check = (view: string, works: string[], band: V["band"]) => {
+      this.rig.update(0);
+      this.rig.camera.updateMatrixWorld(true);
+      for (const sm of samples) if (sm.g.userData.samples) { sm.g.userData.aim?.(this.rig.camera); sm.pts = sm.g.userData.samples(); }
+      this.rig.update(0);
+      this.rig.camera.updateMatrixWorld(true);
+      const eye = this.rig.camera.getWorldPosition(new THREE.Vector3());
+      const mine = spaceAt(eye.x, eye.z);
+      const arts: Record<string, number[]> = {};
+      for (const id of Object.keys(this.info.art)) {
+        if (this.info.art[id].study) continue;
+        const c = this.info.art[id].centre;
+        if (spaceAt(c[0] + 0.1 * (SIDE_OUT[this.info.art[id].side]?.[0] ?? 0), c[2] + 0.1 * (SIDE_OUT[this.info.art[id].side]?.[1] ?? 0)) !== mine) continue;
+        const r = this.artRect(id);
+        if (!r) continue;
+        const a = [r.x0 - this.viewport.left, r.y0 - this.viewport.top, r.x1 - this.viewport.left, r.y1 - this.viewport.top];
+        if (a[2] < 0 || a[0] > W || a[3] < 0 || a[1] > H) continue;
+        arts[id] = a;
+      }
+      const plants: V["plants"] = {};
+      for (const { name, pts, space } of samples) {
+        if (space !== mine) continue;
+        let inFrame = 0; const on = new Set<string>();
+        let x0 = Infinity, y0 = Infinity, x1 = -Infinity, y1 = -Infinity;
+        for (const p of pts) {
+          tmpV.copy(p).applyMatrix4(this.rig.camera.matrixWorldInverse);
+          if (tmpV.z > -0.05) continue;
+          tmpV.applyMatrix4(this.rig.camera.projectionMatrix);
+          const px = (tmpV.x * 0.5 + 0.5) * W, py = (0.5 - tmpV.y * 0.5) * H;
+          if (px < 0 || px > W || py < band.t || py > H - band.b) continue;
+          inFrame++;
+          x0 = Math.min(x0, px); x1 = Math.max(x1, px); y0 = Math.min(y0, py); y1 = Math.max(y1, py);
+          for (const [id, a] of Object.entries(arts)) {
+            // the canvas and its frame, and the plaque's strip under it (phone too: the plaque is on the wall)
+            const onCanvas = px > a[0] - 4 && px < a[2] + 4 && py > a[1] - 4 && py < a[3] + 4;
+            // the plaque: centred under the frame, at most 220 px wide (WallLabels)
+            const mid = (a[0] + a[2]) / 2, ph = Math.min(110, (a[2] - a[0]) / 2) + 6;
+            const onPlaque = px > mid - ph && px < mid + ph && py >= a[3] && py < a[3] + (W > 760 ? 44 : 34);
+            if (onCanvas || onPlaque) on.add(id);
+          }
+        }
+        plants[name] = { n: pts.length, inFrame, onArt: [...on], box: inFrame ? [x0, y0, x1, y1].map(Math.round) : null };
+      }
+      out.push({ view, works, band, arts, plants });
+    };
+    this.stops.forEach((s, i) => { this.rig.jumpTo(i); check(s.id, s.works, bandFor(s, W, H)); });
+    for (const e of extra) {
+      const cam = this.info.cams[e.key];
+      if (!cam) continue;
+      const band = bandFor(this.stops[e.stop], W, H);
+      this.rig.hold(stopPose(cam, W, H, band));
+      check(e.key, e.works, band);
+    }
+    this.rig.jumpTo(here);
+    this.rig.update(0);
+    this.wake = 2;
+    return out;
+  }
+
+  /**
+   * The walls in the brand's colours, room by room (Shubham, 3 Nov): Faith (the Quiet Room) and
+   * Portraits in Kajal limewash, Bandh Darwaze (the Red Room) and the Gone Are The Days hall in Khadi,
+   * the courtyard in its warm plaster. The plaster's own grain and the baked light stay; only its
+   * colour changes, by where the wall stands. Paintings are another material: never touched.
+   */
+  private roomWalls() {
+    const k = WALL_TONES;
+    // wall: the Quiet and Red Rooms; field: the Red Room's street wall; panel: the gallery's hanging walls
+    for (const role of ["wall", "wallShade", "field", "panel"] as const) {
+      const m = this.lib?.get(role) as THREE.MeshStandardMaterial | undefined;
+      if (!m || m.userData.toned) continue;
+      m.userData.toned = true;
+      const before = m.onBeforeCompile.bind(m), key = m.customProgramCacheKey.bind(m);
+      m.onBeforeCompile = (sh, r) => {
+        before(sh, r);
+        sh.uniforms.uKajal = { value: new THREE.Color(k.kajal) };
+        sh.uniforms.uKhadi = { value: new THREE.Color(k.khadi) };
+        sh.vertexShader = sh.vertexShader
+          .replace("#include <common>", "#include <common>\nvarying vec3 vToneP;")
+          .replace("#include <worldpos_vertex>", "#include <worldpos_vertex>\nvToneP = (modelMatrix * vec4(transformed, 1.0)).xyz;");
+        sh.fragmentShader = sh.fragmentShader
+          .replace("#include <common>", `#include <common>
+            varying vec3 vToneP; uniform vec3 uKajal; uniform vec3 uKhadi;
+            float inR(vec3 p, float x0, float x1, float z0, float z1) {
+              return step(x0 - 0.06, p.x) * step(p.x, x1 + 0.06) * step(z0 - 0.06, p.z) * step(p.z, z1 + 0.06);
+            }`)
+          .replace("#include <map_fragment>", `#include <map_fragment>
+            {
+              // the room this wall face belongs to (house.json plan, three's x and z)
+              float kajal = max(inR(vToneP, -5.6, -0.45, -6.0, -0.8), inR(vToneP, 0.0, 18.6, 0.45, 4.6));
+              float khadi = max(inR(vToneP, -5.6, -0.45, -0.35, 4.8), inR(vToneP, 0.0, 18.6, 4.6, 8.85));
+              float grain = clamp(1.0 + 0.6 * (dot(diffuseColor.rgb, vec3(0.2126, 0.7152, 0.0722)) / ${(TONE_BASE[role] ?? k.base).toFixed(3)} - 1.0), 0.8, 1.2);
+              diffuseColor.rgb = mix(diffuseColor.rgb, uKajal * grain, kajal);
+              diffuseColor.rgb = mix(diffuseColor.rgb, uKhadi * grain, khadi * (1.0 - kajal));
+            }`);
+      };
+      m.customProgramCacheKey = () => `${key()}|tones`;
+      m.needsUpdate = true;
+    }
+  }
+
+  /** QA: move one plant (by its group name) to try a placement without a reload */
+  movePlant(name: string, x: number, z: number) {
+    const g = this.plants?.getObjectByName(name);
+    if (!g) return false;
+    g.position.set(x, 0, z);
+    g.updateMatrixWorld(true);
+    this.wake = 2;
+    return true;
+  }
+
   private buildPools() {
     const size = 128;
     const grad = (paint: (g: CanvasRenderingContext2D) => void) => {
@@ -843,7 +1004,11 @@ export class Room {
       g.fillStyle = h;
       g.fillRect(0, 0, size, size);
     });
-    const poolMat = new THREE.MeshBasicMaterial({ color: 0xffd6a0, map: pool, transparent: true, opacity: 0.35 * POOL_K,
+    const poolTex = new THREE.TextureLoader().load("/house/props/09-warm-light-pool-master.webp");
+    poolTex.colorSpace = THREE.SRGBColorSpace;
+    this.owned.push(poolTex);
+    void pool;
+    const poolMat = new THREE.MeshBasicMaterial({ color: 0xfff0dc, map: poolTex, transparent: true, opacity: 0.35 * POOL_K,
       blending: THREE.AdditiveBlending, depthWrite: false, fog: false, polygonOffset: true, polygonOffsetFactor: -1 });
     const shadeMat = new THREE.MeshBasicMaterial({ color: 0x211b18, map: shade, transparent: true, opacity: 0.25,
       depthWrite: false, fog: false, polygonOffset: true, polygonOffsetFactor: -1 });
@@ -879,11 +1044,102 @@ export class Room {
       const fw = a.w + 2 * FRAME, fh = a.h / 2 + FRAME;
       at(-fh - 0.05, fw + 0.06, 0.12, shadeMat, `shade:${id}`);
     }
+    this.buildPictureLights(grad);
     // the walls a little lower away from the pools (key to fill about 2.5 : 1)
     for (const role of ["wall", "wallShade"] as const) {
       const m = this.lib?.get(role);
       if (m && !m.userData.dimmed) { m.userData.dimmed = true; m.lightMapIntensity *= 0.9; }
     }
+  }
+
+  /**
+   * A picture light over every painting (Shubham, 2 Nov): the photographed brass fixture just above
+   * the frame, 50 % of its width, a warm bulb strip under it, and its 2700 K wash falling down the wall
+   * round the frame, brightest at the top. The wash lies on the wall behind the canvas (the depth test
+   * keeps it off the paint): her colours are never tinted.
+   */
+  private buildPictureLights(grad: (paint: (g: CanvasRenderingContext2D) => void) => THREE.Texture) {
+    const size = 128;
+    const wash = grad((g) => {
+      // a fan: bright under the bar, widening and fading down the wall
+      const v = g.createLinearGradient(0, 0, 0, size);
+      v.addColorStop(0, "rgba(255,255,255,0)");
+      v.addColorStop(0.08, "rgba(255,255,255,.8)");
+      v.addColorStop(0.22, "rgba(255,255,255,.6)");
+      v.addColorStop(0.6, "rgba(255,255,255,.18)");
+      v.addColorStop(1, "rgba(255,255,255,0)");
+      g.fillStyle = v;
+      g.beginPath(); g.moveTo(size * 0.3, 0); g.lineTo(size * 0.7, 0); g.lineTo(size, size); g.lineTo(0, size); g.closePath(); g.fill();
+      g.globalCompositeOperation = "destination-in";
+      const h = g.createLinearGradient(0, 0, size, 0);
+      h.addColorStop(0, "rgba(0,0,0,0)"); h.addColorStop(0.25, "rgba(0,0,0,1)");
+      h.addColorStop(0.75, "rgba(0,0,0,1)"); h.addColorStop(1, "rgba(0,0,0,0)");
+      g.fillStyle = h; g.fillRect(0, 0, size, size);
+    });
+    const fixture = new THREE.TextureLoader().load("/house/props/06-picture-light-master.webp");
+    fixture.colorSpace = THREE.SRGBColorSpace;
+    fixture.anisotropy = 4;
+    this.owned.push(fixture);
+    const brass = new THREE.MeshBasicMaterial({ map: fixture, transparent: true, alphaTest: 0.3, color: 0xe6dccb, fog: false, side: THREE.DoubleSide });
+    const bulb = new THREE.MeshBasicMaterial({ color: 0xffe0a8, fog: false });
+    const washMat = new THREE.MeshBasicMaterial({ color: 0xffc47e, map: wash, transparent: true, opacity: 0.3,
+      blending: THREE.AdditiveBlending, depthWrite: false, fog: false, polygonOffset: true, polygonOffsetFactor: -1 });
+    this.owned.push(brass, bulb, washMat);
+    const bars: THREE.BufferGeometry[] = [], strips: THREE.BufferGeometry[] = [], washes: THREE.BufferGeometry[] = [], darkWashes: THREE.BufferGeometry[] = [];
+    const washDark = washMat.clone();
+    washDark.opacity = 0.55;
+    this.owned.push(washDark);
+    const turn = { N: 0, S: Math.PI, E: -Math.PI / 2, W: Math.PI / 2 } as Record<string, number>;
+    const ray = new THREE.Raycaster();
+    const n = new THREE.Vector3(), o = new THREE.Vector3(), m = new THREE.Matrix4(), q = new THREE.Quaternion();
+    for (const a of Object.values(this.info.art)) {
+      if (a.study || !SIDE_OUT[a.side]) continue;
+      const [nx, nz] = SIDE_OUT[a.side];
+      n.set(nx, 0, nz);
+      o.set(...a.centre).addScaledVector(n, 0.02);
+      ray.set(o, n.clone().negate());
+      ray.far = 0.4;
+      const hit = ray.intersectObjects(this.parts.statics, false)[0];
+      const back = hit ? hit.distance - 0.02 : 0.045;          // canvas centre to the wall's face
+      const fw = a.w + 2 * FRAME, top = a.centre[1] + a.h / 2 + FRAME;
+      const L = Math.min(0.75, Math.max(0.24, fw * 0.5));
+      q.setFromAxisAngle(new THREE.Vector3(0, 1, 0), turn[a.side]);
+      // in the painting's own axes: x along the wall, y up, z out of the wall (0 = the wall's face)
+      const place = (geo: THREE.BufferGeometry, x: number, y: number, z: number) => {
+        m.compose(new THREE.Vector3(a.centre[0], 0, a.centre[2]).addScaledVector(n, -back)
+          .add(new THREE.Vector3(x, y, z).applyQuaternion(q)), q, new THREE.Vector3(1, 1, 1));
+        geo.applyMatrix4(m);
+        return geo;
+      };
+      const by = top + 0.075, bz = 0.1;
+      // the fixture: the Design agency's photographed brass picture light, square to the wall, its bar over the frame
+      const fh2 = L / FIXTURE_ASPECT;
+      bars.push(place(new THREE.PlaneGeometry(L, fh2), 0, by - 0.012 + fh2 / 2 - 0.02, bz - 0.04));
+      strips.push(place(new THREE.BoxGeometry(L * 0.86, 0.005, 0.012), 0, by - 0.03, bz - 0.04));
+      const wh = Math.min(a.h + 0.5, 1.9), ww = fw * 1.35;
+      // on a Kajal wall the wash must read clearly: stronger there
+      const [cx, , cz] = a.centre;
+      const dark = (cx > -5.66 && cx < -0.39 && cz > -6.06 && cz < -0.74) || (cx > -0.06 && cx < 18.66 && cz > 0.39 && cz < 4.6);
+      (dark ? darkWashes : washes).push(place(new THREE.PlaneGeometry(ww, wh), 0, by - 0.03 - wh / 2, 0.003));
+    }
+    const add = (geos: THREE.BufferGeometry[], mat: THREE.Material, name: string, order = 0) => {
+      const flat = geos.map((g) => (g.index ? g.toNonIndexed() : g));
+      const geo = mergeGeometries(flat, false);
+      geos.forEach((g) => g.dispose());
+      flat.forEach((g) => g.dispose());
+      if (!geo) return;
+      this.owned.push(geo);
+      const mesh = new THREE.Mesh(geo, mat);
+      mesh.name = name;
+      mesh.renderOrder = order;
+      mesh.userData.noAO = true;
+      mesh.castShadow = false;
+      this.world.add(mesh);
+    };
+    add(bars, brass, "picture-lights");
+    add(strips, bulb, "picture-light-bulbs");
+    add(washes, washMat, "picture-light-wash", 1);
+    add(darkWashes, washDark, "picture-light-wash-kajal", 1);
   }
 
   private buildFrieze() {
@@ -901,7 +1157,10 @@ export class Room {
       map.repeat.set(len / REPEAT, 1);
       map.needsUpdate = true;
       const reveal = { value: this.opts.reducedMotion ? 1 : 0 };
-      const mat = new THREE.MeshBasicMaterial({ color: 0x211b18, map, transparent: true, depthWrite: false,
+      // the village border in Kajal on light walls, in Khadi on the Kajal rooms' walls
+      const fu = (f.u0 + f.u1) / 2, fx = f.side === "N" || f.side === "S" ? fu : f.plane, fz = f.side === "N" || f.side === "S" ? f.plane : fu;
+      const onKajal = (fx > -5.66 && fx < -0.39 && fz > -6.06 && fz < -0.74) || (fx > -0.06 && fx < 18.66 && fz > 0.39 && fz < 4.6);
+      const mat = new THREE.MeshBasicMaterial({ color: onKajal ? 0xf5f4f0 : 0x211b18, map, transparent: true, depthWrite: false,
         opacity: this.narrow ? 0.8 : 0.55, polygonOffset: true, polygonOffsetFactor: -2, fog: false, toneMapped: false });
       mat.onBeforeCompile = (sh) => {
         sh.uniforms.uReveal = reveal;

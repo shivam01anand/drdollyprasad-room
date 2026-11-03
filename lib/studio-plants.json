@@ -1,135 +1,204 @@
 {
- "_": "Plants for the rooms (review mock, 29 Oct 2026). Three's floor axes (x, z). kinds: areca (the house's own Foliage_areca0, potted), rubber (Prop_potted_plant_02), small (Prop_potted_plant_04), tulsi, snake, pothos (a wall shelf: side = the wall it hangs on, y = shelf height). Checked against every stop by Room.plantClashes (?qa=1).",
+ "_": "Plants and furniture for the rooms (V3 bold, 2 Nov 2026). Shubham: greenery in matching pairs at the two ends of a wall or group, grounded, never between paintings; a bench centred under its group, a rug centred. Photographs (cut-outs by the Design agency, staged by scripts/house/stage_props.py into public/house/props + lib/studio-props.json) stand as camera-facing cards with their own floor shadow. One species per room (Design agency's elevated set, 3 Nov). To swap a plant in a room, change its one line in `kit` and stage the file (scripts/house/stage_props.py). Three's floor axes (x, z); side = the wall it stands against; light = the room's light at that spot (a multiplier on the photograph). Checked against every stop by Room.plantReport (?qa=1). Faith and Portraits stand on Kajal walls: their props a little brighter so they do not go muddy.",
+ "kit": {
+  "aangan": "01-monstera-master",
+  "faith": "04-olive-stone-master",
+  "gatd": "03-rubber-brass-master",
+  "portraits": "02-bird-paradise-master",
+  "bench": "06-bench-front",
+  "rug": "07-muted-oushak-jute-master"
+ },
  "plants": [
   {
-   "room": "Onset of Spring",
-   "kind": "pothos",
+   "room": "Opening",
+   "kind": "cutout",
+   "img": "aangan",
    "at": [
-    7.198,
-    -3.72
-   ],
-   "side": "E",
-   "y": 2.2
-  },
-  {
-   "room": "Onset of Spring",
-   "kind": "snake",
-   "at": [
-    6.92,
-    -2.3
-   ],
-   "pot": "clay"
-  },
-  {
-   "room": "Faith",
-   "kind": "tulsi",
-   "at": [
-    -0.8,
-    -5.55
-   ]
-  },
-  {
-   "room": "Faith",
-   "kind": "areca",
-   "at": [
-    -5.1,
-    -1.15
-   ],
-   "pot": "brass",
-   "rot": 0.6
-  },
-  {
-   "room": "Bandh Darwaze",
-   "kind": "areca",
-   "at": [
-    -4.6,
-    0.15
-   ],
-   "pot": "terracotta",
-   "rot": 2.1
-  },
-  {
-   "room": "Bandh Darwaze",
-   "kind": "small",
-   "at": [
-    -1.84,
-    0.08
-   ],
-   "rot": 0.4
-  },
-  {
-   "room": "Gone Are The Days",
-   "kind": "small",
-   "at": [
-    -2.18,
-    4.42
-   ],
-   "rot": 1.0
-  },
-  {
-   "room": "Gone Are The Days",
-   "kind": "rubber",
-   "at": [
-    0.45,
-    8.4
-   ],
-   "rot": 2.4
-  },
-  {
-   "room": "Gone Are The Days",
-   "kind": "snake",
-   "at": [
-    5.37,
-    8.45
-   ],
-   "pot": "clay"
-  },
-  {
-   "room": "Gone Are The Days",
-   "kind": "areca",
-   "at": [
-    10.95,
-    8.22
-   ],
-   "pot": "terracotta",
-   "rot": 4.0
-  },
-  {
-   "room": "Portraits",
-   "kind": "pothos",
-   "at": [
-    4.3,
-    0.505
+    2.467,
+    -5.554
    ],
    "side": "N",
-   "y": 1.95
+   "h": 1.45,
+   "light": 0.8
   },
   {
-   "room": "Portraits",
-   "kind": "snake",
+   "room": "Opening",
+   "kind": "cutout",
+   "img": "aangan",
    "at": [
-    8.74,
-    0.88
+    4.733,
+    -5.554
    ],
-   "pot": "clay"
+   "side": "N",
+   "h": 1.45,
+   "light": 0.8
   },
   {
-   "room": "Portraits",
-   "kind": "rubber",
+   "room": "Onset of Spring",
+   "kind": "cutout",
+   "img": "aangan",
    "at": [
-    12.45,
-    0.95
+    6.755,
+    -4.813
    ],
-   "rot": 0.3
+   "side": "E",
+   "h": 1.15,
+   "light": 0.8
+  },
+  {
+   "room": "Onset of Spring",
+   "kind": "cutout",
+   "img": "aangan",
+   "at": [
+    6.755,
+    -0.667
+   ],
+   "side": "E",
+   "h": 1.15,
+   "light": 0.8
+  },
+  {
+   "room": "Faith",
+   "kind": "cutout",
+   "img": "faith",
+   "at": [
+    -5.154,
+    -4.405
+   ],
+   "side": "W",
+   "h": 1.55,
+   "light": 0.9
+  },
+  {
+   "room": "Faith",
+   "kind": "cutout",
+   "img": "faith",
+   "at": [
+    -5.154,
+    -2.395
+   ],
+   "side": "W",
+   "h": 1.55,
+   "light": 0.9
+  },
+  {
+   "room": "Faith",
+   "kind": "rug",
+   "img": "rug",
+   "at": [
+    -3.05,
+    -3.4
+   ],
+   "side": "N",
+   "size": [
+    2.1,
+    1.4
+   ],
+   "light": 0.8
   },
   {
    "room": "Bandh Darwaze",
-   "kind": "rubber",
+   "kind": "cutout",
+   "img": "bench",
+   "face": "wall",
    "at": [
-    -3.45,
-    0.22
+    -1.835,
+    -0.15
    ],
-   "rot": 1.4
+   "side": "N",
+   "h": 0.5,
+   "light": 0.78
+  },
+  {
+   "room": "Gone Are The Days",
+   "kind": "cutout",
+   "img": "gatd",
+   "at": [
+    1.258,
+    8.353
+   ],
+   "side": "S",
+   "h": 1.5,
+   "light": 0.8
+  },
+  {
+   "room": "Gone Are The Days",
+   "kind": "cutout",
+   "img": "gatd",
+   "at": [
+    8.704,
+    8.353
+   ],
+   "side": "S",
+   "h": 1.5,
+   "light": 0.8
+  },
+  {
+   "room": "Portraits",
+   "kind": "cutout",
+   "img": "portraits",
+   "at": [
+    4.562,
+    0.948
+   ],
+   "side": "N",
+   "h": 1.6,
+   "light": 0.9
+  },
+  {
+   "room": "Portraits",
+   "kind": "cutout",
+   "img": "portraits",
+   "at": [
+    11.61,
+    0.948
+   ],
+   "side": "N",
+   "h": 1.6,
+   "light": 0.9
+  },
+  {
+   "room": "Portraits",
+   "kind": "cutout",
+   "img": "bench",
+   "face": "wall",
+   "at": [
+    15.07,
+    0.7475
+   ],
+   "side": "N",
+   "h": 0.5,
+   "light": 0.9
+  },
+  {
+   "room": "Portraits",
+   "kind": "rug",
+   "img": "rug",
+   "at": [
+    15.07,
+    1.75
+   ],
+   "side": "N",
+   "size": [
+    2.2,
+    1.4
+   ],
+   "light": 0.8
+  },
+  {
+   "room": "Her desk",
+   "kind": "rug",
+   "img": "rug",
+   "at": [
+    1.9,
+    -4.25
+   ],
+   "side": "N",
+   "size": [
+    1.9,
+    1.25
+   ],
+   "light": 0.7
   }
  ]
 }

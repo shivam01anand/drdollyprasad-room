@@ -14,7 +14,7 @@ import KnowMore, { OpeningCard } from "./AboutHer";
 import Desk from "./Desk";
 import { WORKS_FILTER, type WorksFilter } from "./Works";
 import * as music from "@/lib/music";
-import { CHAPTERS } from "@/lib/chapters";
+import { CHAPTERS, DARK_ROOMS } from "@/lib/chapters";
 import { stopsFor, isPhoneLayout, roomsOf, isSeries, roomLine, WALK_ORDER, stopOfWork, type Stop } from "@/lib/stops";
 import { activeVariant } from "@/lib/room/variants";
 import { BY_ID } from "@/lib/works";
@@ -124,6 +124,8 @@ export default function Studio({ dims }: { dims: Dims }) {
     performance.mark?.("step-arrive");
     const S = stopsRef.current, s = S[to];
     roomRef.current?.drawFrieze(s?.room, s?.space);
+    // Kajal walls (Faith, Portraits): the lettering and plaques on them turn light
+    if (s) document.documentElement.dataset.wall = DARK_ROOMS.has(s.room) ? "dark" : "light";
     // the room's line, as lettering on the wall at its first painting, for 3 s
     const run = roomsOf(S).find((r) => r.first === to);
     clearTimeout(letterT.current);
@@ -298,6 +300,8 @@ export default function Studio({ dims }: { dims: Dims }) {
         measure: () => room?.measureStops(),
         view: (key: string) => room?.qaView(key, stopRef.current),
         plantClashes: (extra?: { key: string; stop: number; works: string[] }[]) => room?.plantClashes(extra),
+        plantReport: (extra?: { key: string; stop: number; works: string[] }[]) => room?.plantReport(extra),
+        movePlant: (name: string, x: number, z: number) => room?.movePlant(name, x, z),
         more: (on: boolean) => setMore(on),
         mode: (m: "light" | "dark") => setMode(m),
         music,
