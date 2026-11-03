@@ -1061,20 +1061,18 @@ export class Room {
   private buildPictureLights(grad: (paint: (g: CanvasRenderingContext2D) => void) => THREE.Texture) {
     const size = 128;
     const wash = grad((g) => {
-      // a fan: bright under the bar, widening and fading down the wall
-      const v = g.createLinearGradient(0, 0, 0, size);
-      v.addColorStop(0, "rgba(255,255,255,0)");
-      v.addColorStop(0.08, "rgba(255,255,255,.8)");
-      v.addColorStop(0.22, "rgba(255,255,255,.6)");
-      v.addColorStop(0.6, "rgba(255,255,255,.18)");
-      v.addColorStop(1, "rgba(255,255,255,0)");
-      g.fillStyle = v;
-      g.beginPath(); g.moveTo(size * 0.3, 0); g.lineTo(size * 0.7, 0); g.lineTo(size, size); g.lineTo(0, size); g.closePath(); g.fill();
-      g.globalCompositeOperation = "destination-in";
-      const h = g.createLinearGradient(0, 0, size, 0);
-      h.addColorStop(0, "rgba(0,0,0,0)"); h.addColorStop(0.25, "rgba(0,0,0,1)");
-      h.addColorStop(0.75, "rgba(0,0,0,1)"); h.addColorStop(1, "rgba(0,0,0,0)");
-      g.fillStyle = h; g.fillRect(0, 0, size, size);
+      // a soft oval, brightest a third of the way down (the frame's top half), gone at its edges: no cone, no beam
+      g.save();
+      g.translate(size / 2, size * 0.36);
+      g.scale(1, 1.25);
+      const r = g.createRadialGradient(0, 0, 0, 0, 0, size * 0.5);
+      r.addColorStop(0, "rgba(255,255,255,1)");
+      r.addColorStop(0.35, "rgba(255,255,255,.7)");
+      r.addColorStop(0.7, "rgba(255,255,255,.22)");
+      r.addColorStop(1, "rgba(255,255,255,0)");
+      g.fillStyle = r;
+      g.fillRect(-size, -size, size * 2, size * 2);
+      g.restore();
     });
     const fixture = new THREE.TextureLoader().load("/house/props/06-picture-light-master.webp");
     fixture.colorSpace = THREE.SRGBColorSpace;
@@ -1116,7 +1114,7 @@ export class Room {
       const fh2 = L / FIXTURE_ASPECT;
       bars.push(place(new THREE.PlaneGeometry(L, fh2), 0, by - 0.012 + fh2 / 2 - 0.02, bz - 0.04));
       strips.push(place(new THREE.BoxGeometry(L * 0.86, 0.005, 0.012), 0, by - 0.03, bz - 0.04));
-      const wh = Math.min(a.h + 0.5, 1.9), ww = fw * 1.35;
+      const wh = Math.min(a.h * 0.95 + 0.45, 1.8), ww = fw * 1.5;
       // on a Kajal wall the wash must read clearly: stronger there
       const [cx, , cz] = a.centre;
       const dark = (cx > -5.66 && cx < -0.39 && cz > -6.06 && cz < -0.74) || (cx > -0.06 && cx < 18.66 && cz > 0.39 && cz < 4.6);
@@ -1161,7 +1159,7 @@ export class Room {
       const fu = (f.u0 + f.u1) / 2, fx = f.side === "N" || f.side === "S" ? fu : f.plane, fz = f.side === "N" || f.side === "S" ? f.plane : fu;
       const onKajal = (fx > -5.66 && fx < -0.39 && fz > -6.06 && fz < -0.74) || (fx > -0.06 && fx < 18.66 && fz > 0.39 && fz < 4.6);
       const mat = new THREE.MeshBasicMaterial({ color: onKajal ? 0xf5f4f0 : 0x211b18, map, transparent: true, depthWrite: false,
-        opacity: this.narrow ? 0.8 : 0.55, polygonOffset: true, polygonOffsetFactor: -2, fog: false, toneMapped: false });
+        opacity: onKajal ? 0.35 : this.narrow ? 0.8 : 0.55, polygonOffset: true, polygonOffsetFactor: -2, fog: false, toneMapped: false });
       mat.onBeforeCompile = (sh) => {
         sh.uniforms.uReveal = reveal;
         sh.vertexShader = sh.vertexShader.replace("#include <common>", "#include <common>\nvarying float vStrip;")
