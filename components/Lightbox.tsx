@@ -100,22 +100,9 @@ const Lightbox = forwardRef<LightboxHandle, { dims: Dims; onOpenChange(open: boo
       i.src = src;
     };
 
-    /** the slideshow: the painting, then its room, and back, until the reader takes over */
+    /** (no slideshow: a timer kept so any older call to stop it is harmless) */
     const auto = useRef(0);
     const stopShow = () => { clearTimeout(auto.current); auto.current = 0; };
-    const playShow = (id: string) => {
-      stopShow();
-      const order = ["work", ...rooms.current.map((r) => r.room.id)];
-      if (order.length < 2 || reducedMotion()) return;
-      const tick = () => {
-        if (st.current.id !== id) return;
-        const k = order.indexOf(view.current);
-        const next = order[(k + 1) % order.length];
-        show(next);
-        auto.current = window.setTimeout(tick, next === "work" ? 4200 : 5600);
-      };
-      auto.current = window.setTimeout(tick, 3000);
-    };
     /** a swipe across the figure: the next way of seeing it, or the last */
     const stepView = (d: 1 | -1) => {
       const order = ["work", ...rooms.current.map((r) => r.room.id)];
@@ -258,11 +245,9 @@ const Lightbox = forwardRef<LightboxHandle, { dims: Dims; onOpenChange(open: boo
         const first = rooms.current[0];
         const save = (navigator as Navigator & { connection?: { saveData?: boolean } }).connection?.saveData;
         // turning through works, the reader is in charge: no slideshow then
-        if (first && !save && !swap) {
-          warm(first.room.src);
-          // and the slideshow begins: the work, then the work in its room
-          playShow(id);
-        }
+        // the painting stays in front of the reader (QC 3 Nov: the lightbox opens, and stays, on the painting);
+        // its room is one tap away on the second thumbnail, warmed here so it shows at once
+        if (first && !save && !swap) warm(first.room.src);
       };
       if (from && !reduce && !swap) {
         const state = Flip.getState(from);

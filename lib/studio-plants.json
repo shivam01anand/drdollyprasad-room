@@ -168,7 +168,8 @@
    ],
    "side": "N",
    "h": 0.5,
-   "light": 0.9
+   "light": 0.9,
+   "phone": false
   },
   {
    "room": "Portraits",
@@ -183,7 +184,8 @@
     2.2,
     1.4
    ],
-   "light": 0.8
+   "light": 0.8,
+   "phone": false
   },
   {
    "room": "Her desk",

@@ -116,6 +116,8 @@ const tmpC = new THREE.Color();
 const DEEPA_WICK = 0.14;
 /** a canvas's frame beyond its edge: the lip and the shadow gap (build.py float_frame) */
 const FRAME = 0.025;
+/** Portraits east, lower row: their picture lights hide on phone while a top-row portrait is in view */
+const LOW_ROW = new Set(["patterned-turban-portrait", "riverside-figures"]);
 /** wall colours (linear): Kajal #211B18 as a matt limewash, a little lifted so the grain reads; Khadi #F5F4F0. base = the plaster's own mean luminance */
 const WALL_TONES = { kajal: 0x3a302a, khadi: 0xe9e6de, base: 0.6 };
 /** each plaster role's own mean luminance (its tint over the photograph's mean), so its grain survives the recolour */
@@ -299,6 +301,8 @@ export class Room {
     this.owned.push(edge);
     this.parts = assemble(house, lib, this.baked, edge);
     this.roomWalls();
+    this.slimSmallFrames();
+    this.splitLongTriangles("Static_concrete", 2);
     for (const m of this.parts.ceilings) this.ceiling.add(m);
     for (const r of this.parts.roofs) this.ceiling.add(r);
     this.world.add(house.scene, this.ceiling);
@@ -761,7 +765,16 @@ export class Room {
     this.scene.add(group);
     this.owned.push(...owned);
     this.plants = group;
+    // props marked phone: false (the Portraits bench and rug) would fill the lower third of a phone's single-painting view
+    this.laptopOnly = P.plants.flatMap((p, i) => (p.phone === false ? [group.getObjectByName(`prop:${p.img}:${i}`)] : []))
+      .filter((o): o is THREE.Object3D => !!o);
+    // the courtyard's two wall sconces hang just over Under Canopy of Greens: on a phone's single-painting
+    // view they read as two dark lamps cut by the header (QC 3 Nov), so the phone walk goes without them
+    this.world.traverse((o) => { if (/^Deco_studio\d(Arm|Shade)/.test(o.name)) this.laptopOnly.push(o); });
+    for (const o of this.laptopOnly) o.visible = !this.narrow;
   }
+  private laptopOnly: THREE.Object3D[] = [];
+  private lowLights: THREE.Object3D[] = [];
 
   /**
    * QC (?qa=1): any plant that, seen from a stop (or one of `extra` cams), covers one of that stop's
@@ -940,20 +953,122 @@ export class Room {
             varying vec3 vToneP; uniform vec3 uKajal; uniform vec3 uKhadi;
             float inR(vec3 p, float x0, float x1, float z0, float z1) {
               return step(x0 - 0.06, p.x) * step(p.x, x1 + 0.06) * step(z0 - 0.06, p.z) * step(p.z, z1 + 0.06);
+            }
+            float toneKajal(vec3 p) { return max(inR(p, -5.6, -0.45, -6.0, -0.8), inR(p, 0.0, 18.6, 0.45, 4.6)); }
+            float toneBandh(vec3 p) { return inR(p, -5.6, -0.45, -0.35, 4.8); }`)
+          // on Kajal the baked spot cones read as hard-edged discs: take most of the bake from a blurred (mip) read
+          .replace("vec3 bakedIrr = mix( lightMapIrradiance, lmNight, uNight );", `vec3 bakedIrr = mix( lightMapIrradiance, lmNight, uNight );
+            {
+              float kj = toneKajal(vToneP);
+              if (kj > 0.0) {
+                vec3 sD = texture2D( lightMap, vLightMapUv, 4.5 ).rgb * lightMapIntensity;
+                vec3 sN = texture2D( uLmNight, vLightMapUv, 4.5 ).rgb * uLmNightK;
+                bakedIrr = mix( bakedIrr, mix( sD, sN, uNight ), 0.9 * kj );
+              }
+            }`)
+          // the Red Room's baked light is warm (its old red walls bounced it): on Khadi, take most of the colour out
+          .replace("#include <opaque_fragment>", `#include <opaque_fragment>
+            {
+              float bd = toneBandh(vToneP) * (1.0 - toneKajal(vToneP));
+              float L = dot(gl_FragColor.rgb, vec3(0.2126, 0.7152, 0.0722));
+              gl_FragColor.rgb = mix(gl_FragColor.rgb, vec3(L) * vec3(1.0, 0.996, 0.98), 0.92 * bd);
             }`)
           .replace("#include <map_fragment>", `#include <map_fragment>
             {
               // the room this wall face belongs to (house.json plan, three's x and z)
-              float kajal = max(inR(vToneP, -5.6, -0.45, -6.0, -0.8), inR(vToneP, 0.0, 18.6, 0.45, 4.6));
+              float kajal = toneKajal(vToneP);
               float khadi = max(inR(vToneP, -5.6, -0.45, -0.35, 4.8), inR(vToneP, 0.0, 18.6, 4.6, 8.85));
               float grain = clamp(1.0 + 0.6 * (dot(diffuseColor.rgb, vec3(0.2126, 0.7152, 0.0722)) / ${(TONE_BASE[role] ?? k.base).toFixed(3)} - 1.0), 0.8, 1.2);
               diffuseColor.rgb = mix(diffuseColor.rgb, uKajal * grain, kajal);
               diffuseColor.rgb = mix(diffuseColor.rgb, uKhadi * grain, khadi * (1.0 - kajal));
             }`);
       };
-      m.customProgramCacheKey = () => `${key()}|tones`;
+      m.customProgramCacheKey = () => `${key()}|tones3`;
       m.needsUpdate = true;
     }
+  }
+
+  /**
+   * The Bandh Darwaze doors are 30 cm canvases in the same 25 mm moulding as a 1.5 m one, which reads
+   * as heavy black bars (QC, 3 Nov). For canvases under 45 cm, halve the moulding's face: every frame
+   * vertex outside the canvas moves halfway back toward the canvas edge. The canvas itself is untouched.
+   */
+  private slimSmallFrames() {
+    const frame = this.parts.statics.find((m) => m.name.startsWith("Static_artFrame"));
+    const pos = frame?.geometry.getAttribute("position") as THREE.BufferAttribute | undefined;
+    if (!frame || !pos) return;
+    frame.updateMatrixWorld(true);
+    const inv = frame.matrixWorld.clone().invert(), w2l = (v: THREE.Vector3) => v.applyMatrix4(inv);
+    const l2w = frame.matrixWorld, v = new THREE.Vector3();
+    for (const a of Object.values(this.info.art)) {
+      if (a.study || Math.min(a.w, a.h) >= 0.45 || !SIDE_OUT[a.side]) continue;
+      const ns = a.side === "N" || a.side === "S";
+      const [cx, cy, cz] = a.centre;
+      for (let i = 0; i < pos.count; i++) {
+        v.fromBufferAttribute(pos, i).applyMatrix4(l2w);
+        const du = ns ? v.x - cx : v.z - cz, dn = ns ? v.z - cz : v.x - cx, dy = v.y - cy;
+        if (Math.abs(dn) > 0.08 || Math.abs(du) > a.w / 2 + 0.04 || Math.abs(dy) > a.h / 2 + 0.04) continue;
+        const su = Math.abs(du) > a.w / 2 + 0.002 ? Math.sign(du) * (a.w / 2 + (Math.abs(du) - a.w / 2) * 0.5) : du;
+        const sy = Math.abs(dy) > a.h / 2 + 0.002 ? Math.sign(dy) * (a.h / 2 + (Math.abs(dy) - a.h / 2) * 0.5) : dy;
+        if (ns) v.x = cx + su; else v.z = cz + su;
+        v.y = cy + sy;
+        w2l(v);
+        pos.setXYZ(i, v.x, v.y, v.z);
+      }
+    }
+    pos.needsUpdate = true;
+    frame.geometry.computeBoundingSphere();
+  }
+
+  /** QA (?qa=1): what the camera sees at a point of the canvas (0..1 from the top left), nearest first */
+  qaPick(px: number, py: number) {
+    const ray = new THREE.Raycaster();
+    this.rig.camera.updateMatrixWorld(true);
+    ray.setFromCamera(new THREE.Vector2(px * 2 - 1, 1 - py * 2), this.rig.camera);
+    return ray.intersectObjects(this.scene.children, true).slice(0, 6).map((h) => {
+      const path: string[] = [];
+      for (let o: THREE.Object3D | null = h.object; o && path.length < 4; o = o.parent) path.push(o.name || o.type);
+      return { path: path.join(" < "), d: +h.distance.toFixed(2), p: h.point.toArray().map((v) => +v.toFixed(2)), vis: h.object.visible };
+    });
+  }
+
+  /**
+   * The concrete plinths run as single triangles up to 8 m long. Where one passes behind the camera and is
+   * clipped, some GPUs (SwiftShader certainly) mis-interpolate its depth and a dashed line of it shows
+   * through the walls in front (QC 3 Nov, Blooming Innocence on phone). Halving every edge longer than
+   * `max` metres removes the slivers; every attribute is interpolated, so the surface looks the same.
+   */
+  private splitLongTriangles(name: string, max: number) {
+    const mesh = this.parts.statics.find((m) => m.name === name);
+    if (!mesh) return;
+    const src = mesh.geometry.index ? mesh.geometry.toNonIndexed() : mesh.geometry;
+    const names = Object.keys(src.attributes);
+    const attrs = names.map((n) => src.getAttribute(n) as THREE.BufferAttribute);
+    const P = names.indexOf("position");
+    const out: number[][] = names.map(() => []);
+    type V = number[][];
+    const get = (i: number): V => attrs.map((a) => Array.from({ length: a.itemSize }, (_, k) => a.array[i * a.itemSize + k]));
+    const mid = (p: V, q: V): V => p.map((arr, j) => arr.map((v, k) => (v + q[j][k]) / 2));
+    const len = (p: V, q: V) => Math.hypot(p[P][0] - q[P][0], p[P][1] - q[P][1], p[P][2] - q[P][2]);
+    const split = (a: V, b: V, c: V, depth: number): void => {
+      const ab = len(a, b), bc = len(b, c), ca = len(c, a), L = Math.max(ab, bc, ca);
+      if (L <= max || depth > 10) { for (const v of [a, b, c]) v.forEach((arr, j) => out[j].push(...arr)); return; }
+      if (L === ab) { const m = mid(a, b); split(a, m, c, depth + 1); split(m, b, c, depth + 1); }
+      else if (L === bc) { const m = mid(b, c); split(a, b, m, depth + 1); split(a, m, c, depth + 1); }
+      else { const m = mid(c, a); split(a, b, m, depth + 1); split(m, b, c, depth + 1); }
+    };
+    for (let i = 0; i < src.attributes.position.count; i += 3) split(get(i), get(i + 1), get(i + 2), 0);
+    const geo = new THREE.BufferGeometry();
+    names.forEach((n, j) => {
+      const a = attrs[j];
+      const Ctor = a.array.constructor as new (v: number[]) => THREE.TypedArray;
+      geo.setAttribute(n, new THREE.BufferAttribute(new Ctor(out[j]), a.itemSize, a.normalized));
+    });
+    geo.computeBoundingSphere();
+    geo.computeBoundingBox();
+    if (src !== mesh.geometry) src.dispose();
+    mesh.geometry.dispose();
+    mesh.geometry = geo;
   }
 
   /** QA: move one plant (by its group name) to try a placement without a reload */
@@ -1073,6 +1188,15 @@ export class Room {
       g.fillStyle = r;
       g.fillRect(-size, -size, size * 2, size * 2);
       g.restore();
+      // the plane's top edge sits at the fixture: fade into it, so the wash has no hard line across the wall (QC 3 Nov)
+      g.save();
+      g.globalCompositeOperation = "destination-in";
+      const top = g.createLinearGradient(0, 0, 0, size * 0.3);
+      top.addColorStop(0, "rgba(0,0,0,0)");
+      top.addColorStop(1, "rgba(0,0,0,1)");
+      g.fillStyle = top;
+      g.fillRect(0, 0, size, size);
+      g.restore();
     });
     const fixture = new THREE.TextureLoader().load("/house/props/06-picture-light-master.webp");
     fixture.colorSpace = THREE.SRGBColorSpace;
@@ -1083,15 +1207,21 @@ export class Room {
     const washMat = new THREE.MeshBasicMaterial({ color: 0xffc47e, map: wash, transparent: true, opacity: 0.3,
       blending: THREE.AdditiveBlending, depthWrite: false, fog: false, polygonOffset: true, polygonOffsetFactor: -1 });
     this.owned.push(brass, bulb, washMat);
-    const bars: THREE.BufferGeometry[] = [], strips: THREE.BufferGeometry[] = [], washes: THREE.BufferGeometry[] = [], darkWashes: THREE.BufferGeometry[] = [];
+    const bars: THREE.BufferGeometry[] = [], strips: THREE.BufferGeometry[] = [], lowBars: THREE.BufferGeometry[] = [], lowStrips: THREE.BufferGeometry[] = [], washes: THREE.BufferGeometry[] = [], darkWashes: THREE.BufferGeometry[] = [];
     const washDark = washMat.clone();
     washDark.opacity = 0.55;
-    this.owned.push(washDark);
+    // Bandh Darwaze is Khadi: a 2700 K wash at full warmth turns its walls peach (QC 3 Nov); there it is paler and softer
+    const washKhadi = washMat.clone();
+    washKhadi.color.set(0xffe9d2);
+    washKhadi.opacity = 0.2;
+    this.owned.push(washDark, washKhadi);
+    const khadiWashes: THREE.BufferGeometry[] = [];
     const turn = { N: 0, S: Math.PI, E: -Math.PI / 2, W: Math.PI / 2 } as Record<string, number>;
     const ray = new THREE.Raycaster();
     const n = new THREE.Vector3(), o = new THREE.Vector3(), m = new THREE.Matrix4(), q = new THREE.Quaternion();
-    for (const a of Object.values(this.info.art)) {
+    for (const [id, a] of Object.entries(this.info.art)) {
       if (a.study || !SIDE_OUT[a.side]) continue;
+      const low = LOW_ROW.has(id);
       const [nx, nz] = SIDE_OUT[a.side];
       n.set(nx, 0, nz);
       o.set(...a.centre).addScaledVector(n, 0.02);
@@ -1112,13 +1242,14 @@ export class Room {
       const by = top + 0.075, bz = 0.1;
       // the fixture: the Design agency's photographed brass picture light, square to the wall, its bar over the frame
       const fh2 = L / FIXTURE_ASPECT;
-      bars.push(place(new THREE.PlaneGeometry(L, fh2), 0, by - 0.012 + fh2 / 2 - 0.02, bz - 0.04));
-      strips.push(place(new THREE.BoxGeometry(L * 0.86, 0.005, 0.012), 0, by - 0.03, bz - 0.04));
+      (low ? lowBars : bars).push(place(new THREE.PlaneGeometry(L, fh2), 0, by - 0.012 + fh2 / 2 - 0.02, bz - 0.04));
+      (low ? lowStrips : strips).push(place(new THREE.BoxGeometry(L * 0.86, 0.005, 0.012), 0, by - 0.03, bz - 0.04));
       const wh = Math.min(a.h * 0.95 + 0.45, 1.8), ww = fw * 1.5;
       // on a Kajal wall the wash must read clearly: stronger there
       const [cx, , cz] = a.centre;
       const dark = (cx > -5.66 && cx < -0.39 && cz > -6.06 && cz < -0.74) || (cx > -0.06 && cx < 18.66 && cz > 0.39 && cz < 4.6);
-      (dark ? darkWashes : washes).push(place(new THREE.PlaneGeometry(ww, wh), 0, by - 0.03 - wh / 2, 0.003));
+      const bandh = cx > -5.66 && cx < -0.39 && cz > -0.41 && cz < 4.86;
+      (dark ? darkWashes : bandh ? khadiWashes : washes).push(place(new THREE.PlaneGeometry(ww, wh), 0, by - 0.03 - wh / 2, 0.003));
     }
     const add = (geos: THREE.BufferGeometry[], mat: THREE.Material, name: string, order = 0) => {
       const flat = geos.map((g) => (g.index ? g.toNonIndexed() : g));
@@ -1136,8 +1267,13 @@ export class Room {
     };
     add(bars, brass, "picture-lights");
     add(strips, bulb, "picture-light-bulbs");
+    // the lower row's fixtures, kept apart so they can step aside on phone (see renderFrame)
+    add(lowBars, brass, "picture-lights-low");
+    add(lowStrips, bulb, "picture-light-bulbs-low");
+    this.lowLights = ["picture-lights-low", "picture-light-bulbs-low"].map((k) => this.world.getObjectByName(k)).filter((o): o is THREE.Object3D => !!o);
     add(washes, washMat, "picture-light-wash", 1);
     add(darkWashes, washDark, "picture-light-wash-kajal", 1);
+    add(khadiWashes, washKhadi, "picture-light-wash-khadi", 1);
   }
 
   private buildFrieze() {
@@ -1772,6 +1908,7 @@ export class Room {
       // the walk itself changes (painting by painting or groups): stay with the same painting
       index = mapStop(this.stops, index, stopsFor(phone));
       this.narrow = phone;
+      for (const o of this.laptopOnly) o.visible = !phone;
       this.stops = stopsFor(phone);
       this.rig.setShots(this.shotsFor(w, h), index);
       this.opts.onLayout?.(phone, index);
@@ -1799,6 +1936,14 @@ export class Room {
       // This also catches the held-card scale when returning from the collage.
       const rect = this.canvas.getBoundingClientRect();
       this.viewport = { left: rect.left, top: rect.top, width: rect.width, height: rect.height };
+    }
+    if (this.lowLights.length) {
+      // Portraits east hangs in two rows. On phone, a top-row portrait is framed alone; the lower row's
+      // brass fixtures would sit in the bottom of its view (QC 3 Nov), so they step aside while the
+      // camera is up at the top row (eye above 1.5 m on that wall) and come back for the lower row.
+      const c = this.rig.camera.getWorldPosition(tmpV);
+      const hide = this.narrow && c.y > 1.5 && c.x > 13.4 && c.x < 16.9 && c.z > 0.6 && c.z < 3.2;
+      if (this.lowLights[0].visible === hide) { for (const o of this.lowLights) o.visible = !hide; draw = true; }
     }
     const walk = duskAt(this.stops, this.rig.index);
     if (Math.abs(walk - this.eve.walk) > 1e-4) {

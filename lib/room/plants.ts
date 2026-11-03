@@ -19,6 +19,8 @@ export type Plant = {
   size?: [number, number];
   /** cutout: a role in the kit ("pair", "bench", "rug") or a file name in lib/studio-props.json; out of the wall (m); light (0..1, the room's light at that spot) */
   img?: string; off?: number; light?: number; face?: "camera" | "wall";
+  /** false: laptop only (hidden in the phone walk) */
+  phone?: boolean;
 };
 /** a staged cut-out (scripts: scripts/house/stage_props.py): width / height, its floor shadow's box (shares of the image), opaque points for QA */
 export type PropAsset = { aspect: number; shadow: number[] | null; samples: [number, number][] };

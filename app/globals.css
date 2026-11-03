@@ -1065,3 +1065,15 @@ html[data-panel="about"] .wall-labels{visibility:visible;opacity:1}
 html[data-wall="dark"] .plaque{color:#F5F4F0;text-shadow:0 0 10px rgba(20,15,12,.7)}
 html[data-wall="dark"] .pl-status{color:#CFC8BE}
 html[data-wall="dark"] .wall-letter{color:rgba(245,244,240,.82)}
+
+/* QC 3 Nov: at her desk the card carries the heading; the dock keeps only its buttons, and the card stands clear of it */
+html[data-panel="desk"] .vdock .vd-cap{visibility:hidden}
+.walk-panel.desk{bottom:calc(var(--dock-h,120px) + 24px)}
+@media (max-width:760px){
+  .walk-panel.desk{bottom:calc(var(--dock-h,190px) + 16px)}
+  /* the top of the shot behind the header (a lamp, a beam, the brick over the gallery walls) fades into the wall's colour */
+  html[data-wall] body::before{content:"";position:fixed;z-index:2;left:0;right:0;top:0;height:168px;pointer-events:none;
+    background:linear-gradient(180deg,rgba(236,232,224,.98) 0%,rgba(236,232,224,.96) 56%,rgba(236,232,224,0) 100%)}
+  html[data-wall="dark"] body::before{background:linear-gradient(180deg,rgba(33,27,24,.98) 0%,rgba(33,27,24,.96) 56%,rgba(33,27,24,0) 100%)}
+  html[data-room="off"] body::before{display:none}
+}

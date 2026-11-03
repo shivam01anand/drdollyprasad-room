@@ -302,6 +302,8 @@ export default function Studio({ dims }: { dims: Dims }) {
         plantClashes: (extra?: { key: string; stop: number; works: string[] }[]) => room?.plantClashes(extra),
         plantReport: (extra?: { key: string; stop: number; works: string[] }[]) => room?.plantReport(extra),
         movePlant: (name: string, x: number, z: number) => room?.movePlant(name, x, z),
+        pick: (x: number, y: number) => room?.qaPick(x, y),
+        get room() { return room; },
         more: (on: boolean) => setMore(on),
         mode: (m: "light" | "dark") => setMode(m),
         music,
