@@ -66,7 +66,8 @@ export function RoomStudy({ w, src, dims }: { w: Work; src: string; dims?: { w: 
       <div className="viewer">
         <div className="room v-room">
           {/* eslint-disable-next-line @next/next/no-img-element */}
-          <img src={v.room.src} width={v.room.w} height={v.room.h} loading="lazy" decoding="async"
+          <img src={v.room.src} srcSet={v.room.srcSet} sizes={v.room.srcSet ? "(max-width: 760px) 100vw, 900px" : undefined}
+               style={v.room.pos ? { objectPosition: v.room.pos } : undefined} width={v.room.w} height={v.room.h} loading="lazy" decoding="async"
                alt={v.room.inPhoto ? `${name}, shown in a ${study ? "virtual room study" : "room setting"}` : "A room setting"} />
           {!v.room.inPhoto && (
             <span className="room-art" style={{
@@ -80,11 +81,13 @@ export function RoomStudy({ w, src, dims }: { w: Work; src: string; dims?: { w: 
             </span>
           )}
           {!study && v.trueSize && w.size && <span className="scale">Shown to scale · {w.size}</span>}
-          <span className="room-cap">{study ? "Virtual room study" : "Illustrative room setting"}</span>
+          {!v.room.v2 && <span className="room-cap">{study ? "Virtual room study" : "Illustrative room setting"}</span>}
         </div>
       </div>
       <p className="wpa-room-note">
-        {study
+        {v.room.v2
+          ? `${v.room.label}${v.trueSize && w.size ? `, with the painting shown at its stated size (${w.size})` : ""}.`
+          : study
           ? `Virtual room study: ${v.room.label.toLowerCase()}, sized against an assumed ${v.room.assumed}. A guide to relative size, not a measured room.`
           : `${v.room.label}. An illustration${v.trueSize && w.size ? `, with the painting at its stated size (${w.size})` : ""}.`}
       </p>

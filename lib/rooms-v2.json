@@ -1,0 +1,557 @@
+{
+ "woman-with-poppies": {
+  "room": "A drawing room in Delhi",
+  "w": 1600,
+  "h": 900,
+  "files": {
+   "1600": "/art/rooms-v2/woman-with-poppies-1600.webp",
+   "2400": "/art/rooms-v2/woman-with-poppies-2400.webp"
+  },
+  "art": {
+   "x": 36.3,
+   "y": 15.7,
+   "w": 27.4,
+   "h": 34.7
+  }
+ },
+ "priest-with-flame": {
+  "room": "A drawing room in Delhi",
+  "w": 1600,
+  "h": 900,
+  "files": {
+   "1600": "/art/rooms-v2/priest-with-flame-1600.webp",
+   "2400": "/art/rooms-v2/priest-with-flame-2400.webp"
+  },
+  "art": {
+   "x": 41.3,
+   "y": 15.3,
+   "w": 17.5,
+   "h": 41.9
+  }
+ },
+ "offering-of-light": {
+  "room": "A drawing room in Delhi",
+  "w": 1600,
+  "h": 900,
+  "files": {
+   "1600": "/art/rooms-v2/offering-of-light-1600.webp",
+   "2400": "/art/rooms-v2/offering-of-light-2400.webp"
+  },
+  "art": {
+   "x": 41.2,
+   "y": 15.4,
+   "w": 17.7,
+   "h": 41.9
+  }
+ },
+ "prayer-and-scripture": {
+  "room": "A drawing room in Delhi",
+  "w": 1600,
+  "h": 900,
+  "files": {
+   "1600": "/art/rooms-v2/prayer-and-scripture-1600.webp",
+   "2400": "/art/rooms-v2/prayer-and-scripture-2400.webp"
+  },
+  "art": {
+   "x": 41.1,
+   "y": 15.3,
+   "w": 17.8,
+   "h": 41.9
+  }
+ },
+ "bulls-and-wheel": {
+  "room": "A dining room",
+  "w": 1600,
+  "h": 900,
+  "files": {
+   "1600": "/art/rooms-v2/bulls-and-wheel-1600.webp",
+   "2400": "/art/rooms-v2/bulls-and-wheel-2400.webp"
+  },
+  "art": {
+   "x": 36.8,
+   "y": 14.3,
+   "w": 26.3,
+   "h": 46.8
+  }
+ },
+ "three-veiled-women": {
+  "room": "A dining room",
+  "w": 1600,
+  "h": 900,
+  "files": {
+   "1600": "/art/rooms-v2/three-veiled-women-1600.webp",
+   "2400": "/art/rooms-v2/three-veiled-women-2400.webp"
+  },
+  "art": {
+   "x": 37,
+   "y": 14.2,
+   "w": 26,
+   "h": 45.2
+  }
+ },
+ "temple-bells": {
+  "room": "A reading room",
+  "w": 1600,
+  "h": 900,
+  "files": {
+   "1600": "/art/rooms-v2/temple-bells-1600.webp",
+   "2400": "/art/rooms-v2/temple-bells-2400.webp"
+  },
+  "art": {
+   "x": 39.3,
+   "y": 13.7,
+   "w": 21.4,
+   "h": 31.2
+  }
+ },
+ "boy-with-bananas": {
+  "room": "A verandah",
+  "w": 1600,
+  "h": 900,
+  "files": {
+   "1600": "/art/rooms-v2/boy-with-bananas-1600.webp",
+   "2400": "/art/rooms-v2/boy-with-bananas-2400.webp"
+  },
+  "art": {
+   "x": 40.3,
+   "y": 14,
+   "w": 19.4,
+   "h": 34.5
+  }
+ },
+ "child-among-flowers": {
+  "room": "A drawing room in Delhi",
+  "w": 1600,
+  "h": 900,
+  "files": {
+   "1600": "/art/rooms-v2/child-among-flowers-1600.webp",
+   "2400": "/art/rooms-v2/child-among-flowers-2400.webp"
+  },
+  "art": {
+   "x": 36.3,
+   "y": 13.9,
+   "w": 27.4,
+   "h": 38.4
+  }
+ },
+ "red-turban-portrait": {
+  "room": "A reading room",
+  "w": 1600,
+  "h": 900,
+  "files": {
+   "1600": "/art/rooms-v2/red-turban-portrait-1600.webp",
+   "2400": "/art/rooms-v2/red-turban-portrait-2400.webp"
+  },
+  "art": {
+   "x": 42.3,
+   "y": 19.9,
+   "w": 15.4,
+   "h": 27.1
+  }
+ },
+ "milkman-on-bicycle": {
+  "room": "An apartment living room",
+  "w": 1600,
+  "h": 900,
+  "files": {
+   "1600": "/art/rooms-v2/milkman-on-bicycle-1600.webp",
+   "2400": "/art/rooms-v2/milkman-on-bicycle-2400.webp"
+  },
+  "art": {
+   "x": 40.9,
+   "y": 12.3,
+   "w": 18.2,
+   "h": 42.5
+  }
+ },
+ "rickshaw-puller-and-coin": {
+  "room": "A dining room",
+  "w": 1600,
+  "h": 900,
+  "files": {
+   "1600": "/art/rooms-v2/rickshaw-puller-and-coin-1600.webp",
+   "2400": "/art/rooms-v2/rickshaw-puller-and-coin-2400.webp"
+  },
+  "art": {
+   "x": 39.9,
+   "y": 13.6,
+   "w": 20.2,
+   "h": 46.9
+  }
+ },
+ "weathered-door-ring": {
+  "room": "A living room",
+  "w": 1600,
+  "h": 900,
+  "files": {
+   "1600": "/art/rooms-v2/weathered-door-ring-1600.webp",
+   "2400": "/art/rooms-v2/weathered-door-ring-2400.webp"
+  },
+  "art": {
+   "x": 44.3,
+   "y": 16.7,
+   "w": 11.5,
+   "h": 20.6
+  }
+ },
+ "red-and-teal-door-lock": {
+  "room": "A living room",
+  "w": 1600,
+  "h": 900,
+  "files": {
+   "1600": "/art/rooms-v2/red-and-teal-door-lock-1600.webp",
+   "2400": "/art/rooms-v2/red-and-teal-door-lock-2400.webp"
+  },
+  "art": {
+   "x": 44.2,
+   "y": 17.1,
+   "w": 11.6,
+   "h": 19.5
+  }
+ },
+ "teal-door-bolt": {
+  "room": "A living room",
+  "w": 1600,
+  "h": 900,
+  "files": {
+   "1600": "/art/rooms-v2/teal-door-bolt-1600.webp",
+   "2400": "/art/rooms-v2/teal-door-bolt-2400.webp"
+  },
+  "art": {
+   "x": 44.5,
+   "y": 16.7,
+   "w": 11,
+   "h": 20.6
+  }
+ },
+ "carved-door-knocker": {
+  "room": "A living room",
+  "w": 1600,
+  "h": 900,
+  "files": {
+   "1600": "/art/rooms-v2/carved-door-knocker-1600.webp",
+   "2400": "/art/rooms-v2/carved-door-knocker-2400.webp"
+  },
+  "art": {
+   "x": 44.5,
+   "y": 16.7,
+   "w": 11.1,
+   "h": 20.6
+  }
+ },
+ "coins-and-clay-bank": {
+  "room": "An apartment living room",
+  "w": 1600,
+  "h": 900,
+  "files": {
+   "1600": "/art/rooms-v2/coins-and-clay-bank-1600.webp",
+   "2400": "/art/rooms-v2/coins-and-clay-bank-2400.webp"
+  },
+  "art": {
+   "x": 41.1,
+   "y": 17.5,
+   "w": 17.8,
+   "h": 31.9
+  }
+ },
+ "postbox-and-stamps": {
+  "room": "A dining room",
+  "w": 1600,
+  "h": 900,
+  "files": {
+   "1600": "/art/rooms-v2/postbox-and-stamps-1600.webp",
+   "2400": "/art/rooms-v2/postbox-and-stamps-2400.webp"
+  },
+  "art": {
+   "x": 40.1,
+   "y": 13.6,
+   "w": 19.8,
+   "h": 46.7
+  }
+ },
+ "mother-india-and-kettles": {
+  "room": "A dining room",
+  "w": 1600,
+  "h": 900,
+  "files": {
+   "1600": "/art/rooms-v2/mother-india-and-kettles-1600.webp",
+   "2400": "/art/rooms-v2/mother-india-and-kettles-2400.webp"
+  },
+  "art": {
+   "x": 40,
+   "y": 13.6,
+   "w": 20,
+   "h": 46.9
+  }
+ },
+ "shree-420-and-milk-cans": {
+  "room": "A dining room",
+  "w": 1600,
+  "h": 900,
+  "files": {
+   "1600": "/art/rooms-v2/shree-420-and-milk-cans-1600.webp",
+   "2400": "/art/rooms-v2/shree-420-and-milk-cans-2400.webp"
+  },
+  "art": {
+   "x": 40,
+   "y": 13.6,
+   "w": 20,
+   "h": 46.9
+  }
+ },
+ "cycle-rickshaw": {
+  "room": "An apartment living room",
+  "w": 1600,
+  "h": 900,
+  "files": {
+   "1600": "/art/rooms-v2/cycle-rickshaw-1600.webp",
+   "2400": "/art/rooms-v2/cycle-rickshaw-2400.webp"
+  },
+  "art": {
+   "x": 35,
+   "y": 14.9,
+   "w": 29.9,
+   "h": 39.7
+  }
+ },
+ "rickshaw-rest": {
+  "room": "An apartment living room",
+  "w": 1600,
+  "h": 900,
+  "files": {
+   "1600": "/art/rooms-v2/rickshaw-rest-1600.webp",
+   "2400": "/art/rooms-v2/rickshaw-rest-2400.webp"
+  },
+  "art": {
+   "x": 41.3,
+   "y": 17.5,
+   "w": 17.5,
+   "h": 31.9
+  }
+ },
+ "terracotta-pots": {
+  "room": "An apartment living room",
+  "w": 1600,
+  "h": 900,
+  "files": {
+   "1600": "/art/rooms-v2/terracotta-pots-1600.webp",
+   "2400": "/art/rooms-v2/terracotta-pots-2400.webp"
+  },
+  "art": {
+   "x": 41,
+   "y": 18,
+   "w": 17.9,
+   "h": 31
+  }
+ },
+ "monks-and-blue-buddha": {
+  "room": "A reading room",
+  "w": 1600,
+  "h": 900,
+  "files": {
+   "1600": "/art/rooms-v2/monks-and-blue-buddha-1600.webp",
+   "2400": "/art/rooms-v2/monks-and-blue-buddha-2400.webp"
+  },
+  "art": {
+   "x": 37.7,
+   "y": 17.1,
+   "w": 24.7,
+   "h": 34.8
+  }
+ },
+ "monk-and-green-buddha": {
+  "room": "A drawing room in Delhi",
+  "w": 1600,
+  "h": 900,
+  "files": {
+   "1600": "/art/rooms-v2/monk-and-green-buddha-1600.webp",
+   "2400": "/art/rooms-v2/monk-and-green-buddha-2400.webp"
+  },
+  "art": {
+   "x": 41.1,
+   "y": 15.4,
+   "w": 17.8,
+   "h": 41.9
+  }
+ },
+ "sacred-tree": {
+  "room": "A drawing room in Delhi",
+  "w": 1600,
+  "h": 900,
+  "files": {
+   "1600": "/art/rooms-v2/sacred-tree-1600.webp",
+   "2400": "/art/rooms-v2/sacred-tree-2400.webp"
+  },
+  "art": {
+   "x": 38.2,
+   "y": 16,
+   "w": 23.6,
+   "h": 41.9
+  }
+ },
+ "newspaper-reader": {
+  "room": "A reading room",
+  "w": 1600,
+  "h": 900,
+  "files": {
+   "1600": "/art/rooms-v2/newspaper-reader-1600.webp",
+   "2400": "/art/rooms-v2/newspaper-reader-2400.webp"
+  },
+  "art": {
+   "x": 40.8,
+   "y": 17.4,
+   "w": 18.5,
+   "h": 32.9
+  }
+ },
+ "yellow-turban-portrait": {
+  "room": "A reading room",
+  "w": 1600,
+  "h": 900,
+  "files": {
+   "1600": "/art/rooms-v2/yellow-turban-portrait-1600.webp",
+   "2400": "/art/rooms-v2/yellow-turban-portrait-2400.webp"
+  },
+  "art": {
+   "x": 42.3,
+   "y": 19.8,
+   "w": 15.4,
+   "h": 27.4
+  }
+ },
+ "patterned-turban-portrait": {
+  "room": "A reading room",
+  "w": 1600,
+  "h": 900,
+  "files": {
+   "1600": "/art/rooms-v2/patterned-turban-portrait-1600.webp",
+   "2400": "/art/rooms-v2/patterned-turban-portrait-2400.webp"
+  },
+  "art": {
+   "x": 42.3,
+   "y": 19.8,
+   "w": 15.4,
+   "h": 27.4
+  }
+ },
+ "mother-and-child": {
+  "room": "A drawing room in Delhi",
+  "w": 1600,
+  "h": 900,
+  "files": {
+   "1600": "/art/rooms-v2/mother-and-child-1600.webp",
+   "2400": "/art/rooms-v2/mother-and-child-2400.webp"
+  },
+  "art": {
+   "x": 41.2,
+   "y": 15.3,
+   "w": 17.7,
+   "h": 42.1
+  }
+ },
+ "boy-and-kettle": {
+  "room": "A dining room",
+  "w": 1600,
+  "h": 900,
+  "files": {
+   "1600": "/art/rooms-v2/boy-and-kettle-1600.webp",
+   "2400": "/art/rooms-v2/boy-and-kettle-2400.webp"
+  },
+  "art": {
+   "x": 37.6,
+   "y": 14.1,
+   "w": 24.8,
+   "h": 46.9
+  }
+ },
+ "man-among-metal-pans": {
+  "room": "A verandah",
+  "w": 1600,
+  "h": 900,
+  "files": {
+   "1600": "/art/rooms-v2/man-among-metal-pans-1600.webp",
+   "2400": "/art/rooms-v2/man-among-metal-pans-2400.webp"
+  },
+  "art": {
+   "x": 37,
+   "y": 14.6,
+   "w": 25.9,
+   "h": 34.7
+  }
+ },
+ "bandh-darwaze-set": {
+  "room": "A living room",
+  "w": 1600,
+  "h": 900,
+  "files": {
+   "1600": "/art/rooms-v2/bandh-darwaze-set-1600.webp",
+   "2400": "/art/rooms-v2/bandh-darwaze-set-2400.webp"
+  },
+  "art": {
+   "x": 36.1,
+   "y": 14.5,
+   "w": 63.9,
+   "h": 63.9
+  }
+ },
+ "carriage-and-autorickshaw": {
+  "room": "A reading room",
+  "w": 1600,
+  "h": 900,
+  "files": {
+   "1600": "/art/rooms-v2/carriage-and-autorickshaw-1600.webp",
+   "2400": "/art/rooms-v2/carriage-and-autorickshaw-2400.webp"
+  },
+  "art": {
+   "x": 40.6,
+   "y": 17.7,
+   "w": 18.8,
+   "h": 33.5
+  }
+ },
+ "bullock-cart-and-truck": {
+  "room": "A reading room",
+  "w": 1600,
+  "h": 900,
+  "files": {
+   "1600": "/art/rooms-v2/bullock-cart-and-truck-1600.webp",
+   "2400": "/art/rooms-v2/bullock-cart-and-truck-2400.webp"
+  },
+  "art": {
+   "x": 40.6,
+   "y": 17.7,
+   "w": 18.8,
+   "h": 33.5
+  }
+ },
+ "woman-with-bird": {
+  "room": "A reading room",
+  "w": 1600,
+  "h": 900,
+  "files": {
+   "1600": "/art/rooms-v2/woman-with-bird-1600.webp",
+   "2400": "/art/rooms-v2/woman-with-bird-2400.webp"
+  },
+  "art": {
+   "x": 40.6,
+   "y": 17.7,
+   "w": 18.8,
+   "h": 33.5
+  }
+ },
+ "woman-with-red-flower": {
+  "room": "A reading room",
+  "w": 1600,
+  "h": 900,
+  "files": {
+   "1600": "/art/rooms-v2/woman-with-red-flower-1600.webp",
+   "2400": "/art/rooms-v2/woman-with-red-flower-2400.webp"
+  },
+  "art": {
+   "x": 40.8,
+   "y": 17.7,
+   "w": 18.3,
+   "h": 33.5
+  }
+ }
+}

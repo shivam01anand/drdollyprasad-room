@@ -61,9 +61,11 @@ export default function PaintingStage({ w, src, dims, small, sub, children }: {
         )}
         {rv && (
           <div className="pp-room">
-            <div className="room v-room">
+            <div className={`room v-room${rv.room.v2 ? " is-v2" : ""}`}>
               {/* eslint-disable-next-line @next/next/no-img-element */}
-              <img src={rv.room.src} width={rv.room.w} height={rv.room.h} decoding="async" alt={`${name}, in ${rv.room.label.toLowerCase()}`} />
+              <img src={rv.room.src} srcSet={rv.room.srcSet} sizes={rv.room.srcSet ? "(max-width: 760px) 100vw, 900px" : undefined}
+                   style={rv.room.pos ? { objectPosition: rv.room.pos } : undefined}
+                   width={rv.room.w} height={rv.room.h} decoding="async" alt={`${name}, in ${rv.room.label.toLowerCase()}`} />
               {!rv.room.inPhoto && (
                 <span className="room-art" style={{
                   left: `${rv.at.left}%`, top: `${rv.at.top}%`, width: `${rv.at.width}%`, height: `${rv.at.height}%`,
@@ -76,7 +78,7 @@ export default function PaintingStage({ w, src, dims, small, sub, children }: {
                 </span>
               )}
             </div>
-            <p className="pp-cap">{toScale && size ? `To scale · ${size.width} × ${size.height} in` : rv.room.study ? "Virtual room study" : rv.room.label}</p>
+            <p className="pp-cap">{rv.room.v2 ? (rv.trueSize && size ? `${rv.room.label} · shown at its stated size, ${size.width} × ${size.height} in` : rv.room.label) : toScale && size ? `To scale · ${size.width} × ${size.height} in` : rv.room.study ? "Virtual room study" : rv.room.label}</p>
           </div>
         )}
       </div>
