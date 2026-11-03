@@ -179,66 +179,6 @@
    "h": 46.6
   }
  },
- "weathered-door-ring": {
-  "room": "A living room",
-  "w": 1600,
-  "h": 900,
-  "files": {
-   "1600": "/art/rooms-v2/weathered-door-ring-1600.webp",
-   "2400": "/art/rooms-v2/weathered-door-ring-2400.webp"
-  },
-  "art": {
-   "x": 46.9,
-   "y": 16.5,
-   "w": 11.6,
-   "h": 20.8
-  }
- },
- "red-and-teal-door-lock": {
-  "room": "A living room",
-  "w": 1600,
-  "h": 900,
-  "files": {
-   "1600": "/art/rooms-v2/red-and-teal-door-lock-1600.webp",
-   "2400": "/art/rooms-v2/red-and-teal-door-lock-2400.webp"
-  },
-  "art": {
-   "x": 44.2,
-   "y": 17.1,
-   "w": 11.6,
-   "h": 19.6
-  }
- },
- "teal-door-bolt": {
-  "room": "A living room",
-  "w": 1600,
-  "h": 900,
-  "files": {
-   "1600": "/art/rooms-v2/teal-door-bolt-1600.webp",
-   "2400": "/art/rooms-v2/teal-door-bolt-2400.webp"
-  },
-  "art": {
-   "x": 44.6,
-   "y": 16.9,
-   "w": 10.8,
-   "h": 20.3
-  }
- },
- "carved-door-knocker": {
-  "room": "A living room",
-  "w": 1600,
-  "h": 900,
-  "files": {
-   "1600": "/art/rooms-v2/carved-door-knocker-1600.webp",
-   "2400": "/art/rooms-v2/carved-door-knocker-2400.webp"
-  },
-  "art": {
-   "x": 44.4,
-   "y": 16.5,
-   "w": 11.2,
-   "h": 20.8
-  }
- },
  "rickshaw-rest-framed": {
   "room": "An apartment living room",
   "w": 1600,
@@ -567,6 +507,66 @@
    "y": 17.6,
    "w": 18.4,
    "h": 33.6
+  }
+ },
+ "weathered-door-ring": {
+  "room": "A living room",
+  "w": 1600,
+  "h": 900,
+  "files": {
+   "1600": "/art/rooms-v2/weathered-door-ring-1600.webp",
+   "2400": "/art/rooms-v2/weathered-door-ring-2400.webp"
+  },
+  "art": {
+   "x": 44.2,
+   "y": 16.5,
+   "w": 11.6,
+   "h": 20.8
+  }
+ },
+ "red-and-teal-door-lock": {
+  "room": "A living room",
+  "w": 1600,
+  "h": 900,
+  "files": {
+   "1600": "/art/rooms-v2/red-and-teal-door-lock-1600.webp",
+   "2400": "/art/rooms-v2/red-and-teal-door-lock-2400.webp"
+  },
+  "art": {
+   "x": 44.2,
+   "y": 17.1,
+   "w": 11.6,
+   "h": 19.6
+  }
+ },
+ "teal-door-bolt": {
+  "room": "A living room",
+  "w": 1600,
+  "h": 900,
+  "files": {
+   "1600": "/art/rooms-v2/teal-door-bolt-1600.webp",
+   "2400": "/art/rooms-v2/teal-door-bolt-2400.webp"
+  },
+  "art": {
+   "x": 44.6,
+   "y": 16.7,
+   "w": 10.8,
+   "h": 20.3
+  }
+ },
+ "carved-door-knocker": {
+  "room": "A living room",
+  "w": 1600,
+  "h": 900,
+  "files": {
+   "1600": "/art/rooms-v2/carved-door-knocker-1600.webp",
+   "2400": "/art/rooms-v2/carved-door-knocker-2400.webp"
+  },
+  "art": {
+   "x": 44.4,
+   "y": 16.5,
+   "w": 11.2,
+   "h": 20.8
   }
  }
 }
