@@ -2454,3 +2454,8 @@ body *{font-style:normal !important}
   .press-play:hover::before{transform:scale(1.06)}
   .press-play svg{position:relative;z-index:1}
 }
+
+/* rooms-v2: a finished photoreal room, shown as photographed; on a phone the frame is taller and covers,
+   with object-position (set inline from the art rectangle) keeping the painting in view */
+.room.is-v2>img{display:block;width:100%;height:auto;object-fit:cover}
+@media (max-width:760px){ .room.is-v2{aspect-ratio:4/5} .room.is-v2>img{height:100%} }

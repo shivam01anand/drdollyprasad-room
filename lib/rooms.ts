@@ -1,5 +1,6 @@
 import type { Work } from "./works";
 import hallway from "./hallway-rooms.json";
+import v2 from "./rooms-v2.json";
 
 /**
  * Rooms to see a painting in.
@@ -50,6 +51,12 @@ export type Room = {
   study?: boolean;
   /** for a study: the furniture its relative size was judged against (an assumption, not a measurement) */
   assumed?: string;
+  /** a finished photoreal room (rooms-v2): shown as it is, covering its frame, with the painting kept in view */
+  v2?: boolean;
+  /** v2: the image at two widths, for srcset */
+  srcSet?: string;
+  /** v2: CSS object-position that keeps the painting in view when the frame is cropped (phone) */
+  pos?: string;
 };
 
 export type Tailored = Room & {
@@ -193,10 +200,31 @@ export function hang(room: Room, longestCm: number, aspect: number): Hang {
   };
 }
 
+type V2Entry = { room: string; w: number; h: number; files: Record<string, string>; art: { x: number; y: number; w: number; h: number } };
+const V2 = v2 as Record<string, V2Entry>;
+
+/** the photoreal room made for a work (public/art/rooms-v2, imported by scripts/rooms/import-works-final.mjs) */
+export function v2Room(workId: string): Room | undefined {
+  const e = V2[workId];
+  if (!e) return undefined;
+  // phone crop is 4:5 over a 16:9 photo: 45% of its width shows; put the art's centre in the middle of it
+  const vis = (4 / 5) / (e.w / e.h);
+  const cx = Math.min(100, Math.max(0, (((e.art.x + e.art.w / 2) / 100 - vis / 2) / (1 - vis)) * 100));
+  const cy = e.art.y + e.art.h / 2;
+  return {
+    id: `v2-${workId}`, label: e.room, src: e.files["1600"], thumb: e.files["1600"], w: e.w, h: e.h,
+    srcSet: `${e.files["1600"]} 1600w, ${e.files["2400"]} 2400w`, pos: `${cx.toFixed(1)}% ${cy.toFixed(1)}%`,
+    pxPerCm: 0, floor: 0, cx: 0, sill: 0, inPhoto: true, v2: true,
+  };
+}
+
 export type RoomView = { room: Room; at: Hang; trueSize: boolean };
 
 /** the rooms a work can be seen in: its own, else the generic ones if she has stated its size */
 export function roomsFor(work: Work, aspect: number, opts: { pilot?: boolean } = {}): RoomView[] {
+  // the finished photoreal room, when there is one, is the one room view
+  const photo = v2Room(work.id);
+  if (photo) return [{ room: photo, at: hang(photo, 1, aspect), trueSize: !!work.inches }];
   // the hallway pilot first where one was made (the website's painting page and the studio's lightbox, rooms[0])
   const pilot = opts.pilot ? PILOT.find((r) => r.work === work.id) : undefined;
   const own = TAILORED.find((r) => r.work === work.id);
