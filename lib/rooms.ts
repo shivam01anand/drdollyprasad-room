@@ -207,7 +207,10 @@ const V2 = v2 as Record<string, V2Entry>;
 export function v2Room(workId: string): Room | undefined {
   const e = V2[workId];
   if (!e) return undefined;
-  const cx = e.art.x + e.art.w / 2, cy = e.art.y + e.art.h / 2;
+  // phone crop is 4:5 over a 16:9 photo: 45% of its width shows; put the art's centre in the middle of it
+  const vis = (4 / 5) / (e.w / e.h);
+  const cx = Math.min(100, Math.max(0, (((e.art.x + e.art.w / 2) / 100 - vis / 2) / (1 - vis)) * 100));
+  const cy = e.art.y + e.art.h / 2;
   return {
     id: `v2-${workId}`, label: e.room, src: e.files["1600"], thumb: e.files["1600"], w: e.w, h: e.h,
     srcSet: `${e.files["1600"]} 1600w, ${e.files["2400"]} 2400w`, pos: `${cx.toFixed(1)}% ${cy.toFixed(1)}%`,
