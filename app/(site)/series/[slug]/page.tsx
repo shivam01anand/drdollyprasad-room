@@ -37,7 +37,7 @@ export async function generateMetadata({ params }: Props): Promise<Metadata> {
 const PHOTO: Record<string, { src: string; alt: string; cap: string; w: number; h: number }> = {
   "gone-are-the-days": { src: "/site/ex/ihc-press-b.jpg", w: 1200, h: 803, alt: "Dr Dolly Prasad interviewed beside The Bullocks",
     cap: "Beside The Bullocks, in front of the cameras at Open Palm Court, India Habitat Centre, New Delhi, November 2010." },
-  faith: { src: "/site/ex/iccr-02.jpg", w: 1080, h: 1080, alt: "Dr Dolly Prasad beside The Blue Buddha at ICCR",
+  faith: { src: "/site/ex/iccr-02.jpg", w: 1030, h: 696, alt: "Dr Dolly Prasad beside The Blue Buddha at ICCR",
     cap: "Beside The Blue Buddha at A Lifetime to Paint, ICCR, New Delhi, June 2010." },
 };
 
