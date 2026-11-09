@@ -344,6 +344,20 @@ export default function PhotoStudio({ dims }: { dims: Dims }) {
   // a new wall, a new painting in focus, a turned screen: the wall comes to rest
   useEffect(() => { setZoom(restRef.current()); }, [stop, focus, frames]);
   const phone = vp ? isPhone(vp.W) : false;
+  /** a phone: where the room's name can sit without covering a painting or its plaque in this view
+   *  (the top band, or the band just above the dock); null = neither is clear, so it is only in the dock */
+  const titleAt = useMemo((): "top" | "bottom" | null => {
+    const f = frames[stop];
+    if (!phone || here.kind !== "wall" || !f) return null;
+    const x0 = rest(here.wall, f, focus).x;
+    const boxes = here.wall.works.flatMap((w) => [w.bbox, w.plaque]).map(([x, y, bw, bh]) =>
+      ({ l: x * f.s + x0, r: (x + bw) * f.s + x0, t: y * f.s + f.oy, b: (y + bh) * f.s + f.oy }))
+      .filter((r) => r.r > 0 && r.l < f.W);
+    const TOP = [52, 132], BOTTOM = [f.H - PHONE_DOCK - 92, f.H - PHONE_DOCK - 6];
+    const clear = ([a, z]: number[]) => boxes.every((r) => r.b <= a || r.t >= z);
+    return clear(TOP) ? "top" : clear(BOTTOM) ? "bottom" : null;
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [frames, stop, focus, phone]);
   const wallIndex = here.kind === "wall" ? WALLS.indexOf(here.wall) : -1;
   const roomNow = here.kind === "wall" ? here.wall.room : here.kind === "desk" ? "Her desk" : "";
   const tone = here.kind === "wall" ? here.wall.tone : "dark";
@@ -449,8 +463,8 @@ export default function PhotoStudio({ dims }: { dims: Dims }) {
       </header>
 
       {/* the room's name and its line (ours, never hers): above the wall on a phone, in the dock on a wide screen */}
-      {here.kind === "wall" && phone && (
-        <div className="ps-title" key={`t-${here.wall.room}`} data-on={titleOn ? "1" : "0"}>
+      {here.kind === "wall" && phone && titleAt && (
+        <div className="ps-title" key={`t-${here.wall.room}`} data-on={titleOn ? "1" : "0"} data-at={titleAt}>
           <h1 className="ps-room">{here.wall.room}</h1>
           {roomLine(here.wall.room) && <p className="ps-line">{roomLine(here.wall.room)}</p>}
         </div>

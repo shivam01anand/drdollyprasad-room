@@ -140,3 +140,6 @@ html[data-photo-studio],html[data-photo-studio] body{height:100%;overflow:hidden
 .ps-wall[data-tone="light"] .ps-glow{mix-blend-mode:soft-light;opacity:1;
   background:radial-gradient(ellipse 50% 100% at 50% 0%,rgba(255,217,160,.85) 0%,rgba(255,217,160,.45) 35%,rgba(255,217,160,0) 100%)}
 .ps-title[data-on="0"]{opacity:0}
+/* a phone: the room's name in the band just above the dock, when the top band would cover a painting */
+.ps-title[data-at="bottom"]{top:auto;bottom:116px;padding:30px 24px 12px;
+  background:linear-gradient(0deg,rgba(33,27,24,.82) 0%,rgba(33,27,24,.6) 55%,rgba(33,27,24,0) 100%)}
