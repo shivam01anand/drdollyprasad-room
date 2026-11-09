@@ -41,7 +41,7 @@ function frameFor(wall: Wall, W: number, H: number): Frame {
   for (const w of wall.works) for (const [x, y, bw, bh] of [w.bbox, w.plaque]) {
     x0 = Math.min(x0, x); y0 = Math.min(y0, y); x1 = Math.max(x1, x + bw); y1 = Math.max(y1, y + bh);
   }
-  const padX = phone ? 20 : 140, padY = phone ? 40 : 110;
+  const padX = phone ? 20 : 140, padY = phone ? 40 : 60;
   x0 -= padX; x1 += padX; y0 -= padY; y1 += padY;
   const short = H < 520;
   if (phone) {
@@ -67,12 +67,21 @@ function frameFor(wall: Wall, W: number, H: number): Frame {
 /** the phone's dock, Previous and Next over the room names */
 const PHONE_DOCK = 116;
 
-/** where the wall rests: on a phone, the painting in focus centred (as far as the photo allows) */
+/** a wall's columns, left to right: the centres of the paintings that hang one above another (within 80 px) */
+export function columnsOf(wall: Wall): number[] {
+  const cs = wall.works.map((w) => w.bbox[0] + w.bbox[2] / 2).sort((a, b) => a - b);
+  const out: number[][] = [];
+  for (const c of cs) { const last = out[out.length - 1]; if (last && c - last[last.length - 1] < 80) last.push(c); else out.push([c]); }
+  return out.map((g) => g.reduce((a, b) => a + b, 0) / g.length);
+}
+
+/** where the wall rests: on a phone, the column in focus centred (as far as the photo allows) */
 function homeX(wall: Wall, f: Frame, focus: number) {
   if (!f.phone) return 0;
-  const w = wall.works[clamp(focus, 0, wall.works.length - 1)];
-  if (!w || f.iw <= f.W) return (f.W - f.iw) / 2;
-  return clamp(f.W / 2 - (w.bbox[0] + w.bbox[2] / 2) * f.s, f.W - f.iw, 0);
+  const cols = columnsOf(wall);
+  const c = cols[clamp(focus, 0, cols.length - 1)];
+  if (c === undefined || f.iw <= f.W) return (f.W - f.iw) / 2;
+  return clamp(f.W / 2 - c * f.s, f.W - f.iw, 0);
 }
 const rest = (wall: Wall | null, f: Frame | null, focus: number): Zoom => ({ z: 1, x: wall && f ? homeX(wall, f, focus) : 0, y: 0 });
 
@@ -150,7 +159,7 @@ export default function PhotoStudio({ dims }: { dims: Dims }) {
     setLeaving(from);
     setStop(to);
     const t = STOPS[to];
-    setFocus(t.kind === "wall" && to < from && method !== "rail" ? t.wall.works.length - 1 : 0);
+    setFocus(t.kind === "wall" && to < from && method !== "rail" ? columnsOf(t.wall).length - 1 : 0);
     clearTimeout(leaveT.current);
     leaveT.current = window.setTimeout(() => setLeaving(null), 600);
   }, []);
@@ -279,7 +288,7 @@ export default function PhotoStudio({ dims }: { dims: Dims }) {
       const s = STOPS[stopRef.current];
       if (frameNow.current?.phone && across && s.kind === "wall") {
         // a phone: sideways is the next painting on this wall, then the next wall
-        const n = s.wall.works.length, k = focusRef.current;
+        const n = columnsOf(s.wall).length, k = focusRef.current;
         if ((far || fast) && k + d >= 0 && k + d < n) { setFocus(k + d); setZoom(rest(s.wall, frameNow.current, k + d)); }
         else if (far || fast) { setZoom(restNow()); step(d, "swipe"); }
         else setZoom(restNow());
@@ -377,8 +386,12 @@ export default function PhotoStudio({ dims }: { dims: Dims }) {
           const covered = f.iw >= f.W - 1 && f.ih >= f.H - 1;
           // a plaque's widest: the space between its neighbours' centres
           const cx = s.wall.works.map((w) => (w.plaque[0] + w.plaque[2] / 2) * f.s + f.ox);
-          const pitch = cx.length > 1 ? Math.min(...cx.slice(1).map((c, k) => c - cx[k])) : f.W;
-          const fs = clamp(22 * f.s, 11, 16);
+          const cy = s.wall.works.map((w) => w.plaque[1] + w.plaque[3] / 2);
+          const room = (k: number) => {
+            let gap = f.W;
+            cx.forEach((c, j) => { if (j !== k && Math.abs(cy[j] - cy[k]) < 60) gap = Math.min(gap, Math.abs(c - cx[k])); });
+            return Math.max(84, gap - 12);
+          };
           return (
             <section key={s.wall.id} className="ps-scene ps-wall" data-state={state} data-dir={dir} data-tone={s.wall.tone}
                      aria-hidden={!on} aria-label={`${s.wall.room}, wall ${WALLS.indexOf(s.wall) + 1} of ${WALL_COUNT}`}>
@@ -397,9 +410,10 @@ export default function PhotoStudio({ dims }: { dims: Dims }) {
                   return <i key={`g-${w.id}`} className="ps-glow" aria-hidden="true"
                             style={{ left: (bx + bw / 2 - gw / 2) * f.s + f.ox, top: ly * f.s + f.oy, width: gw * f.s, height: (60 + bh * 0.55) * f.s }} />;
                 })}
-                {s.wall.works.map((w) => {
+                {s.wall.works.map((w, k) => {
                   const work = BY_ID.get(w.id)!;
-                  const [bx, by, bw, bh] = w.bbox, [px, py, pw] = w.plaque;
+                  const [bx, by, bw, bh] = w.bbox, [px, py, pw, ph] = w.plaque;
+                  const fs = clamp(Math.max(ph * f.s * 0.7, 22 * f.s), 10, 15);
                   return (
                     <div key={w.id}>
                       <button type="button" className="ps-hit" tabIndex={on ? 0 : -1}
@@ -407,7 +421,7 @@ export default function PhotoStudio({ dims }: { dims: Dims }) {
                               style={{ left: bx * f.s + f.ox, top: by * f.s + f.oy, width: bw * f.s, height: bh * f.s }}
                               onClick={() => { if (dragged.current) { dragged.current = false; return; } openWork(w.id); }} />
                       <p className="ps-plaque" aria-hidden="true"
-                         style={{ left: (px + pw / 2) * f.s + f.ox, top: py * f.s + f.oy, fontSize: fs, maxWidth: Math.max(80, pitch - 10) }}>
+                         style={{ left: (px + pw / 2) * f.s + f.ox, top: (py + ph / 2) * f.s + f.oy, fontSize: fs, maxWidth: room(k), minWidth: pw * f.s, minHeight: ph * f.s }}>
                         {work.title}
                       </p>
                     </div>
@@ -477,7 +491,7 @@ export default function PhotoStudio({ dims }: { dims: Dims }) {
             {!phone && here.kind === "desk" && <span className="ps-cap-room">Her desk</span>}
             <span className="ps-cap-count">
               {here.kind === "wall" ? `${phone ? `${here.wall.room} · ` : ""}Wall ${wallIndex + 1} of ${WALL_COUNT}` : here.kind === "desk" ? "The end of the walk" : ""}
-              {phone && here.kind === "wall" && here.wall.works.length > 1 ? ` · Painting ${focus + 1} of ${here.wall.works.length}` : ""}
+              {phone && here.kind === "wall" && columnsOf(here.wall).length > 1 ? ` · ${focus + 1} of ${columnsOf(here.wall).length}` : ""}
             </span>
           </div>
           <button type="button" className="ps-arrow ps-arrow-next" onClick={() => step(1, "next")} disabled={!nextStop}

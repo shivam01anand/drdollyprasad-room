@@ -36,8 +36,8 @@ html[data-photo-studio],html[data-photo-studio] body{height:100%;overflow:hidden
 .ps-hit:focus-visible{outline:2px solid #D4202A;outline-offset:4px}
 
 /* the title plaques: Khadi with Kajal on a light wall; cream on antique brass on a dark one */
-.ps-plaque{position:absolute;margin:0;width:max-content;box-sizing:border-box;transform:translateX(-50%);pointer-events:none;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;
-  padding:.32em .9em .36em;border-radius:1.5px;
+.ps-plaque{position:absolute;margin:0;width:max-content;box-sizing:border-box;transform:translate(-50%,-50%);display:flex;align-items:center;justify-content:center;pointer-events:none;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;
+  padding:.28em .8em .32em;border-radius:1.5px;
   font-family:"Cormorant Garamond","Cormorant Garamond Fallback",Georgia,serif;font-weight:600;line-height:1.1;letter-spacing:.015em;
   background:rgba(245,244,240,.95);color:#211B18;
   box-shadow:0 0 0 1px rgba(33,27,24,.14),0 3px 8px -3px rgba(33,27,24,.4)}

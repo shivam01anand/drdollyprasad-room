@@ -1,67 +1,259 @@
 {
   "space": [2400, 1350],
+  "source": "Team Handoffs/021-studio-plants/outputs/STUDIO-WALLS/MANIFEST.json (feedback 19); bbox = frame_bbox, plaque = ChatGPT's blank brass plaque",
   "walls": [
     {
-      "id": "onset-spring-pair",
+      "id": "os-a",
       "room": "Onset of Spring",
       "tone": "light",
-      "image": "/studio/onset-spring-pair",
+      "glow": false,
+      "image": "/studio/os-a",
       "works": [
         {
+          "id": "woman-with-poppies",
+          "bbox": [761, 276, 457, 328],
+          "plaque": [964, 630, 52, 15]
+        },
+        {
           "id": "woman-with-bird",
-          "bbox": [811, 258, 344, 344],
-          "plaque": [843, 642, 280, 60]
+          "bbox": [1389, 129, 232, 232],
+          "plaque": [1479, 387, 52, 15]
         },
         {
           "id": "woman-with-red-flower",
-          "bbox": [1252, 258, 335, 344],
-          "plaque": [1280, 642, 280, 60]
+          "bbox": [1392, 514, 226, 232],
+          "plaque": [1479, 772, 52, 15]
         }
       ]
     },
     {
-      "id": "faith-triptych",
+      "id": "os-b",
+      "room": "Onset of Spring",
+      "tone": "light",
+      "glow": false,
+      "image": "/studio/os-b",
+      "works": [
+        {
+          "id": "child-among-flowers",
+          "bbox": [1027, 113, 347, 275],
+          "plaque": [1180, 408, 39, 11]
+        },
+        {
+          "id": "boy-with-bananas",
+          "bbox": [844, 519, 262, 262],
+          "plaque": [956, 801, 39, 11]
+        },
+        {
+          "id": "temple-bells",
+          "bbox": [1294, 542, 262, 216],
+          "plaque": [1406, 778, 39, 11]
+        }
+      ]
+    },
+    {
+      "id": "f-a",
       "room": "Faith",
       "tone": "dark",
-      "image": "/studio/faith-triptych",
+      "glow": false,
+      "image": "/studio/f-a",
       "works": [
         {
           "id": "sacred-tree",
-          "bbox": [453, 165, 535, 537],
-          "plaque": [580, 742, 280, 60]
+          "bbox": [452, 164, 542, 542],
+          "plaque": [692, 737, 62, 18]
         },
         {
           "id": "prayer-and-scripture",
-          "bbox": [1066, 167, 402, 535],
-          "plaque": [1127, 742, 280, 60]
+          "bbox": [1062, 164, 410, 542],
+          "plaque": [1236, 737, 62, 18]
         },
         {
           "id": "offering-of-light",
-          "bbox": [1543, 167, 401, 535],
-          "plaque": [1604, 742, 280, 60]
+          "bbox": [1540, 164, 408, 542],
+          "plaque": [1713, 737, 62, 18]
         }
       ]
     },
     {
-      "id": "portraits-trio",
+      "id": "f-b",
+      "room": "Faith",
+      "tone": "dark",
+      "glow": false,
+      "image": "/studio/f-b",
+      "works": [
+        {
+          "id": "monk-and-green-buddha",
+          "bbox": [763, 103, 255, 335],
+          "plaque": [871, 457, 38, 11]
+        },
+        {
+          "id": "monks-and-blue-buddha",
+          "bbox": [1313, 137, 335, 267],
+          "plaque": [1461, 423, 38, 11]
+        },
+        {
+          "id": "priest-with-flame",
+          "bbox": [765, 563, 250, 335],
+          "plaque": [871, 917, 38, 11]
+        },
+        {
+          "id": "newspaper-reader",
+          "bbox": [1353, 603, 253, 253],
+          "plaque": [1461, 875, 38, 11]
+        }
+      ]
+    },
+    {
+      "id": "b-a",
+      "room": "Bandh Darwaze",
+      "tone": "dark",
+      "glow": false,
+      "image": "/studio/b-a",
+      "works": [
+        {
+          "id": "weathered-door-ring",
+          "bbox": [986, 315, 148, 149],
+          "plaque": [1027, 497, 66, 19]
+        },
+        {
+          "id": "red-and-teal-door-lock",
+          "bbox": [1265, 319, 149, 142],
+          "plaque": [1307, 494, 66, 19]
+        },
+        {
+          "id": "teal-door-bolt",
+          "bbox": [989, 555, 142, 149],
+          "plaque": [1027, 737, 66, 19]
+        },
+        {
+          "id": "carved-door-knocker",
+          "bbox": [1269, 555, 143, 149],
+          "plaque": [1307, 737, 66, 19]
+        }
+      ]
+    },
+    {
+      "id": "g-a",
+      "room": "Gone Are The Days",
+      "tone": "light",
+      "glow": false,
+      "image": "/studio/g-a",
+      "works": [
+        {
+          "id": "bulls-and-wheel",
+          "bbox": [605, 195, 530, 530],
+          "plaque": [840, 755, 60, 17]
+        },
+        {
+          "id": "terracotta-pots",
+          "bbox": [1235, 265, 399, 390],
+          "plaque": [1405, 685, 60, 17]
+        }
+      ]
+    },
+    {
+      "id": "g-b",
+      "room": "Gone Are The Days",
+      "tone": "dark",
+      "glow": false,
+      "image": "/studio/g-b",
+      "works": [
+        {
+          "id": "cycle-rickshaw",
+          "bbox": [671, 113, 417, 313],
+          "plaque": [861, 445, 38, 11]
+        },
+        {
+          "id": "postbox-and-stamps",
+          "bbox": [1353, 103, 253, 335],
+          "plaque": [1461, 457, 38, 11]
+        },
+        {
+          "id": "rickshaw-rest-framed",
+          "bbox": [754, 563, 252, 335],
+          "plaque": [861, 917, 38, 11]
+        },
+        {
+          "id": "rickshaw-puller-and-coin",
+          "bbox": [1351, 563, 258, 335],
+          "plaque": [1461, 917, 38, 11]
+        }
+      ]
+    },
+    {
+      "id": "g-d",
+      "room": "Gone Are The Days",
+      "tone": "light",
+      "glow": false,
+      "image": "/studio/g-d",
+      "works": [
+        {
+          "id": "coins-and-clay-bank",
+          "bbox": [877, 205, 247, 250],
+          "plaque": [972, 483, 56, 16]
+        },
+        {
+          "id": "carriage-and-autorickshaw",
+          "bbox": [1275, 205, 250, 250],
+          "plaque": [1372, 483, 56, 16]
+        },
+        {
+          "id": "rickshaw-rest",
+          "bbox": [878, 635, 244, 250],
+          "plaque": [972, 913, 56, 16]
+        },
+        {
+          "id": "bullock-cart-and-truck",
+          "bbox": [1275, 635, 250, 250],
+          "plaque": [1372, 913, 56, 16]
+        }
+      ]
+    },
+    {
+      "id": "p-a",
       "room": "Portraits",
       "tone": "dark",
-      "image": "/studio/portraits-trio",
+      "glow": false,
+      "image": "/studio/p-a",
       "works": [
         {
           "id": "red-turban-portrait",
-          "bbox": [571, 283, 356, 353],
-          "plaque": [609, 676, 280, 60]
+          "bbox": [567, 280, 364, 360],
+          "plaque": [716, 673, 66, 19]
         },
         {
           "id": "yellow-turban-portrait",
-          "bbox": [1017, 281, 360, 357],
-          "plaque": [1057, 678, 280, 60]
+          "bbox": [1018, 278, 364, 364],
+          "plaque": [1167, 675, 66, 19]
         },
         {
           "id": "patterned-turban-portrait",
-          "bbox": [1468, 282, 361, 355],
-          "plaque": [1508, 677, 280, 60]
+          "bbox": [1469, 278, 364, 364],
+          "plaque": [1618, 675, 66, 19]
+        }
+      ]
+    },
+    {
+      "id": "p-b",
+      "room": "Portraits",
+      "tone": "light",
+      "glow": false,
+      "image": "/studio/p-b",
+      "works": [
+        {
+          "id": "three-veiled-women",
+          "bbox": [1027, 120, 347, 340],
+          "plaque": [1180, 480, 39, 11]
+        },
+        {
+          "id": "milkman-on-bicycle",
+          "bbox": [817, 587, 265, 347],
+          "plaque": [930, 954, 39, 11]
+        },
+        {
+          "id": "man-among-metal-pans",
+          "bbox": [1277, 629, 347, 263],
+          "plaque": [1430, 912, 39, 11]
         }
       ]
     }
