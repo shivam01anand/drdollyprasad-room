@@ -12,7 +12,8 @@ import { WALLS, WALL_ORDER, SPACE, ROOM_ORDER, roomLine, type Wall } from "@/lib
 type Dims = Record<string, { w: number; h: number }>;
 type Stop = { kind: "open" } | { kind: "wall"; wall: Wall } | { kind: "desk" };
 type Method = "next" | "prev" | "swipe" | "wheel" | "key" | "rail" | "enter" | "link";
-type Frame = { s: number; ox: number; oy: number; iw: number; ih: number; W: number; H: number };
+type Frame = { s: number; ox: number; oy: number; iw: number; ih: number; W: number; H: number; phone: boolean };
+type Zoom = { z: number; x: number; y: number };
 
 const HOME = "/";
 const [IW, IH] = SPACE;
@@ -43,6 +44,12 @@ function frameFor(wall: Wall, W: number, H: number): Frame {
   const padX = phone ? 20 : 140, padY = phone ? 40 : 110;
   x0 -= padX; x1 += padX; y0 -= padY; y1 += padY;
   const short = H < 520;
+  if (phone) {
+    // a phone held upright: the photo runs from the top of the screen down to the dock (no empty band),
+    // the paintings large; the wall is walked painting by painting (see homeX), pinch to look closer
+    const s = Math.max(W / (x1 - x0), (H - PHONE_DOCK) / IH);
+    return { s, ox: 0, oy: 0, iw: IW * s, ih: IH * s, W, H, phone };
+  }
   const top = phone ? 150 : short ? 52 : 64;
   const bottom = phone ? 150 : short ? 84 : 150;
   const availH = Math.max(120, H - top - bottom);
@@ -54,8 +61,20 @@ function frameFor(wall: Wall, W: number, H: number): Frame {
   let oy = top + availH / 2 - ((y0 + y1) / 2) * s;
   ox = iw >= W ? clamp(ox, W - iw, 0) : (W - iw) / 2;
   oy = ih >= H ? clamp(oy, H - ih, 0) : clamp(oy, 0, H - ih);
-  return { s, ox, oy, iw, ih, W, H };
+  return { s, ox, oy, iw, ih, W, H, phone };
 }
+
+/** the phone's dock, Previous and Next over the room names */
+const PHONE_DOCK = 116;
+
+/** where the wall rests: on a phone, the painting in focus centred (as far as the photo allows) */
+function homeX(wall: Wall, f: Frame, focus: number) {
+  if (!f.phone) return 0;
+  const w = wall.works[clamp(focus, 0, wall.works.length - 1)];
+  if (!w || f.iw <= f.W) return (f.W - f.iw) / 2;
+  return clamp(f.W / 2 - (w.bbox[0] + w.bbox[2] / 2) * f.s, f.W - f.iw, 0);
+}
+const rest = (wall: Wall | null, f: Frame | null, focus: number): Zoom => ({ z: 1, x: wall && f ? homeX(wall, f, focus) : 0, y: 0 });
 
 const srcFor = (wall: Wall, f: Frame | null) => {
   const dpr = typeof window === "undefined" ? 2 : Math.min(3, devicePixelRatio || 1);
@@ -77,7 +96,13 @@ export default function PhotoStudio({ dims }: { dims: Dims }) {
   const [more, setMore] = useState(false);
   const [lbOpen, setLbOpen] = useState(false);
   const [playing, setPlaying] = useState(false);
-  const [zoom, setZoom] = useState({ z: 1, x: 0, y: 0 });
+  const [zoom, setZoom] = useState<Zoom>({ z: 1, x: 0, y: 0 });
+  /** a phone walks a wall painting by painting: the one in front */
+  const [focus, setFocus] = useState(0);
+  const [dragging, setDragging] = useState(false);
+  /** a phone: the room's name and line over the top of the photo, for a moment on arrival */
+  const [titleOn, setTitleOn] = useState(true);
+  useEffect(() => { setTitleOn(true); const t = setTimeout(() => setTitleOn(false), 3200); return () => clearTimeout(t); }, [stop]);
   const stopRef = useRef(0);
   const holds = useRef(new Set<string>());
   const hold = useCallback((reason: string, on: boolean) => {
@@ -124,7 +149,8 @@ export default function PhotoStudio({ dims }: { dims: Dims }) {
     setDir(to > from ? 1 : -1);
     setLeaving(from);
     setStop(to);
-    setZoom({ z: 1, x: 0, y: 0 });
+    const t = STOPS[to];
+    setFocus(t.kind === "wall" && to < from && method !== "rail" ? t.wall.works.length - 1 : 0);
     clearTimeout(leaveT.current);
     leaveT.current = window.setTimeout(() => setLeaving(null), 600);
   }, []);
@@ -151,7 +177,7 @@ export default function PhotoStudio({ dims }: { dims: Dims }) {
       if (e.defaultPrevented || e.metaKey || e.ctrlKey || e.altKey || holds.current.size) return;
       const t = e.target as HTMLElement | null;
       if (t?.closest?.("input, textarea, select, [contenteditable], dialog[open]")) return;
-      if (e.key === "Escape" && zoomRef.current.z > 1) { setZoom({ z: 1, x: 0, y: 0 }); return; }
+      if (e.key === "Escape" && zoomRef.current.z > 1) { setZoom(restNow()); return; }
       const next = ["ArrowRight", "ArrowDown", "PageDown"].includes(e.key) || (e.key === " " && !t?.closest?.("button, a"));
       const prev = ["ArrowLeft", "ArrowUp", "PageUp"].includes(e.key);
       if (!next && !prev) return;
@@ -182,10 +208,12 @@ export default function PhotoStudio({ dims }: { dims: Dims }) {
   const gest = useRef({ x: 0, y: 0, t: 0, moved: false, pinch: 0, z0: 1, px: 0, py: 0, mx: 0, my: 0, lastTap: 0 });
   const dragged = useRef(false);
   const frameNow = useRef<Frame | null>(null);
+  const restRef = useRef<() => Zoom>(() => ({ z: 1, x: 0, y: 0 }));
+  const restNow = () => restRef.current();
 
   const clampZoom = useCallback((z: number, x: number, y: number) => {
     const f = frameNow.current;
-    if (!f || z <= 1.001) return { z: 1, x: 0, y: 0 };
+    if (!f || z <= 1.001) return restRef.current();
     const fit = (o: number, size: number, view: number, p: number) => {
       const a = o * z + p, b = (o + size) * z + p;
       if (size * z <= view) return (o + size / 2) - (o + size / 2) * z; // centred as it was
@@ -225,7 +253,15 @@ export default function PhotoStudio({ dims }: { dims: Dims }) {
     }
     const dx = e.clientX - g.x, dy = e.clientY - g.y;
     if (Math.hypot(dx, dy) > 8) { g.moved = true; dragged.current = true; }
-    if (zoomRef.current.z > 1 && g.moved && e.pointerType !== "mouse") setZoom(clampZoom(zoomRef.current.z, g.px + dx, g.py + dy));
+    if (zoomRef.current.z > 1 && g.moved && e.pointerType !== "mouse") { setDragging(true); setZoom(clampZoom(zoomRef.current.z, g.px + dx, g.py + dy)); return; }
+    const f = frameNow.current;
+    if (f?.phone && g.moved && Math.abs(dx) > Math.abs(dy)) {
+      // the wall follows the finger, with a little give past its ends
+      const lo = f.W - f.iw, hi = 0, x = g.px + dx;
+      const give = x > hi ? hi + (x - hi) * 0.35 : x < lo ? lo + (x - lo) * 0.35 : x;
+      setDragging(true);
+      setZoom({ z: 1, x: give, y: 0 });
+    }
   };
   const onPointerUp = (e: React.PointerEvent) => {
     if (!ptrs.current.has(e.pointerId)) return;
@@ -234,11 +270,22 @@ export default function PhotoStudio({ dims }: { dims: Dims }) {
     if (ptrs.current.size > 0) return;
     if (g.pinch) { g.pinch = 0; return; }
     const dx = e.clientX - g.x, dy = e.clientY - g.y, dt = Math.max(1, performance.now() - g.t);
+    setDragging(false);
     if (zoomRef.current.z <= 1 && g.moved) {
       const across = Math.abs(dx) > Math.abs(dy);
       const far = across ? Math.abs(dx) > 45 : Math.abs(dy) > 60;
       const fast = Math.max(Math.abs(dx), Math.abs(dy)) / dt > 0.4 && Math.max(Math.abs(dx), Math.abs(dy)) > 24;
-      if (far || fast) step((across ? dx : dy) < 0 ? 1 : -1, "swipe");
+      const d: 1 | -1 = (across ? dx : dy) < 0 ? 1 : -1;
+      const s = STOPS[stopRef.current];
+      if (frameNow.current?.phone && across && s.kind === "wall") {
+        // a phone: sideways is the next painting on this wall, then the next wall
+        const n = s.wall.works.length, k = focusRef.current;
+        if ((far || fast) && k + d >= 0 && k + d < n) { setFocus(k + d); setZoom(rest(s.wall, frameNow.current, k + d)); }
+        else if (far || fast) { setZoom(restNow()); step(d, "swipe"); }
+        else setZoom(restNow());
+        return;
+      }
+      if (far || fast) step(d, "swipe"); else setZoom(restNow());
       return;
     }
     // a double tap on the wall (not on a painting): look closer, or back
@@ -247,12 +294,12 @@ export default function PhotoStudio({ dims }: { dims: Dims }) {
       if (now - g.lastTap < 320) {
         g.lastTap = 0;
         const zc = zoomRef.current;
-        if (zc.z > 1) setZoom({ z: 1, x: 0, y: 0 });
+        if (zc.z > 1) setZoom(restNow());
         else { const z = 2.2; setZoom(clampZoom(z, e.clientX - (e.clientX - zc.x) * z, e.clientY - (e.clientY - zc.y) * z)); }
       } else g.lastTap = now;
     }
   };
-  const onPointerCancel = (e: React.PointerEvent) => { ptrs.current.delete(e.pointerId); gest.current.pinch = 0; };
+  const onPointerCancel = (e: React.PointerEvent) => { ptrs.current.delete(e.pointerId); gest.current.pinch = 0; setDragging(false); };
 
   // a link to one painting (/studio#work=<id>): to its wall, and open it there
   useEffect(() => {
@@ -282,6 +329,11 @@ export default function PhotoStudio({ dims }: { dims: Dims }) {
   const here = STOPS[stop];
   const frames = useMemo(() => (vp ? STOPS.map((s) => (s.kind === "wall" ? frameFor(s.wall, vp.W, vp.H) : null)) : []), [vp]);
   frameNow.current = frames[stop] ?? null;
+  const focusRef = useRef(focus);
+  focusRef.current = focus;
+  restRef.current = () => rest(here.kind === "wall" ? here.wall : null, frames[stop] ?? null, focusRef.current);
+  // a new wall, a new painting in focus, a turned screen: the wall comes to rest
+  useEffect(() => { setZoom(restRef.current()); }, [stop, focus, frames]);
   const phone = vp ? isPhone(vp.W) : false;
   const wallIndex = here.kind === "wall" ? WALLS.indexOf(here.wall) : -1;
   const roomNow = here.kind === "wall" ? here.wall.room : here.kind === "desk" ? "Her desk" : "";
@@ -321,7 +373,7 @@ export default function PhotoStudio({ dims }: { dims: Dims }) {
           const f = frames[i];
           if (!f) return null;
           const src = srcFor(s.wall, f);
-          const z = on ? zoom : { z: 1, x: 0, y: 0 };
+          const z = on ? zoom : rest(s.wall, f, i === leaving ? focus : 0);
           const covered = f.iw >= f.W - 1 && f.ih >= f.H - 1;
           // a plaque's widest: the space between its neighbours' centres
           const cx = s.wall.works.map((w) => (w.plaque[0] + w.plaque[2] / 2) * f.s + f.ox);
@@ -334,10 +386,17 @@ export default function PhotoStudio({ dims }: { dims: Dims }) {
                 // eslint-disable-next-line @next/next/no-img-element
                 <img className="ps-fill" src={src} alt="" aria-hidden="true" decoding="async" />
               )}
-              <div className="ps-layer" style={{ transform: `translate3d(${z.x}px,${z.y}px,0) scale(${z.z})` }} data-zoomed={z.z > 1 ? "1" : "0"}>
+              <div className="ps-layer" style={{ transform: `translate3d(${z.x}px,${z.y}px,0) scale(${z.z})` }} data-zoomed={z.z > 1 ? "1" : "0"} data-drag={on && dragging ? "1" : "0"}>
                 {/* eslint-disable-next-line @next/next/no-img-element */}
                 <img className="ps-photo" src={src} alt="" decoding="async" draggable={false}
                      style={{ left: f.ox, top: f.oy, width: f.iw, height: f.ih }} />
+                {/* the picture light pours down over the top of each canvas (off where the photo has it already) */}
+                {s.wall.glow !== false && s.wall.works.map((w) => {
+                  const [bx, by, bw, bh] = w.bbox;
+                  const ly = by - 60, gw = bw * 1.5;
+                  return <i key={`g-${w.id}`} className="ps-glow" aria-hidden="true"
+                            style={{ left: (bx + bw / 2 - gw / 2) * f.s + f.ox, top: ly * f.s + f.oy, width: gw * f.s, height: (60 + bh * 0.55) * f.s }} />;
+                })}
                 {s.wall.works.map((w) => {
                   const work = BY_ID.get(w.id)!;
                   const [bx, by, bw, bh] = w.bbox, [px, py, pw] = w.plaque;
@@ -377,7 +436,7 @@ export default function PhotoStudio({ dims }: { dims: Dims }) {
 
       {/* the room's name and its line (ours, never hers): above the wall on a phone, in the dock on a wide screen */}
       {here.kind === "wall" && phone && (
-        <div className="ps-title" key={`t-${here.wall.room}`}>
+        <div className="ps-title" key={`t-${here.wall.room}`} data-on={titleOn ? "1" : "0"}>
           <h1 className="ps-room">{here.wall.room}</h1>
           {roomLine(here.wall.room) && <p className="ps-line">{roomLine(here.wall.room)}</p>}
         </div>
@@ -417,8 +476,8 @@ export default function PhotoStudio({ dims }: { dims: Dims }) {
             )}
             {!phone && here.kind === "desk" && <span className="ps-cap-room">Her desk</span>}
             <span className="ps-cap-count">
-              {here.kind === "wall" ? `Wall ${wallIndex + 1} of ${WALL_COUNT}` : here.kind === "desk" ? "The end of the walk" : ""}
-              {phone && here.kind === "wall" ? " · Tap a painting" : ""}
+              {here.kind === "wall" ? `${phone ? `${here.wall.room} · ` : ""}Wall ${wallIndex + 1} of ${WALL_COUNT}` : here.kind === "desk" ? "The end of the walk" : ""}
+              {phone && here.kind === "wall" && here.wall.works.length > 1 ? ` · Painting ${focus + 1} of ${here.wall.works.length}` : ""}
             </span>
           </div>
           <button type="button" className="ps-arrow ps-arrow-next" onClick={() => step(1, "next")} disabled={!nextStop}

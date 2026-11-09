@@ -11,12 +11,13 @@ import { BY_ID } from "./works";
  */
 export type Box = [number, number, number, number];
 export type WallWork = { id: string; bbox: Box; plaque: Box };
-export type Wall = { id: string; room: string; tone: "light" | "dark"; image: string; works: WallWork[] };
+/** `glow: false`: the photo already has the picture lights' pool baked in, so the code overlay is off */
+export type Wall = { id: string; room: string; tone: "light" | "dark"; image: string; glow: boolean; works: WallWork[] };
 
 /** the walk's rooms, in order (only the ones with a wall appear) */
 export const ROOM_ORDER = ["Onset of Spring", "Faith", "Bandh Darwaze", "Gone Are The Days", "Portraits"] as const;
 
-type RawWall = { id: string; room: string; tone?: string; image: string; works: { id: string; bbox: number[]; plaque?: number[] }[] };
+type RawWall = { id: string; room: string; tone?: string; image: string; glow?: boolean; works: { id: string; bbox: number[]; plaque?: number[] }[] };
 const raw = RAW as unknown as { space: [number, number]; walls: RawWall[] };
 
 export const SPACE = raw.space;
@@ -28,6 +29,7 @@ export const WALLS: Wall[] = raw.walls
     room: w.room,
     tone: (w.tone === "light" || w.tone === "dark" ? w.tone : DARK_ROOMS.has(w.room) ? "dark" : "light") as Wall["tone"],
     image: w.image,
+    glow: w.glow !== false,
     works: w.works.filter((x) => BY_ID.has(x.id)).map((x) => {
       const b = x.bbox as Box;
       // no plaque measured yet: centred about 40 px below the frame
