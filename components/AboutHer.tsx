@@ -12,7 +12,8 @@ import { askPath } from "@/lib/studio-ask";
 const HEADING = "An artist who makes the everyday memorable";
 const CREDITS = "Eighteen exhibitions and art fairs, 2005–2018 · Collectors in India, the USA and the UK";
 
-const ORDER = ["ihc-press-01", "tv-ncr-2010", "delhi-times", "ihc-press-06", "ihc-press-03", "tv-archive"];
+// three tiles, in this order (Shubham, 9 Nov 2026)
+const ORDER = ["ihc-press-01", "tv-ncr-2010", "delhi-times"];
 const ITEMS: PressItem[] = ORDER.map((id) => PRESS_ALL.find((p) => p.id === id)).filter((p): p is PressItem => !!p);
 
 /** a clip is a poster until it is tapped; only then is the video fetched. Muted: sound is her visitor's to turn on. */

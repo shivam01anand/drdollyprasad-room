@@ -226,3 +226,9 @@
     .pnx-t{font-size:28px !important}
   }
 }
+
+/* 9 Nov 2026: the past-tense show note on a painting's page is a quiet line, not a banner */
+@layer final {
+  .show-note,.pp-text p.show-note{background:none !important;color:var(--muted) !important;padding:0 !important;margin:2px 0 16px !important;
+    font:400 14px/1.5 var(--sans) !important}
+}

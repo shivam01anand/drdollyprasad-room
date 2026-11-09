@@ -371,3 +371,12 @@ html[data-motion="paused"] *,html[data-motion="paused"] *::before,html[data-moti
   .hw-pi{grid-template-columns:88px 1fr}
   .hw-pi-img,.hw-pi-img img{width:88px;height:66px}
 }
+
+/* 9 Nov 2026: her latest exhibition. The lede on its Exhibitions row; the home strip says "Latest", not "Live" */
+.ex-ch .ex-ch-lede{margin:0 0 12px;font-family:var(--sans);font-size:16px;line-height:1.6;color:var(--ink);max-width:34em;text-wrap:pretty}
+.latest-strip .live{background:transparent !important;color:var(--dark-muted) !important;padding:0 !important;
+  font-family:var(--sans);font-size:12.5px;letter-spacing:.02em}
+.show-note a{color:inherit;text-decoration:underline;text-underline-offset:3px;text-decoration-thickness:1px}
+/* the past-tense show note: a quiet line, not a banner (the show closed 21 Oct 2026) */
+.show-note{background:none !important;color:var(--muted,#6A615B) !important;padding:0 !important;margin:2px 0 16px !important;font-size:14px !important;line-height:1.5 !important}
+.show-note a:hover{color:var(--red,#D4202A)}

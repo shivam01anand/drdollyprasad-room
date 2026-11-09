@@ -7,14 +7,15 @@ import "@fontsource/jost/500.css";
 import WELCOME_FONTS from "@/lib/welcome-fonts.json";
 import "../fonts.css";
 import "../globals.css";
+import "./photo.css";
 
 export const metadata: Metadata = {
   title: "The studio",
-  description: "Walk through Dr Dolly Prasad’s studio: a courtyard, a quiet room, a red room and a gallery, with her paintings on the walls.",
+  description: "Dr Dolly Prasad’s paintings, hung by series on the walls of her studio. Tap a painting to look closer.",
   alternates: { canonical: "/studio" },
 };
 
-/** the 3D house, as it was the whole site: its own fonts and styles, loaded only here */
+/** the studio (photo walls; the 3D house is kept at /studio/house): its own fonts and styles, loaded only here */
 export default function StudioLayout({ children }: { children: React.ReactNode }) {
   return (
     <>

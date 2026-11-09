@@ -8,7 +8,7 @@ import HashRedirect from "@/components/site/HashRedirect";
 import Marquee from "@/components/site/Marquee";
 import IgRoll from "@/components/site/IgRoll";
 import {
-  BIO_LINE, BIO_SUB, EMAIL, INSTAGRAM, NOW, NOW_SHOWING_CONFIRMED, PORTRAIT, SERIES_PAGES, SHOWS, SITE, STUDIO_PATH, worksIn,
+  BIO_LINE, BIO_SUB, EMAIL, INSTAGRAM, LATEST_SHOW_ID, NOW, NOW_SHOWING_CONFIRMED, PORTRAIT, SERIES_PAGES, SHOWS, SITE, STUDIO_PATH, worksIn,
   LEAD,
 } from "@/lib/site";
 import { BY_ID } from "@/lib/works";
@@ -33,12 +33,14 @@ const IG = ["patterned-turban-portrait", "bulls-and-wheel", "temple-bells", "red
 const now = NOW;
 // R4 fix 7 (Brand P1-5): "On the walls" reads newest first, in the one SHOWS order (Kala Mela first)
 const CARDS = [
+  { id: "sacred-fragments-2026", src: "/site/ex/sf-with-paintings.jpg", alt: "Dr Dolly Prasad beside Under Canopy of Greens and Threads of Faith at India Habitat Centre, 2026" },
   { id: "india-habitat-centre-2010", src: "/site/ex/ihc-03.jpg", alt: "Dr Dolly Prasad lights the lamp at the opening at India Habitat Centre" },
   { id: "a-lifetime-to-paint", src: "/site/ex/iccr-speech.jpg", alt: "Dr Dolly Prasad speaks at the opening of A Lifetime to Paint, ICCR" },
   { id: "kala-mela-2018", src: "/site/ex/kala-dolly.jpg", alt: "Dr Dolly Prasad beside her painting at the First International Kala Mela" },
 ].sort((a, b) => SHOWS.findIndex((x) => x.id === a.id) - SHOWS.findIndex((x) => x.id === b.id));
 
 export default function Home() {
+  const latest = SHOWS.find((s) => s.id === LATEST_SHOW_ID);
   const total = SERIES_PAGES.reduce((n, s) => n + worksIn(s.label).length, 0);
   return (
     <>
@@ -53,6 +55,17 @@ export default function Home() {
           <span className="live"><i aria-hidden="true" />Live now</span><b><span className="nw-long">{now.title}</span><span className="nw-short">{now.title.split(":")[0]}</span></b><span className="nw-where">{now.venue}, {now.city} · {now.when}</span><span className="nw-short nw-when">IHC · 18 to 21 Oct</span><u>See the show →</u>
         </Link>
       </Until>}
+
+      {/* her latest exhibition, past tense (it closed 21 Oct 2026): one quiet line to its page */}
+      {latest && (
+        <Link className="nowstrip latest-strip" href={`/exhibitions#${latest.id}`}>
+          <span className="live">Latest exhibition</span>
+          <b><span className="nw-long">{latest.name}</span><span className="nw-short">{latest.name?.split(":")[0]}</span></b>
+          <span className="nw-where">{latest.venue}, {latest.city} · {latest.when}</span>
+          <span className="nw-short nw-when">IHC · Oct 2026</span>
+          <u>See the show →</u>
+        </Link>
+      )}
 
       <div className="layer band-indigo">
       <section className="sec wrap">
