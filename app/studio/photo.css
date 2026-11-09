@@ -1,0 +1,133 @@
+/* =============================================================================
+   The photo studio (components/PhotoStudio.tsx, 8 Nov 2026): one photographed wall per screen.
+   Kajal #211B18, Khadi #F5F4F0, one red #D4202A. Cormorant for names, Jost for small text.
+   ========================================================================== */
+html[data-photo-studio],html[data-photo-studio] body{height:100%;overflow:hidden;overscroll-behavior:none;background:#211B18}
+
+.ps{position:fixed;inset:0;overflow:hidden;background:#211B18;color:#F5F4F0;-webkit-tap-highlight-color:transparent}
+.ps-stage{position:absolute;inset:0;touch-action:none;user-select:none;-webkit-user-select:none}
+
+/* a scene: the wall in front fades in and slides a little, the one left fades out */
+.ps-scene{position:absolute;inset:0;overflow:hidden;opacity:0;visibility:hidden;
+  transition:opacity .45s cubic-bezier(.22,1,.36,1),transform .55s cubic-bezier(.22,1,.36,1),visibility 0s linear .55s}
+.ps-scene[data-state="on"]{opacity:1;visibility:visible;transform:none;transition-delay:0s;z-index:2}
+.ps-scene[data-state="off"]{z-index:1}
+.ps-scene[data-state="next"]{transform:translateX(2.5%)}
+.ps-scene.ps-wall[data-state="on"]{animation:ps-in .55s cubic-bezier(.22,1,.36,1)}
+.ps-scene.ps-wall[data-state="on"][data-dir="-1"]{animation-name:ps-in-back}
+@keyframes ps-in{from{transform:translateX(2.5%)}to{transform:none}}
+@keyframes ps-in-back{from{transform:translateX(-2.5%)}to{transform:none}}
+@media (prefers-reduced-motion:reduce){ .ps-scene,.ps-scene[data-state]{transition:opacity .2s linear,visibility 0s linear .2s;animation:none;transform:none} }
+
+/* the photograph's own light, blurred, where it does not reach the edge of the screen */
+.ps-fill{position:absolute;inset:-40px;width:calc(100% + 80px);height:calc(100% + 80px);object-fit:cover;filter:blur(28px) brightness(.42) saturate(.9);transform:scale(1.08)}
+.ps-layer{position:absolute;inset:0;transform-origin:0 0;transition:transform .28s cubic-bezier(.22,1,.36,1);will-change:transform}
+.ps-stage:active .ps-layer[data-zoomed="1"]{transition:none}
+.ps-photo{position:absolute;display:block;max-width:none;pointer-events:none;
+  box-shadow:0 0 0 1px rgba(0,0,0,.25)}
+.ps[data-phone="1"] .ps-photo{box-shadow:0 30px 60px -20px rgba(0,0,0,.6),0 0 0 1px rgba(245,244,240,.06)}
+
+/* a painting's tap area, with a soft glow on hover */
+.ps-hit{position:absolute;padding:0;margin:0;border:0;background:transparent;cursor:pointer;border-radius:1px;
+  transition:box-shadow .35s ease,background-color .35s ease}
+@media (hover:hover) and (pointer:fine){
+  .ps-hit:hover{box-shadow:0 0 0 1px rgba(245,236,214,.55),0 0 34px 6px rgba(255,226,170,.28);background:rgba(255,240,210,.04)}
+}
+.ps-hit:focus-visible{outline:2px solid #D4202A;outline-offset:4px}
+
+/* the title plaques: Khadi with Kajal on a light wall; cream on antique brass on a dark one */
+.ps-plaque{position:absolute;margin:0;width:max-content;box-sizing:border-box;transform:translateX(-50%);pointer-events:none;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;
+  padding:.32em .9em .36em;border-radius:1.5px;
+  font-family:"Cormorant Garamond","Cormorant Garamond Fallback",Georgia,serif;font-weight:600;line-height:1.1;letter-spacing:.015em;
+  background:rgba(245,244,240,.95);color:#211B18;
+  box-shadow:0 0 0 1px rgba(33,27,24,.14),0 3px 8px -3px rgba(33,27,24,.4)}
+.ps-wall[data-tone="dark"] .ps-plaque{color:#F5F4F0;text-shadow:0 1px 0 rgba(0,0,0,.35);
+  background:
+    repeating-linear-gradient(90deg,rgba(255,255,255,.035) 0 1px,rgba(0,0,0,.03) 1px 3px),
+    linear-gradient(160deg,#8a7046 0%,#6e5733 45%,#5a4628 100%);
+  box-shadow:inset 0 1px 0 rgba(255,236,190,.28),inset 0 -1px 0 rgba(0,0,0,.3),0 0 0 1px rgba(20,14,8,.5),0 4px 10px -4px rgba(0,0,0,.7)}
+.ps[data-phone="1"] .ps-plaque{white-space:normal;text-align:center;padding:.3em .6em .34em}
+
+/* the opening: Woman with Poppies, and the welcome */
+.ps-open{display:flex;flex-direction:column;align-items:center;justify-content:flex-start;padding:76px 20px 0;box-sizing:border-box}
+.ps-welcome{margin:0 0 18px;display:flex;flex-direction:column;align-items:center;gap:2px;text-align:center;color:#F5F4F0}
+.ps-welcome span:first-child{font-family:"Tiro Devanagari Hindi","Noto Serif Devanagari","Cormorant Garamond",serif;font-size:26px;line-height:1.2}
+.ps-welcome span:last-child{font-family:"Cormorant Garamond",Georgia,serif;font-style:italic;font-weight:500;font-size:18px;color:rgba(245,244,240,.78)}
+.ps-open-art{display:block;width:auto;height:auto;max-width:min(92vw,560px);max-height:calc(100svh - 336px - 150px);cursor:zoom-in;
+  box-shadow:0 30px 60px -24px rgba(0,0,0,.75),0 0 0 1px rgba(245,244,240,.08)}
+@media (min-width:761px){
+  .ps-open{padding:0 6vw 0 480px;justify-content:center}
+  .ps-welcome span:first-child{font-size:30px}
+  .ps-welcome span:last-child{font-size:21px}
+  .ps-open-art{max-width:100%;max-height:calc(100svh - 230px)}
+}
+
+/* her desk: the last wall, dimmed, under the card */
+.ps-desk-bg{position:absolute;inset:0;width:100%;height:100%;object-fit:cover;filter:blur(18px) brightness(.38);transform:scale(1.06)}
+.ps-deskwrap .walk-panel.desk{left:50%;top:50%;bottom:auto;transform:translate(-50%,calc(-50% + 8px));z-index:60;
+  width:min(26rem,calc(100vw - 32px));box-sizing:border-box;max-height:none}
+.ps-deskwrap .walk-panel.desk[data-on="1"]{transform:translate(-50%,-50%)}
+
+/* the header: the way out, and the music */
+.ps-head{position:fixed;z-index:170;top:0;left:0;right:0;display:flex;justify-content:space-between;align-items:center;
+  padding:12px 14px;pointer-events:none}
+.ps-head>*{pointer-events:auto}
+.ps-exit,.ps-music{display:inline-flex;align-items:center;gap:8px;height:40px;padding:0 16px 0 12px;border-radius:20px;border:0;cursor:pointer;
+  background:rgba(245,244,240,.92);color:#211B18;text-decoration:none;font:500 14px/1 "Jost",Arial,sans-serif;
+  box-shadow:0 0 0 1px rgba(33,27,24,.1),0 6px 16px -8px rgba(0,0,0,.5);-webkit-backdrop-filter:blur(8px);backdrop-filter:blur(8px)}
+.ps-music{padding:0 14px 0 12px;font-size:13px;color:#3A302B}
+.ps-exit:hover,.ps-music:hover{background:#211B18;color:#F5F4F0}
+.ps-exit svg,.ps-music svg{width:18px;height:18px;fill:none;stroke:currentColor;stroke-width:1.7;stroke-linecap:round;stroke-linejoin:round}
+@media (max-width:760px){ .ps-music span{display:none} .ps-music{padding:0;width:40px;justify-content:center} }
+@media (min-width:761px){ .ps-head{padding:18px 24px} }
+
+/* a phone: the room's name and line above the wall */
+.ps-title{position:fixed;z-index:20;left:0;right:0;top:70px;padding:0 24px;text-align:center;pointer-events:none;animation:ps-fade .5s ease}
+.ps-room{margin:0;font-family:"Cormorant Garamond",Georgia,serif;font-weight:600;font-size:32px;line-height:1.05;color:#F5F4F0}
+.ps-line{margin:6px 0 0;font:400 14px/1.4 "Jost",Arial,sans-serif;color:rgba(245,244,240,.74)}
+@keyframes ps-fade{from{opacity:0;transform:translateY(6px)}to{opacity:1;transform:none}}
+
+/* wide screens: a quiet arrow at each side */
+.ps-side{position:fixed;z-index:30;top:50%;width:52px;height:52px;margin-top:-26px;border-radius:50%;border:0;cursor:pointer;display:grid;place-items:center;
+  background:rgba(245,244,240,.16);color:#F5F4F0;-webkit-backdrop-filter:blur(6px);backdrop-filter:blur(6px);
+  box-shadow:0 0 0 1px rgba(245,244,240,.22);transition:background .2s ease,color .2s ease}
+.ps[data-tone="light"] .ps-side{background:rgba(245,244,240,.55);color:#211B18;box-shadow:0 0 0 1px rgba(33,27,24,.12)}
+.ps-side:hover{background:#F5F4F0;color:#211B18}
+.ps-side svg{width:24px;height:24px;fill:none;stroke:currentColor;stroke-width:1.6;stroke-linecap:round;stroke-linejoin:round}
+.ps-side-prev{left:22px}.ps-side-next{right:22px}
+
+/* the dock */
+.ps-dock{position:fixed;z-index:40;left:50%;bottom:16px;transform:translateX(-50%);box-sizing:border-box;width:min(720px,calc(100vw - 32px));
+  padding:12px 14px 10px;border-radius:18px;background:rgba(245,244,240,.95);color:#211B18;
+  box-shadow:0 0 0 1px rgba(33,27,24,.1),0 18px 40px -20px rgba(0,0,0,.7);-webkit-backdrop-filter:blur(10px);backdrop-filter:blur(10px);
+  transition:opacity .3s ease,transform .3s ease,visibility 0s linear 0s}
+.ps-dock[data-on="0"]{opacity:0;visibility:hidden;transform:translate(-50%,14px);transition:opacity .2s ease,transform .2s ease,visibility 0s linear .2s}
+.ps-row{display:grid;grid-template-columns:auto 1fr auto;align-items:center;gap:14px}
+.ps-arrow{display:inline-flex;align-items:center;justify-content:center;gap:10px;min-width:44px;height:44px;padding:0 12px;border-radius:22px;border:0;cursor:pointer;
+  background:transparent;color:#211B18;box-shadow:inset 0 0 0 1.2px rgba(33,27,24,.22);font:500 14px/1 "Jost",Arial,sans-serif;white-space:nowrap}
+.ps-arrow-next{background:#211B18;color:#F5F4F0;box-shadow:none;padding:0 14px 0 18px}
+.ps-arrow:hover:not(:disabled){background:#3A302B;color:#F5F4F0}
+.ps-arrow:disabled{opacity:.3;cursor:default}
+.ps-arrow svg{width:20px;height:20px;fill:none;stroke:currentColor;stroke-width:1.7;stroke-linecap:round;stroke-linejoin:round;flex:none}
+.ps-cap{display:flex;flex-direction:column;align-items:center;text-align:center;min-width:0;gap:1px}
+.ps-cap-room{font-family:"Cormorant Garamond",Georgia,serif;font-weight:600;font-size:24px;line-height:1.1}
+.ps-cap-line{font:400 13.5px/1.35 "Jost",Arial,sans-serif;color:#3A302B}
+.ps-cap-count{font:400 12px/1.4 "Jost",Arial,sans-serif;color:#6A615B}
+.ps-rail{list-style:none;margin:10px 0 0;padding:8px 0 0;border-top:1px solid rgba(33,27,24,.1);display:flex;justify-content:center;gap:4px;
+  overflow-x:auto;scrollbar-width:none}
+.ps-rail::-webkit-scrollbar{display:none}
+.ps-rail li{flex:none}
+.ps-rail button{height:32px;padding:0 10px;border:0;border-radius:16px;background:none;cursor:pointer;color:#6A615B;
+  font:400 13px/1 "Jost",Arial,sans-serif;white-space:nowrap}
+.ps-rail button:hover{color:#211B18;background:rgba(33,27,24,.06)}
+.ps-rail button[aria-current="location"]{color:#211B18;font-weight:500;box-shadow:inset 0 -1.5px 0 #211B18;border-radius:0}
+@media (max-width:760px){
+  .ps-dock{left:0;right:0;bottom:0;width:auto;transform:none;border-radius:18px 18px 0 0;padding:10px 12px calc(8px + env(safe-area-inset-bottom,0px))}
+  .ps-dock[data-on="0"]{transform:translateY(14px)}
+  .ps-row{gap:8px}
+  .ps-arrow-next{padding:0 12px}
+  .ps-rail{justify-content:flex-start;margin-top:8px;padding-top:6px}
+  .ps-rail button{height:36px}
+}
+@media (max-height:520px) and (min-width:761px){ .ps-rail{display:none} .ps-dock{bottom:8px;padding:8px 12px} .ps-cap-line{display:none} }
+.ps[data-zoomed="1"] .ps-title{opacity:0;transition:opacity .2s ease}

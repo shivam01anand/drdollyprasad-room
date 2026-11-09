@@ -1,0 +1,69 @@
+{
+  "space": [2400, 1350],
+  "walls": [
+    {
+      "id": "onset-spring-pair",
+      "room": "Onset of Spring",
+      "tone": "light",
+      "image": "/studio/onset-spring-pair",
+      "works": [
+        {
+          "id": "woman-with-bird",
+          "bbox": [811, 258, 344, 344],
+          "plaque": [843, 642, 280, 60]
+        },
+        {
+          "id": "woman-with-red-flower",
+          "bbox": [1252, 258, 335, 344],
+          "plaque": [1280, 642, 280, 60]
+        }
+      ]
+    },
+    {
+      "id": "faith-triptych",
+      "room": "Faith",
+      "tone": "dark",
+      "image": "/studio/faith-triptych",
+      "works": [
+        {
+          "id": "sacred-tree",
+          "bbox": [453, 165, 535, 537],
+          "plaque": [580, 742, 280, 60]
+        },
+        {
+          "id": "prayer-and-scripture",
+          "bbox": [1066, 167, 402, 535],
+          "plaque": [1127, 742, 280, 60]
+        },
+        {
+          "id": "offering-of-light",
+          "bbox": [1543, 167, 401, 535],
+          "plaque": [1604, 742, 280, 60]
+        }
+      ]
+    },
+    {
+      "id": "portraits-trio",
+      "room": "Portraits",
+      "tone": "dark",
+      "image": "/studio/portraits-trio",
+      "works": [
+        {
+          "id": "red-turban-portrait",
+          "bbox": [571, 283, 356, 353],
+          "plaque": [609, 676, 280, 60]
+        },
+        {
+          "id": "yellow-turban-portrait",
+          "bbox": [1017, 281, 360, 357],
+          "plaque": [1057, 678, 280, 60]
+        },
+        {
+          "id": "patterned-turban-portrait",
+          "bbox": [1468, 282, 361, 355],
+          "plaque": [1508, 677, 280, 60]
+        }
+      ]
+    }
+  ]
+}
