@@ -13,15 +13,18 @@ import { dims } from "@/lib/images";
 
 export const metadata: Metadata = {
   title: "Exhibitions",
-  description: "Dr Dolly Prasad’s exhibitions: eighteen exhibitions and art fairs, 2005 to 2018, including India Habitat Centre (2010), A Lifetime to Paint at ICCR (2010), the First International Kala Mela (2018) and more.",
+  description: "Dr Dolly Prasad’s exhibitions: eighteen exhibitions and art fairs, 2005 to 2018, including Sacred Fragments: A Journey Home at India Habitat Centre (2026), India Habitat Centre (2010), A Lifetime to Paint at ICCR (2010), the First International Kala Mela (2018) and more.",
   alternates: { canonical: "/exhibitions" },
 };
 
 const years = [...new Set(RECORD.map((r) => r.year))];
 // R6 (Shubham, 20 Oct 22:50): his order on this page beats newest-first: India Habitat Centre, then the press,
 // then A Lifetime to Paint, then Kala Mela. SHOWS itself stays newest first for every other listing.
-const ORDER = ["india-habitat-centre-2010", "a-lifetime-to-paint", "kala-mela-2018"];
+// 9 Nov 2026: her latest show, Sacred Fragments (2026), goes first
+const ORDER = ["sacred-fragments-2026", "india-habitat-centre-2010", "a-lifetime-to-paint", "kala-mela-2018"];
 const shows = ORDER.map((id) => SHOWS.find((s) => s.id === id)!);
+/** the press band follows India Habitat Centre 2010, as Shubham ordered it (R6) */
+const PRESS_AFTER = "india-habitat-centre-2010";
 const AFTER_FIRST = "press";
 
 export default function Exhibitions() {
@@ -52,7 +55,7 @@ export default function Exhibitions() {
         {shows.map((s, k) => (
           <Fragment key={s.id}>
             <a href={`#${s.id}`}><span>{s.year}</span>{s.name ?? s.title}</a>
-            {k === 0 && <a href={`#${AFTER_FIRST}`}><span>Press</span>In the press</a>}
+            {s.id === PRESS_AFTER && <a href={`#${AFTER_FIRST}`}><span>Press</span>In the press</a>}
           </Fragment>
         ))}
         <a href="#record"><span>2005–18</span>List of exhibitions</a>
@@ -74,8 +77,9 @@ export default function Exhibitions() {
                            <h2 id={`${s.id}-h`}>{s.name ?? s.title}</h2>
                            <p className="ex-ch-where">{s.where ?? `${s.venue}, ${s.city} · ${s.when}`}</p>
                          </header>
-                         {(s.quote || s.note) && (
+                         {(s.quote || s.note || s.showLede) && (
                            <div className="ex-ch-txt">
+                             {s.showLede && <p className="ex-ch-lede">{s.lede}</p>}
                              {s.quote && (
                                <figure className="ex-quote">
                                  <blockquote>“{s.quote}”</blockquote>
@@ -87,7 +91,7 @@ export default function Exhibitions() {
                          )}
                        </>} />
           </section>
-          {k === 0 && (
+          {s.id === PRESS_AFTER && (
             <section id="press" className="ex-press band-indigo" aria-labelledby="press-h">
               <span id="on-screen" aria-hidden="true" />
               <div className="sec-head">

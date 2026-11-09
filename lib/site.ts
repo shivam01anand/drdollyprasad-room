@@ -345,6 +345,8 @@ export type Show = {
   lede: string;
   /** her words, verbatim, where they belong to this show */
   quote?: string;
+  /** show the lede on the Exhibitions page (the newest show; the older rows stay compact, R6) */
+  showLede?: boolean;
   note?: string;
   albums: Album[];
   clips?: Clip[];
@@ -377,6 +379,11 @@ const CAP: Record<string, string> = {
   "kala-painting": "The Cart-Man and the Rupaya, Kala Mela",
   "kala-selfie": "A visitor’s selfie with the paintings, Kala Mela",
   "kala-booklet": "The First International Kala Mela booklet",
+  "sf-with-paintings": "Dr Dolly Prasad with her two paintings, Visual Arts Gallery",
+  "sf-poster": "At the Sacred Fragments poster, India Habitat Centre",
+  "sf-flowers": "Flowers in hand, beside Threads of Faith",
+  "sf-gallery": "The Visual Arts Gallery, her two paintings on the left wall",
+  "sf-passing": "A visitor walks past the two paintings",
 };
 const ph = (n: string, alt: string): Photo => ({ src: `/site/ex/${n}.jpg`, alt, ...(CAP[n] ? { cap: CAP[n] } : {}) });
 
@@ -397,6 +404,26 @@ export const NOW = {
 
 /** the shows as first recorded (the Exhibitions hero wall keeps this column order and its tones) */
 export const SHOWS_AS_RECORDED: Show[] = [
+  {
+    // her latest show (9 Nov 2026): title, venue and dates from the poster and her Instagram post of 19 Oct 2026;
+    // photographs from 06_EXHIBITION_PHOTOS/New exhibition pics, unaltered (edges trimmed 1%). Copy record:
+    // studio-review/copy/EXHIBITION_2026.md. Not in RECORD: that list is hers, 2005 to 2018.
+    id: "sacred-fragments-2026", title: "India Habitat Centre", name: "Sacred Fragments: A Journey Home", kind: "Art exhibition",
+    where: "Visual Arts Gallery, India Habitat Centre, New Delhi · 18 to 21 October 2026",
+    venue: "Visual Arts Gallery, India Habitat Centre", city: "New Delhi", when: "18 to 21 October 2026", year: "2026",
+    lede: "Four days in October, and two of her newest paintings side by side on a white wall at India Habitat Centre. Threads of Faith, all red threads and temple bells, and Under Canopy of Greens, a boy steadying a bunch of bananas beneath wide green leaves. She stood beside them, flowers in hand.",
+    showLede: true,
+    works: ["temple-bells", "boy-with-bananas"],
+    albums: [
+      { title: "The show", line: "18 to 21 October 2026, Visual Arts Gallery.", photos: [
+        ph("sf-with-paintings", "Dr Dolly Prasad stands beside Under Canopy of Greens and Threads of Faith on the gallery wall."),
+        ph("sf-poster", "Dr Dolly Prasad beside the Sacred Fragments: A Journey Home poster in the courtyard of India Habitat Centre."),
+        ph("sf-flowers", "Dr Dolly Prasad holds a bouquet beside Threads of Faith, with Under Canopy of Greens to the left."),
+        ph("sf-gallery", "The Visual Arts Gallery at India Habitat Centre, with Under Canopy of Greens and Threads of Faith on the left wall."),
+        ph("sf-passing", "A visitor walks past Under Canopy of Greens and Threads of Faith."),
+      ] },
+    ],
+  },
   {
     id: "india-habitat-centre-2010", title: "India Habitat Centre", kind: "Exhibition", where: "Open Palm Court, India Habitat Centre, New Delhi · November 2010",
     venue: "Open Palm Court, India Habitat Centre", city: "New Delhi", when: "November 2010", year: "2010",
@@ -464,7 +491,7 @@ export const showKey = (sh: { year: string; when: string }) => {
   const m = sh.when.toLowerCase().match(new RegExp(MONTHS.join("|"), "g"));
   return Number(sh.year) * 100 + (m ? MONTHS.indexOf(m[m.length - 1]) + 1 : 0);
 };
-/** R4 fix 7 (Brand P1-5, "latest first"): the one sorted source, newest first: Kala Mela 2018, India Habitat Centre
+/** R4 fix 7 (Brand P1-5, "latest first"): the one sorted source, newest first: Sacred Fragments 2026, Kala Mela 2018, India Habitat Centre
  *  Nov 2010, A Lifetime to Paint June 2010. Every listing of the shows reads this (Exhibitions sets its own order, R6). */
 export const SHOWS: Show[] = [...SHOWS_AS_RECORDED].sort((a, b) => showKey(b) - showKey(a));
 
@@ -499,6 +526,9 @@ export const RECORD: RecordEntry[] = [
   { year: "2005", venue: "Indraprastha Art Gallery", city: "New Delhi" },
   { year: "2005", venue: "Sriram Centre", city: "New Delhi" },
 ];
+
+/** her latest show, for the home page strip */
+export const LATEST_SHOW_ID = "sacred-fragments-2026";
 
 export const RECORD_LINE = "Eighteen exhibitions and art fairs, 2005 to 2018";
 

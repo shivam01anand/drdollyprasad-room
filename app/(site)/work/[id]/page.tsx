@@ -3,7 +3,7 @@ import Link from "next/link";
 import IndigoBand from "@/components/site/IndigoBand";
 import { notFound } from "next/navigation";
 import { BY_ID, LARGE, SHOW, SITE, WORKS, inchDims, quoted, workPath, type Work } from "@/lib/works";
-import { INSTAGRAM, LOOK, NOW_SHOWING_CONFIRMED, PULL, SERIES_BY_SLUG, SHOWS, SMALL_PHOTO, showKey, shownYear, statusText, STUDIO_PATH, WHATSAPP, WORDS, enquireHref, labelLine, neighbours, seriesPath, whatsappHref, worksIn } from "@/lib/site";
+import { INSTAGRAM, LOOK, PULL, SERIES_BY_SLUG, SHOWS, SMALL_PHOTO, showKey, shownYear, statusText, STUDIO_PATH, WHATSAPP, WORDS, enquireHref, labelLine, neighbours, seriesPath, whatsappHref, worksIn } from "@/lib/site";
 import PrevNext from "@/components/site/PrevNext";
 import manifest from "@/public/art/manifest.json";
 import Card from "@/components/site/Card";
@@ -11,7 +11,6 @@ import PaintingStage from "@/components/site/PaintingStage";
 import WpBar from "@/components/site/WpBar";
 import Tabs from "@/components/site/Tabs";
 import Share from "@/components/Share";
-import Until from "@/components/Until";
 import { ChatIcon, InstagramIcon } from "@/components/site/Icons";
 
 /**
@@ -131,9 +130,7 @@ export default async function WorkPage({ params }: Props) {
           {lead && words && <p className="pp-attr">Dr Dolly Prasad</p>}
           <p className="pp-status"><span className={`status st-${sold ? "sold" : w.status === "Enquire" ? "enquire" : "free"}`}><i aria-hidden="true" />{sold ? "In a private collection" : statusText(w)}</span></p>
           {!sold && <p className="pp-price">Prices on request.</p>}
-          {NOW_SHOWING_CONFIRMED && SHOW.works.includes(id) && (
-            <Until until={SHOW.until}><p className="show-note">{SHOW.line}</p></Until>
-          )}
+          {SHOW.works.includes(id) && <p className="show-note"><Link href={SHOW.href}>{SHOW.line}</Link></p>}
           <div className="pp-ctas">
             <Link className="btn btn-solid" href={enquireHref(w)}>{sold ? "Ask about her work" : "Enquire about this painting"}</Link>
             {WHATSAPP && <a className="btn" href={whatsappHref(w)}><ChatIcon />WhatsApp</a>}

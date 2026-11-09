@@ -137,7 +137,8 @@ export const LARGE = new Set([
 /** her exhibition, while it is on: her words as the Threads of Faith chapter gives them, and the
  *  works she is showing there */
 export const SHOW = {
-  line: "Showing at Sacred Fragments: A Journey Home, Visual Arts Gallery, India Habitat Centre, New Delhi, 18 to 21 October 2026.",
+  line: "Shown at Sacred Fragments: A Journey Home, Visual Arts Gallery, India Habitat Centre, New Delhi, 18 to 21 October 2026.",
+  href: "/exhibitions#sacred-fragments-2026",
   until: "2026-10-21",
   works: ["temple-bells", "boy-with-bananas"],
 };
