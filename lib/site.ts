@@ -317,8 +317,9 @@ export const enquireHref = (w?: Work) => (w ? `/enquire?work=${w.id}` : "/enquir
 
 /**
  * From the exhibition archive (Project Memory/exhibitions-master.json and the
- * exhibition post records, 18 Oct 2026). Her own record lists eighteen
- * exhibitions and art fairs, 2005 to 2018; it does not say which were solo, so
+ * exhibition post records, 18 Oct 2026). Her record lists nineteen
+ * exhibitions and art fairs, 2005 to 2026 (Sacred Fragments, Oct 2026, added on the
+ * owner's confirmation); it does not say which were solo, so
  * nothing here calls them all solo. Dates are given only as precisely as the
  * record gives them.
  */
@@ -479,6 +480,7 @@ export const PRESS = {
 /** her record, as she lists it (drdollyprasad.wordpress.com/about), newest first */
 export type RecordEntry = { year: string; month?: string; venue: string; city: string; show?: string };
 export const RECORD: RecordEntry[] = [
+  { year: "2026", month: "October", venue: "Sacred Fragments: A Journey Home, Visual Arts Gallery, India Habitat Centre", city: "New Delhi" },
   { year: "2018", month: "October", venue: "International Art Fair", city: "Jaipur" },
   { year: "2018", month: "February", venue: "International Lalit Kala Art Fair (First International Kala Mela)", city: "Delhi", show: "kala-mela-2018" },
   { year: "2016", month: "March", venue: "Cabinet Secretariat Gallery", city: "Delhi" },
@@ -499,7 +501,7 @@ export const RECORD: RecordEntry[] = [
   { year: "2005", venue: "Sriram Centre", city: "New Delhi" },
 ];
 
-export const RECORD_LINE = "Eighteen exhibitions and art fairs, 2005 to 2018";
+export const RECORD_LINE = "Nineteen exhibitions and art fairs, 2005 to 2026";
 
 export const PORTRAIT = "/site/dolly.jpg";
 export const PORTRAIT_LARGE = "/site/ex/kala-dolly.jpg";

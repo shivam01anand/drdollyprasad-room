@@ -10,7 +10,7 @@ import { BY_ID, workPath } from "@/lib/works";
 
 export const metadata: Metadata = {
   title: "About",
-  description: "Dr Dolly Prasad is a New Delhi artist who makes the everyday memorable: oil paintings of a changing India. Eighteen exhibitions and art fairs; collectors in India, the USA and the UK.",
+  description: "Dr Dolly Prasad is a New Delhi artist who makes the everyday memorable: oil paintings of a changing India. Nineteen exhibitions and art fairs; collectors in India, the USA and the UK.",
   alternates: { canonical: "/about" },
 };
 
@@ -108,8 +108,8 @@ export default function About() {
         <div className="wrap ab-split">
           <div className="ab-txt">
             <p className="eyebrow">On the walls, and in the news</p>
-            <h2>Eighteen exhibitions and art fairs</h2>
-            <p className="ab-p">Between 2005 and 2018 her paintings hung at India Habitat Centre, the Indian Council for Cultural Relations, Triveni Kala Sangam, Travancore Art Gallery and Nehru Art Gallery in Bombay, and at the First International Kala Mela organised by Lalit Kala Akademi.</p>
+            <h2>Nineteen exhibitions and art fairs</h2>
+            <p className="ab-p">From 2005 to 2026 her paintings hung at India Habitat Centre (most recently Sacred Fragments: A Journey Home, 2026), the Indian Council for Cultural Relations, Triveni Kala Sangam, Travancore Art Gallery and Nehru Art Gallery in Bombay, and at the First International Kala Mela organised by Lalit Kala Akademi.</p>
             <p className="ab-p">Her shows have been covered on television and in the papers. Today her paintings are in private collections in India, the USA and the UK.</p>
             <Link className="btn btn-solid" href="/exhibitions">See the exhibitions</Link>
           </div>

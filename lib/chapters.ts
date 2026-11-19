@@ -159,7 +159,7 @@ export const CHAPTERS: Chapter[] = [
   { id: "featured", eyebrow: "Featured", stop: "Featured works", slot: "featured", view: "featured", dusk: 0.45 },
   {
     id: "plan",
-    eyebrow: "Eighteen exhibitions and art fairs · 2005–2018",
+    eyebrow: "Nineteen exhibitions and art fairs · 2005–2026",
     stop: "Exhibitions",
     body:
       "Triveni Kala Sangam · India Habitat Centre · ICCR · Travancore Art Gallery · " +

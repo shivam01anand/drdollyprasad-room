@@ -118,7 +118,7 @@ export default function Home() {
         <div className="sec-head">
           <div>
             <h2>On the walls</h2>
-            <p className="sec-line">Eighteen exhibitions and art fairs, 2005 to 2018.</p>
+            <p className="sec-line">Nineteen exhibitions and art fairs, 2005 to 2026, most recently Sacred Fragments at India Habitat Centre, New Delhi.</p>
           </div>
           <Link className="link" href="/exhibitions">All exhibitions →</Link>
         </div>

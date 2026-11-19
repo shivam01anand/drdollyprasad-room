@@ -13,7 +13,7 @@ import { dims } from "@/lib/images";
 
 export const metadata: Metadata = {
   title: "Exhibitions",
-  description: "Dr Dolly Prasad’s exhibitions: eighteen exhibitions and art fairs, 2005 to 2018, including India Habitat Centre (2010), A Lifetime to Paint at ICCR (2010), the First International Kala Mela (2018) and more.",
+  description: "Dr Dolly Prasad’s exhibitions: nineteen exhibitions and art fairs, 2005 to 2026, including India Habitat Centre (2010), A Lifetime to Paint at ICCR (2010), the First International Kala Mela (2018) and more.",
   alternates: { canonical: "/exhibitions" },
 };
 
@@ -27,8 +27,8 @@ const AFTER_FIRST = "press";
 export default function Exhibitions() {
   return (
     <>
-    <WallHero columns={SHOW_WALL} label="Her exhibitions" eyebrow="2005 to 2018" title="Her Exhibitions" red="Exhibitions"
-              held="Eighteen exhibitions and art fairs, Delhi to Bombay: the things you walk past, hung where you stop.">
+    <WallHero columns={SHOW_WALL} label="Her exhibitions" eyebrow="2005 to 2026" title="Her Exhibitions" red="Exhibitions"
+              held="Nineteen exhibitions and art fairs, Delhi to Bombay: the things you walk past, hung where you stop.">
       <a className="btn btn-solid" href={`#${shows[0].id}`}>See the shows</a>
       <a className="btn" href="#record">List of exhibitions</a>
     </WallHero>
@@ -55,7 +55,7 @@ export default function Exhibitions() {
             {k === 0 && <a href={`#${AFTER_FIRST}`}><span>Press</span>In the press</a>}
           </Fragment>
         ))}
-        <a href="#record"><span>2005–18</span>List of exhibitions</a>
+        <a href="#record"><span>2005–26</span>List of exhibitions</a>
       </nav>
 
       {/* R6: each show one compact row, the photograph and its strip on the left, the heading, her words and the caption on the right */}
