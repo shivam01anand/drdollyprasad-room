@@ -32,10 +32,11 @@ export default {
       { source: "/series/recent-work", destination: "/series/bahaar", permanent: true },
       { source: "/series/onset-of-spring", destination: "/series/bahaar", permanent: true },
       {
-      source: "/:path*",
-      has: [{ type: "host", value: "www.drdollyprasad.com" }],
-      destination: "https://drdollyprasad.com/:path*",
-      permanent: true,
-    }];
+        source: "/:path*",
+        has: [{ type: "host", value: "www.drdollyprasad.com" }],
+        destination: "https://drdollyprasad.com/:path*",
+        permanent: true,
+      },
+    ];
   },
 };

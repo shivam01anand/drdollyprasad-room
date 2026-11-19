@@ -27,9 +27,9 @@ export const dynamicParams = false;
  *  on that preview. Build with SHOW_SHOWN_AT=0 to hide the row again. */
 const SHOW_SHOWN_AT = process.env.SHOW_SHOWN_AT !== "0";
 const SHOWN_AT_LABEL = "Shown at";
-/** Chief Content 2c §1.5 FACT FLAG: these two are dated 2016 to 2018 but listed under IHC, November 2010.
- *  The row stays off for them until Mummy confirms (the data is not edited). */
-const SHOWN_AT_HOLD = new Set(["bulls-and-wheel", "coins-and-clay-bank"]);
+/** Works whose "Shown at" row stays off. Empty since 18 Nov 2026: The Bullocks and The Matka and the
+ *  Coins are now dated 2010, matching their listing under IHC, November 2010 (Shubham). */
+const SHOWN_AT_HOLD = new Set<string>([]);
 export const generateStaticParams = () => WORKS.map((w) => ({ id: w.id }));
 
 type Props = { params: Promise<{ id: string }> };
