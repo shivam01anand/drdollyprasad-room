@@ -11,7 +11,7 @@ import { SERIES_HERO_WALL } from "@/components/site/Collage";
 
 export const metadata: Metadata = {
   title: "Collections",
-  description: "Dr Dolly Prasad’s five collections: Onset of Spring, Bandh Darwaze, Gone Are The Days, Portraits and Faith.",
+  description: "Dr Dolly Prasad’s five collections: Bahaar, Bandh Darwaze, Gone Are The Days, Portraits and Faith.",
   alternates: { canonical: "/series" },
 };
 
@@ -25,7 +25,7 @@ export default function SeriesIndex() {
     <>
       <WallHero size="dir" columns={SERIES_HERO_WALL} label="The five collections" eyebrow="Five collections" title="Her Collections" red="Collections"
                 sub={<>The everyday, held <span className="red">sacred</span>, in five collections.</>}>
-        <Link className="btn btn-solid" href="/series/recent-work">Start with the newest</Link>
+        <Link className="btn btn-solid" href="/series/bahaar">Start with the newest</Link>
       </WallHero>
 
       <CollectionsSwitcher />

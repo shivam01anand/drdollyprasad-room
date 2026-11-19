@@ -151,7 +151,7 @@ export type SeriesPage = {
 export const SERIES_PAGES: SeriesPage[] = [
   // R4 B1-3: newest first. This array is the one order source for every listing of the collections.
   {
-    slug: "recent-work", label: "Onset of Spring", period: "2024 to 2026",
+    slug: "bahaar", label: "Bahaar", period: "2024 to 2026",
     line: "Flowers, leaves, a bird and a pause, in her own words. Beauty, found even among the thorns.",
     hero: "boy-with-bananas",
     held: "The smallest moments bloom, if you stop long enough to see them.",
@@ -185,7 +185,7 @@ export const SERIES_PAGES: SeriesPage[] = [
     ],
   },
   {
-    slug: "gone-are-the-days", label: "Gone Are The Days", period: "2016 to 2018",
+    slug: "gone-are-the-days", label: "Gone Are The Days", period: "2010 to 2018",
     line: "A tonga, a clay gullak, a twenty-paise coin. The ordinary days were the good ones, and here they still are.",
     hero: "bulls-and-wheel",
     quote: "The shades that touched me, the live frames that seemed to tell a story larger than the attention they seemed to draw.",
@@ -209,7 +209,7 @@ export const SERIES_PAGES: SeriesPage[] = [
     ],
   },
   {
-    slug: "portraits", label: "Portraits", period: "2005 to 2015",
+    slug: "portraits", label: "Portraits", period: "2007 to 2012",
     line: "A turban, a kettle, a stack of kadhais. The people who carry our days, given a long, unhurried look.",
     hero: "three-veiled-women",
     held: "Every face you meet holds a story. Here, there is time to find it.",
@@ -227,7 +227,7 @@ export const SERIES_PAGES: SeriesPage[] = [
     ],
   },
   {
-    slug: "faith", label: "Faith", period: "2005 to 2015",
+    slug: "faith", label: "Faith", period: "2007 to 2014",
     line: "A lamp, a thread, a page of scripture, the morning paper. Devotion as attention, given daily.",
     hero: "offering-of-light",
     held: "Faith is rarely loud. Most days, it is a small light kept burning.",
@@ -249,7 +249,7 @@ export const SERIES_PAGES: SeriesPage[] = [
 /** the one painting that stands for each collection where only one is shown (Shubham, 20 Oct): the strongest image */
 export const LEAD: Record<string, string> = {
   "gone-are-the-days": "bulls-and-wheel", "bandh-darwaze": "red-and-teal-door-lock", faith: "monks-and-blue-buddha",
-  portraits: "red-turban-portrait", "recent-work": "woman-with-poppies",
+  portraits: "red-turban-portrait", bahaar: "woman-with-poppies",
 };
 
 /** the collection order, newest first (R4 B1-3); every listing reads SERIES_PAGES, this is its slug list */
@@ -269,7 +269,7 @@ export function collectionOrder(slug: string): string[] {
 }
 /** every painting a story page shows in its chapters, in chapter order */
 export const featuredIds = (s: SeriesPage) => new Set(s.chapters.flatMap((c) => c.works));
-/** the collections either side, wrapping round (Faith -> Onset of Spring; Onset of Spring <- Faith) */
+/** the collections either side, wrapping round (Faith -> Bahaar; Bahaar <- Faith) */
 export function seriesNeighbours(slug: string) {
   const i = SERIES_PAGES.findIndex((s) => s.slug === slug), n = SERIES_PAGES.length;
   return { prev: SERIES_PAGES[(i - 1 + n) % n], next: SERIES_PAGES[(i + 1) % n] };

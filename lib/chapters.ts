@@ -64,8 +64,8 @@ export const CHAPTERS: Chapter[] = [
   { id: "presence", eyebrow: "“Woman with Poppies”", stop: "Woman with Poppies", room: "The courtyard", view: "presence", labels: ["woman-with-poppies"] },
   {
     id: "floral",
-    eyebrow: "Recent work · 2024–",
-    stop: "Recent work",
+    eyebrow: "Bahaar · 2024–",
+    stop: "Bahaar",
     room: "The courtyard",
     // her own words, written for "Petals of Thought"
     quote:
@@ -103,7 +103,7 @@ export const CHAPTERS: Chapter[] = [
   },
   {
     id: "street",
-    eyebrow: "Gone Are The Days · c. 2016–2018",
+    eyebrow: "Gone Are The Days · c. 2010–2018",
     stop: "Gone Are The Days",
     room: "The Red Room",
     // a portrait screen faces Threads of Faith: it turns to the passage before going through
@@ -119,30 +119,30 @@ export const CHAPTERS: Chapter[] = [
     dusk: 0.38,
     labels: ["terracotta-pots", "bulls-and-wheel"],
   },
-  { id: "redwall", eyebrow: "“Shree 420” · “Three Women in Red”", stop: "Shree 420 · Three Women", room: "The Red Room", view: "redwall",
+  { id: "redwall", eyebrow: "“Shree 420” · “Lajja”", stop: "Shree 420 · Lajja", room: "The Red Room", view: "redwall",
     via: "redvia", dusk: 0.45, labels: ["shree-420-and-milk-cans", "three-veiled-women"] },
   // through the Red Room's east doorway: the gallery hall, where the rest of her work hangs as an
   // exhibition hangs, one line at eye level, a series to a wall (scripts/house/build.py)
   { id: "gallery", ink: "light", eyebrow: "The gallery", stop: "The gallery", room: "The gallery",
     view: "gallery", via: "galleryvia", dusk: 0.5 },
-  { id: "rupaya", eyebrow: "Gone Are The Days · c. 2016–2018", stop: "Twenty Paise · Mother India", room: "The gallery",
+  { id: "rupaya", eyebrow: "Gone Are The Days · c. 2010–2018", stop: "Twenty Paise · Mother India", room: "The gallery",
     view: "rupaya", dusk: 0.5, labelSide: "below",
     labels: ["rickshaw-puller-and-coin", "postbox-and-stamps", "mother-india-and-kettles"] },
-  { id: "cartman", eyebrow: "Gone Are The Days · c. 2016–2018", stop: "The Cycle Rickshaw-wala · The Cart-Man", room: "The gallery",
+  { id: "cartman", eyebrow: "Gone Are The Days · c. 2010–2018", stop: "The Cycle Rickshaw-wala · The Cart-Man", room: "The gallery",
     view: "cartman", dusk: 0.5, labelSide: "below", labels: ["cycle-rickshaw", "rickshaw-rest-framed"] },
-  { id: "panels", eyebrow: "Gone Are The Days · c. 2016–2018", stop: "The small panels", room: "The gallery",
+  { id: "panels", eyebrow: "Gone Are The Days · c. 2010–2018", stop: "The small panels", room: "The gallery",
     view: "panels", dusk: 0.52, labelSide: "below",
     labels: ["horse-cart-and-autorickshaw", "coins-and-clay-bank", "rickshaw-and-autorickshaw", "carriage-and-autorickshaw",
       "rickshaw-rest", "bullock-cart-and-truck"] },
   // Faith, either side of the window onto the palm court
-  { id: "shrine", eyebrow: "Faith · c. 2005–2015", stop: "The Peepal Shrine · The Aarti", room: "The gallery",
+  { id: "shrine", eyebrow: "Faith · c. 2007–2014", stop: "Mannat · The Aarti", room: "The gallery",
     view: "shrine", dusk: 0.52, labelSide: "below", labels: ["sacred-tree", "priest-with-flame"] },
-  { id: "gayatri", eyebrow: "Faith · c. 2005–2015", stop: "Gayatri · Vakratunda", room: "The gallery",
+  { id: "gayatri", eyebrow: "Faith · c. 2007–2014", stop: "Gayatri · Vakratunda", room: "The gallery",
     view: "gayatri", dusk: 0.53, labelSide: "below", labels: ["prayer-and-scripture", "offering-of-light"] },
   {
     id: "portraits",
     ink: "light",
-    eyebrow: "Portraits · c. 2005–2015",
+    eyebrow: "Portraits · c. 2007–2012",
     stop: "Portraits",
     room: "The gallery",
     // her own page's words about her, as written there (drdollyprasad.wordpress.com)
@@ -152,9 +152,9 @@ export const CHAPTERS: Chapter[] = [
     labelSide: "below",
     labels: ["red-turban-portrait", "elder-woman-portrait", "yellow-turban-portrait", "patterned-turban-portrait", "riverside-figures"],
   },
-  { id: "kadhai", eyebrow: "Portraits · c. 2005–2015", stop: "The Chai Boy · The Kadhai Seller", room: "The gallery",
+  { id: "kadhai", eyebrow: "Portraits · c. 2007–2012", stop: "The Chai Boy · Intezar", room: "The gallery",
     view: "kadhai", dusk: 0.55, labelSide: "below", labels: ["boy-and-kettle", "man-among-metal-pans"] },
-  { id: "doodhwala", eyebrow: "Portraits · c. 2005–2015", stop: "Mother and Son · The Doodhwala", room: "The gallery",
+  { id: "doodhwala", eyebrow: "Portraits · c. 2007–2012", stop: "Mother and Son · The Doodhwala", room: "The gallery",
     view: "doodhwala", dusk: 0.55, labelSide: "below", labels: ["milkman-on-bicycle", "newspaper-reader", "mother-and-child"] },
   { id: "featured", eyebrow: "Featured", stop: "Featured works", slot: "featured", view: "featured", dusk: 0.45 },
   {

@@ -187,9 +187,9 @@ export default async function SeriesStory({ params }: Props) {
   const s = SERIES_BY_SLUG.get((await params).slug);
   if (!s) notFound();
   const nb = seriesNeighbours(s.slug);
-  // Brand pick (R4 B3 rough, 4): Onset of Spring opens on its LEAD, so its one allowed repeat sits six chapters apart
+  // Brand pick (R4 B3 rough, 4): Bahaar opens on its LEAD, so its one allowed repeat sits six chapters apart
   // R4 fix 3 (Brand P1-3): Faith opens on The Blue Buddha (its LEAD, beside the ICCR photo), so Vakratunda is not repeated on the next screen
-  const cover = BY_ID.get(s.slug === "recent-work" || s.slug === "faith" ? (LEAD[s.slug] ?? s.hero) : s.hero)!;
+  const cover = BY_ID.get(s.slug === "bahaar" || s.slug === "faith" ? (LEAD[s.slug] ?? s.hero) : s.hero)!;
   const works = worksIn(s.label);
   const photo = PHOTO[s.slug];
   const feat = featuredIds(s);

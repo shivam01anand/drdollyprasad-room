@@ -74,7 +74,7 @@ export const MIXED_WALL: Item[][] = [
 const TONE_CYCLE = ["rust", "dark", "stone", "rust", "dark"] as const;
 /** tones keyed by collection, so a reorder of SERIES_PAGES never recolours a tile (R4 B1-4) */
 const TONES: Record<string, "rust" | "dark" | "stone"> = {
-  "gone-are-the-days": "rust", "bandh-darwaze": "dark", faith: "stone", portraits: "rust", "recent-work": "dark",
+  "gone-are-the-days": "rust", "bandh-darwaze": "dark", faith: "stone", portraits: "rust", bahaar: "dark",
 };
 export const SERIES_WALL: Item[][] = SERIES_PAGES.map((s) => [
   { k: "n", em: "Collection", title: s.label, sub: `${worksIn(s.label).length} works · ${s.period}`, href: `/series/${s.slug}`, tone: TONES[s.slug] ?? "rust" } as Item,
