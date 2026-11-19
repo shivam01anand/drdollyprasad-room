@@ -152,9 +152,9 @@ export const CHAPTERS: Chapter[] = [
     labelSide: "below",
     labels: ["red-turban-portrait", "elder-woman-portrait", "yellow-turban-portrait", "patterned-turban-portrait", "riverside-figures"],
   },
-  { id: "kadhai", eyebrow: "Portraits · 2007–2012", stop: "Bachpan · Intezar", room: "The gallery",
+  { id: "kadhai", eyebrow: "Gone Are The Days · 2007–2010", stop: "Bachpan · Intezar", room: "The gallery",
     view: "kadhai", dusk: 0.55, labelSide: "below", labels: ["boy-and-kettle", "man-among-metal-pans"] },
-  { id: "doodhwala", eyebrow: "Portraits · 2007–2012", stop: "Aanchal · Before the Chai", room: "The gallery",
+  { id: "doodhwala", eyebrow: "Gone Are The Days · Portraits", stop: "Aanchal · Before the Chai", room: "The gallery",
     view: "doodhwala", dusk: 0.55, labelSide: "below", labels: ["milkman-on-bicycle", "newspaper-reader", "mother-and-child"] },
   { id: "featured", eyebrow: "Featured", stop: "Featured works", slot: "featured", view: "featured", dusk: 0.45 },
   {

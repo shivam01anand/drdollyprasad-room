@@ -60,23 +60,23 @@ const CATALOGUE: Work[] = [
   W("prayer-and-scripture", "Gayatri", "Faith", "Sold", { year: "2011", size: "48 × 36 in", inches: 48 }),
   W("priest-with-flame", "Aarti", "Faith", "Sold", { year: "2012", size: "48 × 36 in", inches: 48 }),
   W("sacred-tree", "Mannat", "Faith", "Sold", { year: "2007", size: "48 × 48 in", inches: 48 }),
-  W("newspaper-reader", "Morning Ritual", "Faith", "Sold", { year: "2010", size: "36 × 36 in", inches: 36 }),
+  W("newspaper-reader", "Morning Ritual", "Gone Are The Days", "Sold", { year: "2010", size: "36 × 36 in", inches: 36 }),
   // Portraits: 2007 to 2012
   W("elder-woman-portrait", "Sabr", "Portraits", "Available", { year: "2012", size: "30 × 30 in", inches: 30 }),
   W("red-turban-portrait", "Muskaan", "Portraits", "Available", { year: "2012", size: "30 × 30 in", inches: 30 }),
   W("yellow-turban-portrait", "Garv", "Portraits", "Available", { year: "2012", size: "30 × 30 in", inches: 30 }),
   W("patterned-turban-portrait", "Fikr", "Portraits", "Available", { year: "2012", size: "30 × 30 in", inches: 30 }),
   W("mother-and-child", "Aanchal", "Portraits", "Available", { year: "2011", size: "48 × 36 in", inches: 48 }),
-  W("boy-and-kettle", "Bachpan", "Portraits", "Sold", { year: "2010", size: "48 × 48 in", inches: 48 }),
-  W("man-among-metal-pans", "Intezar", "Portraits", "Sold", { year: "2007", size: "36 × 48 in", inches: 48 }),
+  W("boy-and-kettle", "Bachpan", "Gone Are The Days", "Sold", { year: "2010", size: "48 × 48 in", inches: 48 }),
+  W("man-among-metal-pans", "Intezar", "Gone Are The Days", "Sold", { year: "2007", size: "36 × 48 in", inches: 48 }),
   W("three-veiled-women", "Lajja", "Portraits", "Sold", { year: "2007", size: "48 × 48 in", inches: 48 }),
-  W("milkman-on-bicycle", "Before the Chai", "Portraits", "Sold", { year: "2010", size: "48 × 36 in", inches: 48 }),
-  W("riverside-figures", "Evening at the Ghat", "Portraits", "Sold", { year: "2010", size: "30 × 36 in", inches: 36 }),
+  W("milkman-on-bicycle", "Before the Chai", "Gone Are The Days", "Sold", { year: "2010", size: "48 × 36 in", inches: 48 }),
+  W("riverside-figures", "Evening at the Ghat", "Gone Are The Days", "Sold", { year: "2010", size: "30 × 36 in", inches: 36 }),
   // Bahaar: 2024 to 2026
   W("child-among-flowers", "Blooming Innocence", "Bahaar", "Available", { year: "2024", size: "36 × 48 in", inches: 48 }),
   W("woman-with-poppies", "Khwaab", "Bahaar", "Available", { year: "2024", size: "36 × 48 in", inches: 48 }),
   // both offered at Sacred Fragments, New Delhi, 18 to 21 Oct 2026
-  W("temple-bells", "Threads of Faith", "Bahaar", "Available", { year: "2026", size: "30 × 36 in", inches: 36 }),
+  W("temple-bells", "Threads of Faith", "Faith", "Available", { year: "2026", size: "30 × 36 in", inches: 36 }),
   W("woman-with-bird", "Whispers of Stillness", "Bahaar", "Sold", { year: "2024", size: "24 × 24 in", inches: 24 }),
   W("woman-with-red-flower", "Petals of Thought", "Bahaar", "Enquire",
     { year: "2024", size: "24 × 24 in", inches: 24, medium: "Oil and pastel on canvas" }),
@@ -111,11 +111,11 @@ export const WORKS: Work[] = CATALOGUE.map(shapeSize);
 export const BY_ID = new Map(WORKS.map((w) => [w.id, w]));
 
 export const SERIES: { label: string; note: string }[] = [
-  { label: "Gone Are The Days", note: "2010 to 2018 · oil on canvas" },
+  { label: "Gone Are The Days", note: "2007 to 2018 · oil on canvas" },
   { label: "Bandh Darwaze", note: "Closed Doors · 2018 · 12 × 12 in each" },
-  { label: "Faith", note: "2007 to 2014" },
+  { label: "Faith", note: "2007 to 2026" },
   { label: "Portraits", note: "2007 to 2012" },
-  { label: "Bahaar", note: "2024 to 2026" },
+  { label: "Bahaar", note: "2024 to 2025" },
 ];
 
 /** the featured row, in hanging order; the large files exist for these */

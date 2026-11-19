@@ -156,12 +156,11 @@ export const SERIES_PAGES: SeriesPage[] = [
     hero: "boy-with-bananas",
     held: "The smallest moments bloom, if you stop long enough to see them.",
     intro: [
-      "Her spring work turns inward, and looks up. A child beneath banana leaves. A woman beside a bird. Bells hung with red thread. Beauty, noticed anyway.",
-      "Five of the six paintings come with her own words. They are given here in full.",
+      "Her spring work turns inward, and looks up. A child beneath banana leaves. A woman beside a bird. Beauty, noticed anyway.",
+      "Four of the five paintings come with her own words. They are given here in full.",
     ],
     chapters: [
       { title: "Under Canopy of Greens", works: ["boy-with-bananas"], room: true, hers: true, big: WORDS["boy-with-bananas"] },
-      { title: "Threads of Faith", works: ["temple-bells"], hers: true, big: WORDS["temple-bells"] },
       { title: "Whispers of Stillness", works: ["woman-with-bird"], room: true, dark: true, hers: true, big: WORDS["woman-with-bird"] },
       { title: "Petals of Thought", works: ["woman-with-red-flower"], hers: true, big: WORDS["woman-with-red-flower"] },
       { title: "Blooming Innocence", works: ["child-among-flowers"], room: true, hers: true, big: WORDS["child-among-flowers"] },
@@ -190,7 +189,7 @@ export const SERIES_PAGES: SeriesPage[] = [
     hero: "bulls-and-wheel",
     quote: "The shades that touched me, the live frames that seemed to tell a story larger than the attention they seemed to draw.",
     intro: [
-      "Fourteen canvases of ordinary things. The bullock cart and the tonga. The clay gullak and its coins. The red letterbox. The hand-painted film poster. None felt special while it was happening; it was just a Tuesday.",
+      "Nineteen canvases of ordinary things and the people who worked among them. The bullock cart and the tonga. The clay gullak and its coins. The red letterbox. The hand-painted film poster. None felt special while it was happening; it was just a Tuesday.",
       "Often an old thing shares the canvas with whatever came after it, and both are given the same light.",
     ],
     chapters: [
@@ -203,6 +202,8 @@ export const SERIES_PAGES: SeriesPage[] = [
       { title: "Then and now", works: ["carriage-and-autorickshaw", "bullock-cart-and-truck", "cycle-rickshaw", "rickshaw-rest"],
         big: "A tonga beside an autorickshaw. A bullock cart beside a truck.",
         small: "Two ways of moving through the same street, on one canvas." },
+      { title: "Working lives", works: ["boy-and-kettle", "man-among-metal-pans", "milkman-on-bicycle", "newspaper-reader"], dark: true,
+        small: "A chai boy, a kadhai seller, a milkman, a man with the morning paper: the street ran on them." },
       { title: "Letters and cinema", works: ["postbox-and-stamps", "mother-india-and-kettles", "shree-420-and-milk-cans"],
         big: "A red letterbox. Steel kettles. Milk cans under a film poster.",
         small: "The street’s post, its tea and its cinema." },
@@ -210,38 +211,36 @@ export const SERIES_PAGES: SeriesPage[] = [
   },
   {
     slug: "portraits", label: "Portraits", period: "2007 to 2012",
-    line: "A turban, a kettle, a stack of kadhais. The people who carry our days, given a long, unhurried look.",
+    line: "A turban, a tilak, a veil drawn close. Each face given a long, unhurried look.",
     hero: "three-veiled-women",
     held: "Every face you meet holds a story. Here, there is time to find it.",
     intro: [
-      "The play of emotion on a face has always held her. These portraits stay close: elders in turbans, a chai boy between orders, a kadhai seller among his pans, a doodhwala on his round.",
-      "Each figure is painted with the things of their work beside them. The face is where you meet them; the rest is theirs to keep. The people who carry our days are given the time the street did not.",
+      "The play of emotion on a face has always held her. These portraits stay close: elders in turbans, a woman with a tilak, a mother and her son, three women in red veils.",
+      "The face is where you meet them; the rest is theirs to keep.",
     ],
     chapters: [
       { title: "Turbans", works: ["red-turban-portrait", "yellow-turban-portrait", "patterned-turban-portrait"],
         big: "Red, yellow, a lattice of cloth.", small: "The colour draws you in. The faces keep you there." },
-      { title: "Working lives", works: ["boy-and-kettle", "man-among-metal-pans", "milkman-on-bicycle"], dark: true,
-        small: "A kettle, a stack of kadhais, milk cans on a bicycle: each figure is painted with the things of their day." },
       { title: "Together", works: ["three-veiled-women", "mother-and-child"], room: true,
         big: "Red veils, gathered close." },
     ],
   },
   {
     slug: "faith", label: "Faith", period: "2007 to 2014",
-    line: "A lamp, a thread, a page of scripture, the morning paper. Devotion as attention, given daily.",
+    line: "A lamp, a thread, a page of scripture, a temple bell. Devotion as attention, given daily.",
     hero: "offering-of-light",
     held: "Faith is rarely loud. Most days, it is a small light kept burning.",
     intro: [
       "Not spectacle, but habit. A lamp is raised to a wall of scripture. A devotee sits before it. A priest lifts the aarti flame. A peepal is wound in red thread.",
-      "And a man opens his morning paper. In these paintings, that too is a kind of faith.",
+      "And temple bells, each tied with a thread for a hope.",
     ],
     chapters: [
       { title: "Light and scripture", works: ["offering-of-light", "prayer-and-scripture"],
         big: "What do you bring to a prayer?", small: "And what do you hope to leave behind?" },
       { title: "The Buddhas", works: ["monks-and-blue-buddha", "monk-and-green-buddha"], room: true, dark: true,
         big: "Stillness, held in blue and green." },
-      { title: "Daily rites", works: ["priest-with-flame", "sacred-tree", "newspaper-reader"],
-        small: "A flame, a tree wound with thread, the morning news: the rituals of an ordinary day." },
+      { title: "Daily rites", works: ["priest-with-flame", "sacred-tree", "temple-bells"],
+        small: "A flame, a peepal wound with thread, a row of temple bells: the rituals of an ordinary day." },
     ],
   },
 ];
