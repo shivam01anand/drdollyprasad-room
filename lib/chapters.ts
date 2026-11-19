@@ -128,7 +128,7 @@ export const CHAPTERS: Chapter[] = [
   { id: "rupaya", eyebrow: "Gone Are The Days · 2010–2018", stop: "Twenty Paise · Mother India", room: "The gallery",
     view: "rupaya", dusk: 0.5, labelSide: "below",
     labels: ["rickshaw-puller-and-coin", "postbox-and-stamps", "mother-india-and-kettles"] },
-  { id: "cartman", eyebrow: "Gone Are The Days · 2010–2018", stop: "The Cycle Rickshaw-wala · Ek Rupaya", room: "The gallery",
+  { id: "cartman", eyebrow: "Gone Are The Days · 2010–2018", stop: "Last of the Pedals · Ek Rupaya", room: "The gallery",
     view: "cartman", dusk: 0.5, labelSide: "below", labels: ["cycle-rickshaw", "rickshaw-rest-framed"] },
   { id: "panels", eyebrow: "Gone Are The Days · 2010–2018", stop: "Then and now", room: "The gallery",
     view: "panels", dusk: 0.52, labelSide: "below",
@@ -154,7 +154,7 @@ export const CHAPTERS: Chapter[] = [
   },
   { id: "kadhai", eyebrow: "Portraits · 2007–2012", stop: "Bachpan · Intezar", room: "The gallery",
     view: "kadhai", dusk: 0.55, labelSide: "below", labels: ["boy-and-kettle", "man-among-metal-pans"] },
-  { id: "doodhwala", eyebrow: "Portraits · 2007–2012", stop: "Aanchal · The Doodhwala", room: "The gallery",
+  { id: "doodhwala", eyebrow: "Portraits · 2007–2012", stop: "Aanchal · Before the Chai", room: "The gallery",
     view: "doodhwala", dusk: 0.55, labelSide: "below", labels: ["milkman-on-bicycle", "newspaper-reader", "mother-and-child"] },
   { id: "featured", eyebrow: "Featured", stop: "Featured works", slot: "featured", view: "featured", dusk: 0.45 },
   {
