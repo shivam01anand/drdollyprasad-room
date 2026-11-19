@@ -22,7 +22,7 @@ const paint = (ids: string[]): RollItem[] => ids.map((id) => {
 
 const SHOW_PHOTOS: RollItem[] = [
   { src: "/site/ex/ihc-03.jpg", title: "India Habitat Centre, 2010", sub: "Lighting the lamp at the opening.", href: "/exhibitions#india-habitat-centre-2010", framed: false },
-  { src: "/site/ex/iccr-speech.jpg", title: "A Lifetime to Paint, ICCR, 2010", sub: "Speaking at the opening, The Blue Buddha behind her.", href: "/exhibitions#a-lifetime-to-paint", framed: false },
+  { src: "/site/ex/iccr-speech.jpg", title: "A Lifetime to Paint, ICCR, 2010", sub: "Speaking at the opening, Dhyan behind her.", href: "/exhibitions#a-lifetime-to-paint", framed: false },
   { src: "/site/ex/ihc-press-b.jpg", title: "In front of the cameras", sub: "An interview beside The Bullocks.", href: "/exhibitions#india-habitat-centre-2010", framed: false },
   { src: "/site/ex/kala-dolly.jpg", title: "First International Kala Mela, 2018", sub: "At the art fair organised by Lalit Kala Akademi.", href: "/exhibitions#kala-mela-2018", framed: false },
 ];

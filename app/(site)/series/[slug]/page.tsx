@@ -37,8 +37,8 @@ export async function generateMetadata({ params }: Props): Promise<Metadata> {
 const PHOTO: Record<string, { src: string; alt: string; cap: string; w: number; h: number }> = {
   "gone-are-the-days": { src: "/site/ex/ihc-press-b.jpg", w: 1200, h: 803, alt: "Dr Dolly Prasad interviewed beside The Bullocks",
     cap: "Beside The Bullocks, in front of the cameras at Open Palm Court, India Habitat Centre, New Delhi, November 2010." },
-  faith: { src: "/site/ex/iccr-02.jpg", w: 1080, h: 1080, alt: "Dr Dolly Prasad beside The Blue Buddha at ICCR",
-    cap: "Beside The Blue Buddha at A Lifetime to Paint, ICCR, New Delhi, June 2010." },
+  faith: { src: "/site/ex/iccr-02.jpg", w: 1080, h: 1080, alt: "Dr Dolly Prasad beside Dhyan at ICCR",
+    cap: "Beside Dhyan at A Lifetime to Paint, ICCR, New Delhi, June 2010." },
 };
 
 const img = (id: string) => (LARGE.has(id) ? `/art/large/${id}.jpg` : `/art/works/${id}.jpg`);
@@ -188,7 +188,7 @@ export default async function SeriesStory({ params }: Props) {
   if (!s) notFound();
   const nb = seriesNeighbours(s.slug);
   // Brand pick (R4 B3 rough, 4): Bahaar opens on its LEAD, so its one allowed repeat sits six chapters apart
-  // R4 fix 3 (Brand P1-3): Faith opens on The Blue Buddha (its LEAD, beside the ICCR photo), so Vakratunda is not repeated on the next screen
+  // R4 fix 3 (Brand P1-3): Faith opens on Dhyan (its LEAD, beside the ICCR photo), so Vakratunda is not repeated on the next screen
   const cover = BY_ID.get(s.slug === "bahaar" || s.slug === "faith" ? (LEAD[s.slug] ?? s.hero) : s.hero)!;
   const works = worksIn(s.label);
   const photo = PHOTO[s.slug];
