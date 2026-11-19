@@ -1,15 +1,10 @@
 import { WORKS, type Work, EMAIL, INSTAGRAM, SITE, quoted, workPath } from "./works";
 
 /**
- * The website around the studio: the series stories, her own words on her
- * paintings, and her exhibitions.
+ * The website around the studio: the series stories and her exhibitions.
  *
- * Three voices, never mixed (brand thesis §12.1):
- *  - `words` are hers, verbatim, only where she has written them;
- *  - `intro`, `lines` and chapter text are editorial, written about the work,
- *    never in her first person;
- *  - the label (title, medium, size, year, series, status) is fact from lib/works.
- * Nothing here states a fact the archive does not record.
+ * All words on this site are Shubham's (kb/voice.md). Nothing is presented as hers.
+ * The label (title, medium, size, year, series, status) is fact from lib/works.
  */
 
 export { EMAIL, INSTAGRAM, SITE, quoted, workPath };
@@ -31,71 +26,52 @@ export const NAV = [
 export const BIO_LINE = "The everyday, held sacred.";
 export const BIO_SUB = "Catching the hues of India in its waiting and wishing, its worship and whispers.";
 
-/** her own descriptions of her recent paintings, verbatim */
-export const WORDS: Record<string, string> = {
-  "child-among-flowers":
-    "The girl with wide eyed wonder and pure heart represent the essence of innocence. The bougainvillea flowers with bold colours and delicate petals embody both beauty and fragility of life. The vibrant bougainvillea serves as a reminder that beauty can be found even amidst the thorn of life’s challenges.",
-  "temple-bells":
-    "The layers of red threads and bells become a contemporary expression of the emotions we quietly carry within us. Every thread representing a hope, desire, promise, or prayer.",
-  "woman-with-bird":
-    "A quiet moment between thought and nature. I wanted to capture stillness — where nothing is loud, yet everything is felt. The bird, the leaves, the calm face… all connected in silence. Sometimes, I paint not to show, but to pause.",
-  "woman-with-red-flower":
-    "Sometimes thoughts don’t need words… they just sit quietly, like a flower beside you. In this piece, I wanted to capture that silent moment where emotions bloom within, unseen yet deeply felt. A pause, a breath, a space where the mind softens and listens.",
-  "boy-with-bananas":
-    "A young boy stands quietly beneath the shelter of large banana leaves. The bananas on his head look like a natural crown from the earth. Surrounded by deep green, he becomes part of the landscape itself. The painting speaks about nature, childhood, and the quiet beauty of everyday.",
-};
-
-/** short pulls from her words, for cards — each a whole sentence of hers */
-export const PULL: Record<string, string> = {
-  "temple-bells": "Every thread representing a hope, desire, promise, or prayer.",
-  "woman-with-bird": "Sometimes, I paint not to show, but to pause.",
-  "woman-with-red-flower": "A pause, a breath, a space where the mind softens and listens.",
-  "boy-with-bananas": "The bananas on his head look like a natural crown from the earth.",
-  "child-among-flowers": "The vibrant bougainvillea serves as a reminder that beauty can be found even amidst the thorn of life’s challenges.",
-};
-
 /**
  * One line per painting, in the observer's voice (third person, never hers):
- * what is on the canvas, and a thought to leave with. Nothing about the
- * sitters' lives that the painting itself does not show.
+ * what is on the canvas. Source: kb descriptions (2026-11-19).
  */
 export const LOOK: Record<string, string> = {
-  "rickshaw-puller-and-coin": "Broad shoulders in front, a twenty-paise coin behind. What is earned and what is carried, on one canvas.",
-  "carriage-and-autorickshaw": "A tonga and an autorickshaw on the same road, given the same light.",
-  "bullock-cart-and-truck": "A bullock cart beside a truck. Two speeds, one street.",
-  "rickshaw-rest-framed": "A working man at rest against a giant rupee. For a moment, the money waits for him, and so does the day.",
-  "coins-and-clay-bank": "A clay gullak, and the coins it was made to hold: 20 paise, 5 naye paise, 4 annas. The coins have moved on. The gullak is still here, still holding.",
-  "postbox-and-stamps": "Patra petika: the red letterbox, set against a field of stamps. Letters went in; the world came back.",
-  "mother-india-and-kettles": "Steel kettles in front of a Mother India poster: the street’s tea, and the street’s cinema.",
-  "shree-420-and-milk-cans": "Milk cans beneath a peeling Shree 420 poster. The morning round passes an old film still on the wall.",
-  "bulls-and-wheel": "Before engines, there were these two, shoulder to shoulder under one yoke. The wheel still stands. The road has moved on.",
-  "cycle-rickshaw": "A rickshaw-wala and his cycle, large against a red field of smaller vehicles.",
-  "rickshaw-rest": "Between fares, an arm across the wheel. The rest is part of the work.",
-  "horse-cart-and-autorickshaw": "A tonga full of passengers, with an autorickshaw parked beside it.",
-  "rickshaw-and-autorickshaw": "A boy pulls a hand rickshaw while an autorickshaw waits beside him.",
-  "terracotta-pots": "Clay pots, mouth after mouth, in the colour of the earth they were made from.",
-  "weathered-door-ring": "A ring on a weathered door, the paint worn down to its layers.",
-  "red-and-teal-door-lock": "Red wood, teal wood, and a lock holding them shut.",
-  "teal-door-bolt": "A bolt drawn across teal paint. Whatever is inside stays inside.",
-  "carved-door-knocker": "A carved knocker on a turquoise door, waiting for a visitor.",
-  "monks-and-blue-buddha": "Small figures in saffron before a vast blue face. Stillness, at two scales.",
-  "monk-and-green-buddha": "A monk beneath the Bodhi tree, held in green and gold.",
-  "offering-of-light": "A lamp raised to a wall of scripture. What do you bring to a prayer?",
-  "prayer-and-scripture": "A devotee sits before the written word. And what do you hope to leave behind?",
-  "priest-with-flame": "The aarti flame, lifted: a gesture of seconds, held on canvas.",
-  "sacred-tree": "A peepal trunk wound in red thread, a thread for every wish.",
-  "newspaper-reader": "The morning paper, opened like a ritual.",
-  "elder-woman-portrait": "An elder’s face, painted close, and given all the time it asks for.",
-  "red-turban-portrait": "A red turban, a gold earring, a smile. The rest of his story stays his own.",
-  "yellow-turban-portrait": "The yellow catches you first. Then the eyes, which ask for longer.",
-  "patterned-turban-portrait": "A lattice of cloth tied above the face, and the lines of a life beneath it.",
-  "mother-and-child": "A mother and her son, close, and the small space between them.",
-  "boy-and-kettle": "The chai boy between orders, chin in hand, in a world of blue.",
-  "man-among-metal-pans": "The kadhai seller among his pans, circle upon circle.",
-  "three-veiled-women": "Three women in red, their veils drawn close together.",
-  "milkman-on-bicycle": "The doodhwala on his round, the cans swinging from his bicycle.",
-  "riverside-figures": "Boatmen at the water’s edge.",
-  "woman-with-poppies": "A face turned to one side, and the poppies in full voice around her.",
+  "rickshaw-puller-and-coin": "He has his back to us, a red cloth across his shoulders, both hands on the rickshaw's shafts and a small bell hanging below one fist. Behind him, she painted a twenty paise coin, far bigger than the man.",
+  "carriage-and-autorickshaw": "The tonga is painted in full: grey horse, red harness, a man waiting under the orange hood. The autorickshaw beside it is only a white outline on maroon.",
+  "bullock-cart-and-truck": "The bullock cart is drawn in greys, the driver raising his whip over a load of sacks. Beside it stands a Tata public carrier in loud orange paint. Whatever the whip says, the bullock keeps its own pace.",
+  "rickshaw-rest-framed": "He looks back over his shoulder, a small bell hanging still from two fingers. The one rupee coin behind him is painted large enough to lean on, wheat ear and all. Until a fare comes, he sits with it at his back.",
+  "coins-and-clay-bank": "A clay gullak sits on a bed of old coins: half an anna from 1946, five naye paise from 1963. The slot on top is one dark line. The only way to get the coins back out was to break it.",
+  "postbox-and-stamps": "The red letterbox has New Delhi painted on its front in Hindi, with a pin code under it. Behind it the wall is papered with old stamps, Gandhi's face turning up more than once. Each one paid a letter's way through that slot.",
+  "mother-india-and-kettles": "Four steel kettles tumble down the left edge at every angle, and only the bottom one lands upright. Behind them, a Mother India poster has faded into the same red as everything else.",
+  "shree-420-and-milk-cans": "Three milk cans, dented and rusting in patches, stand in front of a torn Shree 420 poster. It still lists the shows at Maratha Mandir, from 11.30 in the morning to 9.30 at night. The milk was out long before the first one.",
+  "bulls-and-wheel": "Two bullocks under one yoke. Someone painted their horns, one pair blue and one green, hung a brass bell at each neck and laid a striped cloth over one back. They were work animals, dressed like family.",
+  "cycle-rickshaw": "The cars, autos and the bus behind him are dark red shapes, sunk into the red ground. He is the one she painted in full colour: bare-chested, a white cloth over one shoulder, pedalling past them all.",
+  "rickshaw-rest": "He has climbed onto the footboard of the rickshaw, knees up, one arm hanging loose over them. A brass bell dangles from his fingers. For now, nobody needs to hear it.",
+  "horse-cart-and-autorickshaw": "The tonga is drawn in brown like an old photograph, three passengers packed in behind a turbaned driver. The autorickshaw is solid teal and yellow, and its back half slips behind that old picture.",
+  "rickshaw-and-autorickshaw": "In the brown half of the painting, a thin man walks between the shafts of a hand rickshaw while his passenger sits back. On the red half, an autorickshaw waits. That one runs on its own.",
+  "terracotta-pots": "Clay pots tumble over one another, mouths open every which way. She laid the paint on thick and pitted, so the surface looks like fired earth. Deep inside one mouth near the bottom, the clay turns a pale pink.",
+  "weathered-door-ring": "The planks have dried to grey and split along the grain. The iron ring on the door has kept its red, with flecks of teal still clinging to it. Above, a small barred window shows only dark.",
+  "red-and-teal-door-lock": "The red paint is coming away in flakes, showing grey wood underneath, and the teal frame has worn through in patches. The padlock and its hasp have rusted to a single brown, and the lock still holds.",
+  "teal-door-bolt": "Someone slid the long iron bolt across both doors, then hung a padlock from it as well. Around the rusted hardware, the teal paint has fallen away in patches, and the brown wood shows through.",
+  "carved-door-knocker": "There is no lock on this door. Its iron handle is shaped like a heart, three studs below it have flowers worked into their centres, and a border of turquoise and copper arcs is carved down one side.",
+  "monks-and-blue-buddha": "The Buddha's face fills the canvas in blue, eyes shut. Below it, two of the four monks have shut their eyes as well. The other two are not there yet, one still reading his loose pages, one sitting with his back to us.",
+  "monk-and-green-buddha": "A monk in saffron bows his head into his joined hands. Above him the Buddha sits in green under a yellow halo, one hand raised.",
+  "offering-of-light": "A boy with a shaved head and a knotted tuft lifts a small lamp towards a wall of tablets. Every tablet carries the same Ganesh prayer, Vakratunda Mahakaya, written over and over.",
+  "prayer-and-scripture": "We only see his back, bare, with a saffron cloth gathered over one shoulder. He sits facing a wall written over with the Gayatri mantra, a brass lamp at his side, every tablet saying the same lines.",
+  "priest-with-flame": "He has his back to us, bell low in one hand, flaming lamp lifted in the other. Around him the paint goes on thick and fast, fire colours to the left and blue to the right, as though the bell has shaken the air.",
+  "sacred-tree": "Red and white thread is wound round the peepal trunk so many times that a broad band of bark disappears under it. People tie these threads when they ask for something. At the roots, a trident and a small red shrine sit in marigolds.",
+  "newspaper-reader": "He sits against the wall, barefoot, the morning paper held up close to his face. One section rests on his knee, and another has slipped to the floor by his foot. He is in no hurry to pick it up.",
+  "elder-woman-portrait": "Her mouth is set, and three lines of white ash and a red dot cross her forehead. Every line of her face is painted in, and she looks straight back through all of them.",
+  "red-turban-portrait": "His eyes have nearly closed with the smile, and his head has dropped a little, the way it does when a laugh is starting. Under the red turban, a gold flower earring catches the light.",
+  "yellow-turban-portrait": "The yellow turban is tied high and full, and he keeps his head up under its weight. His face turns aside, but his eyes come round to hold ours.",
+  "patterned-turban-portrait": "The turban is bright, a cream lattice over orange, but the face under it has gone the other way. His brow pulls down, his lower lip pushes out, and his eyes stay on the ground.",
+  "mother-and-child": "The boy stays half hidden at his mother's side, one small hand wrapped round her arm. She looks down at him. From there, he can afford to look straight out at us.",
+  "boy-and-kettle": "She painted the boy and the kettle in the same blue, as if one belongs to the other. He sits with his chin in his hand, watching the stove, while the tea comes to the boil.",
+  "man-among-metal-pans": "He sits with his back to us, pale turban and a shawl round his shoulders, in a ring of iron kadhais nearly as wide as he is. Every pan sits empty, waiting to be lifted.",
+  "three-veiled-women": "Three women in red have drawn so close that not one face shows. What we get instead are their arms, heavy with silver bangles: one raised high over the others, one holding a veil shut at the face.",
+  "milkman-on-bicycle": "We see the milkman only from behind: red turban, white kurta. Steel cans hang off both sides of the bicycle, and one has swung out on its hook.",
+  "riverside-figures": "People sit on the ghat steps under big woven umbrellas, wrapped in white and saffron. Bamboo poles slant across them, and the river is a dark blur along the bottom edge. The whole scene has turned the gold of late light.",
+  "child-among-flowers": "The bougainvillea takes nearly the whole canvas, and the girl has to fit into one corner of it. She keeps a hand over her mouth and slides her eyes sideways, as if her name had just been called.",
+  "woman-with-poppies": "Poppies bigger than her face crowd in from both sides. She looks straight through the yellow one in front of her, somewhere else entirely. Behind her, more poppies sink into the maroon.",
+  "temple-bells": "Red thread is wound in thick bunches along the bamboo, and brass bells hang from the loose ends. A red chunri has been left over the top rail. On the wall behind, Ram is written again and again.",
+  "woman-with-bird": "The bird at her shoulder has its beak open, mid-call. She keeps her profile still against the square of orange and lets it call.",
+  "woman-with-red-flower": "The face is cropped so close that only one eye shows, and it has turned towards the red flower beside her. Her fingertip rests just under that eye. The flower is nearly as big as her face and almost touches her mouth.",
+  "boy-with-bananas": "He balances a whole bunch of bananas on his head, one hand up to steady it, and still finds a small smile for us. Up in the leaves hangs the red and purple flower a bunch like his grows from.",
 };
 
 /** approved editorial lines (third person), for cards and chapters */
@@ -104,18 +80,17 @@ export const LINES: Record<string, string> = {
   "coins-and-clay-bank": "The coins have moved on. The gullak is still here, still holding.",
 };
 
-/** her poem, verbatim (its opening two lines were withdrawn by Shubham with her agreement, 18 Oct 2026; do not restore) */
+/** the poem: Shubham's words, shown unsigned (approved 2026-11-19) */
 export const STATEMENT = [
-  "They come to me", "They hold my hand",
-  "They give me a brush", "Then sit quietly", "In front of me", "I put them on canvas",
-  "I don’t paint", "Am not a painter",
+  "A chai boy, chin in his hand,",
+  "lets the kettle steam.",
+  "Two bullocks stand in their painted horns.",
+  "A red letterbox keeps its corner.",
+  "The road hurries past them all.",
+  "She stops,",
+  "and sits with them",
+  "until the paint has set.",
 ];
-
-export const ON_THE_WORK =
-  "My paintings are just a representation of some and many others of the shades and paradigms that I picked up at different stages in my life.";
-
-export const ON_EXHIBITIONS =
-  "Each of these paintings reminds me I have yet to pick up many more hues to fill up some empty lines, some yet to be filled up nooks. I hope it would be a life-long unraveling with these tinges, an affair to last a lifetime…";
 
 export type Chapter = {
   title: string;
@@ -123,10 +98,9 @@ export type Chapter = {
   works: string[];
   /** a line that comes before the larger one, setting it up */
   setup?: string;
-  /** the larger line, editorial or hers (`hers`) */
+  /** the larger line (editorial) */
   big?: string;
   small?: string;
-  hers?: boolean;
   /** show the first work in its room photograph */
   room?: boolean;
   dark?: boolean;
@@ -140,9 +114,7 @@ export type SeriesPage = {
   line: string;
   /** the work that opens the series */
   hero: string;
-  /** her words on the series, verbatim, where she has written them */
-  quote?: string;
-  /** where she has not yet written a line: one short editorial line in the site's own voice (never in quotes, never hers) */
+  /** one short editorial line, unsigned */
   held?: string;
   intro: string[];
   chapters: Chapter[];
@@ -152,95 +124,106 @@ export const SERIES_PAGES: SeriesPage[] = [
   // R4 B1-3: newest first. This array is the one order source for every listing of the collections.
   {
     slug: "bahaar", label: "Bahaar", period: "2024 to 2026",
-    line: "Flowers, leaves, a bird and a pause, in her own words. Beauty, found even among the thorns.",
+    line: "A boy under banana leaves, a girl half lost in bougainvillea.",
     hero: "boy-with-bananas",
-    held: "The smallest moments bloom, if you stop long enough to see them.",
+    held: "Something is in flower in each of these five paintings.",
     intro: [
-      "Her spring work turns inward, and looks up. A child beneath banana leaves. A woman beside a bird. Beauty, noticed anyway.",
-      "Four of the five paintings come with her own words. They are given here in full.",
+      "After the street paintings, these are quiet. Only the boy with the bananas is carrying anything, and even he has stopped to look at you.",
+      "Each painting is one person among plants, and the leaves and petals get as much care as the face.",
     ],
     chapters: [
-      { title: "Under Canopy of Greens", works: ["boy-with-bananas"], room: true, hers: true, big: WORDS["boy-with-bananas"] },
-      { title: "Whispers of Stillness", works: ["woman-with-bird"], room: true, dark: true, hers: true, big: WORDS["woman-with-bird"] },
-      { title: "Petals of Thought", works: ["woman-with-red-flower"], hers: true, big: WORDS["woman-with-red-flower"] },
-      { title: "Blooming Innocence", works: ["child-among-flowers"], room: true, hers: true, big: WORDS["child-among-flowers"] },
-      { title: "Khwaab", works: ["woman-with-poppies"], big: LOOK["woman-with-poppies"] },
+      { title: "Under Canopy of Greens", works: ["boy-with-bananas"], room: true,
+        big: "He steadies the bananas with one hand. Behind him, at the left, a red banana flower hangs from its stalk." },
+      { title: "Whispers of Stillness", works: ["woman-with-bird"], room: true, dark: true,
+        big: "She and the bird face the same way. Only the bird has its beak open." },
+      { title: "Petals of Thought", works: ["woman-with-red-flower"],
+        big: "Her fingertips rest at the corner of her eye. Beside her is a single red flower with a yellow centre, the only flower in the painting." },
+      { title: "Blooming Innocence", works: ["child-among-flowers"], room: true,
+        big: "Bougainvillea fills nearly the whole canvas and pushes the girl down to the lower right. She keeps her fist at her mouth and watches you." },
+      { title: "Khwaab", works: ["woman-with-poppies"],
+        big: "Poppies bigger than her face crowd in from both sides. She looks straight through the yellow one in front of her, somewhere else entirely. Behind her, more poppies sink into the maroon." },
     ],
   },
   {
     slug: "bandh-darwaze", label: "Bandh Darwaze", period: "2018",
-    line: "Four shut doors: a ring, a lock, a bolt, a knocker. A closed door is a door someone cared for.",
+    line: "Four shut doors, painted close enough to count the nails.",
     hero: "red-and-teal-door-lock",
-    held: "A closed door keeps one world inside, and turns you toward another.",
+    held: "Two of these doors have a knocker for a visitor. The other two are padlocked from outside, which means nobody is home.",
     intro: [
-      "Bandh darwaze: closed doors. Four small square canvases, each a close look at the hardware of an old door, painted over worn, colour-washed wood.",
-      "No people, no rooms. Only what a hand reaches for at a threshold. Shut, but kept: the layered paint is proof of care.",
+      "Bandh darwaze means closed doors. Each canvas is a foot square and holds one small patch of an old door, painted close up, with no room or person around it.",
+      "Where the teal and the red have flaked, bare grey and brown wood shows through.",
     ],
     chapters: [
       { title: "The ring and the lock", works: ["weathered-door-ring", "red-and-teal-door-lock"], dark: true,
-        big: "A ring to knock with. A lock to keep the rest unseen." },
+        big: "Above the iron ring in Bandh Darwaze I is a small grille, for seeing who has knocked before you open.",
+        small: "In II a rusted padlock hangs from the hasp, beside a round iron stud." },
       { title: "The bolt and the knocker", works: ["teal-door-bolt", "carved-door-knocker"],
-        small: "A foot square each, the four are made to be seen together, on one wall." },
+        big: "Someone carved a row of arches down the edge of the fourth door and gave it a heart-shaped knocker.",
+        small: "In III the bolt is drawn across both halves of the door and locked." },
     ],
   },
   {
     slug: "gone-are-the-days", label: "Gone Are The Days", period: "2010 to 2018",
-    line: "A tonga, a clay gullak, a twenty-paise coin. The ordinary days were the good ones, and here they still are.",
+    line: "Tongas and bullock carts, often painted beside the autos and trucks that replaced them.",
     hero: "bulls-and-wheel",
-    quote: "The shades that touched me, the live frames that seemed to tell a story larger than the attention they seemed to draw.",
+    held: "Nobody waved goodbye to the last tonga.",
     intro: [
-      "Nineteen canvases of ordinary things and the people who worked among them. The bullock cart and the tonga. The clay gullak and its coins. The red letterbox. The hand-painted film poster. None felt special while it was happening; it was just a Tuesday.",
-      "Often an old thing shares the canvas with whatever came after it, and both are given the same light.",
+      "Most of these paintings put two times side by side. A tonga waits beside an auto, a bullock cart beside a truck, and coins nobody spends any more lie next to the clay gullak that held them.",
+      "The rest are the people who kept the street running: a chai boy, a kadhai seller, the milkman on his round, a man with the morning paper, boatmen at the river's edge.",
     ],
     chapters: [
       { title: "Coins and clay", works: ["rickshaw-puller-and-coin", "coins-and-clay-bank", "terracotta-pots"],
-        big: "A clay gullak, and the coins it was made to hold: 20 paise, 5 naye paise, 4 annas.",
-        small: "The coins have moved on. The gullak is still here, still holding." },
-      { title: "Roads", works: ["bulls-and-wheel"], room: true, dark: true,
-        setup: "Before engines, there were these two. Shoulder to shoulder under one yoke, pulling the wheel that carried a village’s harvest, its weddings, its markets.",
-        big: "The wheel still stands. The road has moved on." },
+        big: "A gullak gets broken open when someone wants the coins. This one is still whole, and most of the coins behind it went out of use long ago.",
+        small: "In Twenty Paise the coin is as wide as the canvas, and the man holding the rickshaw shafts stands facing it." },
+      { title: "Under one yoke", works: ["bulls-and-wheel"], room: true, dark: true,
+        setup: "Two bullocks, and behind them the cart wheel they pulled, a darker red on the red.",
+        big: "Both wear brass bells, and someone has painted their horns, one pair blue, one green." },
       { title: "Then and now", works: ["carriage-and-autorickshaw", "bullock-cart-and-truck", "cycle-rickshaw", "rickshaw-rest"],
-        big: "A tonga beside an autorickshaw. A bullock cart beside a truck.",
-        small: "Two ways of moving through the same street, on one canvas." },
+        big: "In Aakhri Savaari the tonga is painted in full and the auto is only a white outline. In Dheere Dheere the truck gets the colour, and the bullock cart is drawn in grey.",
+        small: "In Last of the Pedals the autos and Ambassadors are flat shapes in a darker red. Only the man and his cycle rickshaw are painted solid." },
       { title: "Working lives", works: ["boy-and-kettle", "man-among-metal-pans", "milkman-on-bicycle", "newspaper-reader"], dark: true,
-        small: "A chai boy, a kadhai seller, a milkman, a man with the morning paper: the street ran on them." },
+        small: "The milkman is already out on his round. The kadhai seller sits among his pans, waiting for a buyer. Intezar means waiting." },
       { title: "Letters and cinema", works: ["postbox-and-stamps", "mother-india-and-kettles", "shree-420-and-milk-cans"],
-        big: "A red letterbox. Steel kettles. Milk cans under a film poster.",
-        small: "The street’s post, its tea and its cinema." },
+        big: "The Shree 420 poster is peeling, but you can still read where it was playing, Maratha Mandir, and that it ran four shows a day.",
+        small: "In Patra Petika a red letterbox stands in front of old Indian stamps, with Gandhi's face on several of them." },
     ],
   },
   {
     slug: "portraits", label: "Portraits", period: "2007 to 2012",
-    line: "A turban, a tilak, a veil drawn close. Each face given a long, unhurried look.",
+    line: "Faces painted close, most of them named for a feeling.",
     hero: "three-veiled-women",
-    held: "Every face you meet holds a story. Here, there is time to find it.",
+    held: "Lajja means modesty, and it is the one portrait here where no face shows.",
     intro: [
-      "The play of emotion on a face has always held her. These portraits stay close: elders in turbans, a woman with a tilak, a mother and her son, three women in red veils.",
-      "The face is where you meet them; the rest is theirs to keep.",
+      "Three old men in turbans, each 30 inches square. In all three the turban runs off the top of the canvas, so the face sits low and close.",
+      "In Muskaan the smile has almost shut his eyes. In Fikr the corners of the mouth turn down, and the eyes look away.",
     ],
     chapters: [
       { title: "Turbans", works: ["red-turban-portrait", "yellow-turban-portrait", "patterned-turban-portrait"],
-        big: "Red, yellow, a lattice of cloth.", small: "The colour draws you in. The faces keep you there." },
+        big: "Garv is the only one of the three who looks straight at you.", small: "Muskaan wears a small gold earring shaped like a flower." },
       { title: "Together", works: ["three-veiled-women", "mother-and-child"], room: true,
-        big: "Red veils, gathered close." },
+        big: "In Aanchal the mother looks down. The child holding her arm looks straight out at you.",
+        small: "One woman's arm is raised over her head, bangles stacked to the wrist." },
     ],
   },
   {
     slug: "faith", label: "Faith", period: "2007 to 2014",
-    line: "A lamp, a thread, a page of scripture, a temple bell. Devotion as attention, given daily.",
+    line: "Prayer in its daily form: a lamp lifted to a wall of mantras, a thread tied round a peepal.",
     hero: "offering-of-light",
-    held: "Faith is rarely loud. Most days, it is a small light kept burning.",
+    held: "Most of the people praying in these paintings are seen from behind, so you stand where they stand.",
     intro: [
-      "Not spectacle, but habit. A lamp is raised to a wall of scripture. A devotee sits before it. A priest lifts the aarti flame. A peepal is wound in red thread.",
-      "And temple bells, each tied with a thread for a hope.",
+      "In Vakratunda and Gayatri the wall itself is the prayer. One is covered in the Vakratunda mantra and the other in the Gayatri mantra, and a figure in saffron faces each.",
+      "In Mannat and Threads of Faith nobody is left, only what people tied there: red thread wound round a peepal trunk, and brass bells hung on thread below the name Ram, written over and over on the wall.",
     ],
     chapters: [
       { title: "Light and scripture", works: ["offering-of-light", "prayer-and-scripture"],
-        big: "What do you bring to a prayer?", small: "And what do you hope to leave behind?" },
+        big: "Small drawings of Ganesha sit between the lines of the Vakratunda mantra, the prayer that asks him to clear the way for every task.",
+        small: "In Gayatri a tall brass lamp stands beside the seated man, a yellow cloth over his shoulder." },
       { title: "The Buddhas", works: ["monks-and-blue-buddha", "monk-and-green-buddha"], room: true, dark: true,
-        big: "Stillness, held in blue and green." },
+        big: "In Dhyan the Buddha's face is too big for the canvas. The four monks below it reach only as high as his nose.",
+        small: "In Sharan a monk sits, palms pressed to his forehead, before a Buddha in green and gold." },
       { title: "Daily rites", works: ["priest-with-flame", "sacred-tree", "temple-bells"],
-        small: "A flame, a peepal wound with thread, a row of temple bells: the rituals of an ordinary day." },
+        big: "In Aarti the priest has the flame in one hand and the bell in the other.",
+        small: "In Threads of Faith someone has left a red cloth hanging from the top pole with the threads." },
     ],
   },
 ];
@@ -343,8 +326,6 @@ export type Show = {
   year: string;
   /** editorial, from the record and the photographs */
   lede: string;
-  /** her words, verbatim, where they belong to this show */
-  quote?: string;
   note?: string;
   albums: Album[];
   clips?: Clip[];
@@ -432,7 +413,7 @@ export const SHOWS_AS_RECORDED: Show[] = [
     id: "a-lifetime-to-paint", title: "ICCR", name: "A Lifetime to Paint", kind: "Exhibition, presented by the Indian Council for Cultural Relations", where: "Azad Bhavan Art Gallery, ICCR, I.P. Estate, New Delhi · 11 to 16 June 2010",
     venue: "Azad Bhavan Art Gallery, ICCR, I.P. Estate", city: "New Delhi", when: "Opened 11 June 2010 · on view 12 to 16 June", year: "2010",
     lede: "She spoke at the opening beside a marigold-decked lamp, Dhyan behind her. The title looks past the walls, to the paintings still to come.",
-    quote: "I hope it would be a life-long unraveling with these tinges, an affair to last a lifetime…",
+    note: "Dhyan, then called The Blue Buddha, hung behind the opening.",
     works: ["monks-and-blue-buddha"],
     albums: [
       { title: "The opening", line: "11 June 2010, Azad Bhavan Art Gallery.", photos: [

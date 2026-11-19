@@ -86,8 +86,8 @@ export default function Home() {
           <img className="round" src="/site/ex/kala-dolly.jpg" alt="Dr Dolly Prasad beside one of her paintings" loading="lazy" {...dims("/site/ex/kala-dolly.jpg")} />
           <div className="hw-intro">
             <p className="eyebrow">The artist</p>
-            <h2 id="hw-h">Dr Dolly Prasad, painter of the everyday</h2>
-            <p className="hw-lede">A New Delhi artist who holds the everyday sacred. For her, the ordinary is never small: a clay gullak, a closed door, a lamp lifted at aarti, a face at the corner of a lane. Those ordinary days were the good ones, and she paints them so we can see them clearly, and keep seeing the ones we are living today.</p>
+            <h2 id="hw-h">Oil paintings of everyday India</h2>
+            <p className="hw-lede">Dr Dolly Prasad is a doctor and painter in New Delhi. Many of her paintings show the street as it used to be: a rickshaw puller resting between fares, a milkman with his cans hung off his bicycle.</p>
             <Link className="link" href="/about">Her story →</Link>
           </div>
           <aside className="hw-press" aria-labelledby="hw-press-h">
@@ -157,7 +157,7 @@ export default function Home() {
         <div className="wrap ig-in">
           <div className="txt">
             <h2>Follow {INSTAGRAM.handle}, or ask about a painting</h2>
-            <p className="meta ig-sub">The paintings, the small stories behind them, and the shows they hung in.</p>
+            <p className="meta ig-sub">Each painting, posted with a few lines on what to look for in it.</p>
             <div className="ig-ctas">
               <a className="btn btn-solid" href={INSTAGRAM.url} target="_blank" rel="noopener noreferrer"><InstagramIcon />Open Instagram</a>
               <Link className="btn" href="/enquire">Enquire</Link>

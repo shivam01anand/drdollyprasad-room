@@ -791,7 +791,7 @@ export default function Studio({ dims }: { dims: Dims }) {
 
       {/* the copy slot — fixed, below the header's reach */}
       <div className="copy" ref={copyRef} data-has="0" aria-hidden="true">
-        {CHAPTERS.map((c, i) => (c.body || c.verse || c.quote) ? (
+        {CHAPTERS.map((c, i) => (c.body || c.verse) ? (
           <div className="copy-panel" data-i={i} data-on="0" key={c.id}>
             <div className="copy-head">
               <div className="lab" data-eyebrow={c.eyebrow}>{c.eyebrow}</div>
@@ -804,7 +804,6 @@ export default function Studio({ dims }: { dims: Dims }) {
               </p>
             )}
             {c.body && (c.bodyUntil ? <Until until={c.bodyUntil}><p className="lede">{c.body}</p></Until> : <p className="lede">{c.body}</p>)}
-            {c.quote && <blockquote className="quote">“{c.quote}”</blockquote>}
           </div>
         ) : null)}
       </div>
@@ -827,12 +826,11 @@ export default function Studio({ dims }: { dims: Dims }) {
             </section>
           ) : (
             <section className="sec" key={c.id} data-chapter={c.id} aria-label={c.eyebrow}>
-              {(c.body || c.verse || c.quote) && (
+              {(c.body || c.verse) && (
                 <div className="chapter-text">
                   <h2 className="lab">{c.eyebrow}</h2>
                   {c.verse && <p className="poem">{c.verse}</p>}
                   {c.body && (c.bodyUntil ? <Until until={c.bodyUntil}><p className="lede">{c.body}</p></Until> : <p className="lede">{c.body}</p>)}
-                  {c.quote && <blockquote className="quote">“{c.quote}”</blockquote>}
                 </div>
               )}
             </section>

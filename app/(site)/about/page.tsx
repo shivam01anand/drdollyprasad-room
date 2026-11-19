@@ -5,19 +5,19 @@ import WallHero from "@/components/site/WallHero";
 import { ABOUT_WALL } from "@/components/site/Collage";
 import PressRow from "@/components/site/PressRow";
 import { PRESS_ALL } from "@/lib/press";
-import { LOOK, PULL, ON_THE_WORK, PORTRAIT_LARGE, STUDIO_PATH, shownYear } from "@/lib/site";
+import { LOOK, STATEMENT, PORTRAIT_LARGE, STUDIO_PATH, shownYear } from "@/lib/site";
 import { BY_ID, workPath } from "@/lib/works";
 
 export const metadata: Metadata = {
   title: "About",
-  description: "Dr Dolly Prasad is a New Delhi artist who makes the everyday memorable: oil paintings of a changing India. Nineteen exhibitions and art fairs; collectors in India, the USA and the UK.",
+  description: "Dr Dolly Prasad is a doctor and painter in New Delhi who works in oil on canvas. Nineteen exhibitions and art fairs since 2005; paintings in private collections in India, the USA and the UK.",
   alternates: { canonical: "/about" },
 };
 
 /** paintings for a roll: the painting, its title and year, and its one line */
 const paint = (ids: string[]): RollItem[] => ids.map((id) => {
   const w = BY_ID.get(id)!;
-  return { src: `/site/thumbs/${id}.jpg`, title: `${w.title}${shownYear(w) ? `, ${shownYear(w)}` : ""}`, sub: LOOK[id] ?? (PULL[id] ? `“${PULL[id]}”` : undefined), href: workPath(id) };
+  return { src: `/site/thumbs/${id}.jpg`, title: `${w.title}${shownYear(w) ? `, ${shownYear(w)}` : ""}`, sub: LOOK[id], href: workPath(id) };
 });
 
 const SHOW_PHOTOS: RollItem[] = [
@@ -28,21 +28,14 @@ const SHOW_PHOTOS: RollItem[] = [
 ];
 
 /*
- * The drafted first-person "From the artist" line is off the page until she
- * approves or rewrites it (website test, round 2). Its draft is kept in the
- * project notes, not here, so it cannot be shown as hers by mistake.
- *
- * "Who she is" says only what the record supports (brand thesis §2, §6: a
- * practising doctor and a painter; the play of emotion on faces
- * has always fascinated her). The longer hospital-to-easel story waits for
- * her own account (backlog sprint, Needs Mummy).
+ * All words are Shubham's. No line on this page is presented as hers.
  */
 
 export default function About() {
   return (
     <>
       {/* CR-006: About opens like every landing, the white card centred on a wall of her paintings */}
-      <WallHero columns={ABOUT_WALL} label="About the artist" eyebrow="About the artist" title="The everyday, held sacred" red="sacred" held="Dr Dolly Prasad, New Delhi.">
+      <WallHero columns={ABOUT_WALL} label="About the artist" eyebrow="About the artist" title="Dr Dolly Prasad" red="Dolly" held="Doctor and painter, New Delhi.">
         <a className="btn btn-solid" href="#story">Her story</a>
         <Link className="btn" href="/works">See her work</Link>
       </WallHero>
@@ -53,7 +46,8 @@ export default function About() {
             <img src={PORTRAIT_LARGE} alt="Dr Dolly Prasad beside one of her paintings at the First International Kala Mela, 2018" />
           </figure>
           <div className="ab-txt">
-            <p className="ab-p">Dr Dolly Prasad is a New Delhi artist who holds the everyday sacred. For her, the ordinary is never small: a clay gullak, a closed door, a lamp lifted at aarti, a face at the corner of a lane. Each holds a story. Looking back, those ordinary days were the good ones, and she paints them so we can see them clearly now, and keep seeing the ones we are living today.</p>
+            <p className="ab-p">Dr Dolly Prasad is a doctor and painter in New Delhi who works in oil on canvas. She paints what most people pass without a second look: a chai boy beside his kettle, two bullocks under one yoke, a temple bell tied with red thread, a woman lost among poppies.</p>
+            <p className="ab-p">Since 2005 her work has been shown at exhibitions and art fairs, most recently at India Habitat Centre in 2026. Her paintings are in private collections in India, the USA and the UK.</p>
           </div>
         </div>
       </section>
@@ -61,21 +55,21 @@ export default function About() {
       <section className="ab-band tone-light">
         <div className="wrap ab-split">
           <div className="ab-txt">
-            <p className="eyebrow">Who she is</p>
-            <h2>The good days were the everyday</h2>
-            <p className="ab-p">She is a doctor, and a painter in oil on canvas. Doctors learn to look at people carefully, and she kept that habit when she picked up the brush: the play of emotion on a face has always held her, at the hospital and on the canvas.</p>
-            <p className="ab-p">Her subject is the India around her as it changes: rickshaws sharing the road with autos, coins out of use, old doors shut and kept. She paints them with the warmth of someone who remembers, and the hope of someone who still looks. Never relics; always parts of a life.</p>
+            <p className="eyebrow">Who she paints</p>
+            <h2>The rickshaw puller, the milkman, the kadhai seller</h2>
+            <p className="ab-p">Many of the people in her paintings are at work or between jobs: a rickshaw puller resting on his footboard, a kadhai seller among his pans.</p>
+            <p className="ab-p">The Portraits turn round: three old men face you, close enough to count the lines.</p>
           </div>
-          <Roll label="Faces from her portraits" items={paint(["red-turban-portrait", "three-veiled-women", "boy-and-kettle", "yellow-turban-portrait", "mother-and-child"])} />
+          <Roll label="People in her paintings" items={paint(["red-turban-portrait", "three-veiled-women", "boy-and-kettle", "yellow-turban-portrait", "mother-and-child"])} />
         </div>
       </section>
 
       <section className="ab-band tone-dark">
         <div className="wrap ab-statement">
           <p className="eyebrow">The work</p>
-          <h2>She captures the everyday: its waiting and wishing, its worship and whispers.</h2>
-          <p className="ab-p">A clay gullak and the coins it was made to hold. A door nobody opens any more. A lamp raised to a wall of scripture. She gives these ordinary things the scale, the colour and the stillness we usually keep for the sacred.</p>
-          <p className="ab-p">Why these things? Because they are what made it home, and they are the first a changing country overlooks. Each painting is a way of saying they matter.</p>
+          <h2>Small things, given a big canvas</h2>
+          <p className="ab-p">A twenty-paise coin fills a canvas four feet tall, and a clay gullak with its coins gets one three feet square.</p>
+          <p className="ab-p">Bandh Darwaze goes the other way: four door fittings, each on a canvas only a foot square.</p>
         </div>
       </section>
 
@@ -83,8 +77,8 @@ export default function About() {
         <div className="wrap ab-split">
           <div className="ab-txt">
             <p className="eyebrow">A doctor’s eye</p>
-            <h2>From a bullock cart to a child beneath banana leaves</h2>
-            <p className="ab-p">A doctor is taught to look beneath the surface. She turns that eye on the everyday, a lamp, a thread, a pause, until the thing you walk past is the thing you stop for. In her words: “Sometimes, I paint not to show, but to pause.”</p>
+            <h2>The small sign</h2>
+            <p className="ab-p">A doctor learns to look for the small sign that explains the rest. In her paintings it might be the brass bell hanging from a resting rickshaw puller's fingers, or the sheet of newspaper that has slid to the floor under a reader.</p>
             <Link className="btn btn-solid" href="/series">The five collections</Link>
           </div>
           <Roll label="A few of her paintings" items={paint(["bulls-and-wheel", "offering-of-light", "boy-with-bananas", "temple-bells", "woman-with-bird"])} />
@@ -109,8 +103,8 @@ export default function About() {
           <div className="ab-txt">
             <p className="eyebrow">On the walls, and in the news</p>
             <h2>Nineteen exhibitions and art fairs</h2>
-            <p className="ab-p">From 2005 to 2026 her paintings hung at India Habitat Centre (most recently Sacred Fragments: A Journey Home, 2026), the Indian Council for Cultural Relations, Triveni Kala Sangam, Travancore Art Gallery and Nehru Art Gallery in Bombay, and at the First International Kala Mela organised by Lalit Kala Akademi.</p>
-            <p className="ab-p">Her shows have been covered on television and in the papers. Today her paintings are in private collections in India, the USA and the UK.</p>
+            <p className="ab-p">From 2005 to 2026 her paintings were shown at India Habitat Centre, the Indian Council for Cultural Relations, Triveni Kala Sangam and Travancore Art Gallery in New Delhi, at the First International Kala Mela organised by Lalit Kala Akademi, and at Nehru Art Gallery in Bombay. The most recent was Sacred Fragments: A Journey Home, at the Visual Arts Gallery, India Habitat Centre, from 18 to 21 October 2026.</p>
+            <p className="ab-p">Television cameras were at the gallery in June 2010, and Delhi Times listed a Travancore group show she was in under Must See, Must Do.</p>
             <Link className="btn btn-solid" href="/exhibitions">See the exhibitions</Link>
           </div>
           <Roll label="Her exhibitions" items={SHOW_PHOTOS} shape="wide" />
@@ -119,8 +113,7 @@ export default function About() {
 
       <section className="ab-band tone-wall">
         <div className="wrap ab-close">
-          <p className="ab-quote">“{ON_THE_WORK}”</p>
-          <p className="eyebrow">Dr Dolly Prasad, on her work</p>
+          <p className="ab-quote ab-poem">{STATEMENT.map((ln, i) => <span key={i} style={{ display: "block" }}>{ln}</span>)}</p>
           <div className="ab-ctas">
             <Link className="btn btn-solid" href="/works">See her work</Link>
             <Link className="btn" href="/enquire">Enquire</Link>

@@ -2,7 +2,7 @@ import type { Metadata, Viewport } from "next";
 import Analytics from "@/components/Analytics";
 
 const DESCRIPTION =
-  "Dr Dolly Prasad is a New Delhi artist who makes the everyday memorable: oil paintings of a changing India, its waiting and wishing, its worship and whispers. Nineteen exhibitions and art fairs; collectors in India, the USA and the UK.";
+  "Dr Dolly Prasad is a doctor and painter in New Delhi who works in oil on canvas. Nineteen exhibitions and art fairs since 2005; paintings in private collections in India, the USA and the UK.";
 
 export const metadata: Metadata = {
   metadataBase: new URL("https://drdollyprasad.com"),

@@ -1,6 +1,6 @@
 import Link from "next/link";
 import { BY_ID, workPath } from "@/lib/works";
-import { LOOK, SERIES_PAGES, worksIn, ON_EXHIBITIONS, ON_THE_WORK, PRESS, PULL, SHOWS, SHOWS_AS_RECORDED, SMALL_PHOTO, labelLine } from "@/lib/site";
+import { LOOK, SERIES_PAGES, worksIn, PRESS, SHOWS, SHOWS_AS_RECORDED, SMALL_PHOTO, labelLine } from "@/lib/site";
 import { dims, smSet } from "@/lib/images";
 import { thumb } from "./Card";
 import WallDrift from "./WallDrift";
@@ -105,7 +105,7 @@ export const ABOUT_WALL: Item[][] = ABOUT_BASE.map((col, i) => {
 });
 
 /**
- * Exhibitions: the shows in photographs, the press, her words on exhibiting and
+ * Exhibitions: the shows in photographs, the press and
  * short lines about each show, the venues by name and the numbers from her record.
  * Everything here is from the site's own records (lib/site: SHOWS, PRESS, RECORD).
  */
@@ -157,8 +157,7 @@ function Tile({ it }: { it: Item }) {
   }
   const w = BY_ID.get(it.id);
   if (!w || SMALL_PHOTO.has(w.id)) return null;
-  // her words in quote marks; the observer's line without
-  const line = PULL[w.id] ? `“${PULL[w.id]}”` : LOOK[w.id];
+  const line = LOOK[w.id];
   return (
     <Link className="tile flip" href={workPath(w.id)} tabIndex={-1}>
       <span className="flipper">

@@ -21,11 +21,11 @@ type Props = {
 };
 
 const SEEN = "dp:welcomed";
-const WORDS = ["Welcome", "to", "my", "studio"];
+const WORDS = ["Welcome", "to", "the", "studio"];
 
 /**
  * The welcome. Warm paper, lamplight from above, and her greeting, word by
- * word — नमस्ते, then "Welcome to my studio" — with her name beneath and a
+ * word — नमस्ते, then "Welcome to the studio" — with her name beneath and a
  * hairline that fills as the house loads. As soon as the house is ready and
  * the greeting has been said, the visitor is taken in: her name rises into
  * the header, one painting is shown clean exactly where the room has it, and
@@ -199,7 +199,7 @@ const Preloader = forwardRef<PreloaderHandle, Props>(function Preloader(props, r
         <div className="pre-light" aria-hidden="true" />
         <div className="pre-welcome" ref={greet}>
           <p className="pre-namaste" data-in="" lang="hi">नमस्ते</p>
-          <h1 className="pre-hello" aria-label={again ? "Welcome back to my studio" : "Welcome to my studio"}>
+          <h1 className="pre-hello" aria-label={again ? "Welcome back to the studio" : "Welcome to the studio"}>
             {(again ? ["Welcome", "back"] : WORDS).map((w, i) => <span key={i} data-in="">{w}</span>)}
           </h1>
           <div className="pre-sign" ref={sign} data-in="" />

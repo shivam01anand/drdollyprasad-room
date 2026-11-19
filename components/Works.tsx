@@ -32,7 +32,7 @@ export default function Works({ dims }: { dims: Dims }) {
       <div className="collage-head">
         <div className="lab">The work</div>
         <h2 id="works-title" className="collage-title">
-          “My paintings are just a representation of some and many others of the shades and paradigms that I picked up at different stages in my life.”
+          Forty-one paintings, 2007 to 2026
         </h2>
         <div className="works-filter" role="group" aria-label="Show the works">
           {(["all", "available", "sold"] as WorksFilter[]).map((f) => (
@@ -80,8 +80,7 @@ export default function Works({ dims }: { dims: Dims }) {
 
 /** her approved introduction (the Sacred Fragments catalogue, Oct 2026) */
 const STATEMENT =
-  "Dr. Dolly Prasad’s art is the everyday held sacred. A\u00A0painter, she catches the hues of " +
-  "India in its waiting and its wishing, its worship and its whispers.";
+  "Dr Dolly Prasad is a doctor and painter in New Delhi who works in oil on canvas.";
 
 /**
  * Her statement, her biography verbatim, and the way to reach her.

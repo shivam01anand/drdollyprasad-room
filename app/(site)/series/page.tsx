@@ -24,7 +24,7 @@ export default function SeriesIndex() {
   return (
     <>
       <WallHero size="dir" columns={SERIES_HERO_WALL} label="The five collections" eyebrow="Five collections" title="Her Collections" red="Collections"
-                sub={<>The everyday, held <span className="red">sacred</span>, in five collections.</>}>
+                sub={<>Forty-one paintings in five <span className="red">collections</span>.</>}>
         <Link className="btn btn-solid" href="/series/bahaar">Start with the newest</Link>
       </WallHero>
 

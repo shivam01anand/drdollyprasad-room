@@ -58,7 +58,7 @@ export default function Exhibitions() {
         <a href="#record"><span>2005–26</span>List of exhibitions</a>
       </nav>
 
-      {/* R6: each show one compact row, the photograph and its strip on the left, the heading, her words and the caption on the right */}
+      {/* R6: each show one compact row, the photograph and its strip on the left, the heading and the note on the right */}
       {shows.map((s, k) => {
         const photos = s.albums.flatMap((a) => a.photos);
         return (
@@ -74,15 +74,9 @@ export default function Exhibitions() {
                            <h2 id={`${s.id}-h`}>{s.name ?? s.title}</h2>
                            <p className="ex-ch-where">{s.where ?? `${s.venue}, ${s.city} · ${s.when}`}</p>
                          </header>
-                         {(s.quote || s.note) && (
+                         {s.note && (
                            <div className="ex-ch-txt">
-                             {s.quote && (
-                               <figure className="ex-quote">
-                                 <blockquote>“{s.quote}”</blockquote>
-                                 <figcaption>Dr Dolly Prasad, on her exhibitions</figcaption>
-                               </figure>
-                             )}
-                             {s.note && <p className="meta">{s.note}</p>}
+                             <p className="meta">{s.note}</p>
                            </div>
                          )}
                        </>} />

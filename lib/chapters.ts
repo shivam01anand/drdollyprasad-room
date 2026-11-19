@@ -1,7 +1,6 @@
 import { aim, type Pose } from "./room/rig";
 import type { HouseInfo, V3 } from "./room/house";
 import { phoneGroupView } from "./room/phone-framing";
-import { NOW } from "./site";
 
 /**
  * One chapter model owns the copy and the camera, so the two can never drift
@@ -22,8 +21,6 @@ export type Chapter = {
   body?: string;
   /** YYYY-MM-DD (New Delhi): the body line is shown only until the end of this day (components/Until) */
   bodyUntil?: string;
-  /** her own words, set as a quotation */
-  quote?: string;
   /** rendered as verse, one line per line */
   verse?: string;
   /** the section is content of its own (the featured slider) */
@@ -50,15 +47,15 @@ export type Chapter = {
   room?: string;
 };
 
-/** her poem, verbatim; its opening two lines were withdrawn (Shubham, with her agreement, 18 Oct 2026): do not restore */
-export const POEM = `They come to me
-They hold my hand
-They give me a brush
-Then sit quietly
-In front of me
-I put them on canvas
-I don’t paint
-Am not a painter`;
+/** the poem: Shubham's words, shown unsigned (approved 2026-11-19) */
+export const POEM = `A chai boy, chin in his hand,
+lets the kettle steam.
+Two bullocks stand in their painted horns.
+A red letterbox keeps its corner.
+The road hurries past them all.
+She stops,
+and sits with them
+until the paint has set.`;
 
 export const CHAPTERS: Chapter[] = [
   { id: "presence", eyebrow: "“Khwaab”", stop: "Khwaab", room: "The courtyard", view: "presence", labels: ["woman-with-poppies"] },
@@ -67,19 +64,15 @@ export const CHAPTERS: Chapter[] = [
     eyebrow: "Bahaar · 2024–",
     stop: "Bahaar",
     room: "The courtyard",
-    // her own words, written for "Petals of Thought"
-    quote:
-      "Sometimes thoughts don’t need words… they just sit quietly, like a flower beside you. " +
-      "A pause, a breath, a space where the mind softens and listens.",
+    body: "Three faces from Bahaar, each with flowers pressed up close.",
     view: "floral",
     labels: ["child-among-flowers", "woman-with-red-flower", "woman-with-bird"],
   },
   { id: "canopy", eyebrow: "“Under Canopy of Greens” · 2025", stop: "Under Canopy of Greens", room: "The courtyard", view: "canopy", dusk: 0.04, labels: ["boy-with-bananas"],
     labelSide: "left",
-    // her own words for the painting
-    quote: "A young boy stands quietly beneath the shelter of large banana leaves. The bananas on his head look like a natural crown from the earth." },
+    body: "Bananas on his head, banana leaves all round him, and a red banana flower at the top left." },
   // her corner by the banana: she paints at her easel, her statement beside her
-  { id: "easel", eyebrow: "Artist’s statement", stop: "At her easel", room: "The courtyard", verse: POEM, view: "easel",
+  { id: "easel", eyebrow: "A poem", stop: "At her easel", room: "The courtyard", verse: POEM, view: "easel",
     via: "easelvia", dusk: 0.12,
     // the canvas she is working on, from her own photograph (scripts/figure/make.py)
     asides: [{ anchor: "easel", title: "On her easel", line: "A new painting, in progress", size: [1.28, 1.06] }] },
@@ -92,11 +85,7 @@ export const CHAPTERS: Chapter[] = [
     via: "faithvia",
     stop: "Threads of Faith",
     room: "The Quiet Room",
-    // her own words for the painting, then where it is showing
-    quote: "Every thread representing a hope, desire, promise, or prayer.",
-    body: "Showing at Sacred Fragments: A Journey Home, New Delhi, 18–21 October 2026.",
-    // gone by itself after 21 Oct 2026 23:59 IST, the same date as the Now showing line (NOW.until)
-    bodyUntil: NOW.until,
+    body: "Brass bells tied on with red thread, under the name Ram written over and over.",
     view: "faith",
     dusk: 0.28,
     labels: ["monks-and-blue-buddha", "temple-bells"],
@@ -110,10 +99,7 @@ export const CHAPTERS: Chapter[] = [
     via: "streetvia",
     // the framed print on its easel is 0.64 × 0.48 m (scripts/house/build.py press_easel)
     asides: [{ anchor: "press", title: "The artist, in conversation", line: "Beside “Before the Engines”, at her exhibition", size: [0.64, 0.48] }],
-    // her own words (her studio page, drdollyprasad.wordpress.com, 2018)
-    quote:
-      "The shades that touched me, the live frames that seemed to tell a story larger than the " +
-      "attention they seemed to draw.",
+    body: "Mitti's clay pots, tipped every way, and the painted horns of Before the Engines.",
     ink: "light",
     view: "street",
     dusk: 0.38,
@@ -145,14 +131,13 @@ export const CHAPTERS: Chapter[] = [
     eyebrow: "Portraits · 2007–2012",
     stop: "Portraits",
     room: "The gallery",
-    // her own page's words about her, as written there (drdollyprasad.wordpress.com)
-    body: "Play of emotions, be it on the faces around her or on the canvas, have always fascinated her.",
+    body: "Three turbans, red, yellow and a cream lattice, each running off the top of the canvas.",
     view: "portraits",
     dusk: 0.54,
     labelSide: "below",
     labels: ["red-turban-portrait", "elder-woman-portrait", "yellow-turban-portrait", "patterned-turban-portrait", "riverside-figures"],
   },
-  { id: "kadhai", eyebrow: "Gone Are The Days · 2007–2010", stop: "Bachpan · Intezar", room: "The gallery",
+  { id: "kadhai", eyebrow: "Gone Are The Days · 2007–2018", stop: "Bachpan · Intezar", room: "The gallery",
     view: "kadhai", dusk: 0.55, labelSide: "below", labels: ["boy-and-kettle", "man-among-metal-pans"] },
   { id: "doodhwala", eyebrow: "Gone Are The Days · Portraits", stop: "Aanchal · Before the Chai", room: "The gallery",
     view: "doodhwala", dusk: 0.55, labelSide: "below", labels: ["milkman-on-bicycle", "newspaper-reader", "mother-and-child"] },
@@ -164,11 +149,6 @@ export const CHAPTERS: Chapter[] = [
     body:
       "Triveni Kala Sangam · India Habitat Centre · ICCR · Travancore Art Gallery · " +
       "Lalit Kala Akademi · Nehru Art Gallery, Bombay.",
-    // the close of her studio page (drdollyprasad.wordpress.com, 2018)
-    quote:
-      "Each of these paintings reminds me I have yet to pick up many more hues to fill up some " +
-      "empty lines, some yet to be filled up nooks. I hope it would be a life-long unraveling " +
-      "with these tinges, an affair to last a lifetime…",
     view: "plan",
     dusk: 0.4,
   },

@@ -3,7 +3,7 @@ import Link from "next/link";
 import IndigoBand from "@/components/site/IndigoBand";
 import { notFound } from "next/navigation";
 import { BY_ID, LARGE, SHOW, SITE, WORKS, inchDims, quoted, workPath, type Work } from "@/lib/works";
-import { INSTAGRAM, LOOK, NOW_SHOWING_CONFIRMED, PULL, SERIES_BY_SLUG, SHOWS, SMALL_PHOTO, showKey, shownYear, statusText, STUDIO_PATH, WHATSAPP, WORDS, enquireHref, labelLine, neighbours, seriesPath, whatsappHref, worksIn } from "@/lib/site";
+import { INSTAGRAM, LOOK, NOW_SHOWING_CONFIRMED, SERIES_BY_SLUG, SHOWS, SMALL_PHOTO, showKey, shownYear, statusText, STUDIO_PATH, WHATSAPP, enquireHref, labelLine, neighbours, seriesPath, whatsappHref, worksIn } from "@/lib/site";
 import PrevNext from "@/components/site/PrevNext";
 import manifest from "@/public/art/manifest.json";
 import Card from "@/components/site/Card";
@@ -17,8 +17,8 @@ import { ChatIcon, InstagramIcon } from "@/components/site/Icons";
 /**
  * One painting's own page: what a shared link opens and what a search finds.
  * Its title and label above, the painting hung in a room (to scale where she
- * has stated its size), the ways to ask, her own words where she has written
- * them, and more from the same series.
+ * has stated its size), the ways to ask,
+ * and more from the same series.
  */
 
 export const dynamicParams = false;
@@ -71,8 +71,7 @@ export default async function WorkPage({ params }: Props) {
   const d = DIMS.get(id);
   const src = LARGE.has(id) ? `/art/large/${id}.jpg` : `/art/works/${id}.jpg`;
   const size = inchDims(w, d ? { w: d.w, h: d.h } : undefined);
-  const words = WORDS[id];
-  const lead = words ? PULL[id] : LOOK[id];
+  const lead = LOOK[id];
   const sold = w.status === "Sold";
   const more = worksIn(w.series).filter((x) => x.id !== id && !SMALL_PHOTO.has(x.id))
     .sort((a, b) => Number(a.status === "Sold") - Number(b.status === "Sold")).slice(0, 4);
@@ -105,11 +104,6 @@ export default async function WorkPage({ params }: Props) {
   ];
 
   const tabs = [
-    ...(words ? [{ label: "In her words", body: (
-      <>
-        <p className="quote">“{words}”</p>
-        <p className="eyebrow" style={{ marginTop: 14 }}>Dr Dolly Prasad</p>
-      </>) }] : []),
     { label: "Details and size", body: <dl>{rows.map(([k, v]) => <div key={k} style={{ display: "contents" }}><dt>{k}</dt><dd>{v}</dd></div>)}</dl> },
     { label: "Delivery and framing", body: (
       <>
@@ -127,8 +121,7 @@ export default async function WorkPage({ params }: Props) {
           <Link className="pp-back" href={`/series/${coll.slug}`}>‹ {coll.label}</Link>
           <h1 className="pp-title">{w.title}</h1>
           <p className="pp-facts">{[w.medium, w.size, shownYear(w)].filter(Boolean).join(" · ")}</p>
-          {lead && <p className={words ? "pp-story" : "pp-story is-ours"}>{words ? `“${lead}”` : lead}</p>}
-          {lead && words && <p className="pp-attr">Dr Dolly Prasad</p>}
+          {lead && <p className="pp-story is-ours">{lead}</p>}
           <p className="pp-status"><span className={`status st-${sold ? "sold" : w.status === "Enquire" ? "enquire" : "free"}`}><i aria-hidden="true" />{sold ? "In a private collection" : statusText(w)}</span></p>
           {!sold && <p className="pp-price">Prices on request.</p>}
           {NOW_SHOWING_CONFIRMED && SHOW.works.includes(id) && (
