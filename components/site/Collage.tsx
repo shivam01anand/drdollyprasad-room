@@ -53,7 +53,7 @@ export const HOME: Item[][] = [
     X("/site/ex/ihc-03.jpg", "Opening night · 2010", "Lighting the lamp", "India Habitat Centre", "Dr Dolly Prasad lights the lamp at her exhibition", "/exhibitions#india-habitat-centre-2010"),
     P("yellow-turban-portrait"), P("rickshaw-rest-framed"), P("prayer-and-scripture")],
   [P("shree-420-and-milk-cans"), P("teal-door-bolt"), P("woman-with-red-flower"), P("monk-and-green-buddha"),
-    X("/site/ex/ihc-press-b.jpg", "In front of the cameras", "Beside The Bullocks", "India Habitat Centre · 2010", "Dr Dolly Prasad interviewed beside The Bullocks", "/exhibitions#india-habitat-centre-2010"),
+    X("/site/ex/ihc-press-b.jpg", "In front of the cameras", "Beside “Before the Engines”", "India Habitat Centre · 2010", "Dr Dolly Prasad interviewed beside “Before the Engines”", "/exhibitions#india-habitat-centre-2010"),
     P("cycle-rickshaw")],
   [P("sacred-tree"), P("rickshaw-rest"), P("carriage-and-autorickshaw"), P("newspaper-reader"), P("mother-and-child"), P("carved-door-knocker")],
 ];

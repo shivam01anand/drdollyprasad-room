@@ -35,8 +35,8 @@ export async function generateMetadata({ params }: Props): Promise<Metadata> {
 
 /** a photograph of the series out in the world, from her exhibitions */
 const PHOTO: Record<string, { src: string; alt: string; cap: string; w: number; h: number }> = {
-  "gone-are-the-days": { src: "/site/ex/ihc-press-b.jpg", w: 1200, h: 803, alt: "Dr Dolly Prasad interviewed beside The Bullocks",
-    cap: "Beside The Bullocks, in front of the cameras at Open Palm Court, India Habitat Centre, New Delhi, November 2010." },
+  "gone-are-the-days": { src: "/site/ex/ihc-press-b.jpg", w: 1200, h: 803, alt: "Dr Dolly Prasad interviewed beside “Before the Engines”",
+    cap: "Beside “Before the Engines”, in front of the cameras at Open Palm Court, India Habitat Centre, New Delhi, November 2010." },
   faith: { src: "/site/ex/iccr-02.jpg", w: 1080, h: 1080, alt: "Dr Dolly Prasad beside Dhyan at ICCR",
     cap: "Beside Dhyan at A Lifetime to Paint, ICCR, New Delhi, June 2010." },
 };

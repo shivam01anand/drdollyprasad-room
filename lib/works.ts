@@ -42,7 +42,7 @@ const CATALOGUE: Work[] = [
   W("postbox-and-stamps", "Patra Petika", "Gone Are The Days", "Available", { year: "2017", size: "48 × 36 in", inches: 48 }),
   W("mother-india-and-kettles", "Mother India", "Gone Are The Days", "Available", { year: "2017", size: "48 × 36 in", inches: 48 }),
   W("shree-420-and-milk-cans", "Shree 420", "Gone Are The Days", "Available", { year: "2017", size: "48 × 36 in", inches: 48 }),
-  W("bulls-and-wheel", "The Bullocks", "Gone Are The Days", "Available", { year: "2010", size: "48 × 48 in", inches: 48 }),
+  W("bulls-and-wheel", "Before the Engines", "Gone Are The Days", "Available", { year: "2010", size: "48 × 48 in", inches: 48 }),
   W("cycle-rickshaw", "Last of the Pedals", "Gone Are The Days", "Available", { year: "2018", size: "36 × 48 in", inches: 48 }),
   W("rickshaw-rest", "Thodi Der", "Gone Are The Days", "Sold", { year: "2018", size: "36 × 36 in", inches: 36 }),
   W("horse-cart-and-autorickshaw", "A Ride Together", "Gone Are The Days", "Available", { year: "2016", size: "24 × 24 in", inches: 24 }),

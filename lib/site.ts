@@ -364,7 +364,7 @@ const CAP: Record<string, string> = {
   "ihc-07": "Three paintings on the walls, India Habitat Centre",
   "ihc-room-a": "Paintings along a partition, India Habitat Centre",
   "ihc-room-b": "Two paintings above the lamp, India Habitat Centre",
-  "ihc-room-c": "The Bullocks on the wall, India Habitat Centre",
+  "ihc-room-c": "“Before the Engines” on the wall, India Habitat Centre",
   "ihc-room-e": "Gullak, India Habitat Centre",
   "ihc-room-d": "A painting of a working figure, India Habitat Centre",
   "ihc-room-f": "The rickshaw puller painting, India Habitat Centre",
@@ -399,7 +399,7 @@ export const SHOWS_AS_RECORDED: Show[] = [
   {
     id: "india-habitat-centre-2010", title: "India Habitat Centre", kind: "Exhibition", where: "Open Palm Court, India Habitat Centre, New Delhi · November 2010",
     venue: "Open Palm Court, India Habitat Centre", city: "New Delhi", when: "November 2010", year: "2010",
-    lede: "A lamp lit at the opening. The Bullocks, the gullak and the rickshaw-walas on red-brick walls. Visitors stopping to talk, to look, to take a photograph. And the press, with their questions, beside the paintings.",
+    lede: "A lamp lit at the opening. “Before the Engines”, the gullak and the rickshaw-walas on red-brick walls. Visitors stopping to talk, to look, to take a photograph. And the press, with their questions, beside the paintings.",
     works: ["bulls-and-wheel", "coins-and-clay-bank", "monks-and-blue-buddha"],
     albums: [
       { title: "The evening", line: "The lamp is lit, and the room fills.", photos: [
@@ -410,16 +410,16 @@ export const SHOWS_AS_RECORDED: Show[] = [
         ph("ihc-06", "Photographers and visitors in front of a large painting of a rickshaw puller."),
         ph("ihc-08", "Dr Dolly Prasad beside Dhyan, looking across the room."),
       ] },
-      { title: "In front of the cameras", line: "Interviews beside the work: a rickshaw-wala behind her in one, The Bullocks in the other.", photos: [
+      { title: "In front of the cameras", line: "Interviews beside the work: a rickshaw-wala behind her in one, “Before the Engines” in the other.", photos: [
         ph("ihc-press-a", "Dr Dolly Prasad smiles in conversation with a reporter beside her rickshaw painting."),
-        ph("ihc-press-b", "Dr Dolly Prasad listens during an interview beside The Bullocks."),
+        ph("ihc-press-b", "Dr Dolly Prasad listens during an interview beside “Before the Engines”."),
       ] },
       { title: "A walk through the room", line: "The wide views first, then the canvases up close.", photos: [
         ph("ihc-01", "The empty exhibition room, paintings around the walls and a brass lamp at its centre."),
         ph("ihc-07", "Three framed paintings along the pale and red-brick gallery walls."),
         ph("ihc-room-a", "Paintings along a pale gallery partition and the adjoining wall."),
         ph("ihc-room-b", "Two paintings of working figures above the brass lamp on a red-brick wall."),
-        ph("ihc-room-c", "The Bullocks in its black frame on the exhibition wall."),
+        ph("ihc-room-c", "“Before the Engines” in its black frame on the exhibition wall."),
         ph("ihc-room-e", "Gullak in its exhibition frame."),
         ph("ihc-room-d", "A framed painting of a working figure against a large coin."),
         ph("ihc-room-f", "A large framed painting of a rickshaw puller on a red-brick wall."),

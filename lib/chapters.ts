@@ -109,7 +109,7 @@ export const CHAPTERS: Chapter[] = [
     // a portrait screen faces Threads of Faith: it turns to the passage before going through
     via: "streetvia",
     // the framed print on its easel is 0.64 × 0.48 m (scripts/house/build.py press_easel)
-    asides: [{ anchor: "press", title: "The artist, in conversation", line: "Beside “The Bullocks”, at her exhibition", size: [0.64, 0.48] }],
+    asides: [{ anchor: "press", title: "The artist, in conversation", line: "Beside “Before the Engines”, at her exhibition", size: [0.64, 0.48] }],
     // her own words (her studio page, drdollyprasad.wordpress.com, 2018)
     quote:
       "The shades that touched me, the live frames that seemed to tell a story larger than the " +
