@@ -50,7 +50,7 @@ export const HOME: Item[][] = [
     X("/site/ex/kala-dolly.jpg", "Art fair · February 2018", "First International Kala Mela", "IGNCA, New Delhi", "Dr Dolly Prasad beside her painting at the First International Kala Mela", "/exhibitions#kala-mela-2018"),
     P("terracotta-pots"), P("man-among-metal-pans")],
   [P("child-among-flowers"), P("postbox-and-stamps"),
-    X("/site/ex/ihc-03.jpg", "Opening night · 2010", "Lighting the lamp", "India Habitat Centre", "Dr Dolly Prasad lights the lamp at her exhibition", "/exhibitions#india-habitat-centre-2010"),
+    X("/site/ex/ihc-03.jpg", "Opening night · 2010", "The opening", "India Habitat Centre", "The opening at her exhibition, India Habitat Centre", "/exhibitions#india-habitat-centre-2010"),
     P("yellow-turban-portrait"), P("rickshaw-rest-framed"), P("prayer-and-scripture")],
   [P("shree-420-and-milk-cans"), P("teal-door-bolt"), P("woman-with-red-flower"), P("monk-and-green-buddha"),
     X("/site/ex/ihc-press-b.jpg", "In front of the cameras", "Beside “Before the Engines”", "India Habitat Centre · 2010", "Dr Dolly Prasad interviewed beside “Before the Engines”", "/exhibitions#india-habitat-centre-2010"),

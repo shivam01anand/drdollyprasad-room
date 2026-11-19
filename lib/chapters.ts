@@ -48,14 +48,7 @@ export type Chapter = {
 };
 
 /** the poem: Shubham’s words, shown unsigned (approved 2026-11-19) */
-export const POEM = `A chai boy, chin in his hand,
-lets the kettle steam.
-Two bullocks stand in their painted horns.
-A red letterbox keeps its corner.
-The road hurries past them all.
-She stops,
-and sits with them
-until the paint has set.`;
+export const POEM = `The everyday has its waiting and wishing, its worship and whispers. A rickshaw puller rests, a bell hanging from his fingers. Red thread goes round a peepal one wish at a time. A boy lifts a lamp to a wall of the same prayer, written again and again. Three women in red lean in, veiled.`;
 
 export const CHAPTERS: Chapter[] = [
   { id: "presence", eyebrow: "“Khwaab”", stop: "Khwaab", room: "The courtyard", view: "presence", labels: ["woman-with-poppies"] },
@@ -72,7 +65,7 @@ export const CHAPTERS: Chapter[] = [
     labelSide: "left",
     body: "Bananas on his head, banana leaves all round him, and a red banana flower at the top left." },
   // her corner by the banana: she paints at her easel, her statement beside her
-  { id: "easel", eyebrow: "A poem", stop: "At her easel", room: "The courtyard", verse: POEM, view: "easel",
+  { id: "easel", eyebrow: "The everyday, held sacred", stop: "At her easel", room: "The courtyard", verse: POEM, view: "easel",
     via: "easelvia", dusk: 0.12,
     // the canvas she is working on, from her own photograph (scripts/figure/make.py)
     asides: [{ anchor: "easel", title: "On her easel", line: "A new painting, in progress", size: [1.28, 1.06] }] },

@@ -33,7 +33,7 @@ const IG = ["patterned-turban-portrait", "bulls-and-wheel", "temple-bells", "red
 const now = NOW;
 // R4 fix 7 (Brand P1-5): "On the walls" reads newest first, in the one SHOWS order (Kala Mela first)
 const CARDS = [
-  { id: "india-habitat-centre-2010", src: "/site/ex/ihc-03.jpg", alt: "Dr Dolly Prasad lights the lamp at the opening at India Habitat Centre" },
+  { id: "india-habitat-centre-2010", src: "/site/ex/ihc-03.jpg", alt: "The opening at India Habitat Centre, 2010" },
   { id: "a-lifetime-to-paint", src: "/site/ex/iccr-speech.jpg", alt: "Dr Dolly Prasad speaks at the opening of A Lifetime to Paint, ICCR" },
   { id: "kala-mela-2018", src: "/site/ex/kala-dolly.jpg", alt: "Dr Dolly Prasad beside her painting at the First International Kala Mela" },
 ].sort((a, b) => SHOWS.findIndex((x) => x.id === a.id) - SHOWS.findIndex((x) => x.id === b.id));

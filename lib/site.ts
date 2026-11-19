@@ -82,14 +82,7 @@ export const LINES: Record<string, string> = {
 
 /** the poem: Shubham’s words, shown unsigned (approved 2026-11-19) */
 export const STATEMENT = [
-  "A chai boy, chin in his hand,",
-  "lets the kettle steam.",
-  "Two bullocks stand in their painted horns.",
-  "A red letterbox keeps its corner.",
-  "The road hurries past them all.",
-  "She stops,",
-  "and sits with them",
-  "until the paint has set.",
+  "The everyday has its waiting and wishing, its worship and whispers. A rickshaw puller rests, a bell hanging from his fingers. Red thread goes round a peepal one wish at a time. A boy lifts a lamp to a wall of the same prayer, written again and again. Three women in red lean in, veiled.",
 ];
 
 export type Chapter = {
@@ -335,7 +328,7 @@ export type Show = {
 /** one-line captions, Chief Content 2c (C7), applied verbatim [Ours] */
 const CAP: Record<string, string> = {
   "ihc-02": "Visitors around the lit lamp, India Habitat Centre",
-  "ihc-03": "Dr Dolly Prasad lights the lamp, India Habitat Centre",
+  "ihc-03": "The opening, India Habitat Centre",
   "ihc-04": "Dr Dolly Prasad with visitors, India Habitat Centre",
   "ihc-05": "Dr Dolly Prasad and visitors, India Habitat Centre",
   "ihc-06": "Photographers at the rickshaw painting, India Habitat Centre",
@@ -381,12 +374,12 @@ export const SHOWS_AS_RECORDED: Show[] = [
   {
     id: "india-habitat-centre-2010", title: "India Habitat Centre", kind: "Exhibition", where: "Open Palm Court, India Habitat Centre, New Delhi · November 2010",
     venue: "Open Palm Court, India Habitat Centre", city: "New Delhi", when: "November 2010", year: "2010",
-    lede: "A lamp lit at the opening. “Before the Engines”, the gullak and the rickshaw-walas on red-brick walls. Visitors stopping to talk, to look, to take a photograph. And the press, with their questions, beside the paintings.",
+    lede: "“Before the Engines”, the gullak and the rickshaw-walas on red-brick walls. Visitors stopping to talk, to look, to take a photograph. And the press, with their questions, beside the paintings.",
     works: ["bulls-and-wheel", "coins-and-clay-bank", "monks-and-blue-buddha"],
     albums: [
       { title: "The evening", line: "The lamp is lit, and the room fills.", photos: [
         ph("ihc-02", "The opening at Open Palm Court, India Habitat Centre: visitors gathered around the lit brass lamp."),
-        ph("ihc-03", "Dr Dolly Prasad lights the brass lamp at the opening, with guests beside her."),
+        ph("ihc-03", "The opening, with guests gathered round the brass lamp."),
         ph("ihc-04", "Dr Dolly Prasad in conversation with visitors in front of her paintings."),
         ph("ihc-05", "Dr Dolly Prasad and visitors look along a wall of paintings of everyday objects and working lives."),
         ph("ihc-06", "Photographers and visitors in front of a large painting of a rickshaw puller."),
