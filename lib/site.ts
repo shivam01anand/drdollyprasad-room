@@ -3,7 +3,7 @@ import { WORKS, type Work, EMAIL, INSTAGRAM, SITE, quoted, workPath } from "./wo
 /**
  * The website around the studio: the series stories and her exhibitions.
  *
- * All words on this site are Shubham's (kb/voice.md). Nothing is presented as hers.
+ * All words on this site are Shubham’s (kb/voice.md). Nothing is presented as hers.
  * The label (title, medium, size, year, series, status) is fact from lib/works.
  */
 
@@ -27,16 +27,16 @@ export const BIO_LINE = "The everyday, held sacred.";
 export const BIO_SUB = "Catching the hues of India in its waiting and wishing, its worship and whispers.";
 
 /**
- * One line per painting, in the observer's voice (third person, never hers):
+ * One line per painting, in the observer’s voice (third person, never hers):
  * what is on the canvas. Source: kb descriptions (2026-11-19).
  */
 export const LOOK: Record<string, string> = {
-  "rickshaw-puller-and-coin": "He has his back to us, a red cloth across his shoulders, both hands on the rickshaw's shafts and a small bell hanging below one fist. Behind him, she painted a twenty paise coin, far bigger than the man.",
+  "rickshaw-puller-and-coin": "He has his back to us, a red cloth across his shoulders, both hands on the rickshaw’s shafts and a small bell hanging below one fist. Behind him, she painted a twenty paise coin, far bigger than the man.",
   "carriage-and-autorickshaw": "The tonga is painted in full: grey horse, red harness, a man waiting under the orange hood. The autorickshaw beside it is only a white outline on maroon.",
   "bullock-cart-and-truck": "The bullock cart is drawn in greys, the driver raising his whip over a load of sacks. Beside it stands a Tata public carrier in loud orange paint. Whatever the whip says, the bullock keeps its own pace.",
   "rickshaw-rest-framed": "He looks back over his shoulder, a small bell hanging still from two fingers. The one rupee coin behind him is painted large enough to lean on, wheat ear and all. Until a fare comes, he sits with it at his back.",
   "coins-and-clay-bank": "A clay gullak sits on a bed of old coins: half an anna from 1946, five naye paise from 1963. The slot on top is one dark line. The only way to get the coins back out was to break it.",
-  "postbox-and-stamps": "The red letterbox has New Delhi painted on its front in Hindi, with a pin code under it. Behind it the wall is papered with old stamps, Gandhi's face turning up more than once. Each one paid a letter's way through that slot.",
+  "postbox-and-stamps": "The red letterbox has New Delhi painted on its front in Hindi, with a pin code under it. Behind it the wall is papered with old stamps, Gandhi’s face turning up more than once. Each one paid a letter’s way through that slot.",
   "mother-india-and-kettles": "Four steel kettles tumble down the left edge at every angle, and only the bottom one lands upright. Behind them, a Mother India poster has faded into the same red as everything else.",
   "shree-420-and-milk-cans": "Three milk cans, dented and rusting in patches, stand in front of a torn Shree 420 poster. It still lists the shows at Maratha Mandir, from 11.30 in the morning to 9.30 at night. The milk was out long before the first one.",
   "bulls-and-wheel": "Two bullocks under one yoke. Someone painted their horns, one pair blue and one green, hung a brass bell at each neck and laid a striped cloth over one back. They were work animals, dressed like family.",
@@ -49,7 +49,7 @@ export const LOOK: Record<string, string> = {
   "red-and-teal-door-lock": "The red paint is coming away in flakes, showing grey wood underneath, and the teal frame has worn through in patches. The padlock and its hasp have rusted to a single brown, and the lock still holds.",
   "teal-door-bolt": "Someone slid the long iron bolt across both doors, then hung a padlock from it as well. Around the rusted hardware, the teal paint has fallen away in patches, and the brown wood shows through.",
   "carved-door-knocker": "There is no lock on this door. Its iron handle is shaped like a heart, three studs below it have flowers worked into their centres, and a border of turquoise and copper arcs is carved down one side.",
-  "monks-and-blue-buddha": "The Buddha's face fills the canvas in blue, eyes shut. Below it, two of the four monks have shut their eyes as well. The other two are not there yet, one still reading his loose pages, one sitting with his back to us.",
+  "monks-and-blue-buddha": "The Buddha’s face fills the canvas in blue, eyes shut. Below it, two of the four monks have shut their eyes as well. The other two are not there yet, one still reading his loose pages, one sitting with his back to us.",
   "monk-and-green-buddha": "A monk in saffron bows his head into his joined hands. Above him the Buddha sits in green under a yellow halo, one hand raised.",
   "offering-of-light": "A boy with a shaved head and a knotted tuft lifts a small lamp towards a wall of tablets. Every tablet carries the same Ganesh prayer, Vakratunda Mahakaya, written over and over.",
   "prayer-and-scripture": "We only see his back, bare, with a saffron cloth gathered over one shoulder. He sits facing a wall written over with the Gayatri mantra, a brass lamp at his side, every tablet saying the same lines.",
@@ -60,7 +60,7 @@ export const LOOK: Record<string, string> = {
   "red-turban-portrait": "His eyes have nearly closed with the smile, and his head has dropped a little, the way it does when a laugh is starting. Under the red turban, a gold flower earring catches the light.",
   "yellow-turban-portrait": "The yellow turban is tied high and full, and he keeps his head up under its weight. His face turns aside, but his eyes come round to hold ours.",
   "patterned-turban-portrait": "The turban is bright, a cream lattice over orange, but the face under it has gone the other way. His brow pulls down, his lower lip pushes out, and his eyes stay on the ground.",
-  "mother-and-child": "The boy stays half hidden at his mother's side, one small hand wrapped round her arm. She looks down at him. From there, he can afford to look straight out at us.",
+  "mother-and-child": "The boy stays half hidden at his mother’s side, one small hand wrapped round her arm. She looks down at him. From there, he can afford to look straight out at us.",
   "boy-and-kettle": "She painted the boy and the kettle in the same blue, as if one belongs to the other. He sits with his chin in his hand, watching the stove, while the tea comes to the boil.",
   "man-among-metal-pans": "He sits with his back to us, pale turban and a shawl round his shoulders, in a ring of iron kadhais nearly as wide as he is. Every pan sits empty, waiting to be lifted.",
   "three-veiled-women": "Three women in red have drawn so close that not one face shows. What we get instead are their arms, heavy with silver bangles: one raised high over the others, one holding a veil shut at the face.",
@@ -80,7 +80,7 @@ export const LINES: Record<string, string> = {
   "coins-and-clay-bank": "The coins have moved on. The gullak is still here, still holding.",
 };
 
-/** the poem: Shubham's words, shown unsigned (approved 2026-11-19) */
+/** the poem: Shubham’s words, shown unsigned (approved 2026-11-19) */
 export const STATEMENT = [
   "A chai boy, chin in his hand,",
   "lets the kettle steam.",
@@ -123,7 +123,7 @@ export type SeriesPage = {
 export const SERIES_PAGES: SeriesPage[] = [
   // R4 B1-3: newest first. This array is the one order source for every listing of the collections.
   {
-    slug: "bahaar", label: "Bahaar", period: "2024 to 2026",
+    slug: "bahaar", label: "Bahaar", period: "2024 to 2025",
     line: "A boy under banana leaves, a girl half lost in bougainvillea.",
     hero: "boy-with-bananas",
     held: "Something is in flower in each of these five paintings.",
@@ -163,13 +163,13 @@ export const SERIES_PAGES: SeriesPage[] = [
     ],
   },
   {
-    slug: "gone-are-the-days", label: "Gone Are The Days", period: "2010 to 2018",
+    slug: "gone-are-the-days", label: "Gone Are The Days", period: "2007 to 2018",
     line: "Tongas and bullock carts, often painted beside the autos and trucks that replaced them.",
     hero: "bulls-and-wheel",
     held: "Nobody waved goodbye to the last tonga.",
     intro: [
       "Most of these paintings put two times side by side. A tonga waits beside an auto, a bullock cart beside a truck, and coins nobody spends any more lie next to the clay gullak that held them.",
-      "The rest are the people who kept the street running: a chai boy, a kadhai seller, the milkman on his round, a man with the morning paper, boatmen at the river's edge.",
+      "The rest are the people who kept the street running: a chai boy, a kadhai seller, the milkman on his round, a man with the morning paper, boatmen at the river’s edge.",
     ],
     chapters: [
       { title: "Coins and clay", works: ["rickshaw-puller-and-coin", "coins-and-clay-bank", "terracotta-pots"],
@@ -185,7 +185,7 @@ export const SERIES_PAGES: SeriesPage[] = [
         small: "The milkman is already out on his round. The kadhai seller sits among his pans, waiting for a buyer. Intezar means waiting." },
       { title: "Letters and cinema", works: ["postbox-and-stamps", "mother-india-and-kettles", "shree-420-and-milk-cans"],
         big: "The Shree 420 poster is peeling, but you can still read where it was playing, Maratha Mandir, and that it ran four shows a day.",
-        small: "In Patra Petika a red letterbox stands in front of old Indian stamps, with Gandhi's face on several of them." },
+        small: "In Patra Petika a red letterbox stands in front of old Indian stamps, with Gandhi’s face on several of them." },
     ],
   },
   {
@@ -202,11 +202,11 @@ export const SERIES_PAGES: SeriesPage[] = [
         big: "Garv is the only one of the three who looks straight at you.", small: "Muskaan wears a small gold earring shaped like a flower." },
       { title: "Together", works: ["three-veiled-women", "mother-and-child"], room: true,
         big: "In Aanchal the mother looks down. The child holding her arm looks straight out at you.",
-        small: "One woman's arm is raised over her head, bangles stacked to the wrist." },
+        small: "One woman’s arm is raised over her head, bangles stacked to the wrist." },
     ],
   },
   {
-    slug: "faith", label: "Faith", period: "2007 to 2014",
+    slug: "faith", label: "Faith", period: "2007 to 2026",
     line: "Prayer in its daily form: a lamp lifted to a wall of mantras, a thread tied round a peepal.",
     hero: "offering-of-light",
     held: "Most of the people praying in these paintings are seen from behind, so you stand where they stand.",
@@ -219,7 +219,7 @@ export const SERIES_PAGES: SeriesPage[] = [
         big: "Small drawings of Ganesha sit between the lines of the Vakratunda mantra, the prayer that asks him to clear the way for every task.",
         small: "In Gayatri a tall brass lamp stands beside the seated man, a yellow cloth over his shoulder." },
       { title: "The Buddhas", works: ["monks-and-blue-buddha", "monk-and-green-buddha"], room: true, dark: true,
-        big: "In Dhyan the Buddha's face is too big for the canvas. The four monks below it reach only as high as his nose.",
+        big: "In Dhyan the Buddha’s face is too big for the canvas. The four monks below it reach only as high as his nose.",
         small: "In Sharan a monk sits, palms pressed to his forehead, before a Buddha in green and gold." },
       { title: "Daily rites", works: ["priest-with-flame", "sacred-tree", "temple-bells"],
         big: "In Aarti the priest has the flame in one hand and the bell in the other.",
@@ -242,7 +242,7 @@ export const seriesPath = (label: string) => `/series/${SERIES_BY_LABEL.get(labe
 export const worksIn = (label: string) => WORKS.filter((w) => w.series === label);
 
 /* ---- R4 B2-1: one order, so the switcher, the pager, the story page and the bands cannot disagree ---- */
-/** a collection's paintings in her chapter order (flattened), then any not featured in a chapter, in register order */
+/** a collection’s paintings in her chapter order (flattened), then any not featured in a chapter, in register order */
 export function collectionOrder(slug: string): string[] {
   const s = SERIES_BY_SLUG.get(slug);
   if (!s) return [];
@@ -257,9 +257,9 @@ export function seriesNeighbours(slug: string) {
   return { prev: SERIES_PAGES[(i - 1 + n) % n], next: SERIES_PAGES[(i + 1) % n] };
 }
 /**
- * a painting's neighbours inside its collection. At the ends, prev/next are the last/first painting of the
- * adjacent collection, flagged with `crossesTo` (that collection's slug); the painting page then links to
- * that collection's story page.
+ * a painting’s neighbours inside its collection. At the ends, prev/next are the last/first painting of the
+ * adjacent collection, flagged with `crossesTo` (that collection’s slug); the painting page then links to
+ * that collection’s story page.
  */
 export function neighbours(id: string) {
   const w = WORKS.find((x) => x.id === id);
@@ -302,7 +302,7 @@ export const enquireHref = (w?: Work) => (w ? `/enquire?work=${w.id}` : "/enquir
  * From the exhibition archive (Project Memory/exhibitions-master.json and the
  * exhibition post records, 18 Oct 2026). Her record lists nineteen
  * exhibitions and art fairs, 2005 to 2026 (Sacred Fragments, Oct 2026, added on the
- * owner's confirmation); it does not say which were solo, so
+ * owner’s confirmation); it does not say which were solo, so
  * nothing here calls them all solo. Dates are given only as precisely as the
  * record gives them.
  */
@@ -313,12 +313,12 @@ export type Clip = { src: string; poster: string; title: string; line: string };
 
 export type Show = {
   id: string;
-  /** one pattern for every show: the place (or the fair's own name) */
+  /** one pattern for every show: the place (or the fair’s own name) */
   title: string;
-  /** the show's own title, where it had one */
+  /** the show’s own title, where it had one */
   name?: string;
   kind: string;
-  /** the one line under the show's title: venue · dates (Chief Content 2c, C3 to C6) */
+  /** the one line under the show’s title: venue · dates (Chief Content 2c, C3 to C6) */
   where?: string;
   venue: string;
   city: string;
@@ -363,7 +363,7 @@ const ph = (n: string, alt: string): Photo => ({ src: `/site/ex/${n}.jpg`, alt, 
 
 /**
  * The one switch for "Now showing": the home strip, the Exhibitions panel, the note on a
- * painting's page and the studio's welcome note stay hidden until Content/COO confirm a
+ * painting’s page and the studio’s welcome note stay hidden until Content/COO confirm a
  * current event record. Set to true only after that confirmation.
  */
 export const NOW_SHOWING_CONFIRMED = false;
@@ -440,7 +440,7 @@ export const SHOWS_AS_RECORDED: Show[] = [
 ];
 
 const MONTHS = ["january", "february", "march", "april", "may", "june", "july", "august", "september", "october", "november", "december"];
-/** a show's date as a number (year * 100 + the last month named in `when`), for newest-first order */
+/** a show’s date as a number (year * 100 + the last month named in `when`), for newest-first order */
 export const showKey = (sh: { year: string; when: string }) => {
   const m = sh.when.toLowerCase().match(new RegExp(MONTHS.join("|"), "g"));
   return Number(sh.year) * 100 + (m ? MONTHS.indexOf(m[m.length - 1]) + 1 : 0);

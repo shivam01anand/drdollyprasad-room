@@ -28,7 +28,7 @@ const SHOW_PHOTOS: RollItem[] = [
 ];
 
 /*
- * All words are Shubham's. No line on this page is presented as hers.
+ * All words are Shubham’s. No line on this page is presented as hers.
  */
 
 export default function About() {
@@ -78,7 +78,7 @@ export default function About() {
           <div className="ab-txt">
             <p className="eyebrow">A doctor’s eye</p>
             <h2>The small sign</h2>
-            <p className="ab-p">A doctor learns to look for the small sign that explains the rest. In her paintings it might be the brass bell hanging from a resting rickshaw puller's fingers, or the sheet of newspaper that has slid to the floor under a reader.</p>
+            <p className="ab-p">A doctor learns to look for the small sign that explains the rest. In her paintings it might be the brass bell hanging from a resting rickshaw puller’s fingers, or the sheet of newspaper that has slid to the floor under a reader.</p>
             <Link className="btn btn-solid" href="/series">The five collections</Link>
           </div>
           <Roll label="A few of her paintings" items={paint(["bulls-and-wheel", "offering-of-light", "boy-with-bananas", "temple-bells", "woman-with-bird"])} />

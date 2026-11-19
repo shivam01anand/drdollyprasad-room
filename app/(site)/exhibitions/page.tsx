@@ -48,7 +48,7 @@ export default function Exhibitions() {
       </Until>}
 
       <nav className="ex-index" aria-label="On this page">
-        {/* R6: the page's own order (India Habitat Centre, the press, A Lifetime to Paint, Kala Mela), then the list */}
+        {/* R6: the page’s own order (India Habitat Centre, the press, A Lifetime to Paint, Kala Mela), then the list */}
         {shows.map((s, k) => (
           <Fragment key={s.id}>
             <a href={`#${s.id}`}><span>{s.year}</span>{s.name ?? s.title}</a>

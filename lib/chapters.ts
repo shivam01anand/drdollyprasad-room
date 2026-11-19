@@ -4,7 +4,7 @@ import { phoneGroupView } from "./room/phone-framing";
 
 /**
  * One chapter model owns the copy and the camera, so the two can never drift
- * apart. The camera framings are the house's own views (scripts/house),
+ * apart. The camera framings are the house’s own views (scripts/house),
  * made in Blender and walked in order: each turn is at most a quarter, and
  * every move from one room to the next passes through a doorway
  * (scripts/house/pathcheck.py proves it).
@@ -37,17 +37,17 @@ export type Chapter = {
   /** the canvases in this framing that get a wall label */
   labels?: string[];
   /** captions for things in the framing that are not her works (a house anchor and its words,
-   *  and the thing's size in metres, so no wall label covers it) */
+   *  and the thing’s size in metres, so no wall label covers it) */
   asides?: { anchor: string; title: string; line: string; size: [number, number] }[];
   /** which side of its canvas a label tries first (a door or a corner on the other) */
   labelSide?: "left" | "right" | "below";
-  /** the stop's short name, for the phone's dock and the list of stops */
+  /** the stop’s short name, for the phone’s dock and the list of stops */
   stop: string;
   /** where in the house it is */
   room?: string;
 };
 
-/** the poem: Shubham's words, shown unsigned (approved 2026-11-19) */
+/** the poem: Shubham’s words, shown unsigned (approved 2026-11-19) */
 export const POEM = `A chai boy, chin in his hand,
 lets the kettle steam.
 Two bullocks stand in their painted horns.
@@ -61,7 +61,7 @@ export const CHAPTERS: Chapter[] = [
   { id: "presence", eyebrow: "“Khwaab”", stop: "Khwaab", room: "The courtyard", view: "presence", labels: ["woman-with-poppies"] },
   {
     id: "floral",
-    eyebrow: "Bahaar · 2024–",
+    eyebrow: "Bahaar · 2024–2025",
     stop: "Bahaar",
     room: "The courtyard",
     body: "Three faces from Bahaar, each with flowers pressed up close.",
@@ -92,14 +92,14 @@ export const CHAPTERS: Chapter[] = [
   },
   {
     id: "street",
-    eyebrow: "Gone Are The Days · 2010–2018",
+    eyebrow: "Gone Are The Days · 2007–2018",
     stop: "Gone Are The Days",
     room: "The Red Room",
     // a portrait screen faces Threads of Faith: it turns to the passage before going through
     via: "streetvia",
     // the framed print on its easel is 0.64 × 0.48 m (scripts/house/build.py press_easel)
     asides: [{ anchor: "press", title: "The artist, in conversation", line: "Beside “Before the Engines”, at her exhibition", size: [0.64, 0.48] }],
-    body: "Mitti's clay pots, tipped every way, and the painted horns of Before the Engines.",
+    body: "Mitti’s clay pots, tipped every way, and the painted horns of Before the Engines.",
     ink: "light",
     view: "street",
     dusk: 0.38,
@@ -107,23 +107,23 @@ export const CHAPTERS: Chapter[] = [
   },
   { id: "redwall", eyebrow: "“Shree 420” · “Lajja”", stop: "Shree 420 · Lajja", room: "The Red Room", view: "redwall",
     via: "redvia", dusk: 0.45, labels: ["shree-420-and-milk-cans", "three-veiled-women"] },
-  // through the Red Room's east doorway: the gallery hall, where the rest of her work hangs as an
+  // through the Red Room’s east doorway: the gallery hall, where the rest of her work hangs as an
   // exhibition hangs, one line at eye level, a series to a wall (scripts/house/build.py)
   { id: "gallery", ink: "light", eyebrow: "The gallery", stop: "The gallery", room: "The gallery",
     view: "gallery", via: "galleryvia", dusk: 0.5 },
-  { id: "rupaya", eyebrow: "Gone Are The Days · 2010–2018", stop: "Twenty Paise · Mother India", room: "The gallery",
+  { id: "rupaya", eyebrow: "Gone Are The Days · 2007–2018", stop: "Twenty Paise · Mother India", room: "The gallery",
     view: "rupaya", dusk: 0.5, labelSide: "below",
     labels: ["rickshaw-puller-and-coin", "postbox-and-stamps", "mother-india-and-kettles"] },
-  { id: "cartman", eyebrow: "Gone Are The Days · 2010–2018", stop: "Last of the Pedals · Ek Rupaya", room: "The gallery",
+  { id: "cartman", eyebrow: "Gone Are The Days · 2007–2018", stop: "Last of the Pedals · Ek Rupaya", room: "The gallery",
     view: "cartman", dusk: 0.5, labelSide: "below", labels: ["cycle-rickshaw", "rickshaw-rest-framed"] },
-  { id: "panels", eyebrow: "Gone Are The Days · 2010–2018", stop: "Then and now", room: "The gallery",
+  { id: "panels", eyebrow: "Gone Are The Days · 2007–2018", stop: "Then and now", room: "The gallery",
     view: "panels", dusk: 0.52, labelSide: "below",
     labels: ["horse-cart-and-autorickshaw", "coins-and-clay-bank", "rickshaw-and-autorickshaw", "carriage-and-autorickshaw",
       "rickshaw-rest", "bullock-cart-and-truck"] },
   // Faith, either side of the window onto the palm court
-  { id: "shrine", eyebrow: "Faith · 2007–2014", stop: "Mannat · Aarti", room: "The gallery",
+  { id: "shrine", eyebrow: "Faith · 2007–2026", stop: "Mannat · Aarti", room: "The gallery",
     view: "shrine", dusk: 0.52, labelSide: "below", labels: ["sacred-tree", "priest-with-flame"] },
-  { id: "gayatri", eyebrow: "Faith · 2007–2014", stop: "Gayatri · Vakratunda", room: "The gallery",
+  { id: "gayatri", eyebrow: "Faith · 2007–2026", stop: "Gayatri · Vakratunda", room: "The gallery",
     view: "gayatri", dusk: 0.53, labelSide: "below", labels: ["prayer-and-scripture", "offering-of-light"] },
   {
     id: "portraits",
@@ -212,7 +212,7 @@ export function resolveWalk(info: HouseInfo, narrow = false, aspect = 390 / 844)
       if (narrow && c.id === "faith" && vc) vc = {
         ...vc, eye: [vc.eye[0], 1.55, vc.eye[2]], target: [vc.target[0], 1.4, vc.target[2]],
       };
-      // The wider phone view approaches the Red Room through the door's centre.
+      // The wider phone view approaches the Red Room through the door’s centre.
       if (narrow && c.id === "street" && vc) vc = {
         ...vc, eye: [-4.6, 1.55, -2.2], target: [-4.3, 1.4, 0.2],
       };
@@ -229,7 +229,7 @@ export function resolveWalk(info: HouseInfo, narrow = false, aspect = 390 / 844)
   return { shots, vias };
 }
 
-/** the establishing shot: the hero's wall, from the courtyard's far side */
+/** the establishing shot: the hero’s wall, from the courtyard’s far side */
 export const startPose = (info: HouseInfo, narrow = false) => viewPose(cam(info, "start", narrow));
 /** rearrange: the dollhouse view, high over the house */
 export const messPose = (info: HouseInfo) => viewPose(info.cams.mess);
@@ -237,7 +237,7 @@ export const messPose = (info: HouseInfo) => viewPose(info.cams.mess);
 /** portrait screens get their own framings */
 export const isNarrow = (aspect: number) => aspect < 0.85;
 
-/** Bandh Darwaze I–IV hang on the Red Room's north wall, seen from the Shree 420 stop (unlabelled) */
+/** Bandh Darwaze I–IV hang on the Red Room’s north wall, seen from the Shree 420 stop (unlabelled) */
 const BANDH_WALL = ["weathered-door-ring", "red-and-teal-door-lock", "teal-door-bolt", "carved-door-knocker"];
 
 /** every work in the order the walk passes it, wall by wall (Bandh Darwaze with Shree 420) */
