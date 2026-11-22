@@ -31,8 +31,9 @@ export type HouseInfo = {
   lightmap: { day: number; night?: number };
   /** `late`: far from the door (the gallery); its photograph loads after the house has opened.
    *  `light`: where its gallery light hangs, when it has one */
+  /** `frame`: the mat and moulding beyond the canvas's edge, each side, in metres */
   /** `lk`: the canvas's light scale, afternoon and evening: a painting is shown in a gallery's light, never washed out */
-  art: Record<string, { w: number; h: number; side: string; centre: V3; late?: boolean; light?: V3; study?: boolean; lk?: [number, number] }>;
+  art: Record<string, { w: number; h: number; side: string; centre: V3; frame?: number; late?: boolean; light?: V3; study?: boolean; lk?: [number, number] }>;
   cams: Record<string, { eye: V3; target: V3; fov: number }>;
   anchors: Record<string, V3>;
   sun: { toSun: V3 };

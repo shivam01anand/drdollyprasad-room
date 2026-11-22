@@ -18,11 +18,13 @@ export function phoneGroupView(info: HouseInfo, view: string, ids: readonly stri
     const art = info.art[id];
     if (!art || !NORMALS[art.side]) return null;
     const [nx, nz] = NORMALS[art.side];
+    // the framed work, mat and moulding included, and a little air
+    const m = (art.frame ?? 0) + 0.03;
     for (const sx of [-1, 1]) for (const sy of [-1, 1]) {
       corners.push(new THREE.Vector3(
-        art.centre[0] + nz * (art.w / 2 + 0.03) * sx,
-        art.centre[1] + (art.h / 2 + 0.03) * sy,
-        art.centre[2] - nx * (art.w / 2 + 0.03) * sx,
+        art.centre[0] + nz * (art.w / 2 + m) * sx,
+        art.centre[1] + (art.h / 2 + m) * sy,
+        art.centre[2] - nx * (art.w / 2 + m) * sx,
       ));
     }
   }

@@ -5,13 +5,19 @@ The house — Dr Dolly Prasad's studio-house, built in Blender.
 
 A gallery inside a Delhi home, in three spaces seen one through the next:
 
-  the Aangan     a courtyard garden open to the sky: the floral works,
-                 "Woman with Poppies" on the far wall, bougainvillea over it
-  the Quiet Room through the arch: "Buddha Under the Bodhi Tree" under one
-                 light, "The Blue Buddha", "Threads of Faith"; a high slit
-                 lets the afternoon in through a peepal
-  the Red Room   by the lane: "The Bullocks" on a red wall, "Shree 420",
-                 "Three Women in Red", "Terracotta"; the turquoise door ajar
+  the Aangan     a courtyard garden open to the sky: Bahaar, "Khwaab" on the
+                 far wall, bougainvillea over it
+  the Quiet Room through the arch: Faith. "Mannat" under one light, "Dhyan",
+                 "Threads of Faith"; a high slit lets the afternoon in
+                 through a peepal
+  the Red Room   by the lane: Gone Are The Days. "Before the Engines" on a red
+                 wall, "Shree 420", "Evening at the Ghat", "Mitti"; Bandh
+                 Darwaze on the north wall; the turquoise door ajar
+  the gallery    through the Red Room's east door: the rest, a series to a group
+
+Every canvas hangs at the size lib/works.ts gives it (height × width in inches, from
+dolly-engine kb/paintings.json), in a black frame round a cream mat as on the 2D site, and
+each group on a wall holds one series (kb/series.md; regrouped 22 Nov 2026).
 
 The architecture is a quiet ground: lime plaster, deep reveals, softened
 edges, a few things that belong. Every canvas has wall around it and light
@@ -27,6 +33,7 @@ import json
 import math
 import os
 import random
+import re
 import sys
 
 import bmesh
@@ -41,7 +48,10 @@ SPP = int(opt.get("--spp", 96))
 RES = int(opt.get("--res", 1440))
 ROOT = os.path.abspath(os.path.join(os.path.dirname(__file__), "..", ".."))
 PUB = os.path.join(ROOT, "public")
+# the photographs: the study's full-size finals where they are on this machine, else the site's own room copies
 ART = os.path.expanduser("~/Desktop/dolly-prasad-study/images-final")
+if not os.path.isdir(ART):
+    ART = os.path.join(ROOT, "public", "art", "room")
 PH = os.path.join(ROOT, "assets", "polyhaven")
 HT = os.path.join(ROOT, "assets", "house-tex")
 os.makedirs(OUT, exist_ok=True)
@@ -99,7 +109,7 @@ SITE = {
     "sandstone": ("sandstone", lin(0xF2DCC0), 1.4),
     "timber": ("timber", (1.25, 1.1, 0.95), 2.0),
     "door": ("door", (1.85, 1.85, 1.78), 1.15),
-    "artFrame": ("timber", (0.30, 0.205, 0.14), 0.9),
+    "artFrame": ("timber", (0.075, 0.07, 0.066), 0.9),           # black, #1C1B1A (kb/brand.md)
     "teak": ("teak", (0.86, 0.77, 0.67), 0.9),
     "teakRail": ("teak", (0.86, 0.77, 0.67), 0.9),
     "courtFloor": ("terracotta", (1.25, 0.95, 0.78), 2.08),
@@ -688,8 +698,10 @@ join("Deco_palmWindow", apply_mods([
     box("bar", _xa, _xb, _y0, _y1, PALM["z0"], PALM["z0"] + 0.035, _steel, bevel=0.003)]))
 # the panels the work hangs on: gallery white, 4 cm proud of the brick, between the piers
 PANEL_D, PANEL_Z = 0.04, (0.3, 2.85)
-GBAYS = {"S": [(1.3, 9.1), (10.5, 17.3)], "N": [(4.8, 11.4), (12.4, 17.9)],
-         "E": [(GY0 + 0.3, PALM["cy"] - PALM["w"] / 2 - 0.5), (PALM["cy"] + PALM["w"] / 2 + 0.5, GY1 - 0.3)]}
+# (widened on 22 Nov 2026 to within 10 cm of the piers and 10-15 cm of the corners, so the work
+# hangs at its true size, framed, with room round it)
+GBAYS = {"S": [(1.2, 9.4), (10.5, 17.3)], "N": [(4.75, 11.5), (12.3, 18.45)],
+         "E": [(GY0 + 0.1, PALM["cy"] - PALM["w"] / 2 - 0.43), (PALM["cy"] + PALM["w"] / 2 + 0.43, GY1 - 0.1)]}
 for side, bays in GBAYS.items():
     for k, (a0, a1) in enumerate(bays):
         wall_box(f"Wall_GalPanel{side}{k}", side, a0, a1, 0, PANEL_D, *PANEL_Z, "panel", bevel=0.006, segs=2)
@@ -791,11 +803,55 @@ floor("Lane", RX0 - 4.2, RX0 - T, RY0 - 3, QY1 + 3, "stone", lm=0.25)
 wall("LaneFacade", RX0 - 4.6, RX0 - 4.15, RY0 - 3, QY1 + 3, 0, 6.5, "court")
 
 # ====================================================================== the paintings
-def painting(art_id, side, face, along, centre_z, longest_m, depth=0.035):
-    """a stretched canvas hung on a wall face; its front carries the work"""
+# Every canvas hangs at the size the catalogue gives it (lib/works.ts `size`, height × width in
+# inches, which follows dolly-engine kb/paintings.json): read here, never typed in, so the room
+# and its wall labels cannot drift apart. The photograph is fitted to that size.
+IN = 0.0254
+
+
+def _catalogue_sizes():
+    src = open(os.path.join(ROOT, "lib", "works.ts"), encoding="utf-8").read()
+    out = {}
+    for chunk in src.split('W("')[1:]:
+        wid = chunk.split('"', 1)[0]
+        m = re.search(r'size: "(\d+(?:\.\d+)?) × (\d+(?:\.\d+)?) in"', chunk.split("\n  W(", 1)[0])
+        if m:
+            out[wid] = (float(m.group(2)) * IN, float(m.group(1)) * IN)        # (width, height) in metres
+    return out
+
+
+SIZES = _catalogue_sizes()
+assert len(SIZES) >= 41, f"lib/works.ts: only {len(SIZES)} sizes read"
+
+# The frame, as on the 2D site (kb/brand.md): black (#1C1B1A) round a cream mat (#F2EDE5). The mat
+# is proportionate, as a framer cuts it: 3 in round a 1 ft work rising to 4 in round a 4 ft one;
+# the canvas floats 2 cm proud of it. The moulding shows a 22 mm face, 6 mm proud of the paint.
+FRAME_LIP = 0.022
+
+
+def mat_of(art_id):
+    w, h = SIZES[art_id]
+    return IN * min(4.0, max(3.0, 3.0 + (max(w, h) / IN - 12.0) / 36.0))
+
+
+def border(art_id):
+    """the frame beyond the canvas's edge, each side: the mat and the moulding"""
+    return mat_of(art_id) + FRAME_LIP
+
+
+def framed(art_id):
+    """a work's outside size on the wall, frame included: (width, height)"""
+    w, h = SIZES[art_id]
+    b = border(art_id)
+    return w + 2 * b, h + 2 * b
+
+
+def painting(art_id, side, face, along, centre_z, longest_m=None, depth=0.035):
+    """a stretched canvas hung on a wall face, at its catalogue size; its front carries the work"""
+    if art_id not in SIZES:
+        raise SystemExit(f"{art_id}: no size in lib/works.ts; the house hangs every work at its stated size")
     im = img(os.path.join(ART, f"{art_id}.jpg"), True)
-    ar = im.size[0] / im.size[1]
-    w, h = (longest_m, longest_m / ar) if ar >= 1 else (longest_m * ar, longest_m)
+    w, h = SIZES[art_id]
     bpy.ops.mesh.primitive_cube_add(size=1)
     o = bpy.context.active_object
     o.name = f"Art_{art_id}"
@@ -829,137 +885,155 @@ def painting(art_id, side, face, along, centre_z, longest_m, depth=0.035):
            "E": (face - off, along, centre_z), "W": (face + off, along, centre_z)}[side]
     o.location = loc
     o["artId"] = art_id
-    INFO["art"][art_id] = {"w": w, "h": h, "side": side, "centre": list(loc), "frame": FRAME_LIP + FRAME_GAP}
-    float_frame(art_id, w, h, depth, Matrix.Translation(loc) @ Matrix.Rotation(rot, 4, "Z"))
+    INFO["art"][art_id] = {"w": w, "h": h, "side": side, "centre": list(loc), "frame": round(border(art_id), 4)}
+    mat_and_frame(art_id, w, h, depth, Matrix.Translation(loc) @ Matrix.Rotation(rot, 4, "Z"))
     return o
 
 
-FRAME_LIP, FRAME_GAP = 0.016, 0.009
+def mat_and_frame(art_id, w, h, depth, M):
+    """the cream mat round the canvas and the black moulding round the mat, in the canvas's own
+    axes (x across, y into the wall, z up), back to the wall; static, so the bake holds their light
+    and the canvas's shadow on the mat"""
+    m, lip = mat_of(art_id), FRAME_LIP
+    wall_y = depth / 2 + 0.008
+    mat_y = -depth / 2 + 0.02                              # the mat's face: 2 cm behind the paint
+    lip_y = -depth / 2 - 0.006                             # the moulding's face: 6 mm proud of it
+    o, p = w / 2 + m, h / 2 + m                            # the mat's outer edge
+    bms = {}
 
-
-def float_frame(art_id, w, h, depth, M):
-    """the frame she would hang it in, made modern: a 16 mm dark lip around a 9 mm
-    shadow gap, a tray behind the canvas, the back on the wall. In the canvas's own
-    axes (x across, y into the wall, z up); static, so the bake holds its shadow."""
-    lip, gap = FRAME_LIP, FRAME_GAP
-    o, p = w / 2 + gap, h / 2 + gap
-    y0, y1 = -depth / 2 - 0.004, depth / 2 + 0.008          # 4 mm proud of the paint, back to the wall
-    pieces = [(-o - lip, o + lip, p, p + lip), (-o - lip, o + lip, -p - lip, -p),
-              (-o - lip, -o, -p, p), (o, o + lip, -p, p)]
-    bm = bmesh.new()
-    def cube(x0, x1, ya, yb, z0, z1):
+    def cube(key, x0, x1, ya, yb, z0, z1):
+        bm = bms.setdefault(key, bmesh.new())
         r = bmesh.ops.create_cube(bm, size=1.0)
         bmesh.ops.scale(bm, vec=(x1 - x0, yb - ya, z1 - z0), verts=r["verts"])
         bmesh.ops.translate(bm, vec=((x0 + x1) / 2, (ya + yb) / 2, (z0 + z1) / 2), verts=r["verts"])
-    for x0, x1, z0, z1 in pieces:
-        cube(x0, x1, y0, y1, z0, z1)
-    cube(-o, o, depth / 2, y1, -p, p)                          # the tray, seen in the gap
-    bmesh.ops.transform(bm, matrix=M, verts=bm.verts)
-    me = bpy.data.meshes.new(f"Wall_Frame_{art_id}")
-    bm.to_mesh(me)
-    bm.free()
-    fr = link(bpy.data.objects.new(f"Wall_Frame_{art_id}", me))
-    fr.data.materials.append(role_mat("artFrame"))
-    bv = fr.modifiers.new("soft", "BEVEL")
-    bv.width = 0.0022
-    bv.segments = 2
-    bv.limit_method = "ANGLE"
-    return fr
+
+    # the mat: four boards round the canvas (none behind it, where no light reaches)
+    cube("mat", -o, o, mat_y, wall_y, h / 2, p)
+    cube("mat", -o, o, mat_y, wall_y, -p, -h / 2)
+    cube("mat", -o, -w / 2, mat_y, wall_y, -h / 2, h / 2)
+    cube("mat", w / 2, o, mat_y, wall_y, -h / 2, h / 2)
+    # the moulding
+    cube("frame", -o - lip, o + lip, lip_y, wall_y, p, p + lip)
+    cube("frame", -o - lip, o + lip, lip_y, wall_y, -p - lip, -p)
+    cube("frame", -o - lip, -o, lip_y, wall_y, -p, p)
+    cube("frame", o, o + lip, lip_y, wall_y, -p, p)
+    out = []
+    for key, role, name, bevel in (("mat", "gesso", f"Wall_Mat_{art_id}", 0.0008),
+                                   ("frame", "artFrame", f"Wall_Frame_{art_id}", 0.0022)):
+        bm = bms[key]
+        bmesh.ops.transform(bm, matrix=M, verts=bm.verts)
+        me = bpy.data.meshes.new(name)
+        bm.to_mesh(me)
+        bm.free()
+        ob = link(bpy.data.objects.new(name, me))
+        ob.data.materials.append(role_mat(role))
+        bv = ob.modifiers.new("soft", "BEVEL")
+        bv.width = bevel
+        bv.segments = 2
+        bv.limit_method = "ANGLE"
+        out.append(ob)
+    return out
 
 
-painting("woman-with-poppies", "N", AY1, 3.6, 1.72, 1.58)
-painting("child-among-flowers", "E", AX1, 1.3, 1.62, 1.15)
-painting("woman-with-red-flower", "E", AX1, 3.0, 1.62, 0.61)
-painting("woman-with-bird", "E", AX1, 4.45, 1.62, 0.61)
-painting("boy-with-bananas", "S", AY0, 5.75, 1.66, 0.914)
-painting("monk-and-green-buddha", "W", QX0, ARCH["cy"], 1.62, 1.5)
-# the Quiet Room's south-east corner: one painting to a wall, each given its own attention
-painting("monks-and-blue-buddha", "S", QY0, -1.78, 1.62, 1.3)
-painting("temple-bells", "E", QX1, 1.98, 1.6, 0.914)
-painting("bulls-and-wheel", "S", RY0 + 0.012, -3.2, 1.66, 1.219)          # 48 × 48 in
-painting("shree-420-and-milk-cans", "E", RX1 - 0.012, -1.3, 1.62, 1.016)   # 30 × 40 in
-painting("three-veiled-women", "E", RX1 - 0.012, -3.92, 1.6, 1.0)
-painting("terracotta-pots", "S", RY0 + 0.012, -1.3, 1.6, 0.914)            # 36 × 36 in
+# --- the Aangan, the courtyard: Bahaar
+painting("woman-with-poppies", "N", AY1, 3.6, 1.72)
+painting("child-among-flowers", "E", AX1, 1.3, 1.62)
+painting("woman-with-red-flower", "E", AX1, 3.0, 1.62)
+painting("woman-with-bird", "E", AX1, 4.45, 1.62)
+painting("boy-with-bananas", "S", AY0, 5.75, 1.66)
+# --- the Quiet Room: Faith. Mannat, the peepal shrine, alone under the slit the peepal shows through
+painting("sacred-tree", "W", QX0, ARCH["cy"], 1.62)
+# its south-east corner: one painting to a wall, each given its own attention; Threads of Faith
+# clear of the arch's edge
+painting("monks-and-blue-buddha", "S", QY0, -1.78, 1.62)
+painting("temple-bells", "E", QX1, 1.82, 1.6)
+# --- the Red Room: Gone Are The Days, and Bandh Darwaze on its north wall
+painting("bulls-and-wheel", "S", RY0 + 0.012, -3.4, 1.66)
+painting("terracotta-pots", "S", RY0 + 0.012, -1.3, 1.6)
+painting("shree-420-and-milk-cans", "E", RX1 - 0.012, -0.95, 1.62)       # between the gallery door and the corner
+painting("riverside-figures", "E", RX1 - 0.012, -3.975, 1.6)            # between the corner and the gallery door
 BANDH = ("weathered-door-ring", "red-and-teal-door-lock", "teal-door-bolt", "carved-door-knocker")
-for k, bid in enumerate(BANDH):                                               # 18 × 18 in each
-    painting(bid, "N", RY1, -2.75 + k * 0.61, 1.62, 0.457, depth=0.03)
+for k, bid in enumerate(BANDH):                                         # 12 × 12 in each
+    painting(bid, "N", RY1, -2.825 + k * 0.66, 1.62, depth=0.03)
 
 
-def salon(side, face, lo, hi, z, works, depth=0.035):
-    """a row of works along one wall between `lo` and `hi`, evenly spaced, centred at height z;
-    `works` is [(id, longest m)], in order of increasing `along` (x for N and S, y for E and W)"""
-    ws = []
-    for wid, longest in works:
-        im = img(os.path.join(ART, f"{wid}.jpg"), True)
-        ar = im.size[0] / im.size[1]
-        ws.append(longest if ar >= 1 else longest * ar)
-    gap = (hi - lo - sum(ws)) / (len(ws) + 1)
-    at = lo + gap
-    for (wid, longest), w in zip(works, ws):
-        painting(wid, side, face, at + w / 2, z, longest, depth)
-        INFO["art"][wid]["late"] = True        # far from the door: the site loads these after the house opens
-        at += w + gap
-
-
-# --- the gallery's hang: close groups a stop apart, so each is seen near, as at an exhibition.
-# Along the south wall, Gone Are The Days: three, then a pair, then the six small panels in two
-# rows; on the east, Faith, a pair either side of the palm window; back along the north wall, the
-# portraits in two rows, a pair, and three. Sizes as she gave them where she has.
+# --- the gallery's hang: close groups a stop apart, so each is seen near, as at an exhibition, one
+# series to a group. Along the south wall, Gone Are The Days: three, then a pair, then the six small
+# panels; on the east, Faith, a pair either side of the palm window; back along the north wall, the
+# Portraits, all six, then Gone Are The Days again, a pair and a pair. Each group is a row of columns
+# (a column is one work, or small ones stacked), centred on eye height.
 GZ = 1.55
+ROW_GAP = 0.18
 
 
-def width_of(wid, longest):
-    im = img(os.path.join(ART, f"{wid}.jpg"), True)
-    ar = im.size[0] / im.size[1]
-    return (longest if ar >= 1 else longest * ar), (longest / ar if ar >= 1 else longest)
+def col_size(col):
+    return max(framed(w)[0] for w in col), sum(framed(w)[1] for w in col) + ROW_GAP * (len(col) - 1)
 
 
-def hang_row(side, centre, z, works, gap):
-    """works in a row, `gap` apart, centred on `centre` along the wall (x on N and S, y on E)"""
-    ws = [width_of(w, l)[0] for w, l in works]
-    at = centre - (sum(ws) + gap * (len(ws) - 1)) / 2
-    for (wid, longest), w in zip(works, ws):
-        painting(wid, side, GFACE[side], at + w / 2, z, longest)
-        INFO["art"][wid]["late"] = True        # far from the door: the site loads these after the house opens
-        at += w + gap
+def group_size(cols, gaps):
+    sizes = [col_size(c) for c in cols]
+    return sum(s[0] for s in sizes) + sum(gaps), max(s[1] for s in sizes)
 
 
-def hang_rows(side, centre, rows, gap=0.3, row_gap=0.22):
-    """small works in rows, centred on `centre` and on eye height: [(works), (works)], top row first"""
-    heights = [max(width_of(w, l)[1] for w, l in r) for r in rows]
-    total = sum(heights) + row_gap * (len(rows) - 1)
-    top = GZ + total / 2
-    for r, h in zip(rows, heights):
-        hang_row(side, centre, top - h / 2, r, gap)
-        top -= h + row_gap
+def hang_group(side, start, cols, gaps):
+    at = start
+    for i, col in enumerate(cols):
+        cw, ch = col_size(col)
+        top = GZ + ch / 2
+        for wid in col:
+            fh = framed(wid)[1]
+            painting(wid, side, GFACE[side], at + cw / 2, top - fh / 2)
+            INFO["art"][wid]["late"] = True        # far from the door: the site loads these after the house opens
+            top -= fh + ROW_GAP
+        at += cw + (gaps[i] if i < len(cols) - 1 else 0.0)
 
 
-HALL = {   # each stop's group: the wall, its centre along it, and the camera's distance from it
-    "rupaya": ("S", 3.2, 3.45), "cartman": ("S", 7.15, 2.75), "panels": ("S", 13.9, 3.4),
-    "shrine": ("E", -7.25, 2.5), "gayatri": ("E", -2.05, 2.5),
-    "portraits": ("N", 15.15, 3.9), "kadhai": ("N", 10.13, 2.6), "doodhwala": ("N", 6.69, 3.6),
-}
+HALL = {}          # each stop's group: its wall, its centre along it, its framed width and height
+
+
+def hang_bay(side, bay, groups, end=0.2):
+    """groups [(stop, columns, gaps)] along a bay in increasing x (N, S) or y (E): one group centred,
+    several from `end` in from the bay's ends with what is left between them"""
+    sizes = [group_size(c, g) for _, c, g in groups]
+    free = (bay[1] - bay[0]) - sum(s[0] for s in sizes)
+    if len(groups) == 1:
+        assert free >= 0.2, (side, bay, free)
+        starts = [bay[0] + free / 2]
+    else:
+        between = (free - 2 * end) / (len(groups) - 1)
+        assert between >= 0.45, (side, bay, between)
+        starts, at = [], bay[0] + end
+        for s in sizes:
+            starts.append(at)
+            at += s[0] + between
+    for (stop, cols, gaps), st, sz in zip(groups, starts, sizes):
+        hang_group(side, st, cols, gaps)
+        HALL[stop] = (side, st + sz[0] / 2, sz[0], sz[1])
+
+
+(s0, s1), (s2, s3) = GBAYS["S"]
+hang_bay("S", (s0, s1), [
+    ("rupaya", [["rickshaw-puller-and-coin"], ["postbox-and-stamps"], ["mother-india-and-kettles"]], [0.3, 0.3]),
+    ("cartman", [["cycle-rickshaw"], ["rickshaw-rest-framed"]], [0.35])])
+hang_bay("S", (s2, s3), [
+    ("panels", [["horse-cart-and-autorickshaw", "carriage-and-autorickshaw"], ["coins-and-clay-bank"], ["rickshaw-rest"],
+                ["rickshaw-and-autorickshaw", "bullock-cart-and-truck"]], [0.35, 0.35, 0.35])])
+(e0, e1), (e2, e3) = GBAYS["E"]
+hang_bay("E", (e0, e1), [("shrine", [["monk-and-green-buddha"], ["priest-with-flame"]], [0.26])])
+hang_bay("E", (e2, e3), [("gayatri", [["prayer-and-scripture"], ["offering-of-light"]], [0.26])])
+(n0, n1), (n2, n3) = GBAYS["N"]
+hang_bay("N", (n0, n1), [
+    ("doodhwala", [["milkman-on-bicycle"], ["newspaper-reader"]], [0.3]),
+    ("kadhai", [["boy-and-kettle"], ["man-among-metal-pans"]], [0.3])], end=0.15)
+hang_bay("N", (n2, n3), [
+    ("portraits", [["three-veiled-women"], ["red-turban-portrait", "elder-woman-portrait"],
+                   ["yellow-turban-portrait", "patterned-turban-portrait"], ["mother-and-child"]], [0.4, 0.18, 0.4])])
 # where a stop has words, its group stands right of them: the camera looks a little to the left of it
 HALL_SHIFT = {"portraits": -0.75}
-hang_row("S", HALL["rupaya"][1], GZ, [("rickshaw-puller-and-coin", 1.1), ("postbox-and-stamps", 0.9),
-                                      ("mother-india-and-kettles", 1.016)], 0.45)
-hang_row("S", HALL["cartman"][1], GZ, [("cycle-rickshaw", 1.0), ("rickshaw-rest-framed", 1.219)], 0.5)
-hang_rows("S", HALL["panels"][1], [[("horse-cart-and-autorickshaw", 0.457), ("coins-and-clay-bank", 0.61),
-                                    ("rickshaw-and-autorickshaw", 0.457)],
-                                   [("carriage-and-autorickshaw", 0.61), ("rickshaw-rest", 0.61), ("bullock-cart-and-truck", 0.61)]])
-(e0, e1), (e2, e3) = GBAYS["E"]
-salon("E", GFACE["E"], e0, e1, GZ, [("sacred-tree", 0.8), ("priest-with-flame", 1.0)])
-salon("E", GFACE["E"], e2, e3, GZ, [("prayer-and-scripture", 1.0), ("offering-of-light", 1.0)])
-hang_rows("N", HALL["portraits"][1], [[("red-turban-portrait", 0.61), ("elder-woman-portrait", 0.762),
-                                       ("yellow-turban-portrait", 0.61)],
-                                      [("patterned-turban-portrait", 0.61), ("riverside-figures", 0.61)]])
-hang_row("N", HALL["kadhai"][1], GZ, [("boy-and-kettle", 0.61), ("man-among-metal-pans", 1.0)], 0.5)
-hang_row("N", HALL["doodhwala"][1], GZ, [("milkman-on-bicycle", 1.0), ("newspaper-reader", 0.8),
-                                         ("mother-and-child", 1.219)], 0.45)
 # the work a portrait screen frames at each stop
 HALL_PHONE = {"rupaya": "mother-india-and-kettles", "cartman": "rickshaw-rest-framed", "panels": "coins-and-clay-bank",
               "shrine": "priest-with-flame", "gayatri": "prayer-and-scripture", "portraits": "elder-woman-portrait",
-              "kadhai": "man-among-metal-pans", "doodhwala": "mother-and-child"}
+              "kadhai": "man-among-metal-pans", "doodhwala": "milkman-on-bicycle"}
 
 
 # ====================================================================== things
@@ -1778,8 +1852,8 @@ fill("Fill_quiet", QX0, QX1, QY0, QY1, float(opt.get("--fillq", 45)))
 fill("Fill_red", RX0, RX1, RY0, RY1, float(opt.get("--fillr", 90)))
 fill("Fill_gallery", GX0, GX1, GY0, GY1, float(opt.get("--fillg", 150)), z=4.4)
 
-for k in ("monk-and-green-buddha", "monks-and-blue-buddha", "temple-bells",
-          "bulls-and-wheel", "shree-420-and-milk-cans", "three-veiled-women", "terracotta-pots"):
+for k in ("sacred-tree", "monks-and-blue-buddha", "temple-bells",
+          "bulls-and-wheel", "shree-420-and-milk-cans", "riverside-figures", "terracotta-pots"):
     gallery_light(k, power=float(opt.get("--gallery", 135)))
 for k in BANDH:
     gallery_light(k, power=float(opt.get("--gallery", 135)) * 0.45)
@@ -1882,7 +1956,8 @@ VIEWS = {
     # the walk, in order: each turn at most a quarter, every room change through a doorway
     "start":     ((3.6, 0.55, 1.62), (3.6, AY1, 1.86)),
     "presence":  ((3.6, 2.05, 1.62), (3.6, AY1, 1.86)),
-    "floral":    ((3.25, 3.0, 1.6), (AX1, 2.85, 1.6)),
+    # back far enough that Blooming Innocence, at its 48 in, is whole beside the two small ones
+    "floral":    ((2.55, 2.71, 1.6), (AX1, 2.71, 1.6)),
     "canopy":    ((4.9, 3.85, 1.6), (4.9, AY0, 1.62)),
     # her easel in the corner by the banana, the poem beside it; from the canopy, a turn through the west
     "easelvia":  ((4.6, 2.9, 1.6), (1.4, 4.4, 1.3)),
@@ -1893,14 +1968,15 @@ VIEWS = {
     "threshold": ((3.9, 3.1, 1.6), (AX0, 3.4, 1.42)),
     "bodhi":     ((-1.45, 3.4, 1.6), (QX0, 3.4, 1.62)),
     # the Quiet Room's south-east corner, two walls, a painting on each
-    "faith":     ((-3.28, 3.63, 1.6), (-0.95, 1.3, 1.55)),
+    "faith":     ((-3.6, 4.0, 1.6), (-1.43, 1.51, 1.55)),
     # passing poses: the walk goes through them without stopping (lib/chapters.ts `via`)
     "faithvia":  ((-2.6, 4.3, 1.6), (-2.6, QY0, 1.55)),
     "redvia":    ((-4.2, -2.0, 1.58), (RX1, -2.4, 1.5)),
     # the red wall, turned a little east so her photograph stands clear of the chapter's words
     "street":    ((-4.0, 0.0, 1.6), (-2.3, RY0, 1.5)),
-    # three-quarters on the east wall, Bandh Darwaze on the north wall to the left
-    "redwall":   ((-5.35, -4.2, 1.55), (-1.1, -1.75, 1.45)),
+    # three-quarters on the east wall, Bandh Darwaze on the north wall to the left: from the
+    # south-west corner, turned so Evening at the Ghat, right of the gallery door, is whole in frame
+    "redwall":   ((-5.3, -4.5, 1.55), (-1.02, -2.32, 1.45)),
     # through the Red Room's east doorway into the gallery hall: down its length to the palms first,
     # then close to each group in turn (HALL): along the south wall, the east, and back along the north
     "galleryvia": ((-1.3, -2.55, 1.62), (6.0, -2.9, 1.66)),
@@ -1931,7 +2007,7 @@ NARROW = {
     "threshold": ((3.7, 3.2, 1.55), (AX0, 3.4, 1.35)),
     "bodhi":     ((-1.85, 3.4, 1.55), (QX0, 3.4, 0.98)),
     # a portrait screen holds one wall: Threads of Faith, frontal; the Blue Buddha comes round on the turn
-    "faith":     ((-3.05, 1.98, 1.55), (QX1, 1.98, 1.3)),
+    "faith":     ((-3.05, 1.82, 1.55), (QX1, 1.82, 1.3)),
     # from facing Threads of Faith, turn first to the passage, then go through it
     "streetvia": ((-4.0, 2.2, 1.58), (-4.3, -0.5, 1.5)),
     "street":    ((-4.3, -0.4, 1.55), (-3.35, RY0, 1.3)),
@@ -1943,12 +2019,18 @@ NARROW = {
     "mess":      ((10.5, -10.5, 11.5), (0.4, 0.4, 0.4)),
 }
 # the hall's stops, from where its groups hang: square to each group, near it
+FOV_DESK = 40.0
 _OUT = {"S": Vector((0, 1, 0)), "N": Vector((0, -1, 0)), "E": Vector((-1, 0, 0))}
-for _k, (_side, _along, _d) in HALL.items():
+# each stop's distance: far enough that its group fills about 85 % of a 1440 × 1000 frame's width
+# and leaves room under it for the wall labels; a stop with words stands further back for them
+_TH, _TV = math.tan(math.radians(FOV_DESK / 2)) * 1.44, math.tan(math.radians(FOV_DESK / 2))
+_FILL = {"portraits": 0.72}
+for _k, (_side, _along, _gw, _gh) in HALL.items():
+    _d = max(_gw / (2 * _TH * _FILL.get(_k, 0.85)), (_gh + 1.0) / (2 * _TV), 2.4)
     _face = Vector((_along, GFACE[_side], 0)) if _side in "NS" else Vector((GFACE[_side], _along, 0))
     _along_dir = Vector((1, 0, 0)) if _side in "NS" else Vector((0, 1, 0))
     _sh = _along_dir * HALL_SHIFT.get(_k, 0.0) * (1 if _side == "N" else -1)
-    VIEWS[_k] = (tuple(_face + _sh + _OUT[_side] * _d + Vector((0, 0, 1.62))), tuple(_face + _sh + Vector((0, 0, GZ))))
+    VIEWS[_k] = (tuple(_face + _sh + _OUT[_side] * _d + Vector((0, 0, 1.62))), tuple(_face + _sh + Vector((0, 0, GZ - 0.1))))
     # a portrait screen holds one work of the group, high in the frame, the words below it
     _a = INFO["art"][HALL_PHONE[_k]]
     _c = Vector(_a["centre"])

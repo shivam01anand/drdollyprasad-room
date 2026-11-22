@@ -104,7 +104,7 @@ const tmpR = new THREE.Vector3(), tmpU = new THREE.Vector3();
 const tmpC = new THREE.Color();
 /** the lamp's wicks, round the rim of its cup (scripts/house/build.py deepa) */
 const DEEPA_WICK = 0.14;
-/** a canvas's frame beyond its edge: the lip and the shadow gap (build.py float_frame) */
+/** a canvas's frame beyond its edge, where house.json does not give it (build.py mat_and_frame) */
 const FRAME = 0.025;
 /** each wall's outward normal on the floor plane, three's (x, z) */
 const SIDE_OUT: Record<string, [number, number]> = { N: [0, 1], S: [0, -1], E: [-1, 0], W: [1, 0] };
@@ -1427,7 +1427,7 @@ export class Room {
     const a = this.info?.art[id];
     if (!a || !this.rig || !this.canvas) return null;
     const [nx, nz] = SIDE_OUT[a.side] ?? [0, 1];
-    const hw = a.w / 2 + FRAME, hh = a.h / 2 + FRAME;
+    const f = a.frame ?? FRAME, hw = a.w / 2 + f, hh = a.h / 2 + f;
     const r = this.viewport;
     let x0 = Infinity, y0 = Infinity, x1 = -Infinity, y1 = -Infinity;
     for (const sx of [-1, 1])
