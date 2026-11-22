@@ -101,7 +101,7 @@ export function Contact() {
           </p>
           <p className="about">
             Being a doctor, professionally, the hospital became her fountain of manifestation, of life
-            affirmation, at its highest intensity. Her paintings speak of various shades of life — some refined,
+            affirmation, at its highest intensity. Her paintings speak of various shades of life: some refined,
             some sublime, some just raw. But the quintessential humane element remains intact.
           </p>
         </div>
