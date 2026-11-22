@@ -72,8 +72,8 @@ export const CHAPTERS: Chapter[] = [
     // the canvas she is working on, from her own photograph (scripts/figure/make.py)
     asides: [{ anchor: "easel", title: "On her easel", line: "A new painting, in progress", size: [1.28, 1.06] }] },
   // from the easel the walk turns to the arch and goes straight through it into the Quiet Room
-  { id: "bodhi", eyebrow: "“Sharan” · 2014", stop: "Sharan", room: "The Quiet Room",
-    view: "bodhi", via: "threshold", dusk: 0.22, labels: ["monk-and-green-buddha"] },
+  { id: "bodhi", eyebrow: "“Mannat” · 2007", stop: "Mannat", room: "The Quiet Room",
+    view: "bodhi", via: "threshold", dusk: 0.22, labels: ["sacred-tree"] },
   {
     id: "faith",
     eyebrow: "Faith · 2007–2026",
@@ -101,11 +101,11 @@ export const CHAPTERS: Chapter[] = [
     labels: ["terracotta-pots", "bulls-and-wheel"],
   },
   // Bandh Darwaze I–IV hang on the Red Room’s north wall, seen from here: they carry labels too
-  { id: "redwall", eyebrow: "“Shree 420” · “Lajja”", stop: "Shree 420 · Lajja", room: "The Red Room", view: "redwall",
-    via: "redvia", dusk: 0.45, labels: ["shree-420-and-milk-cans", "three-veiled-women",
+  { id: "redwall", eyebrow: "Gone Are The Days · Bandh Darwaze", stop: "Shree 420 · Evening at the Ghat", room: "The Red Room", view: "redwall",
+    via: "redvia", dusk: 0.45, labels: ["shree-420-and-milk-cans", "riverside-figures",
       "weathered-door-ring", "red-and-teal-door-lock", "teal-door-bolt", "carved-door-knocker"],
     // the phone keeps its framing of the two large canvases; the doors are labelled where they show
-    frame: ["shree-420-and-milk-cans", "three-veiled-women"] },
+    frame: ["shree-420-and-milk-cans", "riverside-figures"] },
   // through the Red Room’s east doorway: the gallery hall, where the rest of her work hangs as an
   // exhibition hangs, one line at eye level, a series to a wall (scripts/house/build.py)
   { id: "gallery", ink: "light", eyebrow: "The gallery", stop: "The gallery", room: "The gallery",
@@ -120,26 +120,26 @@ export const CHAPTERS: Chapter[] = [
     labels: ["horse-cart-and-autorickshaw", "coins-and-clay-bank", "rickshaw-and-autorickshaw", "carriage-and-autorickshaw",
       "rickshaw-rest", "bullock-cart-and-truck"] },
   // Faith, either side of the window onto the palm court
-  { id: "shrine", eyebrow: "Faith · 2007–2026", stop: "Mannat · Aarti", room: "The gallery",
-    view: "shrine", dusk: 0.52, labelSide: "below", labels: ["sacred-tree", "priest-with-flame"] },
+  { id: "shrine", eyebrow: "Faith · 2007–2026", stop: "Sharan · Aarti", room: "The gallery",
+    view: "shrine", dusk: 0.52, labelSide: "below", labels: ["monk-and-green-buddha", "priest-with-flame"] },
   { id: "gayatri", eyebrow: "Faith · 2007–2026", stop: "Gayatri · Vakratunda", room: "The gallery",
     view: "gayatri", dusk: 0.53, labelSide: "below", labels: ["prayer-and-scripture", "offering-of-light"] },
   {
     id: "portraits",
     ink: "light",
-    eyebrow: "Portraits · and Evening at the Ghat",
+    eyebrow: "Portraits · 2007–2012",
     stop: "Portraits",
     room: "The gallery",
     body: "Three turbans, red, yellow and a cream lattice, each running off the top of the canvas.",
     view: "portraits",
     dusk: 0.54,
     labelSide: "below",
-    labels: ["red-turban-portrait", "elder-woman-portrait", "yellow-turban-portrait", "patterned-turban-portrait", "riverside-figures"],
+    labels: ["three-veiled-women", "red-turban-portrait", "elder-woman-portrait", "yellow-turban-portrait", "patterned-turban-portrait", "mother-and-child"],
   },
   { id: "kadhai", eyebrow: "Gone Are The Days · 2007–2018", stop: "Bachpan · Intezar", room: "The gallery",
     view: "kadhai", dusk: 0.55, labelSide: "below", labels: ["boy-and-kettle", "man-among-metal-pans"] },
-  { id: "doodhwala", eyebrow: "Gone Are The Days · 2007–2018", stop: "Before the Chai · Morning Ritual · Aanchal", room: "The gallery",
-    view: "doodhwala", dusk: 0.55, labelSide: "below", labels: ["milkman-on-bicycle", "newspaper-reader", "mother-and-child"] },
+  { id: "doodhwala", eyebrow: "Gone Are The Days · 2007–2018", stop: "Before the Chai · Morning Ritual", room: "The gallery",
+    view: "doodhwala", dusk: 0.55, labelSide: "below", labels: ["milkman-on-bicycle", "newspaper-reader"] },
   { id: "featured", eyebrow: "Featured", stop: "Featured works", slot: "featured", view: "featured", dusk: 0.45 },
   {
     id: "plan",
