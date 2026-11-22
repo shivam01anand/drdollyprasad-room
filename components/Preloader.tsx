@@ -2,8 +2,6 @@
 
 import { forwardRef, useEffect, useImperativeHandle, useLayoutEffect, useRef, useState } from "react";
 import { motion, gsap, Flip, reducedMotion } from "@/lib/motion";
-import { SHOW } from "@/lib/works";
-import { NOW_SHOWING_CONFIRMED } from "@/lib/site";
 
 export type HeroRect = { left: number; top: number; width: number; height: number };
 export type PreloaderHandle = { finish(): void };
@@ -21,11 +19,11 @@ type Props = {
 };
 
 const SEEN = "dp:welcomed";
-const WORDS = ["Welcome", "to", "my", "studio"];
+const WORDS = ["Welcome", "to", "the", "studio"];
 
 /**
  * The welcome. Warm paper, lamplight from above, and her greeting, word by
- * word — नमस्ते, then "Welcome to my studio" — with her name beneath and a
+ * word — नमस्ते, then "Welcome to the studio" — with her name beneath and a
  * hairline that fills as the house loads. As soon as the house is ready and
  * the greeting has been said, the visitor is taken in: her name rises into
  * the header, one painting is shown clean exactly where the room has it, and
@@ -45,8 +43,6 @@ const Preloader = forwardRef<PreloaderHandle, Props>(function Preloader(props, r
   const hero = useRef<HTMLImageElement>(null);
   const [ready, setReady] = useState(false);
   const [again, setAgain] = useState(false);
-  /** her exhibition, said under her name while it is on (it goes after its last day) */
-  const [showing, setShowing] = useState(false);
 
   const nodes = useRef<{ b1: HTMLSpanElement; b2: HTMLSpanElement } | null>(null);
   const cb = useRef(props);
@@ -71,7 +67,6 @@ const Preloader = forwardRef<PreloaderHandle, Props>(function Preloader(props, r
     sign.current!.append(b1, b2);
     nodes.current = { b1, b2 };
     try { setAgain(sessionStorage.getItem(SEEN) === "1"); } catch { /* private mode */ }
-    setShowing(NOW_SHOWING_CONFIRMED && Date.now() < Date.parse(`${SHOW.until}T23:59:59+05:30`));
     return () => {
       owned.current.forEach((a) => a.kill());
       removeEventListener("resize", place);
@@ -199,12 +194,11 @@ const Preloader = forwardRef<PreloaderHandle, Props>(function Preloader(props, r
         <div className="pre-light" aria-hidden="true" />
         <div className="pre-welcome" ref={greet}>
           <p className="pre-namaste" data-in="" lang="hi">नमस्ते</p>
-          <h1 className="pre-hello" aria-label={again ? "Welcome back to my studio" : "Welcome to my studio"}>
+          <h1 className="pre-hello" aria-label={again ? "Welcome back to the studio" : "Welcome to the studio"}>
             {(again ? ["Welcome", "back"] : WORDS).map((w, i) => <span key={i} data-in="">{w}</span>)}
           </h1>
           <div className="pre-sign" ref={sign} data-in="" />
           <p className="pre-note lab" data-in="">Paintings · New Delhi</p>
-          {showing && <p className="pre-note pre-show lab" data-in="">Showing at Sacred Fragments · 18–21 October</p>}
           <div className="pre-foot">
             <div className="pre-bar" role="progressbar" aria-label="Opening the house" aria-valuemin={0} aria-valuemax={100}
                  aria-valuenow={Math.round(props.pct)} data-ready={ready ? "1" : "0"}>

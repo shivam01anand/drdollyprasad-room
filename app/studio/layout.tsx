@@ -1,5 +1,6 @@
 import type { Metadata } from "next";
 import WELCOME_FONTS from "@/lib/welcome-fonts.json";
+import "@fontsource/cormorant-garamond/500.css";
 import "../fonts.css";
 import "../globals.css";
 

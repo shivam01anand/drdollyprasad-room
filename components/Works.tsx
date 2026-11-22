@@ -32,7 +32,7 @@ export default function Works({ dims }: { dims: Dims }) {
       <div className="collage-head">
         <div className="lab">The work</div>
         <h2 id="works-title" className="collage-title">
-          “My paintings are just a representation of some and many others of the shades and paradigms that I picked up at different stages in my life.”
+          Forty-one paintings, 2007 to 2026
         </h2>
         <div className="works-filter" role="group" aria-label="Show the works">
           {(["all", "available", "sold"] as WorksFilter[]).map((f) => (
@@ -58,9 +58,9 @@ export default function Works({ dims }: { dims: Dims }) {
               const width = Math.round(ar >= 1 ? capped : capped * ar);
               return (
                 <figure className="work" key={w.id} style={{ width }}>
-                  <a href={workPath(w.id)} data-work={w.id} aria-label={`${w.title} — open`} data-cursor="View">
+                  <a href={workPath(w.id)} data-work={w.id} aria-label={`Open ${w.title}`} data-cursor="View">
                     {/* eslint-disable-next-line @next/next/no-img-element */}
-                    <img src={`/art/works/${w.id}.jpg`} alt={`${w.title} — ${w.medium.toLowerCase()}`}
+                    <img src={`/art/works/${w.id}.jpg`} alt={`${w.title}, ${w.medium.toLowerCase()}, by Dr Dolly Prasad`}
                          width={d.w} height={d.h} loading="lazy" decoding="async" data-flip-id={w.id} />
                   </a>
                   <figcaption>
@@ -80,8 +80,7 @@ export default function Works({ dims }: { dims: Dims }) {
 
 /** her approved introduction (the Sacred Fragments catalogue, Oct 2026) */
 const STATEMENT =
-  "Dr. Dolly Prasad’s art is the everyday held sacred. A\u00A0painter, she catches the hues of " +
-  "India in its waiting and its wishing, its worship and its whispers.";
+  "Dr Dolly Prasad is a doctor and painter in New Delhi who works mostly in oil on canvas, sometimes with charcoal or pastel.";
 
 /**
  * Her statement, her biography verbatim, and the way to reach her.
@@ -102,12 +101,12 @@ export function Contact() {
           </p>
           <p className="about">
             Being a doctor, professionally, the hospital became her fountain of manifestation, of life
-            affirmation, at its highest intensity. Her paintings speak of various shades of life — some refined,
+            affirmation, at its highest intensity. Her paintings speak of various shades of life: some refined,
             some sublime, some just raw. But the quintessential humane element remains intact.
           </p>
         </div>
         <div className="contact-side">
-          <div className="lab">Write to me</div>
+          <div className="lab">Write to her</div>
           <h2 id="contact-title" className="contact-title">
             <a href={`mailto:${EMAIL}`}>{EMAIL}</a>
           </h2>

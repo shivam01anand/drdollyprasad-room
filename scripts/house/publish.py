@@ -90,7 +90,8 @@ def lk(k):
 
 out = {
     "lightmap": scales,
-    "art": {k: {"w": v["w"], "h": v["h"], "side": v["side"], "centre": t(v["centre"]), **({"late": True} if v.get("late") else {}),
+    "art": {k: {"w": v["w"], "h": v["h"], "side": v["side"], "centre": t(v["centre"]),
+                **({"frame": v["frame"]} if v.get("frame") else {}), **({"late": True} if v.get("late") else {}),
                 **({"lk": lk(k)} if lk(k) else {}),
                 **({"study": True} if v.get("study") else {}),
                 **({"light": t(v["light"])} if v.get("light") else

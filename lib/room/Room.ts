@@ -9,7 +9,7 @@ import type * as CANNON from "cannon-es";
 import { buildLibrary, textureList, type Library } from "./materials";
 import { Rig } from "./rig";
 import type { Dolly } from "./dolly";
-import { loadHouse, loadHouseInfo, assemble, BakedLight, ROOF, type HouseInfo, type HouseParts } from "./house";
+import { loadHouse, loadHouseInfo, assemble, BakedLight, ROOF, type HouseInfo, type HouseParts, type V3 } from "./house";
 import { paintMaterial, flatRelief, galleryLight } from "./paint";
 import { ReliefBuilder } from "./relief-builder";
 import { activeVariant, NIGHT } from "./variants";
@@ -104,7 +104,7 @@ const tmpR = new THREE.Vector3(), tmpU = new THREE.Vector3();
 const tmpC = new THREE.Color();
 /** the lamp's wicks, round the rim of its cup (scripts/house/build.py deepa) */
 const DEEPA_WICK = 0.14;
-/** a canvas's frame beyond its edge: the lip and the shadow gap (build.py float_frame) */
+/** a canvas's frame beyond its edge, where house.json does not give it (build.py mat_and_frame) */
 const FRAME = 0.025;
 /** each wall's outward normal on the floor plane, three's (x, z) */
 const SIDE_OUT: Record<string, [number, number]> = { N: [0, 1], S: [0, -1], E: [-1, 0], W: [1, 0] };
@@ -1358,15 +1358,50 @@ export class Room {
   /** the camera has arrived where the scroll put it, and the house is at rest */
   get landed() { return this.ready && !!this.rig && this.rig.isEnabled && this.rig.travel < 0.0015 && !this.rearranged; }
 
-  /** every canvas on screen, framed, in CSS pixels (a label must cover none of them) */
+  /** every canvas on screen, framed, in CSS pixels (a label must cover none of them). Only what the
+   *  camera can see: a canvas on the far side of a wall, or behind one, blocks no label */
   artRects() {
     const out: { x0: number; y0: number; x1: number; y1: number }[] = [];
+    if (!this.rig) return out;
+    const eye = this.rig.camera.getWorldPosition(new THREE.Vector3());
     for (const id of Object.keys(this.info?.art ?? {})) {
-      if (this.info?.art[id]?.study) continue;
+      const a = this.info?.art[id];
+      if (!a || a.study) continue;
+      const [nx, nz] = SIDE_OUT[a.side] ?? [0, 1];
+      // facing away: it hangs on the other side of a wall
+      if ((eye.x - a.centre[0]) * nx + (eye.z - a.centre[2]) * nz <= 0) continue;
       const r = this.artRect(id);
-      if (r) out.push(r);
+      if (!r || r.x1 < 0 || r.y1 < 0 || r.x0 > innerWidth || r.y0 > innerHeight) continue;
+      if (this.hidden(eye, a.centre, nx, nz)) continue;
+      out.push(r);
     }
     return out;
+  }
+
+  /** a house anchor the camera can see (no wall between them) */
+  anchorSeen(name: string) {
+    const a = this.info?.anchors[name];
+    if (!a || !this.rig) return false;
+    return !this.hidden(this.rig.camera.getWorldPosition(new THREE.Vector3()), a, 0, 0, 0.6);
+  }
+
+  private sight = new THREE.Raycaster();
+  /** a wall (or anything solid) stands between the eye and a canvas's centre (or an anchor's,
+   *  `clear` metres short of it, so the thing itself does not count) */
+  private hidden(eye: THREE.Vector3, c: V3, nx: number, nz: number, clear = 0.3) {
+    // aim a few centimetres proud of the canvas, so its own frame and wall do not count
+    const to = new THREE.Vector3(c[0] + nx * 0.05, c[1], c[2] + nz * 0.05).sub(eye);
+    const far = to.length();
+    if (far <= clear) return false;
+    this.sight.set(eye, to.normalize());
+    this.sight.camera = this.rig.camera;
+    this.sight.far = far - clear;
+    for (const hit of this.sight.intersectObject(this.world, true)) {
+      let o: THREE.Object3D | null = hit.object, seen = true;
+      for (; o; o = o.parent) if (!o.visible) { seen = false; break; }
+      if (seen) return true;
+    }
+    return false;
   }
 
   /** a thing w × h metres about a house anchor, facing the camera, on screen in CSS pixels; null if behind it */
@@ -1392,7 +1427,7 @@ export class Room {
     const a = this.info?.art[id];
     if (!a || !this.rig || !this.canvas) return null;
     const [nx, nz] = SIDE_OUT[a.side] ?? [0, 1];
-    const hw = a.w / 2 + FRAME, hh = a.h / 2 + FRAME;
+    const f = a.frame ?? FRAME, hw = a.w / 2 + f, hh = a.h / 2 + f;
     const r = this.viewport;
     let x0 = Infinity, y0 = Infinity, x1 = -Infinity, y1 = -Infinity;
     for (const sx of [-1, 1])

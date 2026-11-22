@@ -35,10 +35,10 @@ export async function generateMetadata({ params }: Props): Promise<Metadata> {
 
 /** a photograph of the series out in the world, from her exhibitions */
 const PHOTO: Record<string, { src: string; alt: string; cap: string; w: number; h: number }> = {
-  "gone-are-the-days": { src: "/site/ex/ihc-press-b.jpg", w: 1200, h: 803, alt: "Dr Dolly Prasad interviewed beside The Bullocks",
-    cap: "Beside The Bullocks, in front of the cameras at Open Palm Court, India Habitat Centre, New Delhi, November 2010." },
-  faith: { src: "/site/ex/iccr-02.jpg", w: 1080, h: 1080, alt: "Dr Dolly Prasad beside The Blue Buddha at ICCR",
-    cap: "Beside The Blue Buddha at A Lifetime to Paint, ICCR, New Delhi, June 2010." },
+  "gone-are-the-days": { src: "/site/ex/ihc-press-b.jpg", w: 1200, h: 803, alt: "Dr Dolly Prasad interviewed beside “Before the Engines”",
+    cap: "Beside “Before the Engines”, in front of the cameras at Open Palm Court, India Habitat Centre, New Delhi, November 2010." },
+  faith: { src: "/site/ex/iccr-02.jpg", w: 1080, h: 1080, alt: "Dr Dolly Prasad beside Dhyan at ICCR",
+    cap: "Beside Dhyan at A Lifetime to Paint, ICCR, New Delhi, June 2010." },
 };
 
 const img = (id: string) => (LARGE.has(id) ? `/art/large/${id}.jpg` : `/art/works/${id}.jpg`);
@@ -46,13 +46,12 @@ const alt = (w: Work) => `${w.title}, ${w.medium.toLowerCase()}, by Dr Dolly Pra
 const ROMAN = ["I", "II", "III", "IV", "V", "VI", "VII"];
 const arStyle = (id: string) => ({ ["--ar" as string]: ar(id).toFixed(4) }) as CSSProperties;
 
-/** her words carry quote marks and her name; our lines (big, setup, small) never do */
+/** every line here is editorial: no quote marks, no signature */
 function Words({ c }: { c: Chapter }) {
   return (
     <>
       {c.setup && <p className="chap-small">{c.setup}</p>}
-      {c.big && <p className={`chap-big${c.hers ? " hers" : ""}`}>{c.hers ? `“${c.big}”` : c.big}</p>}
-      {c.hers && <p className="chap-sig">Dr Dolly Prasad</p>}
+      {c.big && <p className="chap-big">{c.big}</p>}
       {c.small && <p className="chap-small">{c.small}</p>}
     </>
   );
@@ -187,15 +186,15 @@ export default async function SeriesStory({ params }: Props) {
   const s = SERIES_BY_SLUG.get((await params).slug);
   if (!s) notFound();
   const nb = seriesNeighbours(s.slug);
-  // Brand pick (R4 B3 rough, 4): Onset of Spring opens on its LEAD, so its one allowed repeat sits six chapters apart
-  // R4 fix 3 (Brand P1-3): Faith opens on The Blue Buddha (its LEAD, beside the ICCR photo), so Vakratunda is not repeated on the next screen
-  const cover = BY_ID.get(s.slug === "recent-work" || s.slug === "faith" ? (LEAD[s.slug] ?? s.hero) : s.hero)!;
+  // Brand pick (R4 B3 rough, 4): Bahaar opens on its LEAD, so its one allowed repeat sits six chapters apart
+  // R4 fix 3 (Brand P1-3): Faith opens on Dhyan (its LEAD, beside the ICCR photo), so Vakratunda is not repeated on the next screen
+  const cover = BY_ID.get(s.slug === "bahaar" || s.slug === "faith" ? (LEAD[s.slug] ?? s.hero) : s.hero)!;
   const works = worksIn(s.label);
   const photo = PHOTO[s.slug];
   const feat = featuredIds(s);
   // B3-4: only the paintings the chapters have not shown; no section at all when there are none
   const also = works.filter((w) => !feat.has(w.id));
-  // Bandh Darwaze: the four doors together, as her note says they are made to be seen ("on one wall")
+  // Bandh Darwaze: the four doors together, on one wall
   // R4 fix 3 (Brand P1-3): each door once on the page: the chapters become caption blocks under their pair in the 2x2
   const doors = s.slug === "bandh-darwaze" ? s.chapters.map((c) => ({ c, works: c.works.map((id) => BY_ID.get(id)!).filter(Boolean) })) : [];
   let singles = 0;
@@ -209,12 +208,7 @@ export default async function SeriesStory({ params }: Props) {
           <p className="eyebrow">{s.period} · {works.length} works</p>
           <h1>{s.label}</h1>
           <p className="lede">{s.line}</p>
-          {s.quote ? (
-            <blockquote className="so-epi hers">
-              <p>“{s.quote}”</p>
-              <p className="so-sig">Dr Dolly Prasad, on the collection</p>
-            </blockquote>
-          ) : s.held ? <p className="so-epi held">{s.held}</p> : null}
+          {s.held && <p className="so-epi held">{s.held}</p>}
           <div className={`so-intro${photo ? " has-photo" : ""}`}>
             <div className="so-ps">{s.intro.slice(0, 2).map((p, i) => <p key={i} className="so-p">{p}</p>)}</div>
             {photo && (

@@ -242,7 +242,7 @@ html[data-gliding="1"]{scroll-snap-type:none}
 .lede{font-size:clamp(16px,1.2vw,18px);line-height:1.55;letter-spacing:-.005em;margin:0;color:var(--ink);max-width:34em;text-wrap:pretty}
 /* a label that is only her words: no rule above them, set a little larger */
 .copy-head + .quote{margin-top:0;padding-top:0;border-top:0;font-size:clamp(16px,1.25vw,19px);line-height:1.5}
-.quote{margin:16px 0 0;padding-top:14px;border-top:1px solid var(--rule);font-size:clamp(15px,1.1vw,17px);line-height:1.55;font-style:italic;color:var(--ink);max-width:34em}
+.quote{margin:16px 0 0;padding-top:14px;border-top:1px solid var(--rule);font-size:clamp(15px,1.1vw,17px);line-height:1.55;font-style:normal;color:var(--ink);max-width:34em}
 .poem{margin:0;font-size:clamp(18px,1.45vw,21px);line-height:1.4;letter-spacing:-.008em}
 .poem-line{display:block;min-height:1.42em}
 
@@ -250,19 +250,29 @@ html[data-gliding="1"]{scroll-snap-type:none}
 .wall-labels{position:fixed;inset:0;z-index:2;pointer-events:none;overflow:hidden}
 /* a hang in one line (the gallery's walls): narrower cards, centred under their canvases */
 .wall-labels[data-dense="1"] .wall-label{max-width:170px;padding:7px 10px 8px}
-/* a close group's cards say what each work is and whether it is free; the rest is a tap away */
-.wall-labels[data-dense="1"] .cap-details{display:none}
+/* a close group's cards keep a short line: size and year, no medium (components/WallLabels) */
 .wall-labels[data-dense="1"] .cap-status{margin-top:2px}
 .wall-label{position:absolute;left:0;top:0;display:flex;flex-direction:column;gap:1px;max-width:214px;
   padding:9px 12px 10px;margin:0;border:0;border-radius:1px;background:#F3EEE5;text-align:left;font:inherit;
   box-shadow:0 1px 1px rgba(48,32,22,.14),0 8px 16px -10px rgba(48,32,22,.45);
   cursor:pointer;pointer-events:auto;visibility:hidden;opacity:0;will-change:transform}
 .wall-label .cap-title{font-size:13.5px;color:#302722;min-height:0}
-.wall-label .cap-details,.wall-label .cap-status{font-size:9.5px;letter-spacing:.07em;color:#76685c;min-height:0}
+.wall-label .cap-details,.wall-label .cap-status{font-size:11.5px;letter-spacing:.01em;text-transform:none;color:#6c5f54;min-height:0}
 .wall-label .cap-status{margin-top:3px}
 .wall-label:focus-visible{outline:2px solid var(--oxide);outline-offset:3px}
 .wall-label.is-aside{cursor:default;pointer-events:none;background:rgba(243,238,229,.92)}
 html[data-mode="dark"] .wall-label{background:#DDD4C6;box-shadow:0 1px 1px rgba(0,0,0,.3),0 8px 18px -10px rgba(0,0,0,.6)}
+/* a card with no room for its details keeps its title (components/WallLabels) */
+.wall-label[data-compact="1"] .cap-details,.wall-label[data-compact="1"] .cap-status{display:none}
+/* the works at a stop with no room for a card at all, named in a line along the foot */
+.label-rest{position:absolute;left:0;top:0;display:flex;flex-wrap:wrap;align-items:baseline;gap:2px 12px;width:max-content;
+  padding:8px 12px 9px;background:#F3EEE5;border-radius:1px;box-shadow:0 1px 1px rgba(48,32,22,.14),0 8px 16px -10px rgba(48,32,22,.45);
+  visibility:hidden;opacity:0;pointer-events:auto;will-change:transform}
+.label-rest-h{font-size:10px;color:#6c5f54;margin-right:2px}
+.label-rest button{background:none;border:0;padding:0;font:inherit;font-family:var(--display);font-size:13px;color:#302722;cursor:pointer}
+.label-rest button[hidden]{display:none}
+.label-rest button:hover{text-decoration:underline;text-underline-offset:3px}
+html[data-mode="dark"] .label-rest{background:#DDD4C6}
 html[data-room="off"] .wall-labels{display:none}
 
 .room-off{position:relative;z-index:2;margin:0;padding:calc(var(--hud-top) + 24px) var(--gut) 0;color:var(--ink)}
@@ -274,6 +284,12 @@ html[data-room="off"] .sec:not(.sec-featured){display:none}
    shown in place when the screen is too short for the fixed copy */
 .chapter-text{position:absolute;width:1px;height:1px;padding:0;margin:-1px;overflow:hidden;clip-path:inset(50%);white-space:normal}
 .chapter-text .poem{white-space:pre-line}
+/* each stop's paintings, as a list: unseen, but read out, and shown while the keyboard is in it */
+.stop-works{position:absolute;width:1px;height:1px;padding:0;margin:-1px;overflow:hidden;clip-path:inset(50%);white-space:nowrap;list-style:none}
+.stop-works:focus-within{position:fixed;z-index:180;left:var(--gut);top:calc(var(--hud-top) + 8px);width:auto;height:auto;margin:0;
+  padding:10px 14px;overflow:visible;clip-path:none;background:var(--page);border:1px solid var(--rule);display:flex;flex-direction:column;gap:2px}
+.stop-works button{background:none;border:0;padding:4px 0;font:inherit;font-size:14px;color:var(--ink);cursor:pointer;text-align:left}
+.stop-works button:focus-visible{outline:2px solid var(--oxide);outline-offset:2px}
 @media (max-height:600px){
   .copy{display:none}
   .sec:not(.sec-featured){display:flex;align-items:center;padding:110px var(--gut) 150px}
@@ -296,14 +312,13 @@ html[data-room="off"] .sec:not(.sec-featured){display:none}
 .pre-welcome [data-in]{visibility:visible}
 .pre-namaste{margin:0 0 clamp(10px,1.6vh,18px);font-family:"IBM Plex Sans Devanagari",var(--display);font-weight:500;
   font-size:clamp(14px,1.1vw,17px);letter-spacing:.06em;color:var(--dim)}
-.pre-hello{margin:0;font-family:"Cormorant Garamond",Georgia,serif;font-style:italic;font-weight:500;
+.pre-hello{margin:0;font-family:"Cormorant Garamond",Georgia,serif;font-style:normal;font-weight:500;
   font-size:clamp(46px,7.2vw,116px);line-height:1.02;letter-spacing:-.012em;color:var(--ink);text-wrap:balance}
 .pre-hello span{display:inline-block;margin:0 .16em}
 .pre-sign{display:flex;gap:.32em;justify-content:center;margin-top:clamp(18px,3vh,30px)}
 .pre-big{display:block;font-family:var(--display);font-weight:500;color:var(--ink);white-space:nowrap;
   font-size:clamp(20px,1.7vw,26px);line-height:1;letter-spacing:-.02em}
 .pre-note{margin:10px 0 0}
-.pre-show{margin-top:2px;color:var(--oxide)}
 .pre-foot{position:relative;margin-top:clamp(30px,6vh,64px);min-height:40px;display:flex;flex-direction:column;align-items:center}
 .pre-bar{position:absolute;top:22px;width:140px;height:1px;background:var(--rule);overflow:hidden;transition:opacity .5s ease}
 .pre-bar i{position:absolute;inset:0;background:var(--ink);transform-origin:0 50%;transform:scaleX(.02);transition:transform .4s ease}
@@ -346,7 +361,7 @@ html[data-room="off"] .sec:not(.sec-featured){display:none}
 /* a gallery label: the title, then size and year, then the status */
 .feat-cap,.work figcaption{display:flex;flex-direction:column;gap:2px}
 .cap-title{font-family:var(--display);font-size:14.5px;line-height:1.3;letter-spacing:-.003em;color:var(--ink);min-height:1.3em;text-wrap:balance}
-.cap-details,.cap-status{font-family:var(--mono);font-size:10.5px;line-height:1.5;letter-spacing:.06em;text-transform:uppercase;color:var(--dim);min-height:1.5em}
+.cap-details,.cap-status{font-family:var(--mono);font-size:11.5px;line-height:1.5;letter-spacing:.01em;text-transform:none;color:var(--dim);min-height:1.5em}
 .cap-status{margin-top:2px}
 /* the gallery's red dot: sold */
 .cap-status.is-sold::before{content:"";display:inline-block;width:7px;height:7px;border-radius:50%;
@@ -655,5 +670,12 @@ html[data-mode="dark"] .lb-veil{background:rgba(0,0,0,.5)}
 .studio-exit:hover{background:#A84B2A;transform:translateX(-50%) translateY(-2px)}
 .studio-exit:focus-visible{outline:3px solid #A84B2A;outline-offset:3px}
 .studio-exit svg{width:20px;height:20px;fill:none;stroke:currentColor;stroke-width:2.2;stroke-linecap:round}
-@media (max-width:760px){ .studio-exit{top:auto;left:auto;right:14px;bottom:96px;transform:none;padding:12px 18px 12px 14px;font-size:14.5px}
+.studio-exit .exit-short{display:none}
+/* a phone: a compact "Exit" in the top bar, just left of the music and the diya (42px each, 10px apart),
+   so it never sits on the copy panel at the foot of the screen */
+@media (max-width:760px){ .studio-exit{top:calc(var(--gut) + env(safe-area-inset-top,0px));left:auto;right:calc(var(--gut) + 104px);
+    transform:none;height:42px;gap:6px;padding:0 14px 0 11px;font-size:14px;letter-spacing:.02em;box-shadow:0 6px 18px rgba(0,0,0,.22)}
+  .studio-exit svg{width:16px;height:16px}
+  .studio-exit .exit-long{display:none}
+  .studio-exit .exit-short{display:inline}
   .studio-exit:hover{transform:none} }

@@ -102,7 +102,7 @@ export default function EnquireForm() {
             <label htmlFor="q-work">Painting (optional)</label>
             <select id="q-work" value={work} onChange={(e) => setWork(e.target.value)}>
               <option value="">Choose a painting</option>
-              {WORKS.map((x) => <option key={x.id} value={x.id}>{x.title}{x.status === "Sold" ? " (sold)" : ""}</option>)}
+              {WORKS.map((x) => <option key={x.id} value={x.id}>{x.title}{x.status === "Sold" ? " (in a private collection)" : ""}</option>)}
             </select>
           </div>
         </div>

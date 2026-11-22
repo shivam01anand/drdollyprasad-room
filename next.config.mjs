@@ -27,11 +27,16 @@ export default {
   },
   // one address: www sends people to the bare domain
   async redirects() {
-    return [{
-      source: "/:path*",
-      has: [{ type: "host", value: "www.drdollyprasad.com" }],
-      destination: "https://drdollyprasad.com/:path*",
-      permanent: true,
-    }];
+    return [
+      // the newest collection was renamed Bahaar (18 Nov 2026); old addresses still land
+      { source: "/series/recent-work", destination: "/series/bahaar", permanent: true },
+      { source: "/series/onset-of-spring", destination: "/series/bahaar", permanent: true },
+      {
+        source: "/:path*",
+        has: [{ type: "host", value: "www.drdollyprasad.com" }],
+        destination: "https://drdollyprasad.com/:path*",
+        permanent: true,
+      },
+    ];
   },
 };

@@ -448,6 +448,12 @@ export default function Studio({ dims }: { dims: Dims }) {
     const ink = () => {
       const r = room;
       if (!r || dead || !r.introDone || lastScroll > (centers[centers.length - 1] ?? Infinity) + 2) return;
+      // over Featured the header sits on the page's own wash, not on the room: the page's own ink
+      if (copyRef.current?.dataset.yield === "1") {
+        if (html.dataset.hud) html.dataset.hud = "";
+        inkLight = null; inkStop = -1; wasLanded = false;
+        return;
+      }
       const now = performance.now();
       const landed = r.landed, arrived = landed && !wasLanded;
       wasLanded = landed;
@@ -723,13 +729,13 @@ export default function Studio({ dims }: { dims: Dims }) {
       {/* always on screen, from the first frame: the way back to the website */}
       <a className="studio-exit" href="/" aria-label="Exit the studio and go back to the website">
         <svg viewBox="0 0 24 24" aria-hidden="true"><path d="M6 6l12 12M18 6L6 18" /></svg>
-        <span>Exit the studio</span>
+        <span className="exit-long">Exit the studio</span><span className="exit-short">Exit</span>
       </a>
 
       {/* the header — line work and pills, as in the original */}
       <header className="hud" ref={hudRef} inert={!ready && !failed} data-state="pre">
         <div className="hud-top">
-          <a className="brand" href="#top" aria-label="Dr Dolly Prasad — back to the door"
+          <a className="brand" href="#top" aria-label="Dr Dolly Prasad, back to the door"
              onClick={(e) => {
                e.preventDefault();
                const quick = reducedMotion();
@@ -741,7 +747,7 @@ export default function Studio({ dims }: { dims: Dims }) {
             <span data-hud-text="New Delhi">New Delhi</span>
             <span ref={clockRef} />
           </div>
-          <a className="hud-mail lab" href={`mailto:${EMAIL}`} data-hud-text="↳ Write to me">↳ Write to me</a>
+          <a className="hud-mail lab" href={`mailto:${EMAIL}`} data-hud-text="↳ Write to her">↳ Write to her</a>
           <button type="button" className="diya-btn music-btn" aria-pressed={playing}
                   aria-label={playing ? "Pause the music" : "Play the music"} onClick={() => music.toggle()}>
             <svg viewBox="0 0 32 32" aria-hidden="true">
@@ -761,7 +767,7 @@ export default function Studio({ dims }: { dims: Dims }) {
           </button>
         </div>
         <div className="hud-bottom">
-          <span className="lab hud-hint">Scroll ↓</span>
+          <span className="lab hud-hint">Scroll or use ← →</span>
           {/* the phone's dock: where you are in the house, the works, and the rest in a sheet */}
           {ready && !failed && (
             <div className="dock">
@@ -791,7 +797,7 @@ export default function Studio({ dims }: { dims: Dims }) {
 
       {/* the copy slot — fixed, below the header's reach */}
       <div className="copy" ref={copyRef} data-has="0" aria-hidden="true">
-        {CHAPTERS.map((c, i) => (c.body || c.verse || c.quote) ? (
+        {CHAPTERS.map((c, i) => (c.body || c.verse) ? (
           <div className="copy-panel" data-i={i} data-on="0" key={c.id}>
             <div className="copy-head">
               <div className="lab" data-eyebrow={c.eyebrow}>{c.eyebrow}</div>
@@ -804,7 +810,6 @@ export default function Studio({ dims }: { dims: Dims }) {
               </p>
             )}
             {c.body && (c.bodyUntil ? <Until until={c.bodyUntil}><p className="lede">{c.body}</p></Until> : <p className="lede">{c.body}</p>)}
-            {c.quote && <blockquote className="quote">“{c.quote}”</blockquote>}
           </div>
         ) : null)}
       </div>
@@ -827,13 +832,25 @@ export default function Studio({ dims }: { dims: Dims }) {
             </section>
           ) : (
             <section className="sec" key={c.id} data-chapter={c.id} aria-label={c.eyebrow}>
-              {(c.body || c.verse || c.quote) && (
+              {(c.body || c.verse) && (
                 <div className="chapter-text">
                   <h2 className="lab">{c.eyebrow}</h2>
                   {c.verse && <p className="poem">{c.verse}</p>}
                   {c.body && (c.bodyUntil ? <Until until={c.bodyUntil}><p className="lede">{c.body}</p></Until> : <p className="lede">{c.body}</p>)}
-                  {c.quote && <blockquote className="quote">“{c.quote}”</blockquote>}
                 </div>
+              )}
+              {/* the paintings on this wall, for a screen reader and the keyboard: each opens its card */}
+              {!!c.labels?.length && (
+                <ul className="stop-works" aria-label={`Paintings at this stop: ${c.stop}`}>
+                  {c.labels.map((id) => {
+                    const w = BY_ID.get(id);
+                    return w ? (
+                      <li key={id}>
+                        <button type="button" onClick={() => lbRef.current?.open(id, null, WALK_ORDER)}>{w.title}</button>
+                      </li>
+                    ) : null;
+                  })}
+                </ul>
               )}
             </section>
           )

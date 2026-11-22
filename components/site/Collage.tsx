@@ -1,6 +1,6 @@
 import Link from "next/link";
 import { BY_ID, workPath } from "@/lib/works";
-import { LOOK, SERIES_PAGES, worksIn, ON_EXHIBITIONS, ON_THE_WORK, PRESS, PULL, SHOWS, SHOWS_AS_RECORDED, SMALL_PHOTO, labelLine } from "@/lib/site";
+import { LOOK, SERIES_PAGES, worksIn, PRESS, SHOWS, SHOWS_AS_RECORDED, SMALL_PHOTO, labelLine } from "@/lib/site";
 import { dims, smSet } from "@/lib/images";
 import { thumb } from "./Card";
 import WallDrift from "./WallDrift";
@@ -50,10 +50,10 @@ export const HOME: Item[][] = [
     X("/site/ex/kala-dolly.jpg", "Art fair · February 2018", "First International Kala Mela", "IGNCA, New Delhi", "Dr Dolly Prasad beside her painting at the First International Kala Mela", "/exhibitions#kala-mela-2018"),
     P("terracotta-pots"), P("man-among-metal-pans")],
   [P("child-among-flowers"), P("postbox-and-stamps"),
-    X("/site/ex/ihc-03.jpg", "Opening night · 2010", "Lighting the lamp", "India Habitat Centre", "Dr Dolly Prasad lights the lamp at her exhibition", "/exhibitions#india-habitat-centre-2010"),
+    X("/site/ex/ihc-03.jpg", "Opening night · 2010", "The opening", "India Habitat Centre", "The opening at her exhibition, India Habitat Centre", "/exhibitions#india-habitat-centre-2010"),
     P("yellow-turban-portrait"), P("rickshaw-rest-framed"), P("prayer-and-scripture")],
   [P("shree-420-and-milk-cans"), P("teal-door-bolt"), P("woman-with-red-flower"), P("monk-and-green-buddha"),
-    X("/site/ex/ihc-press-b.jpg", "In front of the cameras", "Beside The Bullocks", "India Habitat Centre · 2010", "Dr Dolly Prasad interviewed beside The Bullocks", "/exhibitions#india-habitat-centre-2010"),
+    X("/site/ex/ihc-press-b.jpg", "In front of the cameras", "Beside “Before the Engines”", "India Habitat Centre · 2010", "Dr Dolly Prasad interviewed beside “Before the Engines”", "/exhibitions#india-habitat-centre-2010"),
     P("cycle-rickshaw")],
   [P("sacred-tree"), P("rickshaw-rest"), P("carriage-and-autorickshaw"), P("newspaper-reader"), P("mother-and-child"), P("carved-door-knocker")],
 ];
@@ -74,7 +74,7 @@ export const MIXED_WALL: Item[][] = [
 const TONE_CYCLE = ["rust", "dark", "stone", "rust", "dark"] as const;
 /** tones keyed by collection, so a reorder of SERIES_PAGES never recolours a tile (R4 B1-4) */
 const TONES: Record<string, "rust" | "dark" | "stone"> = {
-  "gone-are-the-days": "rust", "bandh-darwaze": "dark", faith: "stone", portraits: "rust", "recent-work": "dark",
+  "gone-are-the-days": "rust", "bandh-darwaze": "dark", faith: "stone", portraits: "rust", bahaar: "dark",
 };
 export const SERIES_WALL: Item[][] = SERIES_PAGES.map((s) => [
   { k: "n", em: "Collection", title: s.label, sub: `${worksIn(s.label).length} works · ${s.period}`, href: `/series/${s.slug}`, tone: TONES[s.slug] ?? "rust" } as Item,
@@ -95,7 +95,7 @@ const ABOUT_BASE: Item[][] = [...MIXED_WALL.slice(3), ...MIXED_WALL.slice(0, 3)]
 /** About: the same painting-heavy wall, with three placards (about one tile in twelve), quiet and spread across the columns */
 const PLACARDS: [number, number, Item][] = [
   [1, 2, C("Exhibited at", "India Habitat Centre", "New Delhi", "white", "/exhibitions#india-habitat-centre-2010")],
-  [3, 3, C("Her record", "Eighteen exhibitions and art fairs", "2005–2018", "indigo", "/exhibitions#record")],
+  [3, 3, C("Her record", "Nineteen exhibitions and art fairs", "2005–2026", "indigo", "/exhibitions#record")],
   [5, 1, C("ICCR · June 2010", "A Lifetime to Paint", "Azad Bhavan Art Gallery, New Delhi", "white", "/exhibitions#a-lifetime-to-paint")],
 ];
 export const ABOUT_WALL: Item[][] = ABOUT_BASE.map((col, i) => {
@@ -105,7 +105,7 @@ export const ABOUT_WALL: Item[][] = ABOUT_BASE.map((col, i) => {
 });
 
 /**
- * Exhibitions: the shows in photographs, the press, her words on exhibiting and
+ * Exhibitions: the shows in photographs, the press and
  * short lines about each show, the venues by name and the numbers from her record.
  * Everything here is from the site's own records (lib/site: SHOWS, PRESS, RECORD).
  */
@@ -157,8 +157,7 @@ function Tile({ it }: { it: Item }) {
   }
   const w = BY_ID.get(it.id);
   if (!w || SMALL_PHOTO.has(w.id)) return null;
-  // her words in quote marks; the observer's line without
-  const line = PULL[w.id] ? `“${PULL[w.id]}”` : LOOK[w.id];
+  const line = LOOK[w.id];
   return (
     <Link className="tile flip" href={workPath(w.id)} tabIndex={-1}>
       <span className="flipper">
