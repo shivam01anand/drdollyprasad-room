@@ -47,8 +47,8 @@ export type Chapter = {
   room?: string;
 };
 
-/** the poem: Shubham’s words, shown unsigned (approved 2026-11-19) */
-export const POEM = `The everyday has its waiting and wishing, its worship and whispers. A rickshaw puller rests, a bell hanging from his fingers. Red thread goes round a peepal one wish at a time. A boy lifts a lamp to a wall of the same prayer, written again and again. Three women in red lean in, veiled.`;
+/** the theme paragraph: Shubham’s words, shown unsigned (approved 2026-11-19); set as prose, not verse */
+export const THEME = `The everyday has its waiting and wishing, its worship and whispers. A rickshaw puller rests, a bell hanging from his fingers. Red thread goes round a peepal one wish at a time. A boy lifts a lamp to a wall of the same prayer, written again and again. Three women in red lean in, veiled.`;
 
 export const CHAPTERS: Chapter[] = [
   { id: "presence", eyebrow: "“Khwaab”", stop: "Khwaab", room: "The courtyard", view: "presence", labels: ["woman-with-poppies"] },
@@ -64,8 +64,8 @@ export const CHAPTERS: Chapter[] = [
   { id: "canopy", eyebrow: "“Under Canopy of Greens” · 2025", stop: "Under Canopy of Greens", room: "The courtyard", view: "canopy", dusk: 0.04, labels: ["boy-with-bananas"],
     labelSide: "left",
     body: "Bananas on his head, banana leaves all round him, and a red banana flower at the top left." },
-  // her corner by the banana: she paints at her easel, her statement beside her
-  { id: "easel", eyebrow: "The everyday, held sacred", stop: "At her easel", room: "The courtyard", verse: POEM, view: "easel",
+  // her corner by the banana: she paints at her easel, the theme paragraph beside her
+  { id: "easel", eyebrow: "The everyday", stop: "At her easel", room: "The courtyard", body: THEME, view: "easel",
     via: "easelvia", dusk: 0.12,
     // the canvas she is working on, from her own photograph (scripts/figure/make.py)
     asides: [{ anchor: "easel", title: "On her easel", line: "A new painting, in progress", size: [1.28, 1.06] }] },
