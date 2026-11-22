@@ -10,7 +10,7 @@ import { BY_ID, workPath } from "@/lib/works";
 
 export const metadata: Metadata = {
   title: "About",
-  description: "Dr Dolly Prasad is a doctor and painter in New Delhi who works in oil on canvas. Nineteen exhibitions and art fairs since 2005; paintings in private collections in India, the USA and the UK.",
+  description: "Dr Dolly Prasad is a doctor and painter in New Delhi who works mostly in oil on canvas, sometimes with charcoal or pastel. Nineteen exhibitions and art fairs since 2005; paintings in private collections in India, the USA and the UK.",
   alternates: { canonical: "/about" },
 };
 
@@ -46,7 +46,7 @@ export default function About() {
             <img src={PORTRAIT_LARGE} alt="Dr Dolly Prasad beside one of her paintings at the First International Kala Mela, 2018" />
           </figure>
           <div className="ab-txt">
-            <p className="ab-p">Dr Dolly Prasad is a doctor and painter in New Delhi who works in oil on canvas. She paints what most people pass without a second look: a chai boy beside his kettle, two bullocks under one yoke, a temple bell tied with red thread, a woman lost among poppies.</p>
+            <p className="ab-p">Dr Dolly Prasad is a doctor and painter in New Delhi who works mostly in oil on canvas, sometimes with charcoal or pastel. She paints what most people pass without a second look: a chai boy beside his kettle, two bullocks under one yoke, a temple bell tied with red thread, a woman lost among poppies.</p>
             <p className="ab-p">Since 2005 her work has been shown at exhibitions and art fairs, most recently at India Habitat Centre in 2026. Her paintings are in private collections in India, the USA and the UK.</p>
           </div>
         </div>

@@ -34,10 +34,10 @@ const W = (id: string, title: string, series: string, status: Status, extra: Par
 
 const CATALOGUE: Work[] = [
   // Gone Are The Days: 2010 to 2018
-  W("rickshaw-puller-and-coin", "Twenty Paise", "Gone Are The Days", "Available", { year: "2016", size: "48 × 36 in", inches: 48 }),
+  W("rickshaw-puller-and-coin", "Twenty Paise", "Gone Are The Days", "Available", { year: "2016", size: "48 × 36 in", inches: 48, medium: "Oil and charcoal" }),
   W("carriage-and-autorickshaw", "Aakhri Savaari", "Gone Are The Days", "Available", { year: "2016", size: "24 × 24 in", inches: 24 }),
   W("bullock-cart-and-truck", "Dheere Dheere", "Gone Are The Days", "Available", { year: "2016", size: "24 × 24 in", inches: 24 }),
-  W("rickshaw-rest-framed", "Ek Rupaya", "Gone Are The Days", "Available", { year: "2016", size: "48 × 36 in", inches: 48 }),
+  W("rickshaw-rest-framed", "Ek Rupaya", "Gone Are The Days", "Available", { year: "2016", size: "48 × 36 in", inches: 48, medium: "Oil and charcoal" }),
   W("coins-and-clay-bank", "Gullak", "Gone Are The Days", "Available", { year: "2010", size: "36 × 36 in", inches: 36 }),
   W("postbox-and-stamps", "Patra Petika", "Gone Are The Days", "Available", { year: "2017", size: "48 × 36 in", inches: 48 }),
   W("mother-india-and-kettles", "Mother India", "Gone Are The Days", "Available", { year: "2017", size: "48 × 36 in", inches: 48 }),
@@ -66,7 +66,7 @@ const CATALOGUE: Work[] = [
   W("red-turban-portrait", "Muskaan", "Portraits", "Available", { year: "2012", size: "30 × 30 in", inches: 30 }),
   W("yellow-turban-portrait", "Garv", "Portraits", "Available", { year: "2012", size: "30 × 30 in", inches: 30 }),
   W("patterned-turban-portrait", "Fikr", "Portraits", "Available", { year: "2012", size: "30 × 30 in", inches: 30 }),
-  W("mother-and-child", "Aanchal", "Portraits", "Available", { year: "2011", size: "48 × 36 in", inches: 48 }),
+  W("mother-and-child", "Aanchal", "Portraits", "Available", { year: "2011", size: "48 × 36 in", inches: 48, medium: "Oil and charcoal" }),
   W("boy-and-kettle", "Bachpan", "Gone Are The Days", "Sold", { year: "2010", size: "48 × 48 in", inches: 48 }),
   W("man-among-metal-pans", "Intezar", "Gone Are The Days", "Sold", { year: "2007", size: "36 × 48 in", inches: 48 }),
   W("three-veiled-women", "Lajja", "Portraits", "Sold", { year: "2007", size: "48 × 48 in", inches: 48 }),

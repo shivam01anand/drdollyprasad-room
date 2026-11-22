@@ -80,7 +80,7 @@ export default function Works({ dims }: { dims: Dims }) {
 
 /** her approved introduction (the Sacred Fragments catalogue, Oct 2026) */
 const STATEMENT =
-  "Dr Dolly Prasad is a doctor and painter in New Delhi who works in oil on canvas.";
+  "Dr Dolly Prasad is a doctor and painter in New Delhi who works mostly in oil on canvas, sometimes with charcoal or pastel.";
 
 /**
  * Her statement, her biography verbatim, and the way to reach her.

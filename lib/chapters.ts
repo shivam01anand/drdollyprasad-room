@@ -92,7 +92,7 @@ export const CHAPTERS: Chapter[] = [
     via: "streetvia",
     // the framed print on its easel is 0.64 × 0.48 m (scripts/house/build.py press_easel)
     asides: [{ anchor: "press", title: "The artist, in conversation", line: "Beside “Before the Engines”, at her exhibition", size: [0.64, 0.48] }],
-    body: "Mitti’s clay pots, tipped every way, and the painted horns of Before the Engines.",
+    body: "Mitti’s copper pots, tipped every way, and the painted horns of Before the Engines.",
     ink: "light",
     view: "street",
     dusk: 0.38,
