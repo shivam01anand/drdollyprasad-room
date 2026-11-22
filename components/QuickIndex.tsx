@@ -51,7 +51,7 @@ export default function QuickIndex({ active, live, onStop, onWorks, onPlan, onCo
   return (
     <div className="qi" data-live={live ? "1" : "0"}>
       <button type="button" className="qi-tab lab" ref={tab} aria-expanded={open} aria-controls="qi-panel"
-              onClick={() => setOpen((o) => !o)}>Index</button>
+              onClick={() => setOpen((o) => !o)}>All stops</button>
       <div className="qi-panel" id="qi-panel" ref={panel} role="dialog" aria-label="Index" aria-hidden={!open} data-lenis-prevent="">
         <div className="qi-head">
           <p className="lab">Index</p>

@@ -761,7 +761,7 @@ export default function Studio({ dims }: { dims: Dims }) {
           </button>
         </div>
         <div className="hud-bottom">
-          <span className="lab hud-hint">Scroll ↓</span>
+          <span className="lab hud-hint">Scroll or use ← →</span>
           {/* the phone's dock: where you are in the house, the works, and the rest in a sheet */}
           {ready && !failed && (
             <div className="dock">
