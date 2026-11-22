@@ -36,8 +36,13 @@ const overlaps = (a: Rect, b: Rect, m = 8) => a.x0 < b.x1 + m && a.x1 > b.x0 - m
 function spot(side: Side, f: Rect, w: number, h: number, centred = false) {
   if (side === "right") return { x: f.x1 + GAP, y: f.y1 - h };
   if (side === "left") return { x: f.x0 - GAP - w, y: f.y1 - h };
-  if (side === "above") return { x: centred ? (f.x0 + f.x1) / 2 - w / 2 : f.x0, y: f.y0 - GAP * 0.75 - h };
-  return { x: centred ? (f.x0 + f.x1) / 2 - w / 2 : f.x0, y: f.y1 + GAP * 0.75 };
+  // above or below: a canvas near the screen's edge keeps its card, slid in from the edge while it
+  // still stands under (or over) the canvas
+  const gut = Math.max(16, Math.min(30, innerWidth * 0.022));
+  let x = centred ? (f.x0 + f.x1) / 2 - w / 2 : f.x0;
+  const lo = Math.max(gut, f.x0 - w + 24), hi = Math.min(innerWidth - gut - w, f.x1 - 24);
+  if (lo <= hi) x = Math.min(hi, Math.max(lo, x));
+  return { x, y: side === "above" ? f.y0 - GAP * 0.75 - h : f.y1 + GAP * 0.75 };
 }
 
 export default function WallLabels({ room, active, live, onOpen }: {
@@ -67,6 +72,8 @@ export default function WallLabels({ room, active, live, onOpen }: {
     /** the window has changed size (a moment ago): the cards are placed again */
     let resized = false;
     let lastView = -1;
+    /** whether she can be seen from here, looked up when the cards are placed */
+    let herSeen = false;
     let resizeTimer = 0;
     const onResize = () => { clearTimeout(resizeTimer); resizeTimer = window.setTimeout(() => { resized = true; }, 140); };
     addEventListener("resize", onResize);
@@ -143,7 +150,9 @@ export default function WallLabels({ room, active, live, onOpen }: {
       const things = asides.map((a) => R.anchorRect(a.anchor, a.size[0], a.size[1])).filter((x): x is Rect => !!x);
       // her, at her easel (the room's "dolly" anchor): no card may cover her
       const her = R.anchorRect("dolly", 0.85, 1.35);        // allow room for either figure's silhouette
-      if (her) things.push(her);
+      // (only where she can be seen: from the next room she is behind a wall)
+      if (!placed || resized) herSeen = R.anchorSeen("dolly");
+      if (her && herSeen) things.push(her);
       const first = !placed;
       const redo = !!placed && resized;
       resized = false;
