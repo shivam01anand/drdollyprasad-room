@@ -21,6 +21,8 @@ import type { Room } from "@/lib/room/Room";
  */
 
 const IDS = [...new Set(CHAPTERS.flatMap((c) => c.labels ?? []))];
+/** works labelled in a hang in one line (the gallery's walls): their card's second line is size and year only */
+const DENSE = new Set(CHAPTERS.filter((c) => c.labelSide === "below").flatMap((c) => c.labels ?? []));
 /** captions for what is not her work (her photograph on its easel), keyed chapter:anchor */
 const ASIDES = CHAPTERS.flatMap((c) => (c.asides ?? []).map((a) => ({ key: `${c.id}:${a.anchor}`, chapter: c.id, ...a })));
 type Rect = { x0: number; y0: number; x1: number; y1: number };
@@ -236,7 +238,7 @@ export default function WallLabels({ room, active, live, onOpen }: {
       {IDS.map((id) => {
         const w = BY_ID.get(id);
         if (!w) return null;
-        const line = [w.medium, details(w)].filter(Boolean).join(" · ");
+        const line = DENSE.has(id) ? details(w) : [w.medium, details(w)].filter(Boolean).join(" · ");
         const status = statusLabel(w);
         return (
           <button type="button" className="wall-label" data-label={id} key={id} tabIndex={-1}
