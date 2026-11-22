@@ -1956,7 +1956,8 @@ VIEWS = {
     # the walk, in order: each turn at most a quarter, every room change through a doorway
     "start":     ((3.6, 0.55, 1.62), (3.6, AY1, 1.86)),
     "presence":  ((3.6, 2.05, 1.62), (3.6, AY1, 1.86)),
-    "floral":    ((3.25, 3.0, 1.6), (AX1, 2.85, 1.6)),
+    # back far enough that Blooming Innocence, at its 48 in, is whole beside the two small ones
+    "floral":    ((2.55, 2.71, 1.6), (AX1, 2.71, 1.6)),
     "canopy":    ((4.9, 3.85, 1.6), (4.9, AY0, 1.62)),
     # her easel in the corner by the banana, the poem beside it; from the canopy, a turn through the west
     "easelvia":  ((4.6, 2.9, 1.6), (1.4, 4.4, 1.3)),
@@ -1967,7 +1968,7 @@ VIEWS = {
     "threshold": ((3.9, 3.1, 1.6), (AX0, 3.4, 1.42)),
     "bodhi":     ((-1.45, 3.4, 1.6), (QX0, 3.4, 1.62)),
     # the Quiet Room's south-east corner, two walls, a painting on each
-    "faith":     ((-3.28, 3.63, 1.6), (-0.95, 1.3, 1.55)),
+    "faith":     ((-3.6, 4.0, 1.6), (-1.43, 1.51, 1.55)),
     # passing poses: the walk goes through them without stopping (lib/chapters.ts `via`)
     "faithvia":  ((-2.6, 4.3, 1.6), (-2.6, QY0, 1.55)),
     "redvia":    ((-4.2, -2.0, 1.58), (RX1, -2.4, 1.5)),
@@ -2025,11 +2026,11 @@ _OUT = {"S": Vector((0, 1, 0)), "N": Vector((0, -1, 0)), "E": Vector((-1, 0, 0))
 _TH, _TV = math.tan(math.radians(FOV_DESK / 2)) * 1.44, math.tan(math.radians(FOV_DESK / 2))
 _FILL = {"portraits": 0.72}
 for _k, (_side, _along, _gw, _gh) in HALL.items():
-    _d = max(_gw / (2 * _TH * _FILL.get(_k, 0.85)), (_gh + 0.7) / (2 * _TV), 2.4)
+    _d = max(_gw / (2 * _TH * _FILL.get(_k, 0.85)), (_gh + 1.0) / (2 * _TV), 2.4)
     _face = Vector((_along, GFACE[_side], 0)) if _side in "NS" else Vector((GFACE[_side], _along, 0))
     _along_dir = Vector((1, 0, 0)) if _side in "NS" else Vector((0, 1, 0))
     _sh = _along_dir * HALL_SHIFT.get(_k, 0.0) * (1 if _side == "N" else -1)
-    VIEWS[_k] = (tuple(_face + _sh + _OUT[_side] * _d + Vector((0, 0, 1.62))), tuple(_face + _sh + Vector((0, 0, GZ))))
+    VIEWS[_k] = (tuple(_face + _sh + _OUT[_side] * _d + Vector((0, 0, 1.62))), tuple(_face + _sh + Vector((0, 0, GZ - 0.1))))
     # a portrait screen holds one work of the group, high in the frame, the words below it
     _a = INFO["art"][HALL_PHONE[_k]]
     _c = Vector(_a["centre"])
