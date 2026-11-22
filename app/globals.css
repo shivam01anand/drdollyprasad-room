@@ -262,6 +262,17 @@ html[data-gliding="1"]{scroll-snap-type:none}
 .wall-label:focus-visible{outline:2px solid var(--oxide);outline-offset:3px}
 .wall-label.is-aside{cursor:default;pointer-events:none;background:rgba(243,238,229,.92)}
 html[data-mode="dark"] .wall-label{background:#DDD4C6;box-shadow:0 1px 1px rgba(0,0,0,.3),0 8px 18px -10px rgba(0,0,0,.6)}
+/* a card with no room for its details keeps its title (components/WallLabels) */
+.wall-label[data-compact="1"] .cap-details,.wall-label[data-compact="1"] .cap-status{display:none}
+/* the works at a stop with no room for a card at all, named in a line along the foot */
+.label-rest{position:absolute;left:0;top:0;display:flex;flex-wrap:wrap;align-items:baseline;gap:2px 12px;width:max-content;
+  padding:8px 12px 9px;background:#F3EEE5;border-radius:1px;box-shadow:0 1px 1px rgba(48,32,22,.14),0 8px 16px -10px rgba(48,32,22,.45);
+  visibility:hidden;opacity:0;pointer-events:auto;will-change:transform}
+.label-rest-h{font-size:10px;color:#6c5f54;margin-right:2px}
+.label-rest button{background:none;border:0;padding:0;font:inherit;font-family:var(--display);font-size:13px;color:#302722;cursor:pointer}
+.label-rest button[hidden]{display:none}
+.label-rest button:hover{text-decoration:underline;text-underline-offset:3px}
+html[data-mode="dark"] .label-rest{background:#DDD4C6}
 html[data-room="off"] .wall-labels{display:none}
 
 .room-off{position:relative;z-index:2;margin:0;padding:calc(var(--hud-top) + 24px) var(--gut) 0;color:var(--ink)}
