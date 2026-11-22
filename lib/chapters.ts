@@ -36,6 +36,8 @@ export type Chapter = {
   dusk?: number;
   /** the canvases in this framing that get a wall label */
   labels?: string[];
+  /** the canvases a phone's framing gathers, when not all the labelled ones (default: labels) */
+  frame?: string[];
   /** captions for things in the framing that are not her works (a house anchor and its words,
    *  and the thing’s size in metres, so no wall label covers it) */
   asides?: { anchor: string; title: string; line: string; size: [number, number] }[];
@@ -98,8 +100,12 @@ export const CHAPTERS: Chapter[] = [
     dusk: 0.38,
     labels: ["terracotta-pots", "bulls-and-wheel"],
   },
+  // Bandh Darwaze I–IV hang on the Red Room’s north wall, seen from here: they carry labels too
   { id: "redwall", eyebrow: "“Shree 420” · “Lajja”", stop: "Shree 420 · Lajja", room: "The Red Room", view: "redwall",
-    via: "redvia", dusk: 0.45, labels: ["shree-420-and-milk-cans", "three-veiled-women"] },
+    via: "redvia", dusk: 0.45, labels: ["shree-420-and-milk-cans", "three-veiled-women",
+      "weathered-door-ring", "red-and-teal-door-lock", "teal-door-bolt", "carved-door-knocker"],
+    // the phone keeps its framing of the two large canvases; the doors are labelled where they show
+    frame: ["shree-420-and-milk-cans", "three-veiled-women"] },
   // through the Red Room’s east doorway: the gallery hall, where the rest of her work hangs as an
   // exhibition hangs, one line at eye level, a series to a wall (scripts/house/build.py)
   { id: "gallery", ink: "light", eyebrow: "The gallery", stop: "The gallery", room: "The gallery",
@@ -213,7 +219,7 @@ export function resolveWalk(info: HouseInfo, narrow = false, aspect = 390 / 844)
       if (v) prev = v.pivotRot[1];
       vias.push(v);
     }
-    const group = narrow ? phoneGroupView(info, c.view, c.labels ?? [], c.room, aspect) : null;
+    const group = narrow ? phoneGroupView(info, c.view, c.frame ?? c.labels ?? [], c.room, aspect) : null;
     const p = viewPose(group ?? cam(info, c.view, narrow), prev, NARROW_BACK);
     if (group) p.fov = group.fov;
     prev = p.pivotRot[1];
@@ -230,14 +236,8 @@ export const messPose = (info: HouseInfo) => viewPose(info.cams.mess);
 /** portrait screens get their own framings */
 export const isNarrow = (aspect: number) => aspect < 0.85;
 
-/** Bandh Darwaze I–IV hang on the Red Room’s north wall, seen from the Shree 420 stop (unlabelled) */
-const BANDH_WALL = ["weathered-door-ring", "red-and-teal-door-lock", "teal-door-bolt", "carved-door-knocker"];
+/** every work in the order the walk passes it, wall by wall */
+export const WALK_ORDER: string[] = CHAPTERS.flatMap((c) => c.labels ?? []);
 
-/** every work in the order the walk passes it, wall by wall (Bandh Darwaze with Shree 420) */
-export const WALK_ORDER: string[] = CHAPTERS.flatMap((c) => [...(c.labels ?? []), ...(c.id === "redwall" ? BANDH_WALL : [])]);
-
-/** the stop a work is seen at: the chapter that labels it, or the wall it hangs on; -1 if none */
-export function stopOf(id: string) {
-  const i = CHAPTERS.findIndex((c) => c.labels?.includes(id));
-  return i >= 0 ? i : BANDH_WALL.includes(id) ? CHAPTERS.findIndex((c) => c.id === "redwall") : -1;
-}
+/** the stop a work is seen at: the chapter that labels it; -1 if none */
+export const stopOf = (id: string) => CHAPTERS.findIndex((c) => c.labels?.includes(id));
