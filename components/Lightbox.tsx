@@ -228,7 +228,7 @@ const Lightbox = forwardRef<LightboxHandle, { dims: Dims; onOpenChange(open: boo
       const d = dims[id];
       if (d) { i.width = d.w; i.height = d.h; }
       i.src = from?.currentSrc || `/art/works/${id}.jpg`;
-      i.alt = `${w.title} — ${w.medium.toLowerCase()}`;
+      i.alt = `${w.title}, ${w.medium.toLowerCase()}`;
       i.dataset.flipId = id;
       title.current!.textContent = "";
       const dl = meta.current!;

@@ -79,7 +79,7 @@ const CATALOGUE: Work[] = [
   W("temple-bells", "Threads of Faith", "Faith", "Available", { year: "2026", size: "30 × 36 in", inches: 36 }),
   W("woman-with-bird", "Whispers of Stillness", "Bahaar", "Sold", { year: "2024", size: "24 × 24 in", inches: 24 }),
   W("woman-with-red-flower", "Petals of Thought", "Bahaar", "Enquire",
-    { year: "2024", size: "24 × 24 in", inches: 24, medium: "Oil and pastel on canvas" }),
+    { year: "2024", size: "24 × 24 in", inches: 24, medium: "Oil and pastel" }),
   W("boy-with-bananas", "Under Canopy of Greens", "Bahaar", "Available", { year: "2025", size: "36 × 36 in", inches: 36 }),
 ];
 

@@ -448,6 +448,12 @@ export default function Studio({ dims }: { dims: Dims }) {
     const ink = () => {
       const r = room;
       if (!r || dead || !r.introDone || lastScroll > (centers[centers.length - 1] ?? Infinity) + 2) return;
+      // over Featured the header sits on the page's own wash, not on the room: the page's own ink
+      if (copyRef.current?.dataset.yield === "1") {
+        if (html.dataset.hud) html.dataset.hud = "";
+        inkLight = null; inkStop = -1; wasLanded = false;
+        return;
+      }
       const now = performance.now();
       const landed = r.landed, arrived = landed && !wasLanded;
       wasLanded = landed;
@@ -729,7 +735,7 @@ export default function Studio({ dims }: { dims: Dims }) {
       {/* the header — line work and pills, as in the original */}
       <header className="hud" ref={hudRef} inert={!ready && !failed} data-state="pre">
         <div className="hud-top">
-          <a className="brand" href="#top" aria-label="Dr Dolly Prasad — back to the door"
+          <a className="brand" href="#top" aria-label="Dr Dolly Prasad, back to the door"
              onClick={(e) => {
                e.preventDefault();
                const quick = reducedMotion();
