@@ -303,7 +303,6 @@ html[data-room="off"] .sec:not(.sec-featured){display:none}
 .pre-big{display:block;font-family:var(--display);font-weight:500;color:var(--ink);white-space:nowrap;
   font-size:clamp(20px,1.7vw,26px);line-height:1;letter-spacing:-.02em}
 .pre-note{margin:10px 0 0}
-.pre-show{margin-top:2px;color:var(--oxide)}
 .pre-foot{position:relative;margin-top:clamp(30px,6vh,64px);min-height:40px;display:flex;flex-direction:column;align-items:center}
 .pre-bar{position:absolute;top:22px;width:140px;height:1px;background:var(--rule);overflow:hidden;transition:opacity .5s ease}
 .pre-bar i{position:absolute;inset:0;background:var(--ink);transform-origin:0 50%;transform:scaleX(.02);transition:transform .4s ease}

@@ -83,7 +83,7 @@ it are hers: a gallery inside a Delhi home, built and lit in Blender.
    closely (click, scroll, pinch) or seen in the room made for it (`lib/rooms.ts`, Blender renders
    in `review/rooms/blender`); the card shows the work, then the work in its room, and back, until
    the reader takes over (a swipe across the figure turns between them). Sizes appear only where
-   she has stated them; those works hang at true size in the house, the rest a little larger.
+   she has stated them.
 5. **The collage** — every work, shown to relative scale where she has stated the size, with
    All · Available · Sold. **Quick access**: an Index tab on the left edge (the phone's dock sheet
    on a phone) lists every stop and her work by availability, for a visitor who would rather not walk.
