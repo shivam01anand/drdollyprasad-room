@@ -51,7 +51,7 @@ export type Chapter = {
 export const THEME = `The everyday has its waiting and wishing, its worship and whispers. A rickshaw puller rests, a bell hanging from his fingers. Red thread goes round a peepal one wish at a time. A boy lifts a lamp to a wall of the same prayer, written again and again. Three women in red lean in, veiled.`;
 
 export const CHAPTERS: Chapter[] = [
-  { id: "presence", eyebrow: "“Khwaab”", stop: "Khwaab", room: "The courtyard", view: "presence", labels: ["woman-with-poppies"] },
+  { id: "presence", eyebrow: "“Khwaab” · 2024", stop: "Khwaab", room: "The courtyard", view: "presence", labels: ["woman-with-poppies"] },
   {
     id: "floral",
     eyebrow: "Bahaar · 2024–2025",
@@ -74,9 +74,9 @@ export const CHAPTERS: Chapter[] = [
     view: "bodhi", via: "threshold", dusk: 0.22, labels: ["monk-and-green-buddha"] },
   {
     id: "faith",
-    eyebrow: "“Threads of Faith” · 2026",
+    eyebrow: "Faith · 2007–2026",
     via: "faithvia",
-    stop: "Threads of Faith",
+    stop: "Dhyan · Threads of Faith",
     room: "The Quiet Room",
     body: "Brass bells tied on with red thread, under the name Ram written over and over.",
     view: "faith",
@@ -121,7 +121,7 @@ export const CHAPTERS: Chapter[] = [
   {
     id: "portraits",
     ink: "light",
-    eyebrow: "Portraits · 2007–2012",
+    eyebrow: "Portraits · and Evening at the Ghat",
     stop: "Portraits",
     room: "The gallery",
     body: "Three turbans, red, yellow and a cream lattice, each running off the top of the canvas.",
@@ -132,7 +132,7 @@ export const CHAPTERS: Chapter[] = [
   },
   { id: "kadhai", eyebrow: "Gone Are The Days · 2007–2018", stop: "Bachpan · Intezar", room: "The gallery",
     view: "kadhai", dusk: 0.55, labelSide: "below", labels: ["boy-and-kettle", "man-among-metal-pans"] },
-  { id: "doodhwala", eyebrow: "Gone Are The Days · Portraits", stop: "Aanchal · Before the Chai", room: "The gallery",
+  { id: "doodhwala", eyebrow: "Gone Are The Days · 2007–2018", stop: "Before the Chai · Morning Ritual · Aanchal", room: "The gallery",
     view: "doodhwala", dusk: 0.55, labelSide: "below", labels: ["milkman-on-bicycle", "newspaper-reader", "mother-and-child"] },
   { id: "featured", eyebrow: "Featured", stop: "Featured works", slot: "featured", view: "featured", dusk: 0.45 },
   {
