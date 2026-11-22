@@ -79,9 +79,9 @@ export const SPECS: Record<Role, Spec> = {
   thread:    { tint: 0x9e2b1d, tile: 1, roughness: 0.95, env: 0.5, tunable: false },
   leaf:      { tint: 0x46603d, tile: 1, roughness: 0.9, env: 0.5, tunable: false },
   canvasBack:{ tint: 0x3a2e26, tile: 1, roughness: 0.95, env: 0.4 },
-  // the float frames: dark walnut, a 16 mm lip round a shadow gap (scripts/house/build.py)
-  // one continuous moulding, stained: no plank photograph, whose joints would read as segments
-  artFrame:  { tint: 0x2f231b, tile: 1, roughness: 0.5, env: 0.7, tunable: false },
+  // the float frames: black (brand #1C1B1A), a 16 mm lip round a shadow gap (scripts/house/build.py)
+  // one continuous moulding, painted: no plank photograph, whose joints would read as segments
+  artFrame:  { tint: 0x1c1b1a, tile: 1, roughness: 0.5, env: 0.7, tunable: false },
   // the doors and their frames: old polished teak, a fine straight grain (Poly Haven "Dark Wood"),
   // along the stiles and jambs, across the rails and the lintel
   teak:      { set: "teak", tint: [0.86, 0.77, 0.67], tile: 0.9, rotate: true, roughness: 0.62, env: 0.85, normal: 0.5, tunable: false },
