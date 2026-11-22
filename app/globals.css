@@ -655,5 +655,12 @@ html[data-mode="dark"] .lb-veil{background:rgba(0,0,0,.5)}
 .studio-exit:hover{background:#A84B2A;transform:translateX(-50%) translateY(-2px)}
 .studio-exit:focus-visible{outline:3px solid #A84B2A;outline-offset:3px}
 .studio-exit svg{width:20px;height:20px;fill:none;stroke:currentColor;stroke-width:2.2;stroke-linecap:round}
-@media (max-width:760px){ .studio-exit{top:auto;left:auto;right:14px;bottom:96px;transform:none;padding:12px 18px 12px 14px;font-size:14.5px}
+.studio-exit .exit-short{display:none}
+/* a phone: a compact "Exit" in the top bar, just left of the music and the diya (42px each, 10px apart),
+   so it never sits on the copy panel at the foot of the screen */
+@media (max-width:760px){ .studio-exit{top:calc(var(--gut) + env(safe-area-inset-top,0px));left:auto;right:calc(var(--gut) + 104px);
+    transform:none;height:42px;gap:6px;padding:0 14px 0 11px;font-size:14px;letter-spacing:.02em;box-shadow:0 6px 18px rgba(0,0,0,.22)}
+  .studio-exit svg{width:16px;height:16px}
+  .studio-exit .exit-long{display:none}
+  .studio-exit .exit-short{display:inline}
   .studio-exit:hover{transform:none} }

@@ -723,7 +723,7 @@ export default function Studio({ dims }: { dims: Dims }) {
       {/* always on screen, from the first frame: the way back to the website */}
       <a className="studio-exit" href="/" aria-label="Exit the studio and go back to the website">
         <svg viewBox="0 0 24 24" aria-hidden="true"><path d="M6 6l12 12M18 6L6 18" /></svg>
-        <span>Exit the studio</span>
+        <span className="exit-long">Exit the studio</span><span className="exit-short">Exit</span>
       </a>
 
       {/* the header — line work and pills, as in the original */}
