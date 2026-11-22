@@ -242,7 +242,7 @@ html[data-gliding="1"]{scroll-snap-type:none}
 .lede{font-size:clamp(16px,1.2vw,18px);line-height:1.55;letter-spacing:-.005em;margin:0;color:var(--ink);max-width:34em;text-wrap:pretty}
 /* a label that is only her words: no rule above them, set a little larger */
 .copy-head + .quote{margin-top:0;padding-top:0;border-top:0;font-size:clamp(16px,1.25vw,19px);line-height:1.5}
-.quote{margin:16px 0 0;padding-top:14px;border-top:1px solid var(--rule);font-size:clamp(15px,1.1vw,17px);line-height:1.55;font-style:italic;color:var(--ink);max-width:34em}
+.quote{margin:16px 0 0;padding-top:14px;border-top:1px solid var(--rule);font-size:clamp(15px,1.1vw,17px);line-height:1.55;font-style:normal;color:var(--ink);max-width:34em}
 .poem{margin:0;font-size:clamp(18px,1.45vw,21px);line-height:1.4;letter-spacing:-.008em}
 .poem-line{display:block;min-height:1.42em}
 
@@ -296,7 +296,7 @@ html[data-room="off"] .sec:not(.sec-featured){display:none}
 .pre-welcome [data-in]{visibility:visible}
 .pre-namaste{margin:0 0 clamp(10px,1.6vh,18px);font-family:"IBM Plex Sans Devanagari",var(--display);font-weight:500;
   font-size:clamp(14px,1.1vw,17px);letter-spacing:.06em;color:var(--dim)}
-.pre-hello{margin:0;font-family:"Cormorant Garamond",Georgia,serif;font-style:italic;font-weight:500;
+.pre-hello{margin:0;font-family:"Cormorant Garamond",Georgia,serif;font-style:normal;font-weight:500;
   font-size:clamp(46px,7.2vw,116px);line-height:1.02;letter-spacing:-.012em;color:var(--ink);text-wrap:balance}
 .pre-hello span{display:inline-block;margin:0 .16em}
 .pre-sign{display:flex;gap:.32em;justify-content:center;margin-top:clamp(18px,3vh,30px)}
