@@ -15,7 +15,7 @@ import sys
 
 info = json.load(open(sys.argv[1]))
 NARROW = len(sys.argv) > 2 and sys.argv[2] == "narrow"
-ORDER = ["presence", "floral", "canopy", "easel", "bodhi", "faith", "street", "redwall",
+ORDER = ["presence", "floral", "canopy", "easel", "bodhi", "faith", "street", "redwall", "doors",
          "gallery", "rupaya", "cartman", "panels", "shrine", "gayatri", "portraits", "kadhai", "doodhwala", "featured", "plan"]
 VIA = {"easel": "easelvia", "bodhi": "threshold", "faith": "faithvia", "street": "streetvia", "redwall": "redvia", "gallery": "galleryvia"}
 cams = {k: (info["cams"].get(f"n:{k}") if NARROW else None) or v for k, v in info["cams"].items() if not k.startswith("n:")}

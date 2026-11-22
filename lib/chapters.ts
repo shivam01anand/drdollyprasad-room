@@ -100,17 +100,18 @@ export const CHAPTERS: Chapter[] = [
     dusk: 0.38,
     labels: ["terracotta-pots", "bulls-and-wheel"],
   },
-  // Bandh Darwaze I–IV hang on the Red Room’s north wall, seen from here: they carry labels too
-  { id: "redwall", eyebrow: "Gone Are The Days · Bandh Darwaze", stop: "Shree 420 · Evening at the Ghat", room: "The Red Room", view: "redwall",
-    via: "redvia", dusk: 0.45, labels: ["shree-420-and-milk-cans", "riverside-figures",
-      "weathered-door-ring", "red-and-teal-door-lock", "teal-door-bolt", "carved-door-knocker"],
-    // the phone keeps its framing of the two large canvases; the doors are labelled where they show
-    frame: ["shree-420-and-milk-cans", "riverside-figures"] },
+  { id: "redwall", eyebrow: "Gone Are The Days · 2007–2018", stop: "Shree 420 · Evening at the Ghat", room: "The Red Room", view: "redwall",
+    via: "redvia", dusk: 0.45, labels: ["shree-420-and-milk-cans", "riverside-figures"] },
+  // Bandh Darwaze, four doors a foot square on the Red Room’s north wall: a stop of their own,
+  // square on, so all four are seen and named together
+  { id: "doors", eyebrow: "Bandh Darwaze · 2018", stop: "Bandh Darwaze I to IV", room: "The Red Room", view: "doors",
+    dusk: 0.47, labelSide: "below",
+    labels: ["weathered-door-ring", "red-and-teal-door-lock", "teal-door-bolt", "carved-door-knocker"] },
   // through the Red Room’s east doorway: the gallery hall, where the rest of her work hangs as an
   // exhibition hangs, one line at eye level, a series to a wall (scripts/house/build.py)
   { id: "gallery", ink: "light", eyebrow: "The gallery", stop: "The gallery", room: "The gallery",
     view: "gallery", via: "galleryvia", dusk: 0.5 },
-  { id: "rupaya", eyebrow: "Gone Are The Days · 2007–2018", stop: "Twenty Paise · Mother India", room: "The gallery",
+  { id: "rupaya", eyebrow: "Gone Are The Days · 2007–2018", stop: "Twenty Paise · Patra Petika · Mother India", room: "The gallery",
     view: "rupaya", dusk: 0.5, labelSide: "below",
     labels: ["rickshaw-puller-and-coin", "postbox-and-stamps", "mother-india-and-kettles"] },
   { id: "cartman", eyebrow: "Gone Are The Days · 2007–2018", stop: "Last of the Pedals · Ek Rupaya", room: "The gallery",

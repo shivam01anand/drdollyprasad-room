@@ -25,7 +25,7 @@ export type Role =
   | "wall" | "wallShade" | "field" | "court" | "floor" | "stone" | "sandstone" | "ram"
   | "timber" | "frame" | "door" | "iron" | "ironDark" | "clay" | "postbox"
   | "courtFloor" | "aluminium" | "brass" | "thread" | "leaf" | "canvasBack" | "artFrame" | "teak" | "teakRail"
-  | "brick" | "concrete" | "panel" | "kota" | "gesso";
+  | "brick" | "concrete" | "panel" | "kota" | "gesso" | "mat";
 
 type Spec = {
   set?: SetName;
@@ -95,6 +95,8 @@ export const SPECS: Record<Role, Spec> = {
   // the primed canvas on her easel, waiting: a clean warm white, no photograph in it (a plaster's
   // marks read as dirt on a ground no brush has touched); the bake gives it its light
   gesso:     { tint: 0xece5d6, tile: 1, roughness: 0.92, env: 0.5, tunable: false },
+  // the mats round her canvases: the brand cream (#F2EDE5, kb/brand.md), flat; the bake gives it its light
+  mat:       { tint: 0xf2ede5, tile: 1, roughness: 0.92, env: 0.5, tunable: false },
 };
 
 const SET_TILE_PATH = (set: SetName, kind: "diff" | "nor" | "arm", small: boolean) =>

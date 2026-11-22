@@ -125,6 +125,9 @@ SITE = {
     # the primed face of the canvas on her easel: baked like the walls, so it reads white in the shade
     # (the bake keeps light, not colour: the site draws it a flat warm white, lib/room/materials.ts)
     "gesso": ("plaster", (2.25, 2.18, 2.0), 3.0),
+    # the mats round her canvases: the brand cream (#F2EDE5, kb/brand.md), apart from the primed
+    # canvas on her easel; the site draws it flat (lib/room/materials.ts `mat`), the bake its light
+    "mat": ("plaster", (2.25, 2.14, 1.99), 3.0),
 }
 
 
@@ -907,18 +910,46 @@ def mat_and_frame(art_id, w, h, depth, M):
         bmesh.ops.scale(bm, vec=(x1 - x0, yb - ya, z1 - z0), verts=r["verts"])
         bmesh.ops.translate(bm, vec=((x0 + x1) / 2, (ya + yb) / 2, (z0 + z1) / 2), verts=r["verts"])
 
-    # the mat: four boards round the canvas (none behind it, where no light reaches)
-    cube("mat", -o, o, mat_y, wall_y, h / 2, p)
-    cube("mat", -o, o, mat_y, wall_y, -p, -h / 2)
-    cube("mat", -o, -w / 2, mat_y, wall_y, -h / 2, h / 2)
-    cube("mat", w / 2, o, mat_y, wall_y, -h / 2, h / 2)
+    # the mat: one board with the canvas's opening cut in it (none behind the canvas, where no light
+    # reaches). One piece, its face one surface: four boards met in a joint the bevel and the
+    # lightmap both drew, a grey line across the mat at the canvas's top and foot
+    bm = bms.setdefault("mat", bmesh.new())
+    xs, zs = (-o, -w / 2, w / 2, o), (-p, -h / 2, h / 2, p)
+    face = [[bm.verts.new((x, mat_y, z)) for x in xs] for z in zs]
+    back = [[bm.verts.new((x, wall_y, z)) for x in xs] for z in zs]
+    for j in range(3):
+        for i in range(3):
+            if i == 1 and j == 1:
+                continue                                    # the opening
+            bm.faces.new((face[j][i], face[j][i + 1], face[j + 1][i + 1], face[j + 1][i]))
+    outer = [(0, 0), (3, 0), (3, 3), (0, 3)]               # (i, j) corners round the outside
+    inner = [(1, 1), (2, 1), (2, 2), (1, 2)]               # and round the opening
+    for loop in (outer, inner):
+        for k in range(4):
+            (i0, j0), (i1, j1) = loop[k], loop[(k + 1) % 4]
+            bm.faces.new((face[j0][i0], face[j1][i1], back[j1][i1], back[j0][i0]))
+    # each face turned to the light: the face toward the room, the outer edges outward, the
+    # opening's edges in, toward the canvas
+    bm.normal_update()
+    for f in bm.faces:
+        c = f.calc_center_median()
+        n = f.normal
+        if abs(n.y) > 0.9:
+            want = Vector((0, -1, 0))
+        else:
+            inside = abs(c.x) < w / 2 + 1e-5 and abs(c.z) < h / 2 + 1e-5
+            out = Vector((c.x, 0, 0)) if abs(n.x) > 0.5 else Vector((0, 0, c.z))
+            want = -out if inside else out
+        if n.dot(want) < 0:
+            f.normal_flip()
+    bm.normal_update()
     # the moulding
     cube("frame", -o - lip, o + lip, lip_y, wall_y, p, p + lip)
     cube("frame", -o - lip, o + lip, lip_y, wall_y, -p - lip, -p)
     cube("frame", -o - lip, -o, lip_y, wall_y, -p, p)
     cube("frame", o, o + lip, lip_y, wall_y, -p, p)
     out = []
-    for key, role, name, bevel in (("mat", "gesso", f"Wall_Mat_{art_id}", 0.0008),
+    for key, role, name, bevel in (("mat", "mat", f"Wall_Mat_{art_id}", 0.0008),
                                    ("frame", "artFrame", f"Wall_Frame_{art_id}", 0.0022)):
         bm = bms[key]
         bmesh.ops.transform(bm, matrix=M, verts=bm.verts)
@@ -1977,9 +2008,15 @@ VIEWS = {
     # three-quarters on the east wall, Bandh Darwaze on the north wall to the left: from the
     # south-west corner, turned so Evening at the Ghat, right of the gallery door, is whole in frame
     "redwall":   ((-5.3, -4.5, 1.55), (-1.02, -2.32, 1.45)),
+    # Bandh Darwaze, the four doors on the north wall, square on from the room's middle
+    # (the target a step ahead, not on the wall: the turn on to the gallery swings round a near
+    # pivot, clear of the south wall; pathcheck.py)
+    "doors":     ((-1.835, -3.0, 1.58), (-1.835, -1.6, 1.56)),
     # through the Red Room's east doorway into the gallery hall: down its length to the palms first,
     # then close to each group in turn (HALL): along the south wall, the east, and back along the north
-    "galleryvia": ((-1.3, -2.55, 1.62), (6.0, -2.9, 1.66)),
+    # (its target 4/10 of the way down the hall: a far pivot swung the turn from the doors through
+    # the Red Room's south wall)
+    "galleryvia": ((-1.3, -2.55, 1.62), (-1.3 + 7.3 * 0.4, -2.55 - 0.35 * 0.4, 1.62 + 0.04 * 0.4)),
     "gallery":   ((1.3, -2.85, 1.64), (9.5, -5.0, 1.85)),
     # then up, out of the hall's roof
     "featured":  ((9.3, PALM["cy"], 3.62), (10.8, PALM["cy"], 0.0)),
@@ -2012,7 +2049,7 @@ NARROW = {
     "streetvia": ((-4.0, 2.2, 1.58), (-4.3, -0.5, 1.5)),
     "street":    ((-4.3, -0.4, 1.55), (-3.35, RY0, 1.3)),
     "redwall":   ((-3.55, -3.9, 1.55), (RX1, -3.9, 1.3)),
-    "galleryvia": ((-1.2, -2.55, 1.58), (6.0, -2.75, 1.5)),
+    "galleryvia": ((-1.2, -2.55, 1.58), (-1.2 + 7.2 * 0.4, -2.55 - 0.2 * 0.4, 1.58 - 0.08 * 0.4)),
     "gallery":   ((1.3, -2.75, 1.55), (9.5, -4.3, 1.75)),
     "featured":  ((9.3, PALM["cy"], 3.62), (10.8, PALM["cy"], 0.0)),
     "plan":      ((8.0, -19.4, 60.0), (8.0, -19.4, 0.0)),
