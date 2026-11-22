@@ -833,6 +833,19 @@ export default function Studio({ dims }: { dims: Dims }) {
                   {c.body && (c.bodyUntil ? <Until until={c.bodyUntil}><p className="lede">{c.body}</p></Until> : <p className="lede">{c.body}</p>)}
                 </div>
               )}
+              {/* the paintings on this wall, for a screen reader and the keyboard: each opens its card */}
+              {!!c.labels?.length && (
+                <ul className="stop-works" aria-label={`Paintings at this stop: ${c.stop}`}>
+                  {c.labels.map((id) => {
+                    const w = BY_ID.get(id);
+                    return w ? (
+                      <li key={id}>
+                        <button type="button" onClick={() => lbRef.current?.open(id, null, WALK_ORDER)}>{w.title}</button>
+                      </li>
+                    ) : null;
+                  })}
+                </ul>
+              )}
             </section>
           )
         )}

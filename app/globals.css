@@ -273,6 +273,12 @@ html[data-room="off"] .sec:not(.sec-featured){display:none}
    shown in place when the screen is too short for the fixed copy */
 .chapter-text{position:absolute;width:1px;height:1px;padding:0;margin:-1px;overflow:hidden;clip-path:inset(50%);white-space:normal}
 .chapter-text .poem{white-space:pre-line}
+/* each stop's paintings, as a list: unseen, but read out, and shown while the keyboard is in it */
+.stop-works{position:absolute;width:1px;height:1px;padding:0;margin:-1px;overflow:hidden;clip-path:inset(50%);white-space:nowrap;list-style:none}
+.stop-works:focus-within{position:fixed;z-index:180;left:var(--gut);top:calc(var(--hud-top) + 8px);width:auto;height:auto;margin:0;
+  padding:10px 14px;overflow:visible;clip-path:none;background:var(--page);border:1px solid var(--rule);display:flex;flex-direction:column;gap:2px}
+.stop-works button{background:none;border:0;padding:4px 0;font:inherit;font-size:14px;color:var(--ink);cursor:pointer;text-align:left}
+.stop-works button:focus-visible{outline:2px solid var(--oxide);outline-offset:2px}
 @media (max-height:600px){
   .copy{display:none}
   .sec:not(.sec-featured){display:flex;align-items:center;padding:110px var(--gut) 150px}
