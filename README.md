@@ -142,7 +142,14 @@ python3 scripts/house/pathcheck.py scripts/house/work/vN/house.json [narrow]   #
 nohup blender -b scripts/house/work/vN/house.blend -P scripts/house/export.py -- scripts/house/work/vN/final --res=3072 --spp=144 &
 blender -b -P scripts/bake/denoise.py -- scripts/house/work/vN/final lm-day     # and lm-night
 python3 scripts/house/publish.py scripts/house/work/vN/final scripts/house/work/vN
+python3 scripts/house/check-sizes.py            # every canvas within 2 % of kb/paintings.json
 ```
+
+Sizes are not typed into `build.py`: it reads each work's `size` from `lib/works.ts` (height ×
+width, inches) and hangs it at that size, in a black frame round a cream mat (3-4 in). Poly Haven
+props (`assets/polyhaven`, git-ignored) come from the Poly Haven API at 1k; `potted_plant_04_tc` is
+`potted_plant_04`. Where `~/Desktop/dolly-prasad-study/images-final` is missing, the canvases take
+their photographs from `public/art/room`.
 
 The final bake takes about an hour on an M1; run it with `nohup`. Camera-only changes need no
 rebake: rebuild with `--save=0` and copy the cams into `public/house/house.json`.
