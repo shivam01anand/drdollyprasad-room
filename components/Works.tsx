@@ -106,7 +106,7 @@ export function Contact() {
           </p>
         </div>
         <div className="contact-side">
-          <div className="lab">Write to me</div>
+          <div className="lab">Write to her</div>
           <h2 id="contact-title" className="contact-title">
             <a href={`mailto:${EMAIL}`}>{EMAIL}</a>
           </h2>

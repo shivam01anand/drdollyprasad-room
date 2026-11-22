@@ -741,7 +741,7 @@ export default function Studio({ dims }: { dims: Dims }) {
             <span data-hud-text="New Delhi">New Delhi</span>
             <span ref={clockRef} />
           </div>
-          <a className="hud-mail lab" href={`mailto:${EMAIL}`} data-hud-text="↳ Write to me">↳ Write to me</a>
+          <a className="hud-mail lab" href={`mailto:${EMAIL}`} data-hud-text="↳ Write to her">↳ Write to her</a>
           <button type="button" className="diya-btn music-btn" aria-pressed={playing}
                   aria-label={playing ? "Pause the music" : "Play the music"} onClick={() => music.toggle()}>
             <svg viewBox="0 0 32 32" aria-hidden="true">
