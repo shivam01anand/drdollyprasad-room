@@ -401,109 +401,7 @@ html[data-room="off"] .sec:not(.sec-featured){display:none}
 .feat-card:focus-visible{outline:2px solid var(--oxide);outline-offset:6px}
 
 /* -------------------------------------------------------------- lightbox */
-.lb{position:fixed;inset:0;width:100%;height:100%;max-width:none;max-height:none;margin:0;padding:0;border:0;
-    color:var(--ink);background:transparent;overflow:hidden}
-.lb:not([open]){display:none}
-.lb::backdrop{background:transparent}
-/* one painting, on a card over the house: the room stays there behind it, a little
-   dimmed, and a click anywhere outside the card puts the work away */
-.lb{--lb-w:min(1080px,84vw);--lb-h:min(660px,78vh);--lb-pad:clamp(22px,2.6vw,40px);
-  --lb-y:calc((100vh - var(--lb-h)) / 2);--lb-x:calc((100vw - var(--lb-w)) / 2)}
-.lb-veil{position:absolute;inset:0;background:rgba(24,17,13,.34);cursor:pointer}
-html[data-mode="dark"] .lb-veil{background:rgba(0,0,0,.5)}
-.lb-card{position:absolute;top:var(--lb-y);bottom:var(--lb-y);left:var(--lb-x);right:var(--lb-x);pointer-events:none;
-  background:var(--page);border:1px solid var(--rule);box-shadow:0 2px 6px rgba(30,20,14,.12),0 40px 90px -40px rgba(30,20,14,.55)}
-.lb-grid{position:absolute;top:var(--lb-y);bottom:var(--lb-y);left:var(--lb-x);right:var(--lb-x);
-         display:grid;grid-template-columns:minmax(0,1fr) minmax(260px,340px);gap:clamp(28px,3.5vw,56px);
-         align-items:center;padding:var(--lb-pad);pointer-events:none}
-.lb-figure{margin:0;display:flex;justify-content:flex-end;align-items:center;min-height:0;height:100%;container-type:size}
-/* the painting: it clips only while zoomed, so the flight in is never cut */
-.lb-frame{position:relative;line-height:0;cursor:zoom-in;pointer-events:auto;max-width:100%}
-.lb-frame.is-zoomed{overflow:hidden;cursor:zoom-out;touch-action:none}
-.lb-frame>img{display:block;max-height:calc(var(--lb-h) - 2 * var(--lb-pad));max-width:100%;width:auto;height:auto;
-  box-shadow:0 1px 2px rgba(48,39,34,.08),0 28px 70px -44px rgba(48,39,34,.5);will-change:transform}
-.lb-frame.is-zoomed>img{box-shadow:none}
-/* the trace of a zoom: a hairline track and the level, fading once still */
-.lb-zoombar{position:absolute;right:14px;top:50%;height:120px;width:22px;margin-top:-60px;pointer-events:none;
-  opacity:0;transition:opacity .6s ease;display:flex;flex-direction:column;align-items:center;gap:8px;line-height:1}
-.lb-zoombar i{position:relative;flex:1;width:2px;border-radius:2px;background:rgba(240,234,223,.42);overflow:hidden;
-  box-shadow:0 0 0 1px rgba(48,39,34,.12)}
-.lb-zoombar i::after{content:"";position:absolute;left:0;right:0;bottom:0;height:100%;background:#F0EADF;
-  transform-origin:50% 100%;transform:scaleY(var(--k,0))}
-.lb-zoombar span{font-family:var(--mono);font-size:10px;letter-spacing:.04em;color:#F0EADF;text-shadow:0 1px 3px rgba(0,0,0,.45)}
-
-/* the painting in a room made for it: the room is a container, so one centimetre on
-   its wall (--cm, in cqw, set per room) draws the frame and its shadow at their size */
-.lb-room{position:relative;width:min(100cqw,calc(100cqh * 1.5));max-width:100%;overflow:hidden;pointer-events:auto;
-  container-type:inline-size;
-  box-shadow:0 1px 2px rgba(48,39,34,.08),0 28px 70px -44px rgba(48,39,34,.5)}
-.lb-room-photo{display:block;width:100%;height:100%;object-fit:cover}
-.lb-room-art{position:absolute;--cm:.2cqw;isolation:isolate}
-.lb-room-art img{display:block;width:100%;height:100%;object-fit:cover}
-/* the float frame, as in the house: a 1.6 cm dark walnut lip round a 0.9 cm shadow gap,
-   lit from above; it stands off the wall, so it throws a soft shadow away from the
-   room's light (--shx/--shy/--shb in cm, --shc) and a little contact shade all round */
-.lb-room-art::before{content:"";position:absolute;z-index:-1;inset:calc(var(--cm) * -2.5);
-  border:calc(var(--cm) * 1.6) solid #2a1f18;border-top-color:#3b2d23;border-bottom-color:#211812;
-  background:#0d0906;
-  box-shadow:inset 0 0 0 max(.5px,calc(var(--cm) * .12)) rgba(255,236,214,.07),
-    calc(var(--cm) * var(--shx,1.5)) calc(var(--cm) * var(--shy,2.4)) calc(var(--cm) * var(--shb,5)) var(--shc,rgba(64,46,30,.34)),
-    0 0 calc(var(--cm) * 1.1) rgba(36,25,16,.32)}
-/* the room's own light falls across the canvas and the frame: a map of the light on
-   this wall, cut to the frame's rectangle (lib/rooms hang), or a soft fall-off */
-.lb-room-art::after{content:"";position:absolute;inset:calc(var(--cm) * -2.5);pointer-events:none;mix-blend-mode:multiply;
-  background:var(--light,linear-gradient(100deg,rgba(255,250,242,0) 0%,rgba(120,100,80,.10) 100%));
-  background-size:var(--light-size,100% 100%);background-position:var(--light-pos,0 0);background-repeat:no-repeat}
-.lb-room-cap{position:absolute;left:14px;bottom:12px;margin:0;padding:6px 11px 5px;border-radius:999px;
-  background:rgba(240,234,223,.9);color:#302722;line-height:1.2;max-width:calc(100% - 28px)}
-/* a narrow room (a phone) keeps its caption small, so it never covers the furniture */
-@container (max-width:520px){
-  .lb-room-cap{left:8px;bottom:8px;padding:4px 8px 3px;font-size:8.5px;letter-spacing:.06em;max-width:calc(100% - 16px)}
-}
-
-/* ways to see it: the painting, then the rooms */
-.lb-views{display:flex;gap:10px}
-.lb-view{position:relative;width:72px;height:48px;padding:0;border:1px solid var(--line);border-radius:6px;overflow:hidden;
-  background:var(--page);cursor:pointer;transition:border-color .18s var(--ease),box-shadow .18s var(--ease)}
-.lb-view>img{display:block;width:100%;height:100%;object-fit:cover}
-.lb-view[data-view="work"]>img{object-fit:contain;padding:4px;background:rgba(117,75,54,.06)}
-.lb-view-art{position:absolute;display:block}
-.lb-view-art img{display:block;width:100%;height:100%;object-fit:cover;outline:1px solid rgba(42,31,24,.85);
-  box-shadow:1px 1px 2px rgba(40,28,16,.35)}
-.lb-view:hover{border-color:var(--dim)}
-.lb-view[aria-pressed="true"]{border-color:var(--ink);box-shadow:0 0 0 1px var(--ink)}
-.lb-hint{margin:-6px 0 0}
-.lb-text{pointer-events:auto;align-self:stretch;display:flex;flex-direction:column;justify-content:center;gap:20px;position:relative}
-/* the card closes from its corner, in a round chip, or by a click anywhere outside it */
-.lb-close{position:fixed;z-index:3;top:calc(var(--lb-y) + 14px);right:calc(var(--lb-x) + 14px);width:44px;height:44px;
-  border-radius:50%;padding:0;display:grid;place-items:center;cursor:pointer;color:var(--chip-ink);
-  background:var(--chip);border:1px solid var(--line);transition:background-color .18s var(--ease),color .18s var(--ease)}
-.lb-close:hover{background:var(--pill);color:var(--pill-ink)}
-.lb.by-pointer .lb-close:focus-visible{outline:none}
-.lb-close-word{display:none}
-.lb-close-x{display:block;width:20px;height:20px;stroke:currentColor;stroke-width:1.7;fill:none;stroke-linecap:round}
-/* the title's opening quote hangs in the margin, so the letters align with the details below */
-.lb-title{margin:0;font-weight:400;font-size:clamp(30px,2.9vw,46px);line-height:1.04;letter-spacing:-.03em;min-height:1.04em;text-indent:-.42em;text-wrap:balance}
-.lb-meta{display:grid;grid-template-columns:auto 1fr;gap:9px 20px;margin:0;padding-top:16px;border-top:1px solid var(--rule);
-  font-family:var(--mono);font-size:11px;letter-spacing:.06em;text-transform:uppercase}
-.lb-meta dt{color:var(--dim)}
-.lb-meta dd{margin:0;color:var(--ink);min-height:1.5em}
-.lb .pill{align-self:flex-start}
-.lb-actions{display:flex;flex-wrap:wrap;gap:10px}
-/* turning to the previous and next work, without closing the card */
-.lb-step{display:flex;align-items:center;justify-content:space-between;gap:12px;padding-top:14px;border-top:1px solid var(--rule)}
-.lb-step button{background:none;border:0;padding:8px 0;cursor:pointer;color:var(--ink)}
-.lb-step button:hover{color:var(--oxide)}
-.lb-count{color:var(--dim)}
-.lb-grid{pointer-events:auto}
-@media (max-height:600px) and (min-width:901px){
-  .lb-grid{display:flex;flex-direction:column;align-items:stretch;justify-content:flex-start;overflow-y:auto;overscroll-behavior:contain;padding-top:24px}
-  .lb-figure,.lb-text{flex:none}
-  .lb-text{padding-top:44px}
-  .lb-figure{justify-content:center;height:auto;container-type:inline-size}
-  .lb-frame>img{max-height:52vh}
-  .lb-room{width:min(100%,78vh)}
-}
+/* the painting card over the house: components/painting-card.css, the same card as the painting page */
 
 /* --------------------------------------------------------------- collage */
 .collage{position:relative;z-index:3;background:var(--page);padding:clamp(80px,10vw,150px) var(--gut) clamp(64px,8vw,120px)}
@@ -545,8 +443,8 @@ html[data-mode="dark"] .lb-veil{background:rgba(0,0,0,.5)}
 
 /* ------------------------------------------------------------- small screens */
 @media (pointer:coarse){
-  .pill,.feat-arrow,.lb-close{min-height:44px}
-  .feat-arrow,.lb-close{min-width:44px}
+  .pill,.feat-arrow{min-height:44px}
+  .feat-arrow{min-width:44px}
 }
 @media (max-width:900px){
   :root{--hud-top:84px;--hud-bottom:72px}
@@ -615,27 +513,6 @@ html[data-mode="dark"] .lb-veil{background:rgba(0,0,0,.5)}
   .feat-media{width:fit-content;max-width:100%}
   .feat-media img{width:auto;max-width:100%;max-height:50svh}
   .cap-title{font-size:14px}
-  /* on a phone the card is a sheet from the bottom edge, the house still in view above it */
-  .lb{--lb-y:0px;--lb-x:0px;--lb-w:100vw;--lb-h:92svh}
-  .lb-card,.lb-grid{top:calc(8svh + env(safe-area-inset-top,0px));bottom:0}
-  .lb-card{border-radius:22px 22px 0 0;border-width:1px 0 0}
-  /* a column, not a grid: a grid sized the painting's row before the painting and let the title
-     slide under a tall work */
-  .lb-grid{display:flex;flex-direction:column;align-items:stretch;justify-content:flex-start;overflow-y:auto;overscroll-behavior:contain;
-    padding:62px var(--gut) calc(40px + env(safe-area-inset-bottom,0px))}
-  .lb-figure,.lb-text{flex:none}
-  .lb-frame>img{max-height:52svh}
-  .lb-text{padding-top:8px}
-  /* a phone closes from the corner of the sheet, in a round chip that stays put as it scrolls */
-  .lb-close{position:fixed;z-index:3;top:calc(8svh + 10px + env(safe-area-inset-top,0px));right:var(--gut);width:46px;height:46px;
-    border-radius:50%;padding:0;display:grid;place-items:center;background:var(--chip);border:1px solid var(--line);
-    box-shadow:0 4px 14px -6px rgba(30,20,14,.35)}
-  .lb-close-word{display:none}
-  .lb-close-x{display:block}
-  .lb-figure{justify-content:center;height:auto;container-type:inline-size}
-  .lb-frame>img{max-height:52vh}
-  .lb-room{width:100%}
-  .lb-title{font-size:28px}
   .statement{font-size:26px}
   .contact-grid{grid-template-columns:1fr}
   .series{flex-direction:column;align-items:flex-start;gap:4px}
