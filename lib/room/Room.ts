@@ -31,6 +31,8 @@ export type RoomOpts = {
   onArtwork(id: string): void;
   /** the painting under the pointer, or null — for the cursor's word */
   onHoverArt?(id: string | null): void;
+  /** a click on bare wall or floor in the screen's outer third: a step of the walk (see setWalkZones) */
+  onWallStep?(d: 1 | -1): void;
   /** the physics engine failed to load: leave rearrange */
   onRearrangeError?(error: unknown): void;
 };
@@ -206,6 +208,10 @@ export class Room {
   private introPlayed = false;
   private hoverDirty = false;
   private hoverId: string | null = null;
+  /** which outer thirds of the screen step the walk when clicked (a computer's; null: none) */
+  private zones: { prev: boolean; next: boolean } | null = null;
+  private hoverZone = "";
+  private pointerIn = false;
   private ray = new THREE.Raycaster();
   private ndc = new THREE.Vector2();
 
@@ -1153,6 +1159,7 @@ export class Room {
 
   private onPointerMove = (e: PointerEvent) => {
     if (e.pointerType !== "touch") {
+      this.pointerIn = true;
       const n = this.toNDC(e);
       this.rig.pointer(n.x, n.y);
       this.hoverDirty = true;
@@ -1192,9 +1199,30 @@ export class Room {
   };
 
   private onPointerLeave = () => {
+    this.pointerIn = false;
     this.rig.dropPointer();
     if (this.hoverId) { this.hoverId = null; this.canvas.style.cursor = ""; this.opts.onHoverArt?.(null); }
+    this.setZoneCursor("");
   };
+
+  /** the walk's click zones: the left third goes back, the right third on, where each can */
+  setWalkZones(z: { prev: boolean; next: boolean } | null) {
+    this.zones = z;
+    this.hoverDirty = true;
+  }
+  /** the outer third under a point, if it steps the walk there */
+  private zoneAt(nx: number): "" | "prev" | "next" {
+    const z = this.zones;
+    if (!z) return "";
+    if (nx < -1 / 3 && z.prev) return "prev";
+    if (nx > 1 / 3 && z.next) return "next";
+    return "";
+  }
+  private setZoneCursor(zone: string) {
+    if (zone === this.hoverZone) return;
+    this.hoverZone = zone;
+    if (zone) this.canvas.dataset.zone = zone; else delete this.canvas.dataset.zone;
+  }
 
   private onTouch = () => { this.rig.touched(); };
 
@@ -1271,12 +1299,15 @@ export class Room {
     // the click that follows a tap the room already answered
     if (performance.now() - this.tapOpened < 700) return;
     const id = this.pick(e);
-    if (id) this.opts.onArtwork(id);
+    if (id) { this.opts.onArtwork(id); return; }
+    // bare wall or floor at the screen's side: a step of the walk
+    const zone = this.zoneAt(this.toNDC(e).x);
+    if (zone) this.opts.onWallStep?.(zone === "next" ? 1 : -1);
   };
 
   private updateHover() {
     this.hoverDirty = false;
-    if (!this.rig.isEnabled || this.rearranged) return;
+    if (!this.rig.isEnabled || this.rearranged) { this.setZoneCursor(""); return; }
     // hover is resolved from the last known pointer position in NDC
     this.ray.setFromCamera(this.ndc, this.rig.camera);
     const hit = this.ray.intersectObjects(this.art, false)[0];
@@ -1286,6 +1317,8 @@ export class Room {
       this.canvas.style.cursor = id ? "pointer" : this.rearranged ? "grab" : "";
       this.opts.onHoverArt?.(id);
     }
+    // (only where the pointer is in the room: a pointer that has left keeps no zone)
+    this.setZoneCursor(id || !this.pointerIn ? "" : this.zoneAt(this.ndc.x));
   }
 
   private onVisibility = () => {

@@ -19,6 +19,7 @@ import { CHAPTERS, WALK_ORDER, stopOf } from "@/lib/chapters";
 import { activeVariant } from "@/lib/room/variants";
 import { BY_ID, EMAIL, FEATURED } from "@/lib/works";
 import { rebaseWalkScroll, walkProgress } from "@/lib/walk-layout";
+import { clearWalkEdges } from "@/lib/walk-edges";
 import { paintingProperties, track } from "@/lib/analytics";
 
 type Dims = Record<string, { w: number; h: number }>;
@@ -394,6 +395,7 @@ export default function Studio({ dims }: { dims: Dims }) {
           lbRef.current?.open(id, null, WALK_ORDER);
         },
         onHoverArt: (id) => roomCursorLabel(id ? "View" : null),
+        onWallStep: (d) => stepRef.current(d),
       }).then(() => {
         if (killed || dead) return;
         clearTimeout(timeout);
@@ -420,6 +422,7 @@ export default function Studio({ dims }: { dims: Dims }) {
         top(y: number) { lenis.scrollTo(y, { immediate: true, force: true }); apply(y, true); },
         mode: (m: "light" | "dark") => setMode(m),
         music,
+        room: () => roomRef.current,
       };
       if (q.get("mode") === "dark") setMode("dark");
       if (!q.has("fast") && !q.has("shot")) return;
@@ -661,6 +664,37 @@ export default function Studio({ dims }: { dims: Dims }) {
     setCoach(false);
     try { localStorage.setItem("dp:walked", "1"); } catch { /* private mode */ }
   }, [active, coach]);
+  // and again for anyone who stands at the first stop a while without walking: the › nudges, the hint returns
+  useEffect(() => {
+    if (!ready || failed || coach || active !== 0) return;
+    const idle = window.setTimeout(() => {
+      if (locks.current.size) return;
+      coarse.current = matchMedia("(pointer: coarse)").matches;
+      firstActive.current = 0;
+      setCoach(true);
+    }, 6000);
+    return () => clearTimeout(idle);
+  }, [ready, failed, coach, active]);
+
+  // the walk's arrows stand off any painting's middle, once the camera has landed (lib/walk-edges.ts)
+  useEffect(() => {
+    if (!ready || failed) return;
+    const poll = window.setInterval(() => {
+      const r = roomRef.current;
+      if (!r || !r.landed || Math.abs(r.at * (CHAPTERS.length - 1) - active) > 0.04) return;
+      clearInterval(poll);
+      clearWalkEdges(r.artRects());
+    }, 200);
+    return () => clearInterval(poll);
+  }, [ready, failed, active]);
+
+  // a computer's walk zones: a click on bare wall in the left third goes back, the right third on
+  useEffect(() => {
+    const r = roomRef.current;
+    if (!r || !ready || failed) return;
+    const fine = matchMedia("(hover: hover) and (pointer: fine)").matches;
+    r.setWalkZones(fine ? { prev: active > 0, next: active < CHAPTERS.length - 1 } : null);
+  }, [ready, failed, active]);
 
   // the keyboard walks too: ← and → a wall at a time
   useEffect(() => {
@@ -769,8 +803,6 @@ export default function Studio({ dims }: { dims: Dims }) {
           {/* the phone's dock: where you are in the house, the works, and the rest in a sheet */}
           {ready && !failed && (
             <div className="dock">
-              <button type="button" className="walk-btn is-prev" aria-label="Previous stop" disabled={active === 0}
-                      onClick={() => stepRef.current(-1)}><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M14.5 5.5 8 12l6.5 6.5" /></svg></button>
               <button type="button" className="dock-where" disabled={!ready} onClick={() => setStops(true)}
                       aria-label={`Stop ${active + 1} of ${CHAPTERS.length}: ${CHAPTERS[active]?.stop}. All stops`}>
                 <span className="lab dock-n">{String(active + 1).padStart(2, "0")}<i>/{String(CHAPTERS.length).padStart(2, "0")}</i></span>
@@ -780,29 +812,14 @@ export default function Studio({ dims }: { dims: Dims }) {
                       onClick={() => setStops(true)}>
                 <svg viewBox="0 0 24 24" aria-hidden="true"><path d="M5 8.5h14M5 15.5h14" /></svg>
               </button>
-              <button type="button" className="walk-btn is-next" aria-label="Next stop" disabled={active >= CHAPTERS.length - 1}
-                      data-nudge={coach ? "1" : undefined}
-                      onClick={() => stepRef.current(1)}><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M9.5 5.5 16 12l-6.5 6.5" /></svg></button>
             </div>
           )}
-          {/* a computer's walk: the arrows either side of where you are; the first visit's hint beside them */}
+          {/* a computer's "you are here" (the arrows themselves are at the screen's edges) */}
           {ready && !failed && (
-            <div className="walk-wrap">
-            <div className="walk-nav" role="group" aria-label="Walk through the studio">
-              <button type="button" className="walk-btn is-prev" aria-label="Previous stop" disabled={active === 0}
-                      onClick={() => stepRef.current(-1)}><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M14.5 5.5 8 12l6.5 6.5" /></svg></button>
+            <div className="walk-nav">
               <span className="lab walk-n" aria-live="polite" aria-label={`Stop ${active + 1} of ${CHAPTERS.length}: ${CHAPTERS[active]?.stop}`}>
                 {String(active + 1).padStart(2, "0")}<i> / {String(CHAPTERS.length).padStart(2, "0")}</i>
               </span>
-              <button type="button" className="walk-btn is-next" aria-label="Next stop" disabled={active >= CHAPTERS.length - 1}
-                      data-nudge={coach ? "1" : undefined}
-                      onClick={() => stepRef.current(1)}><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M9.5 5.5 16 12l-6.5 6.5" /></svg></button>
-            </div>
-            {coach && (
-              <p className="coach lab" role="status">
-                {coarse.current ? "Swipe or tap › to walk" : "Scroll, use ← → or click ›"}
-              </p>
-            )}
             </div>
           )}
           <nav className="hud-pills" aria-label="Site">
@@ -816,6 +833,22 @@ export default function Studio({ dims }: { dims: Dims }) {
             <span className="mask"><button type="button" className="pill hud-pill" onClick={() => go("#contact")}>Contact<span className="arr"> →</span></button></span>
           </nav>
         </div>
+        {/* the walk's arrows, large, at the screen's two edges; the first visit's hint by the next one */}
+        {ready && !failed && (
+          <div className="walk-edges" role="group" aria-label="Walk through the studio">
+            <button type="button" className="walk-edge is-prev" aria-label="Previous stop" disabled={active === 0}
+                    onClick={() => stepRef.current(-1)}><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M14.5 5.5 8 12l6.5 6.5" /></svg></button>
+            <button type="button" className="walk-edge is-next" aria-label="Next stop" disabled={active >= CHAPTERS.length - 1}
+                    data-nudge={coach ? "1" : undefined}
+                    onClick={() => stepRef.current(1)}><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M9.5 5.5 16 12l-6.5 6.5" /></svg></button>
+            {/* (kept in place, unseen, at the first stop, so the wall labels already stand clear of it) */}
+            {(coach || active === 0) && (
+              <p className="walk-hint lab" role="status" data-on={coach ? "1" : "0"}>
+                {coarse.current ? "Swipe or tap › to walk" : "Scroll, use ← → or click ›"}
+              </p>
+            )}
+          </div>
+        )}
       </header>
 
       {/* the copy slot — fixed, below the header's reach */}
