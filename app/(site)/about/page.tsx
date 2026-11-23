@@ -21,6 +21,7 @@ const paint = (ids: string[]): RollItem[] => ids.map((id) => {
 });
 
 const SHOW_PHOTOS: RollItem[] = [
+  { src: "/site/ex/sf-01.jpg", title: "Sacred Fragments: A Journey Home, 2026", sub: "Beside Under Canopy of Greens and Threads of Faith, India Habitat Centre.", href: "/exhibitions#sacred-fragments", framed: false },
   { src: "/site/ex/ihc-03.jpg", title: "India Habitat Centre, 2010", sub: "The opening night.", href: "/exhibitions#india-habitat-centre-2010", framed: false },
   { src: "/site/ex/iccr-speech.jpg", title: "A Lifetime to Paint, ICCR, 2010", sub: "Speaking at the opening, Dhyan behind her.", href: "/exhibitions#a-lifetime-to-paint", framed: false },
   { src: "/site/ex/ihc-press-b.jpg", title: "In front of the cameras", sub: "An interview beside “Before the Engines”.", href: "/exhibitions#india-habitat-centre-2010", framed: false },

@@ -7,22 +7,24 @@ import PressRow from "@/components/site/PressRow";
 import { PRESS_ALL } from "@/lib/press";
 import WallHero from "@/components/site/WallHero";
 import { SHOW_WALL } from "@/components/site/Collage";
-import { NOW, NOW_SHOWING_CONFIRMED, RECORD, RECORD_LINE, SHOWS } from "@/lib/site";
+import { NOW, NOW_SHOWING_CONFIRMED, RECORD, RECORD_LINE, SACRED_FRAGMENTS, SHOWS } from "@/lib/site";
 import { BY_ID, workPath } from "@/lib/works";
 import { dims } from "@/lib/images";
 
 export const metadata: Metadata = {
   title: "Exhibitions",
-  description: "Dr Dolly Prasad’s exhibitions: nineteen exhibitions and art fairs, 2005 to 2026, including India Habitat Centre (2010), A Lifetime to Paint at ICCR (2010), the First International Kala Mela (2018) and more.",
+  description: "Dr Dolly Prasad’s exhibitions: nineteen exhibitions and art fairs, 2005 to 2026, most recently Sacred Fragments: A Journey Home at India Habitat Centre (October 2026), and including India Habitat Centre (2010), A Lifetime to Paint at ICCR (2010), the First International Kala Mela (2018) and more.",
   alternates: { canonical: "/exhibitions" },
 };
 
 const years = [...new Set(RECORD.map((r) => r.year))];
 // R6 (Shubham, 20 Oct 22:50): his order on this page beats newest-first: India Habitat Centre, then the press,
 // then A Lifetime to Paint, then Kala Mela. SHOWS itself stays newest first for every other listing.
+// 22 Nov 2026 (Shubham): the latest exhibition, Sacred Fragments (Oct 2026), leads, with its photographs;
+// the R6 order follows it unchanged, the press still straight after India Habitat Centre 2010.
 const ORDER = ["india-habitat-centre-2010", "a-lifetime-to-paint", "kala-mela-2018"];
-const shows = ORDER.map((id) => SHOWS.find((s) => s.id === id)!);
-const AFTER_FIRST = "press";
+const shows = [SACRED_FRAGMENTS, ...ORDER.map((id) => SHOWS.find((s) => s.id === id)!)];
+const PRESS_AFTER = "india-habitat-centre-2010";
 
 export default function Exhibitions() {
   return (
@@ -48,18 +50,18 @@ export default function Exhibitions() {
       </Until>}
 
       <nav className="ex-index" aria-label="On this page">
-        {/* R6: the page’s own order (India Habitat Centre, the press, A Lifetime to Paint, Kala Mela), then the list */}
-        {shows.map((s, k) => (
+        {/* Sacred Fragments, then R6: the page’s own order (India Habitat Centre, the press, A Lifetime to Paint, Kala Mela), then the list */}
+        {shows.map((s) => (
           <Fragment key={s.id}>
             <a href={`#${s.id}`}><span>{s.year}</span>{s.name ?? s.title}</a>
-            {k === 0 && <a href={`#${AFTER_FIRST}`}><span>Press</span>In the press</a>}
+            {s.id === PRESS_AFTER && <a href="#press"><span>Press</span>In the press</a>}
           </Fragment>
         ))}
         <a href="#record"><span>2005–26</span>List of exhibitions</a>
       </nav>
 
       {/* R6: each show one compact row, the photograph and its strip on the left, the heading and the note on the right */}
-      {shows.map((s, k) => {
+      {shows.map((s) => {
         const photos = s.albums.flatMap((a) => a.photos);
         return (
           <Fragment key={s.id}>
@@ -81,7 +83,7 @@ export default function Exhibitions() {
                          )}
                        </>} />
           </section>
-          {k === 0 && (
+          {s.id === PRESS_AFTER && (
             <section id="press" className="ex-press band-indigo" aria-labelledby="press-h">
               <span id="on-screen" aria-hidden="true" />
               <div className="sec-head">
