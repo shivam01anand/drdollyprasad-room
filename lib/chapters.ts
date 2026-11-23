@@ -53,7 +53,7 @@ export type Chapter = {
 
 /** the easel paragraph: Shubham’s words, shown unsigned; set as prose, not verse. Its own text since the content
  *  elevate (2026-11-22): the theme’s four words become the route of the walk. About has its own paragraph (lib/site.ts STATEMENT). */
-export const THEME = `Each painting in this house starts with something seen every day and hardly noticed, a shut door or a cart in the road, and gives it the time a passer-by never did. The whispers are here in the courtyard. Past the front doors the hall holds the street and the faces from it, and the walk ends in the Quiet Room, kept for wishing and worship.`;
+export const THEME = `Each painting in this house starts with something seen every day and hardly noticed, a shut door or a cart in the road, and gives it the time a passer-by never did. The whispers are here in the courtyard. Inside, the hall holds the street and its faces, the Red Room keeps the waiting, and the walk ends in the Quiet Room with wishing and worship.`;
 
 export const CHAPTERS: Chapter[] = [
   { id: "presence", eyebrow: "Bahaar · 2024 to 2025", stop: "Khwaab", room: "The courtyard", view: "presence", labels: ["woman-with-poppies"],
@@ -142,7 +142,7 @@ export const CHAPTERS: Chapter[] = [
     view: "redwall", via: "redvia", dusk: 0.42,
     labels: ["shree-420-and-milk-cans", "riverside-figures", "weathered-door-ring", "red-and-teal-door-lock", "teal-door-bolt", "carved-door-knocker"],
     frame: ["shree-420-and-milk-cans", "riverside-figures"],
-    body: "This corner is where the old street goes quiet, its doors shut for the night and its picture long since over." },
+    body: "The day winds down in this corner, the film on the poster long over, and on the wall beside it the doors stay shut to the lane." },
   // from the Red Room through the Quiet Room’s door, turning to the peepal on its west wall
   { id: "bodhi", eyebrow: "Faith · 2007 to 2026", stop: "Mannat", room: "The Quiet Room",
     view: "bodhi", via: "redout", dusk: 0.46, labels: ["sacred-tree"],
