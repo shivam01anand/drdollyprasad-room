@@ -48,10 +48,11 @@ for (const [w, h] of viewports.filter(([w, h]) => isNarrow(w / h))) {
   for (const reduced of [false, true]) {
     const rig = create(w, h, reduced);
     CHAPTERS.forEach((chapter, i) => {
-      if ((chapter.labels?.length ?? 0) < 2) return;
+      const framed = chapter.frame ?? chapter.labels;
+      if ((framed?.length ?? 0) < 2) return;
       rig.syncScroll(i / (CHAPTERS.length - 1));
       rig.update(1000 / 60);
-      for (const id of chapter.labels) {
+      for (const id of framed) {
         const art = info.art[id], [nx, nz] = normals[art.side];
         for (const sx of [-1, 1]) for (const sy of [-1, 1]) {
           const p = new THREE.Vector3(art.centre[0] + nz * art.w / 2 * sx,

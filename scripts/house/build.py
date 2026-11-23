@@ -549,14 +549,25 @@ def place(o, loc, rot_z):
     o.rotation_euler = (0, 0, rot_z)
 
 
-# the house's front doors, shut: two teak leaves in a moulded teak frame, brass at the joints
+# the house's front doors, open: two teak leaves in a moulded teak frame, brass at the joints, swung
+# back into the courtyard (a little past square, clear of the chaukhat and the step), so the walk goes
+# from the courtyard straight into the gallery hall
 DW, DH = 0.75, 2.42
+DOOR_SWING = math.radians(95)
+DOOR_Y = AY0 + 0.07                                      # the hinge line, just in front of the jambs
+DOOR_Z = 0.075                                           # clear of the front step
 for k, x0 in enumerate((3.6 - DW, 3.6)):
     # the pulls meet at the centre: the right leaf's is on its left stile
     leaf, hwo = door_leaf(f"Wall_FrontDoor{k}", DW, DH, 0.06, "teak", rail_role="teakRail", panels=(1, 4),
                           pull_left=(k == 1), hardware="brass")
-    place(leaf, (x0, AY0 - T / 2, 0), 0)
-    place(hwo, (x0, AY0 - T / 2, 0), 0)
+    if k == 0:   # hinged at its left edge (x0): the leaf's +x turns toward the courtyard
+        rz, at = DOOR_SWING, (x0, DOOR_Y, DOOR_Z)
+    else:        # hinged at its right edge (x0 + DW): its -x turns toward the courtyard
+        rz = DOOR_SWING - math.pi - 2 * (DOOR_SWING - math.pi / 2)
+        hinge = Vector((x0 + DW, DOOR_Y, DOOR_Z))
+        at = tuple(hinge - DW * Vector((math.cos(rz), math.sin(rz), 0)))
+    place(leaf, at, rz)
+    place(hwo, at, rz)
 # the chaukhat: jambs with a stepped face, a lintel, and a thin cornice over it
 for side, (x0, x1) in (("L", (3.6 - 0.75 - 0.16, 3.6 - 0.75)), ("R", (3.6 + 0.75, 3.6 + 0.75 + 0.16))):
     box(f"Wall_FrontDoorJamb{side}", x0, x1, AY0 - T + 0.02, AY0 + 0.035, 0, 2.5, role_mat("teak"), bevel=0.01, segs=3)
@@ -2018,8 +2029,19 @@ VIEWS = {
     # the Red Room's south wall)
     "galleryvia": ((-1.3, -2.55, 1.62), (-1.3 + 7.3 * 0.4, -2.55 - 0.35 * 0.4, 1.62 + 0.04 * 0.4)),
     "gallery":   ((1.3, -2.85, 1.64), (9.5, -5.0, 1.85)),
-    # then up, out of the hall's roof
-    "featured":  ((9.3, PALM["cy"], 3.62), (10.8, PALM["cy"], 0.0)),
+    # the walk with the front doors open (2026-11-23): from the courtyard through them into the hall
+    "frontdoor": ((3.6, 0.9, 1.62), (3.6, -0.6, 1.6)),
+    # just inside the front doors, down the hall's length to the palms
+    "hall":      ((3.3, -1.45, 1.64), (11.5, -4.6, 1.85)),
+    # from the hall, through the Red Room's east doorway, a step into it, facing west (a near
+    # target: the turn on to the street wall swings round a near pivot, clear of the east wall)
+    "redin":     ((-2.2, -2.5, 1.62), (-3.4, -2.6, 1.6)),
+    # through the Quiet Room's door from the Red Room, a step into it, facing north (a near target)
+    "redout":    ((-4.3, 2.2, 1.6), (-4.6, 3.4, 1.58)),
+    # through the arch, out into the courtyard, facing east
+    "archout":   ((0.9, ARCH["cy"], 1.6), (4.5, ARCH["cy"], 1.7)),
+    # then up, out of the courtyard (the featured works cover the room)
+    "featured":  ((3.6, 3.4, 9.0), (7.0, 3.4, 0.0)),
     # the house whole, high in the frame: the exhibitions and her words sit below it, to the left
     "plan":      ((6.0, -5.4, 44.0), (6.0, -5.4, 0.0)),
     "mess":      ((10.5, -10.5, 11.5), (0.4, 0.4, 0.4)),
@@ -2031,6 +2053,10 @@ CLOSER = {"presence": 0.7, "canopy": 0.86, "bodhi": 0.8,
 for k, f in CLOSER.items():
     e, t = Vector(VIEWS[k][0]), Vector(VIEWS[k][1])
     VIEWS[k] = (tuple(t + (e - t) * f), VIEWS[k][1])
+# the street wall is reached from the gallery now: its pivot 1.6 m along the line of sight, not on the
+# wall, so the turn in from the east doorway swings round a near point, clear of the east wall (pathcheck.py)
+_e, _t = Vector(VIEWS["street"][0]), Vector(VIEWS["street"][1])
+VIEWS["street"] = (tuple(_e), tuple(_e + (_t - _e).normalized() * 1.6))
 
 # portrait screens: one painting per chapter, centred, high in the frame (the copy sits below)
 NARROW = {
@@ -2047,11 +2073,15 @@ NARROW = {
     "faith":     ((-3.05, 1.82, 1.55), (QX1, 1.82, 1.3)),
     # from facing Threads of Faith, turn first to the passage, then go through it
     "streetvia": ((-4.0, 2.2, 1.58), (-4.3, -0.5, 1.5)),
-    "street":    ((-4.3, -0.4, 1.55), (-3.35, RY0, 1.3)),
+    "street":    ((-4.3, -0.4, 1.55), (-3.96, -1.96, 1.46)),   # its pivot near, as the wide view's
     "redwall":   ((-3.55, -3.9, 1.55), (RX1, -3.9, 1.3)),
     "galleryvia": ((-1.2, -2.55, 1.58), (-1.2 + 7.2 * 0.4, -2.55 - 0.2 * 0.4, 1.58 - 0.08 * 0.4)),
     "gallery":   ((1.3, -2.75, 1.55), (9.5, -4.3, 1.75)),
-    "featured":  ((9.3, PALM["cy"], 3.62), (10.8, PALM["cy"], 0.0)),
+    "hall":      ((3.3, -1.4, 1.55), (11.5, -4.2, 1.75)),
+    # through the Quiet Room's door, turned already toward the peepal (a phone comes from the Red Room's
+    # east wall, framed whole: its swing would take the door's jamb)
+    "redout":    ((-4.3, 2.6, 1.55), (-5.0, 3.4, 1.5)),
+    "featured":  ((3.6, 3.4, 9.0), (7.0, 3.4, 0.0)),
     "plan":      ((8.0, -19.4, 60.0), (8.0, -19.4, 0.0)),
     "mess":      ((10.5, -10.5, 11.5), (0.4, 0.4, 0.4)),
 }

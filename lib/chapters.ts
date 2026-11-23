@@ -10,8 +10,10 @@ import { phoneGroupView } from "./room/phone-framing";
  * (scripts/house/pathcheck.py proves it).
  *
  * The journey: the Aangan, the courtyard garden, opens on "Woman with
- * Poppies"; through the arch into the Quiet Room; through its door into the
- * Red Room by the lane; then up, out of the house, for Featured and the plan.
+ * Poppies"; through the open front doors into the gallery hall, round it;
+ * through its west doorway into the Red Room by the lane; through its door into
+ * the Quiet Room; out through the arch into the courtyard, and up, out of the
+ * house, for Featured and the plan.
  */
 export type Chapter = {
   id: string;
@@ -51,7 +53,7 @@ export type Chapter = {
 
 /** the easel paragraph: Shubham’s words, shown unsigned; set as prose, not verse. Its own text since the content
  *  elevate (2026-11-22): the theme’s four words become the route of the walk. About has its own paragraph (lib/site.ts STATEMENT). */
-export const THEME = `Each painting in this house starts with something seen every day and hardly noticed, a shut door or a cart in the road, and gives it the time a passer-by never did. The whispers are here in the courtyard. Through the arch, the Quiet Room is for wishing and worship, and in the Red Room past it, the old street waits.`;
+export const THEME = `Each painting in this house starts with something seen every day and hardly noticed, a shut door or a cart in the road, and gives it the time a passer-by never did. The whispers are here in the courtyard. Inside, the hall holds the street and its faces, the Red Room keeps the waiting, and the walk ends in the Quiet Room with wishing and worship.`;
 
 export const CHAPTERS: Chapter[] = [
   { id: "presence", eyebrow: "Bahaar · 2024 to 2025", stop: "Khwaab", room: "The courtyard", view: "presence", labels: ["woman-with-poppies"],
@@ -73,68 +75,24 @@ export const CHAPTERS: Chapter[] = [
     via: "easelvia", dusk: 0.12,
     // the canvas she is working on, from her own photograph (scripts/figure/make.py)
     asides: [{ anchor: "easel", title: "On her easel", line: "A new painting, in progress", size: [1.28, 1.06] }] },
-  // from the easel the walk turns to the arch and goes straight through it into the Quiet Room
-  { id: "bodhi", eyebrow: "Faith · 2007 to 2026", stop: "Mannat", room: "The Quiet Room",
-    view: "bodhi", via: "threshold", dusk: 0.22, labels: ["sacred-tree"],
-    body: "The Quiet Room begins with wishing, the part of faith that asks for something and then has to wait." },
-  {
-    id: "faith",
-    eyebrow: "Faith · 2007 to 2026",
-    via: "faithvia",
-    stop: "Dhyan · Threads of Faith",
-    room: "The Quiet Room",
-    body: "In one painting faith is still being learned, and in the other it has already got what it asked for.",
-    view: "faith",
-    dusk: 0.28,
-    labels: ["monks-and-blue-buddha", "temple-bells"],
-  },
-  {
-    id: "street",
-    eyebrow: "Gone Are The Days · 2007 to 2018",
-    stop: "Gone Are The Days",
-    room: "The Red Room",
-    // a portrait screen faces Threads of Faith: it turns to the passage before going through
-    via: "streetvia",
-    // the framed print on its easel is 0.64 × 0.48 m (scripts/house/build.py press_easel)
-    asides: [{ anchor: "press", title: "The artist, in conversation", line: "Beside “Before the Engines”, at her exhibition", size: [0.64, 0.48] }],
-    body: "The Red Room belongs to the old street. It starts in the kitchen and goes out to the road.",
-    ink: "light",
-    view: "street",
-    dusk: 0.38,
-    labels: ["terracotta-pots", "bulls-and-wheel"],
-  },
-  { id: "redwall", eyebrow: "Gone Are The Days · 2007 to 2018", stop: "Shree 420 · Evening at the Ghat", room: "The Red Room", view: "redwall",
-    via: "redvia", dusk: 0.45, labels: ["shree-420-and-milk-cans", "riverside-figures"],
-    body: "The day had its fixed points then, and this wall keeps the first and the last of them." },
-  // Bandh Darwaze, four doors a foot square on the Red Room’s north wall: a stop of their own,
-  // square on, so all four are seen and named together
-  { id: "doors", eyebrow: "Bandh Darwaze · 2018", stop: "Bandh Darwaze I to IV", room: "The Red Room", view: "doors",
-    dusk: 0.47, labelSide: "below",
-    labels: ["weathered-door-ring", "red-and-teal-door-lock", "teal-door-bolt", "carved-door-knocker"],
-    body: "Four shut doors, and behind each one a house waiting for a knock or for someone to come home." },
-  // through the Red Room’s east doorway: the gallery hall, where the rest of her work hangs as an
+  // through the courtyard's front doors, open since 2026-11-23: the gallery hall, where her work hangs as an
   // exhibition hangs, one line at eye level, a series to a wall (scripts/house/build.py)
   { id: "gallery", ink: "light", eyebrow: "The gallery", stop: "The gallery", room: "The gallery",
-    view: "gallery", via: "galleryvia", dusk: 0.5,
-    body: "The rest of her work hangs here, one series to a wall, the way it would at an exhibition." },
+    view: "hall", via: "frontdoor", dusk: 0.18,
+    body: "Through the front doors the hall opens out, one series to a wall, the way her work hangs at an exhibition." },
   { id: "rupaya", eyebrow: "Gone Are The Days · 2007 to 2018", stop: "Twenty Paise · Patra Petika · Mother India", room: "The gallery",
-    view: "rupaya", dusk: 0.5, labelSide: "below",
+    view: "rupaya", dusk: 0.2, labelSide: "below",
     labels: ["rickshaw-puller-and-coin", "postbox-and-stamps", "mother-india-and-kettles"],
     body: "Small change paid for most of daily life in those years, and each painting on this wall shows where some of it went." },
   { id: "cartman", eyebrow: "Gone Are The Days · 2007 to 2018", stop: "Last of the Pedals · Ek Rupaya", room: "The gallery",
-    view: "cartman", dusk: 0.5, labelSide: "below", labels: ["cycle-rickshaw", "rickshaw-rest-framed"],
+    view: "cartman", dusk: 0.22, labelSide: "below", labels: ["cycle-rickshaw", "rickshaw-rest-framed"],
     body: "These two men are in the same trade, one at work and one between fares, and neither gets to stop for long." },
-  { id: "panels", eyebrow: "Gone Are The Days · 2007 to 2018", stop: "Old road, new traffic", room: "The gallery",
-    view: "panels", dusk: 0.52, labelSide: "below",
-    labels: ["horse-cart-and-autorickshaw", "coins-and-clay-bank", "rickshaw-and-autorickshaw", "carriage-and-autorickshaw",
-      "rickshaw-rest", "bullock-cart-and-truck"],
-    body: "Here the tonga, the bullock cart and the hand-pulled rickshaw are still on the road, and an auto or a truck keeps them company." },
   // Faith, either side of the window onto the palm court
   { id: "shrine", eyebrow: "Faith · 2007 to 2026", stop: "Sharan · Aarti", room: "The gallery",
-    view: "shrine", dusk: 0.52, labelSide: "below", labels: ["monk-and-green-buddha", "priest-with-flame"],
+    view: "shrine", dusk: 0.24, labelSide: "below", labels: ["monk-and-green-buddha", "priest-with-flame"],
     body: "One man worships alone, and the other leads it for whoever comes." },
   { id: "gayatri", eyebrow: "Faith · 2007 to 2026", stop: "Gayatri · Vakratunda", room: "The gallery",
-    view: "gayatri", dusk: 0.53, labelSide: "below", labels: ["prayer-and-scripture", "offering-of-light"],
+    view: "gayatri", dusk: 0.26, labelSide: "below", labels: ["prayer-and-scripture", "offering-of-light"],
     body: "Here prayer is something written down, then said until nobody needs the page." },
   {
     id: "portraits",
@@ -144,17 +102,63 @@ export const CHAPTERS: Chapter[] = [
     room: "The gallery",
     body: "Ordinary faces painted close, most of them named for the feeling they carry.",
     view: "portraits",
-    dusk: 0.54,
+    dusk: 0.28,
     labelSide: "below",
     labels: ["three-veiled-women", "red-turban-portrait", "elder-woman-portrait", "yellow-turban-portrait", "patterned-turban-portrait", "mother-and-child"],
   },
   { id: "kadhai", eyebrow: "Gone Are The Days · 2007 to 2018", stop: "Bachpan · Intezar", room: "The gallery",
-    view: "kadhai", dusk: 0.55, labelSide: "below", labels: ["boy-and-kettle", "man-among-metal-pans"],
+    view: "kadhai", dusk: 0.3, labelSide: "below", labels: ["boy-and-kettle", "man-among-metal-pans"],
     body: "Two street sellers sit out the slow part of the day here, and one of them is young to be working at all." },
   { id: "doodhwala", eyebrow: "Gone Are The Days · 2007 to 2018", stop: "Before the Chai · Morning Ritual", room: "The gallery",
-    view: "doodhwala", dusk: 0.55, labelSide: "below", labels: ["milkman-on-bicycle", "newspaper-reader"],
+    view: "doodhwala", dusk: 0.32, labelSide: "below", labels: ["milkman-on-bicycle", "newspaper-reader"],
     body: "Both men are up early, and only one of them has to be anywhere yet." },
-  { id: "featured", eyebrow: "Featured", stop: "Featured works", slot: "featured", view: "featured", dusk: 0.45 },
+  // the busiest wall, six small canvases, closes the hall: from the north wall the walk turns
+  // east down the hall's middle (hallvia), then on to the south wall, so neither turn is more than a quarter
+  { id: "panels", eyebrow: "Gone Are The Days · 2007 to 2018", stop: "Old road, new traffic", room: "The gallery",
+    view: "panels", via: "hallvia", dusk: 0.34, labelSide: "below",
+    labels: ["horse-cart-and-autorickshaw", "coins-and-clay-bank", "rickshaw-and-autorickshaw", "carriage-and-autorickshaw",
+      "rickshaw-rest", "bullock-cart-and-truck"],
+    body: "Here the tonga, the bullock cart and the hand-pulled rickshaw are still on the road, and an auto or a truck keeps them company." },
+  {
+    id: "street",
+    eyebrow: "Gone Are The Days · 2007 to 2018",
+    stop: "Gone Are The Days",
+    room: "The Red Room",
+    // from the far end of the hall, back along it and through the Red Room's east doorway
+    via: "redin",
+    // the framed print on its easel is 0.64 × 0.48 m (scripts/house/build.py press_easel)
+    asides: [{ anchor: "press", title: "The artist, in conversation", line: "Beside “Before the Engines”, at her exhibition", size: [0.64, 0.48] }],
+    body: "The Red Room belongs to the old street. It starts in the kitchen and goes out to the road.",
+    ink: "light",
+    view: "street",
+    dusk: 0.38,
+    labels: ["terracotta-pots", "bulls-and-wheel"],
+  },
+  // Shree 420 and Evening at the Ghat on the east wall, Bandh Darwaze on the north wall to the left: one stop
+  // since the walk was shortened (2026-11-23). The view is the east wall's; the four doors come into it at the
+  // edge, are seen whole on the turn in from the street, and keep their labels here, so the list of stops,
+  // a painting's "See it in the studio" and a click still reach them. A phone frames the east wall (frame).
+  { id: "redwall", eyebrow: "Gone Are The Days · Bandh Darwaze · 2007 to 2018", stop: "Shree 420 · Bandh Darwaze", room: "The Red Room",
+    view: "redwall", via: "redvia", dusk: 0.42,
+    labels: ["shree-420-and-milk-cans", "riverside-figures", "weathered-door-ring", "red-and-teal-door-lock", "teal-door-bolt", "carved-door-knocker"],
+    frame: ["shree-420-and-milk-cans", "riverside-figures"],
+    body: "The day winds down in this corner, the film on the poster long over, and on the wall beside it the doors stay shut to the lane." },
+  // from the Red Room through the Quiet Room’s door, turning to the peepal on its west wall
+  { id: "bodhi", eyebrow: "Faith · 2007 to 2026", stop: "Mannat", room: "The Quiet Room",
+    view: "bodhi", via: "redout", dusk: 0.46, labels: ["sacred-tree"],
+    body: "The Quiet Room begins with wishing, the part of faith that asks for something and then has to wait." },
+  {
+    id: "faith",
+    eyebrow: "Faith · 2007 to 2026",
+    via: "faithvia",
+    stop: "Dhyan · Threads of Faith",
+    room: "The Quiet Room",
+    body: "In one painting faith is still being learned, and in the other it has already got what it asked for.",
+    view: "faith",
+    dusk: 0.5,
+    labels: ["monks-and-blue-buddha", "temple-bells"],
+  },
+  { id: "featured", eyebrow: "Featured", stop: "Featured works", slot: "featured", view: "featured", via: "archout", dusk: 0.45 },
   {
     id: "plan",
     eyebrow: "Nineteen exhibitions and art fairs · 2005 to 2026",
@@ -165,6 +169,7 @@ export const CHAPTERS: Chapter[] = [
     view: "plan",
     dusk: 0.4,
   },
+
 ];
 
 /**
@@ -206,7 +211,23 @@ export function viewPose(v: { eye: V3; target: V3 }, prevYaw?: number, back = 1)
 const NARROW_BACK = 1;
 
 /** a portrait screen has its own framing of a view where Blender made one ("n:<view>") */
-const cam = (info: HouseInfo, view: string, narrow: boolean) => (narrow && info.cams[`n:${view}`]) || info.cams[view];
+const cam = (info: HouseInfo, view: string, narrow: boolean) =>
+  (narrow && info.cams[`n:${view}`]) || info.cams[view] || PASSING[view];
+
+/** passing poses the walk needs and the house build has not made (site coordinates: y up, the hall's
+ *  north wall at z 0.45). "hallvia": the middle of the gallery hall, facing east toward the palm
+ *  window, between the north wall and the south one, so the about-turn is two quarter turns */
+const PASSING: Record<string, { eye: V3; target: V3; fov: number }> = {
+  hallvia: { eye: [8.6, 1.62, 4.65], target: [12.6, 1.6, 4.65], fov: 40 },
+};
+
+const NEAR_PIVOT = new Set(["street", "redwall"]);
+/** a point `d` metres from `eye` toward `target`: the same framing, a nearer pivot */
+const nearTarget = (eye: V3, target: V3, d: number): V3 => {
+  const v = [target[0] - eye[0], target[1] - eye[1], target[2] - eye[2]];
+  const k = d / Math.hypot(v[0], v[1], v[2]);
+  return [eye[0] + v[0] * k, eye[1] + v[1] * k, eye[2] + v[2] * k];
+};
 
 /**
  * The walk as the rig needs it: one pose per chapter, and for each step
@@ -225,16 +246,17 @@ export function resolveWalk(info: HouseInfo, narrow = false, aspect = 390 / 844)
       if (narrow && c.id === "faith" && vc) vc = {
         ...vc, eye: [vc.eye[0], 1.55, vc.eye[2]], target: [vc.target[0], 1.4, vc.target[2]],
       };
-      // The wider phone view approaches the Red Room through the door’s centre.
-      if (narrow && c.id === "street" && vc) vc = {
-        ...vc, eye: [-4.6, 1.55, -2.2], target: [-4.3, 1.4, 0.2],
-      };
       const v = vc ? viewPose(vc, prev, NARROW_BACK) : null;
       if (v) prev = v.pivotRot[1];
       vias.push(v);
     }
     const group = narrow ? phoneGroupView(info, c.view, c.frame ?? c.labels ?? [], c.room, aspect) : null;
-    const p = viewPose(group ?? cam(info, c.view, narrow), prev, NARROW_BACK);
+    let view = group ?? cam(info, c.view, narrow);
+    // on a phone the stops either side of the Red Room's doorways turn round a near pivot, on the same
+    // line of sight (the same framing): the walk comes in by its east doorway and leaves by the Quiet
+    // Room's door, close to their walls
+    if (narrow && NEAR_PIVOT.has(c.id)) view = { ...view, target: nearTarget(view.eye, view.target, 1.6) };
+    const p = viewPose(view, prev, NARROW_BACK);
     if (group) p.fov = group.fov;
     prev = p.pivotRot[1];
     shots.push(p);
