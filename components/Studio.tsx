@@ -52,8 +52,9 @@ export default function Studio({ dims }: { dims: Dims }) {
   const [mode, setMode] = useState<"light" | "dark">(activeVariant().startDark ? "dark" : "light");
   /** one wall on or back (set by the scroll effect, which knows the stops) */
   const stepRef = useRef<(d: 1 | -1) => void>(() => {});
-  /** the first visit's hint, on a phone: how to walk */
+  /** the first visit's hint: how to walk, until the visitor first moves */
   const [coach, setCoach] = useState(false);
+  const coarse = useRef(false);
   /** the phone's sheet of stops */
   const [stops, setStops] = useState(false);
   /** the tanpura (lib/music.ts) */
@@ -561,9 +562,8 @@ export default function Studio({ dims }: { dims: Dims }) {
       hud.querySelectorAll<HTMLElement>("[data-hud-text]").forEach((el) => { el.textContent = ""; });
       gsap.set(hud.querySelectorAll(".hud-pill"), { yPercent: 300, autoAlpha: 0 });
       gsap.set(hud.querySelectorAll(".diya-btn"), { yPercent: -180, autoAlpha: 0 });
-      // the hint shares a corner with the preloader's "New Delhi"; the
-      // chips would show as empty capsules while their text waits to type in
-      gsap.set(hud.querySelectorAll(".hud-hint, .hud-meta, .hud-mail"), { autoAlpha: 0 });
+      // the chips would show as empty capsules while their text waits to type in
+      gsap.set(hud.querySelectorAll(".hud-meta, .hud-mail"), { autoAlpha: 0 });
     }
     hud.dataset.state = "live";
   }, []);
@@ -579,7 +579,6 @@ export default function Studio({ dims }: { dims: Dims }) {
       { yPercent: 0, autoAlpha: 1, duration: quick ? 0 : 0.5, ease: "genEase", stagger: { amount: quick ? 0 : 0.5 } }));
     tweens.push(gsap.to(hud.querySelectorAll(".diya-btn"), { yPercent: 0, autoAlpha: 1, duration: quick ? 0 : 0.5, ease: "genEase", stagger: 0.08 }));
     tweens.push(gsap.to(hud.querySelectorAll(".hud-meta, .hud-mail"), { autoAlpha: 1, duration: quick ? 0 : 0.35, ease: "power1.out" }));
-    tweens.push(gsap.to(hud.querySelector(".hud-hint"), { autoAlpha: 1, duration: quick ? 0 : 0.6, delay: quick ? 0 : 0.4 }));
     return () => tweens.forEach((t) => t.kill());
   }, [ready, failed]);
 
@@ -646,21 +645,22 @@ export default function Studio({ dims }: { dims: Dims }) {
     setStops(false);
   }, [lock]);
 
-  // the first visit on a phone: a hint, until the visitor walks (or it has been seen)
+  // the first visit: how to walk, shown once the house is open and gone at the first move
+  const firstActive = useRef(-1);
   useEffect(() => {
-    if (!ready || failed || !matchMedia("(pointer: coarse)").matches) return;
-    try { if (localStorage.getItem("dp:coached") === "1") return; } catch { /* private mode */ }
-    const show = window.setTimeout(() => setCoach(true), 900);
-    const done = () => {
-      setCoach(false);
-      try { localStorage.setItem("dp:coached", "1"); } catch { /* private mode */ }
-      removeEventListener("touchstart", onTouch, true);
-    };
-    const onTouch = () => window.setTimeout(done, 400);
-    addEventListener("touchstart", onTouch, true);
-    const hide = window.setTimeout(done, 9000);
-    return () => { clearTimeout(show); clearTimeout(hide); removeEventListener("touchstart", onTouch, true); };
+    if (!ready || failed) return;
+    coarse.current = matchMedia("(pointer: coarse)").matches;
+    try { if (localStorage.getItem("dp:walked") === "1") return; } catch { /* private mode */ }
+    firstActive.current = active;
+    const show = window.setTimeout(() => setCoach(true), 600);
+    return () => clearTimeout(show);
+    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [ready, failed]);
+  useEffect(() => {
+    if (!coach || active === firstActive.current) return;
+    setCoach(false);
+    try { localStorage.setItem("dp:walked", "1"); } catch { /* private mode */ }
+  }, [active, coach]);
 
   // the keyboard walks too: ← and → a wall at a time
   useEffect(() => {
@@ -766,10 +766,11 @@ export default function Studio({ dims }: { dims: Dims }) {
           </button>
         </div>
         <div className="hud-bottom">
-          <span className="lab hud-hint">Scroll or use ← →</span>
           {/* the phone's dock: where you are in the house, the works, and the rest in a sheet */}
           {ready && !failed && (
             <div className="dock">
+              <button type="button" className="walk-btn is-prev" aria-label="Previous stop" disabled={active === 0}
+                      onClick={() => stepRef.current(-1)}><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M14.5 5.5 8 12l6.5 6.5" /></svg></button>
               <button type="button" className="dock-where" disabled={!ready} onClick={() => setStops(true)}
                       aria-label={`Stop ${active + 1} of ${CHAPTERS.length}: ${CHAPTERS[active]?.stop}. All stops`}>
                 <span className="lab dock-n">{String(active + 1).padStart(2, "0")}<i>/{String(CHAPTERS.length).padStart(2, "0")}</i></span>
@@ -779,6 +780,29 @@ export default function Studio({ dims }: { dims: Dims }) {
                       onClick={() => setStops(true)}>
                 <svg viewBox="0 0 24 24" aria-hidden="true"><path d="M5 8.5h14M5 15.5h14" /></svg>
               </button>
+              <button type="button" className="walk-btn is-next" aria-label="Next stop" disabled={active >= CHAPTERS.length - 1}
+                      data-nudge={coach ? "1" : undefined}
+                      onClick={() => stepRef.current(1)}><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M9.5 5.5 16 12l-6.5 6.5" /></svg></button>
+            </div>
+          )}
+          {/* a computer's walk: the arrows either side of where you are; the first visit's hint beside them */}
+          {ready && !failed && (
+            <div className="walk-wrap">
+            <div className="walk-nav" role="group" aria-label="Walk through the studio">
+              <button type="button" className="walk-btn is-prev" aria-label="Previous stop" disabled={active === 0}
+                      onClick={() => stepRef.current(-1)}><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M14.5 5.5 8 12l6.5 6.5" /></svg></button>
+              <span className="lab walk-n" aria-live="polite" aria-label={`Stop ${active + 1} of ${CHAPTERS.length}: ${CHAPTERS[active]?.stop}`}>
+                {String(active + 1).padStart(2, "0")}<i> / {String(CHAPTERS.length).padStart(2, "0")}</i>
+              </span>
+              <button type="button" className="walk-btn is-next" aria-label="Next stop" disabled={active >= CHAPTERS.length - 1}
+                      data-nudge={coach ? "1" : undefined}
+                      onClick={() => stepRef.current(1)}><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M9.5 5.5 16 12l-6.5 6.5" /></svg></button>
+            </div>
+            {coach && (
+              <p className="coach lab" role="status">
+                {coarse.current ? "Swipe or tap › to walk" : "Scroll, use ← → or click ›"}
+              </p>
+            )}
             </div>
           )}
           <nav className="hud-pills" aria-label="Site">
@@ -855,23 +879,6 @@ export default function Studio({ dims }: { dims: Dims }) {
           )
         )}
       </main>
-
-      {/* a phone's way to walk without knowing the gesture: an arrow at each edge */}
-      {ready && !failed && (
-        <div className="edge-nav" aria-hidden="false">
-          <button type="button" className="edge-btn is-prev" aria-label="The last wall" disabled={active === 0}
-                  onClick={() => stepRef.current(-1)}><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M14.5 5.5 8 12l6.5 6.5" /></svg></button>
-          <button type="button" className="edge-btn is-next" aria-label="The next wall"
-                  onClick={() => stepRef.current(1)}><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M9.5 5.5 16 12l-6.5 6.5" /></svg></button>
-        </div>
-      )}
-      {coach && (
-        <div className="coach" role="status">
-          <span className="coach-hand" aria-hidden="true" />
-          <span className="coach-text">Swipe up to walk through the house</span>
-          <span className="coach-sub lab">or swipe sideways · or tap ‹ ›</span>
-        </div>
-      )}
 
       {!failed && (
         <QuickIndex active={active} live={ready} onStop={goStop} onWorks={showWorks}
