@@ -10,7 +10,7 @@ export default function WallHero({ columns, label, face, eyebrow, title, red, he
   columns: Item[][];
   label: string;
   face?: string;
-  eyebrow?: string;
+  eyebrow?: React.ReactNode;
   title: string;
   /** the ONE word of the title set in blood red */
   red?: string;

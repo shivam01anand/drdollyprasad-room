@@ -58,8 +58,8 @@ export default function Home() {
       <section className="sec wrap">
         <div className="sec-head">
           <div>
-            <h2>Five collections</h2>
-            <p className="sec-line">The everyday has its waiting and wishing, its worship and whispers.</p>
+            <h2>Waiting and wishing, worship and whispers</h2>
+            <p className="sec-line">A flame lifted at the same hour every day, and a door bolted from outside that keeps the house till someone comes back.</p>
           </div>
           <Link className="link" href="/series">All collections →</Link>
         </div>

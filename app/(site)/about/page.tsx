@@ -81,9 +81,9 @@ export default function About() {
       <section className="ab-band tone-dark">
         <div className="wrap ab-statement">
           <p className="eyebrow">The work</p>
-          <h2>Small things, given a big canvas</h2>
-          <p className="ab-p">A twenty-paise coin fills a canvas four feet tall, as tall as any in the five collections, and a clay gullak gets one three feet square.</p>
-          <p className="ab-p">Bandh Darwaze goes the other way: four door fittings, each on a canvas only a foot square.</p>
+          <h2>Small things, kept at their true weight</h2>
+          <p className="ab-p">Her paintings start with what people walk past every day, a twenty-paise coin or a padlock on a door, and give it the size it has in someone’s life. Twenty Paise stands four feet tall.</p>
+          <p className="ab-p">A prayer said at sunrise gets the care of a portrait. A stranger’s patience gets a canvas of its own.</p>
         </div>
       </section>
 
