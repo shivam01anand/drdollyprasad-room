@@ -3,15 +3,14 @@ import Link from "next/link";
 import IndigoBand from "@/components/site/IndigoBand";
 import { notFound } from "next/navigation";
 import { BY_ID, LARGE, SITE, WORKS, inchDims, quoted, workPath, type Work } from "@/lib/works";
-import { INSTAGRAM, LOOK, SERIES_BY_SLUG, SHOWS, SMALL_PHOTO, showKey, shownYear, statusText, STUDIO_PATH, WHATSAPP, enquireHref, labelLine, neighbours, seriesPath, whatsappHref, worksIn } from "@/lib/site";
+import { LOOK, SERIES_BY_SLUG, SHOWS, SMALL_PHOTO, showKey, shownYear, statusText, enquireHref, labelLine, neighbours, seriesPath, worksIn } from "@/lib/site";
 import PrevNext from "@/components/site/PrevNext";
 import manifest from "@/public/art/manifest.json";
 import Card from "@/components/site/Card";
 import PaintingStage from "@/components/site/PaintingStage";
+import PaintingInfo from "@/components/site/PaintingInfo";
 import WpBar from "@/components/site/WpBar";
 import Tabs from "@/components/site/Tabs";
-import Share from "@/components/Share";
-import { ChatIcon, InstagramIcon } from "@/components/site/Icons";
 
 /**
  * One painting's own page: what a shared link opens and what a search finds.
@@ -42,7 +41,9 @@ export async function generateMetadata({ params }: Props): Promise<Metadata> {
   const w = BY_ID.get(id);
   if (!w) return {};
   const title = quoted(w.title);
-  const description = `${quoted(w.title)}, by Dr Dolly Prasad. ${facts(w)}. ${statusText(w)}.`;
+  // content elevate (2026-11-22): the share preview carries the first sentence of its painting line; the facts are on the page
+  const first = LOOK[id]?.match(/^.*?[.!?](?=\s|$)/)?.[0];
+  const description = first ? `${quoted(w.title)}, by Dr Dolly Prasad. ${first}` : `${quoted(w.title)}, by Dr Dolly Prasad. ${facts(w)}. ${statusText(w)}.`;
   return {
     title,
     description,
@@ -70,7 +71,6 @@ export default async function WorkPage({ params }: Props) {
   const d = DIMS.get(id);
   const src = LARGE.has(id) ? `/art/large/${id}.jpg` : `/art/works/${id}.jpg`;
   const size = inchDims(w, d ? { w: d.w, h: d.h } : undefined);
-  const lead = LOOK[id];
   const sold = w.status === "Sold";
   const more = worksIn(w.series).filter((x) => x.id !== id && !SMALL_PHOTO.has(x.id))
     .sort((a, b) => Number(a.status === "Sold") - Number(b.status === "Sold")).slice(0, 4);
@@ -116,23 +116,7 @@ export default async function WorkPage({ params }: Props) {
       {/* CR-007: the big painting, the other views under it, then the text */}
       <PaintingStage w={w} src={src} dims={d ? { w: d.w, h: d.h } : undefined}
                      small={!!d && Math.max(d.w, d.h) < 600} sub={labelLine(w)}>
-        <div className="pp-text">
-          <Link className="pp-back" href={`/series/${coll.slug}`}>‹ {coll.label}</Link>
-          <h1 className="pp-title">{w.title}</h1>
-          <p className="pp-facts">{[w.medium, w.size, shownYear(w)].filter(Boolean).join(" · ")}</p>
-          {lead && <p className="pp-story is-ours">{lead}</p>}
-          <p className="pp-status"><span className={`status st-${sold ? "sold" : w.status === "Enquire" ? "enquire" : "free"}`}><i aria-hidden="true" />{sold ? "In a private collection" : statusText(w)}</span></p>
-          {!sold && <p className="pp-price">Prices on request.</p>}
-          <div className="pp-ctas">
-            <Link className="btn btn-solid" href={enquireHref(w)}>{sold ? "Ask about her work" : "Enquire about this painting"}</Link>
-            {WHATSAPP && <a className="btn" href={whatsappHref(w)}><ChatIcon />WhatsApp</a>}
-          </div>
-          <div className="side-small">
-            <a href={INSTAGRAM.url} target="_blank" rel="noopener noreferrer"><InstagramIcon />Instagram</a>
-            <a href={`${STUDIO_PATH}#work=${id}`}>In her studio →</a>
-            <Share title={`${quoted(w.title)} · Dr Dolly Prasad`} path={workPath(id)} className="link share-btn" />
-          </div>
-        </div>
+        <PaintingInfo w={w} />
       </PaintingStage>
 
       <div className="wrap">

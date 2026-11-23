@@ -83,10 +83,10 @@ export default function Stops({ open, active, onClose, onGo, onContact, onWorks 
   return (
     <div className="sheet" ref={root} data-open="0" aria-hidden={!open}>
       <div className="sheet-veil" onClick={onClose} />
-      <div className="sheet-panel" ref={panel} role="dialog" aria-modal="true" aria-label="The house" data-lenis-prevent="">
+      <div className="sheet-panel" ref={panel} role="dialog" aria-modal="true" aria-label="The walk" data-lenis-prevent="">
         <div className="sheet-grip" aria-hidden="true" />
         <div className="sheet-head">
-          <p className="lab">The house · {CHAPTERS.length} stops</p>
+          <p className="lab">The walk · {CHAPTERS.length} stops</p>
           <button type="button" className="sheet-x lab" onClick={onClose}>Close</button>
         </div>
         <ol className="sheet-stops">
@@ -105,7 +105,7 @@ export default function Stops({ open, active, onClose, onGo, onContact, onWorks 
         <div className="sheet-works">
           <button type="button" className="pill pill-solid" onClick={() => { onClose(); onWorks("all"); }}>All her work</button>
           <button type="button" className="pill" onClick={() => { onClose(); onWorks("available"); }}>Available</button>
-          <button type="button" className="pill" onClick={() => { onClose(); onWorks("sold"); }}>Sold</button>
+          <button type="button" className="pill" onClick={() => { onClose(); onWorks("sold"); }}>In private collections</button>
         </div>
         <div className="sheet-actions">
           <a className="pill pill-solid" href="/">← The website</a>

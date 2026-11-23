@@ -58,7 +58,8 @@ export default function Home() {
       <section className="sec wrap">
         <div className="sec-head">
           <div>
-            <h2>Key collections</h2>
+            <h2>Waiting and wishing, worship and whispers</h2>
+            <p className="sec-line">A flame lifted at the same hour every day, and a door bolted from outside that keeps the house till someone comes back.</p>
           </div>
           <Link className="link" href="/series">All collections →</Link>
         </div>
@@ -73,6 +74,7 @@ export default function Home() {
                    style={{ ["--ar" as string]: `${dims(thumb(LEAD[s.slug] ?? s.hero)).width} / ${dims(thumb(LEAD[s.slug] ?? s.hero)).height}` }} />
             </div>
             <span className="card-t">{s.label}</span>
+            <span className="card-line">{s.line}</span>
             <span className="meta">{worksIn(s.label).length} works · {s.period}</span>
           </Link>
         ))}
@@ -86,8 +88,8 @@ export default function Home() {
           <img className="round" src="/site/ex/kala-dolly.jpg" alt="Dr Dolly Prasad beside one of her paintings" loading="lazy" {...dims("/site/ex/kala-dolly.jpg")} />
           <div className="hw-intro">
             <p className="eyebrow">The artist</p>
-            <h2 id="hw-h">Oil paintings of everyday India</h2>
-            <p className="hw-lede">Dr Dolly Prasad is a doctor and painter in New Delhi. Many of her paintings show the street as it used to be: a rickshaw puller resting between fares, a milkman with his cans hung off his bicycle.</p>
+            <h2 id="hw-h">Paintings of what India walks past</h2>
+            <p className="hw-lede">Dr Dolly Prasad gives a copper pot or an old man’s worry the long look most people keep for a shrine. She works in New Delhi, mostly in oil, and her paintings are in private collections in India, the USA and the UK.</p>
             <Link className="link" href="/about">Her story →</Link>
           </div>
           <aside className="hw-press" aria-labelledby="hw-press-h">
@@ -156,8 +158,7 @@ export default function Home() {
       <section className="ig-band">
         <div className="wrap ig-in">
           <div className="txt">
-            <h2>Follow {INSTAGRAM.handle}, or ask about a painting</h2>
-            <p className="meta ig-sub">Each painting, posted with a few lines on what to look for in it.</p>
+            <h2>Follow {INSTAGRAM.handle}</h2>
             <div className="ig-ctas">
               <a className="btn btn-solid" href={INSTAGRAM.url} target="_blank" rel="noopener noreferrer"><InstagramIcon />Open Instagram</a>
               <Link className="btn" href="/enquire">Enquire</Link>

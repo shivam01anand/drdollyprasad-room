@@ -724,7 +724,7 @@ export default function Studio({ dims }: { dims: Dims }) {
   // the chapter in view, for the header's "you are here"
   const here = ready ? CHAPTERS[active]?.id : undefined;
 
-  // a link to one painting (its own page's "See it in her studio", or a shared /#work=<id>): once
+  // a link to one painting (its own page's "See it in the studio", or a shared /#work=<id>): once
   // the house is open, walk to the wall it hangs on and open it there; /#works goes to the collage
   useEffect(() => {
     if (!ready || failed) return;
@@ -844,7 +844,7 @@ export default function Studio({ dims }: { dims: Dims }) {
             {/* (kept in place, unseen, at the first stop, so the wall labels already stand clear of it) */}
             {(coach || active === 0) && (
               <p className="walk-hint lab" role="status" data-on={coach ? "1" : "0"}>
-                {coarse.current ? "Swipe or tap › to walk" : "Scroll, use ← → or click ›"}
+                {coarse.current ? "Swipe or tap › to walk" : "Scroll, press ← → or click › to walk"}
               </p>
             )}
           </div>
@@ -887,7 +887,7 @@ export default function Studio({ dims }: { dims: Dims }) {
               <Featured dims={dims} onOpen={(id, img) => lbRef.current?.open(id, img, FEATURED)} />
             </section>
           ) : (
-            <section className="sec" key={c.id} data-chapter={c.id} aria-label={c.eyebrow}>
+            <section className="sec" key={c.id} data-chapter={c.id} aria-label={c.stop}>
               {(c.body || c.verse) && (
                 <div className="chapter-text">
                   <h2 className="lab">{c.eyebrow}</h2>

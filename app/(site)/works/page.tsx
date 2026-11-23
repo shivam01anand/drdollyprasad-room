@@ -11,7 +11,7 @@ import { InstagramIcon } from "@/components/site/Icons";
 
 export const metadata: Metadata = {
   title: "Works",
-  description: `All ${WORKS.length} paintings by Dr Dolly Prasad, in five collections: Gone Are The Days, Bandh Darwaze, Faith, Portraits and her spring work.`,
+  description: `All ${WORKS.length} paintings by Dr Dolly Prasad, in five collections: Bahaar, Bandh Darwaze, Gone Are The Days, Portraits and Faith.`,
   alternates: { canonical: "/works" },
 };
 
@@ -20,7 +20,7 @@ export const metadata: Metadata = {
 export default function WorksPage() {
   return (
     <>
-    <WallHero columns={WORKS_WALL} label="Her paintings" title="Her Works" red="Works"
+    <WallHero columns={WORKS_WALL} label="Her paintings" title="Works" red="Works"
               held={`All ${WORKS.length} paintings, in five collections.`}>
       <a className="btn btn-solid" href="#all">See the paintings</a>
     </WallHero>
@@ -31,13 +31,13 @@ export default function WorksPage() {
       <section className="sec-tight">
         <a className="note ig-note" href={INSTAGRAM.url} target="_blank" rel="noopener noreferrer"
            style={{ flexDirection: "row", justifyContent: "space-between", alignItems: "center", flexWrap: "wrap", textDecoration: "none" }}>
-          <b>The stories behind each painting are on Instagram</b>
+          <b>Follow {INSTAGRAM.handle} on Instagram</b>
           <span className="link" style={{ display: "inline-flex", gap: 8, alignItems: "center" }}><InstagramIcon />{INSTAGRAM.handle} →</span>
         </a>
         <p className="meta" style={{ marginTop: 18 }}>Looking for something in particular? <Link href="/enquire">Ask about a painting</Link>, or see <Link href="/series">the five collections</Link>.</p>
       </section>
     </div>
-    <IndigoBand title="Key collections" line="Five collections of a changing India, and the everyday you grew up with." href="/series" label="All collections">
+    <IndigoBand title="The collections" line="Read the story of each collection, from Bahaar to Faith." href="/series" label="All collections">
       <div className="ibnd-chips">{SERIES_PAGES.map((s) => <Link key={s.slug} className="btn btn-light" href={`/series/${s.slug}`}>{s.label}</Link>)}</div>
     </IndigoBand>
     </>

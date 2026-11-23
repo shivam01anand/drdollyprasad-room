@@ -11,7 +11,7 @@ import { SERIES_HERO_WALL } from "@/components/site/Collage";
 
 export const metadata: Metadata = {
   title: "Collections",
-  description: "Dr Dolly Prasad’s five collections: Bahaar, Bandh Darwaze, Gone Are The Days, Portraits and Faith.",
+  description: "Dr Dolly Prasad’s five collections, newest first: Bahaar, Bandh Darwaze, Gone Are The Days, Portraits and Faith. Forty-one paintings of the everyday, held sacred.",
   alternates: { canonical: "/series" },
 };
 
@@ -23,9 +23,9 @@ export const metadata: Metadata = {
 export default function SeriesIndex() {
   return (
     <>
-      <WallHero size="dir" columns={SERIES_HERO_WALL} label="The five collections" eyebrow="Five collections" title="Her Collections" red="Collections"
-                sub={<>Forty-one paintings in five <span className="red">collections</span>.</>}>
-        <Link className="btn btn-solid" href="/series/bahaar">Start with the newest</Link>
+      <WallHero size="dir" columns={SERIES_HERO_WALL} label="The five collections" eyebrow={<>The everyday, held <span className="red">sacred</span></>} title="Collections" red="Collections"
+                sub={<>From a thought kept back in spring to a prayer said at sunrise, by way of a shut door, a street on its way out and a face looked at up close.</>}>
+        <Link className="btn btn-solid" href="/series/bahaar">Start with Bahaar</Link>
       </WallHero>
 
       <CollectionsSwitcher />
@@ -34,7 +34,8 @@ export default function SeriesIndex() {
         const works = worksIn(s.label);
         // the row opens on the collection's lead painting (unchanged), then the rest, sold last
         const lead = LEAD[s.slug] ?? s.hero;
-        const rest = works.filter((w) => w.id !== lead && !SMALL_PHOTO.has(w.id))
+        // Sabr opens the Portraits story (2026-11-22), so its small photo stays in the band; the other small photos stay out
+        const rest = works.filter((w) => w.id !== lead && (w.id === "elder-woman-portrait" || !SMALL_PHOTO.has(w.id)))
           .sort((a, b) => Number(a.status === "Sold") - Number(b.status === "Sold"));
         const row = [...works.filter((w) => w.id === lead), ...rest];
         return (

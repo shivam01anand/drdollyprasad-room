@@ -95,7 +95,7 @@ const ABOUT_BASE: Item[][] = [...MIXED_WALL.slice(3), ...MIXED_WALL.slice(0, 3)]
 /** About: the same painting-heavy wall, with three placards (about one tile in twelve), quiet and spread across the columns */
 const PLACARDS: [number, number, Item][] = [
   [1, 2, C("Exhibited at", "India Habitat Centre", "New Delhi", "white", "/exhibitions#india-habitat-centre-2010")],
-  [3, 3, C("Her record", "Nineteen exhibitions and art fairs", "2005–2026", "indigo", "/exhibitions#record")],
+  [3, 3, C("Her record", "Nineteen exhibitions and art fairs", "2005 to 2026", "indigo", "/exhibitions#record")],
   [5, 1, C("ICCR · June 2010", "A Lifetime to Paint", "Azad Bhavan Art Gallery, New Delhi", "white", "/exhibitions#a-lifetime-to-paint")],
 ];
 export const ABOUT_WALL: Item[][] = ABOUT_BASE.map((col, i) => {

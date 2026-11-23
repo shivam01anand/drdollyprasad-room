@@ -13,9 +13,8 @@ const DEFAULT_IN = 34;
 
 /**
  * Every painting, laid out at true scale where she has stated a size: a one
- * foot door panel is never the size of a three-foot canvas; the heading is her
- * own sentence from her studio page. A click opens
- * the work (the page's one lightbox, wired in Studio).
+ * foot door panel is never the size of a three-foot canvas. The words are
+ * Shubham’s (kb/voice.md). A click opens the work (the page's one lightbox, wired in Studio).
  */
 export default function Works({ dims }: { dims: Dims }) {
   const [filter, setFilter] = useState<WorksFilter>("all");
@@ -37,7 +36,7 @@ export default function Works({ dims }: { dims: Dims }) {
         <div className="works-filter" role="group" aria-label="Show the works">
           {(["all", "available", "sold"] as WorksFilter[]).map((f) => (
             <button type="button" key={f} className="pill" aria-pressed={filter === f} onClick={() => setFilter(f)}>
-              {f === "all" ? "All" : f === "available" ? "Available" : "Sold"} <span className="works-n">{count(f)}</span>
+              {f === "all" ? "All" : f === "available" ? "Available" : "In private collections"} <span className="works-n">{count(f)}</span>
             </button>
           ))}
         </div>
@@ -78,12 +77,12 @@ export default function Works({ dims }: { dims: Dims }) {
   );
 }
 
-/** her approved introduction (the Sacred Fragments catalogue, Oct 2026) */
+/** the About opening, word for word (app/(site)/about/page.tsx; content elevate 2026-11-22). Shubham’s words, not hers */
 const STATEMENT =
-  "Dr Dolly Prasad is a doctor and painter in New Delhi who works mostly in oil on canvas, sometimes with charcoal or pastel.";
+  "Dr Dolly Prasad is a painter in New Delhi who works mostly in oil on canvas, sometimes with charcoal or pastel.";
 
 /**
- * Her statement, her biography verbatim, and the way to reach her.
+ * The About opening (the old WordPress biography is cut, kb/decisions.md 2026-11-22), and the way to reach her.
  */
 export function Contact() {
   return (
@@ -95,14 +94,12 @@ export function Contact() {
       <div className="contact-grid">
         <div className="contact-bio">
           <p className="about">
-            Dr. Dolly Prasad is as much an artist as she is a doctor, and her multi-faceted persona has,
-            indubitably, made her the person that she is. Play of emotions, be it on the faces around her or on
-            the canvas, have always fascinated her.
+            Her subjects come from the ordinary Indian day: a chai boy beside his kettle, two bullocks under one yoke,
+            a temple bell tied with red thread, a woman lost among poppies.
           </p>
           <p className="about">
-            Being a doctor, professionally, the hospital became her fountain of manifestation, of life
-            affirmation, at its highest intensity. Her paintings speak of various shades of life: some refined,
-            some sublime, some just raw. But the quintessential humane element remains intact.
+            Since 2005 her work has been shown at exhibitions and art fairs, most recently at India Habitat Centre
+            in 2026. Her paintings are in private collections in India, the USA and the UK.
           </p>
         </div>
         <div className="contact-side">
@@ -110,7 +107,7 @@ export function Contact() {
           <h2 id="contact-title" className="contact-title">
             <a href={`mailto:${EMAIL}`}>{EMAIL}</a>
           </h2>
-          <p className="lab contact-note">Studio · New Delhi · Enquiries and commissions</p>
+          <p className="lab contact-note">New Delhi · Enquiries</p>
           <p className="lab contact-note">
             <a href={INSTAGRAM.url} target="_blank" rel="noopener noreferrer">Instagram {INSTAGRAM.handle} ↗</a>
           </p>
@@ -118,7 +115,7 @@ export function Contact() {
       </div>
       <div className="contact-foot lab">
         <span>© {new Date().getFullYear()} Dr Dolly Prasad</span>
-        <span>Oil on canvas · New Delhi</span>
+        <span>Paintings in oil · New Delhi</span>
       </div>
     </footer>
   );

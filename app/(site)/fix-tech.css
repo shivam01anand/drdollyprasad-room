@@ -78,7 +78,7 @@
 .pp-text a.pp-coll,.pp-text p.pp-attr,.pp-text p.pp-price{font:400 14px/1.45 var(--sans) !important;color:var(--muted) !important;letter-spacing:0;margin:0}
 .pp-text a.pp-coll{text-decoration:none}
 .pp-text a.pp-coll:hover{text-decoration:underline;text-underline-offset:4px}
-.pp-text p.pp-story{display:-webkit-box !important;-webkit-box-orient:vertical;-webkit-line-clamp:4 !important;line-clamp:4;overflow:hidden;margin:4px 0 0 !important}
+.pp-text p.pp-story{display:block !important;-webkit-line-clamp:unset !important;line-clamp:none;overflow:visible;margin:4px 0 0 !important}
 .pp-text p.pp-status{margin:0}
 .pp-ctas .btn-solid{flex:1 1 100%;justify-content:center}
 @media (min-width:1100px){
@@ -271,8 +271,8 @@ html[data-motion="paused"] *,html[data-motion="paused"] *::before,html[data-moti
   .ex-ch .sm-strip:has(.sm-more)>button:not(.sm-more):nth-child(n+5){display:block !important}
   .ex-ch .sm-strip .sm-more{display:none !important}
 }
-/* the index fits one line at 1440 */
-@media (min-width:1100px){ .ex-index{flex-wrap:nowrap;gap:0 24px} .ex-index a{white-space:nowrap} }
+/* the index stays on one line where it fits and wraps where it does not (never wider than the page) */
+@media (min-width:1100px){ .ex-index{flex-wrap:wrap;gap:0 20px} .ex-index a{white-space:nowrap} }
 
 /* R4 B2-2: where the collections switcher is sticky (>=761), anchors land below header bar + switcher (44 px) */
 @media (min-width:761px){

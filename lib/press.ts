@@ -53,20 +53,13 @@ const RAW: PressItem[] = [
     id: "tv-ncr-2010", kind: "video", src: "/site/press/tv-ncr-2010.mp4", poster: "/site/press/tv-ncr-2010-smile.jpg",
     alt: "A television excerpt: the camera moves from her paintings to Dr Dolly Prasad, speaking in the exhibition.",
     title: "On screen · June 2010",
-    line: "The recording carries a 12 June 2010 date display. The camera turns from the paintings to her, speaking within the exhibition.",
+    line: "The date on screen reads 12 June 2010. The camera moves off the paintings and onto her as she speaks.",
     source: "Television archive", credit: "NCR television. Original broadcast sound.", card: "NCR television · 12 June 2010",
     home: { t: "NCR television", s: "On screen · 12 June 2010" },
   },
-  {
-    id: "tv-archive", kind: "video", src: "/site/press/tv-archive.mp4", poster: "/site/press/tv-archive.jpg",
-    alt: "A television excerpt: a reporter stands in a gallery with paintings on its walls, then the camera moves across the work.",
-    title: "On television",
-    line: "A report from a gallery, with paintings on the walls behind. Its date and channel are not recorded.",
-    source: "Television archive", credit: "Original broadcast sound.",
-  },
   ph("ihc-press-06", "Dr Dolly Prasad answers a reporter beside “Before the Engines”.",
     "Beside “Before the Engines”",
-    "The interviews took place beside the paintings themselves."),
+    "She stood beside the paintings to answer each reporter."),
   ph("ihc-press-03", "A reporter holds out a microphone to Dr Dolly Prasad beside her painting of a rickshaw puller.",
     "Questions at the wall",
     "The rickshaw puller behind her, the questions in front."),
@@ -74,26 +67,17 @@ const RAW: PressItem[] = [
     id: "delhi-times", kind: "clipping", src: "/site/press/delhi-times-listing.jpg", sm: "/site/press/sm/delhi-times-listing.jpg",
     alt: "A Delhi Times clipping, Must See Must Do, listing Art Today And Tomorrow, a group show of paintings at Travancore Art Gallery, with one of her paintings.",
     title: "Delhi Times · Must See Must Do",
-    line: "A listing for Art Today And Tomorrow, a group show of paintings at Travancore Art Gallery. The genuine scanned clipping.",
+    line: "The paper’s Must See Must Do column listed Art Today And Tomorrow, a group show at Travancore Art Gallery that included her work.",
     source: "In the papers",
     home: { t: "Delhi Times", s: "Must See Must Do" },
   },
-  ph("ihc-press-02", "Dr Dolly Prasad speaks into a reporter’s microphone, “Before the Engines” behind her.",
-    "In conversation",
-    "Listening to the artist offers another way into the work."),
-  ph("ihc-press-04", "Dr Dolly Prasad is interviewed against the red-brick wall, her rickshaw puller painting behind her.",
-    "On the red-brick wall",
-    "The people and objects she paints are right there behind her."),
   { ...ph("ihc-press-b", "Dr Dolly Prasad listens in profile during an interview beside “Before the Engines”.",
     "Listening", "A camera at her shoulder, “Before the Engines” beside her."), src: "/site/ex/ihc-press-b.jpg", sm: "/site/ex/ihc-press-b.jpg" },
-  ph("ihc-press-05", "Dr Dolly Prasad in conversation with a reporter, the rickshaw puller painting behind her.",
-    "The artist and her audience",
-    "Meeting an audience through conversation as well as through paint."),
 ];
 
 /** one mosaic, stills and the two television clips mixed and spread out (Shubham, 19 Oct 2026):
  *  the India Habitat Centre interview first, top left; a clip never sits next to the other */
-const ORDER = ["ihc-press-01", "tv-ncr-2010", "ihc-press-06", "ihc-press-03", "delhi-times", "tv-archive"];
+const ORDER = ["ihc-press-01", "tv-ncr-2010", "ihc-press-06", "ihc-press-03", "delhi-times"];
 // six cards, 3 + 3 (Chief Content 2c C11; Brand review #2 P1-6): "In conversation", "On the red-brick wall" and
 // "The artist and her audience" dropped as near-duplicate interview photos; they stay in the IHC album // "Listening" (ihc-press-b) dropped: near-duplicate (Chief Content 2c, C11); the photo stays in the IHC album
 export const PRESS_ITEMS: PressItem[] = ORDER.map((id) => RAW.find((p) => p.id === id)!);
@@ -103,5 +87,6 @@ export const PRESS_ITEMS: PressItem[] = ORDER.map((id) => RAW.find((p) => p.id =
 export const PRESS_HOME = ["tv-ncr-2010", "delhi-times", "ihc-press-01"].map((id) => RAW.find((x) => x.id === id)!) as (PressItem & { home: { t: string; s: string } })[];
 
 /** every item, for the moving press row on Exhibitions and About (R3, Shubham 20 Oct: all the press, all the accolades):
- *  the six above first, in their order (the two clips apart), then the four that had been left out */
+ *  the five above first, in their order, then "Listening" (ihc-press-b). Content elevate (Shubham 2026-11-22): the three
+ *  near-duplicate interview stills (ihc-press-02, -04, -05) and the unconfirmed tv-archive clip are cut (supersedes R3 for these). */
 export const PRESS_ALL: PressItem[] = [...PRESS_ITEMS, ...RAW.filter((p) => !ORDER.includes(p.id))];

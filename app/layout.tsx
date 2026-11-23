@@ -2,11 +2,11 @@ import type { Metadata, Viewport } from "next";
 import Analytics from "@/components/Analytics";
 
 const DESCRIPTION =
-  "Dr Dolly Prasad is a doctor and painter in New Delhi who works mostly in oil on canvas, sometimes with charcoal or pastel. Nineteen exhibitions and art fairs since 2005; paintings in private collections in India, the USA and the UK.";
+  "Oil paintings by Dr Dolly Prasad, New Delhi: the everyday, held sacred. Nineteen exhibitions and art fairs since 2005, and paintings in private collections in India, the USA and the UK.";
 
 export const metadata: Metadata = {
   metadataBase: new URL("https://drdollyprasad.com"),
-  title: { default: "Dr Dolly Prasad · Paintings, New Delhi", template: "%s · Dr Dolly Prasad" },
+  title: { default: "Dr Dolly Prasad · Paintings · The everyday, held sacred", template: "%s · Dr Dolly Prasad" },
   description: DESCRIPTION,
   // the link preview when the site is shared (WhatsApp, Instagram, mail)
   openGraph: {

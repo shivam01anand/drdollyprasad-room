@@ -1,0 +1,184 @@
+/* The studio's painting card: the painting page's first screen (/work/[id]) as an overlay on the house.
+   Markup is shared (PaintingStage + PaintingInfo); these rules give it the website's look inside the
+   studio, which does not load the website's stylesheets. Values match the computed styles of the
+   painting page (app/(site)/site.css, fix-tech.css, fix-type.css, tokens.css) at 1440 and 420 px wide.
+   Everything is scoped to .lb, so nothing here reaches the house. */
+
+.lb{--pc-bg:#F5F4F0;--pc-ink:#1A1614;--pc-muted:#6A615B;--pc-frame:#141210;--pc-green:#2F6B45;--pc-chip:#CFC6B9;
+  --pc-serif:"Cormorant Garamond",Georgia,"Times New Roman",serif;--pc-sans:"Jost","Helvetica Neue",Arial,sans-serif;
+  --pc-lift:0 1px 2px rgba(10,8,6,.4),0 10px 18px rgba(10,8,6,.26),0 28px 54px rgba(10,8,6,.24);
+  --pc-inset:clamp(24px,3vw,44px);
+  position:fixed;inset:0;width:100%;height:100%;max-width:none;max-height:none;margin:0;padding:0;border:0;
+  background:transparent;overflow:hidden;color:var(--pc-ink);font:400 18px/1.6 var(--pc-sans)}
+.lb:not([open]){display:none}
+.lb::backdrop{background:transparent}
+.lb-veil{position:absolute;inset:0;background:rgba(24,17,13,.42);cursor:pointer;animation:lb-fade .35s ease both}
+.lb-sheet{position:absolute;inset:var(--pc-inset);display:flex;flex-direction:column;overflow-y:auto;overscroll-behavior:contain;background:var(--pc-bg);
+  box-shadow:0 2px 6px rgba(30,20,14,.12),0 40px 90px -40px rgba(30,20,14,.55);animation:lb-rise .4s cubic-bezier(.2,.7,.2,1) backwards}
+.lb.is-closing .lb-veil{animation:lb-fade .22s ease reverse both}
+.lb.is-closing .lb-sheet,.lb.is-closing .lb-close{animation:lb-rise .22s ease-in reverse both}
+@keyframes lb-fade{from{opacity:0}to{opacity:1}}
+@keyframes lb-rise{from{opacity:0;transform:translateY(14px)}to{opacity:1;transform:none}}
+@media (prefers-reduced-motion:reduce){ .lb-veil,.lb-sheet{animation:none !important} }
+
+.lb *,.lb *::before,.lb *::after{box-sizing:border-box}
+.lb a{color:inherit}
+.lb button{font-family:inherit}
+.lb :focus-visible{outline:2px solid var(--pc-ink);outline-offset:3px}
+
+/* close: a round chip in the corner of the card, always in reach */
+.lb-close{position:absolute;z-index:5;top:calc(var(--pc-inset) + 14px);right:calc(var(--pc-inset) + 14px);width:44px;height:44px;border-radius:50%;
+  display:grid;place-items:center;padding:0;cursor:pointer;color:var(--pc-ink);background:var(--pc-bg);border:1px solid #D9D2C6;
+  box-shadow:0 4px 14px -6px rgba(30,20,14,.35);animation:lb-rise .4s cubic-bezier(.2,.7,.2,1) backwards}
+.lb-close:hover{background:var(--pc-ink);color:var(--pc-bg);border-color:var(--pc-ink)}
+.lb-close svg{width:20px;height:20px;stroke:currentColor;stroke-width:1.7;fill:none;stroke-linecap:round}
+
+/* ---- the painting (PaintingStage) ---- */
+.lb .pp{flex:none;margin-block:auto;display:flex;flex-direction:column;align-items:center;gap:10px;padding:clamp(28px,3vw,44px) clamp(20px,3vw,44px) 8px}
+.lb .pp-stage{width:100%;display:flex;justify-content:center;align-items:center}
+.lb .pp-art{display:block;border:0;padding:0;margin:0;background:none;cursor:zoom-in;line-height:0;width:max-content;max-width:100%}
+/* black frame, white mat, lifted off the wall: as .pp-art img on the site */
+.lb .pp-art img{--fp:36px;display:block;aspect-ratio:auto var(--ar);height:auto;max-width:100%;object-fit:contain;
+  width:min(1100px,calc((min(calc(100svh - 2 * var(--pc-inset) - 230px),760px) - var(--fp)) * var(--ar) + var(--fp)));
+  border:9px solid var(--pc-frame);padding:9px;background:#FFFFFF;
+  box-shadow:inset 0 0 0 1px rgba(0,0,0,.06),0 0 0 1px rgba(255,255,255,.06),var(--pc-lift);transform:translateY(-3px)}
+.lb .pp-art img.is-small{width:calc((min(420px,calc(100svh - 2 * var(--pc-inset) - 230px)) - var(--fp)) * var(--ar) + var(--fp))}
+.lb .pp-art img.is-loading{border-color:transparent;background:transparent;box-shadow:none}
+
+/* the painting in a room */
+.lb .pp-room{width:min(100%,900px,calc((100svh - 2 * var(--pc-inset) - 230px) * 1.5));display:flex;flex-direction:column;gap:10px}
+.lb .room{position:relative;width:100%;overflow:hidden;container-type:inline-size;box-shadow:0 18px 44px rgba(20,12,6,.18)}
+.lb .room>img{display:block;width:100%;height:auto}
+.lb .room-art{position:absolute;--cm:.2cqw;isolation:isolate}
+.lb .room-art img{display:block;width:100%;height:100%;object-fit:cover;border:9px solid var(--pc-frame);padding:9px;background:#FFFFFF;
+  box-shadow:inset 0 0 0 1px rgba(0,0,0,.06),var(--pc-lift)}
+.lb .room-art::before{content:"";position:absolute;z-index:-1;inset:calc(var(--cm) * -2.5);
+  border:calc(var(--cm) * 1.6) solid #2a1f18;border-top-color:#3b2d23;border-bottom-color:#211812;background:#0d0906;
+  box-shadow:calc(var(--cm) * var(--shx,1.5)) calc(var(--cm) * var(--shy,2.4)) calc(var(--cm) * var(--shb,5)) var(--shc,rgba(64,46,30,.34)),0 0 calc(var(--cm) * 1.1) rgba(36,25,16,.32)}
+.lb .room-art::after{content:"";position:absolute;inset:calc(var(--cm) * -2.5);pointer-events:none;mix-blend-mode:multiply;
+  background:var(--light,linear-gradient(100deg,rgba(255,250,242,0) 0%,rgba(120,100,80,.10) 100%));
+  background-size:var(--light-size,100% 100%);background-position:var(--light-pos,0 0);background-repeat:no-repeat}
+.lb .pp-cap{margin:0;text-align:center;font:400 13px/1.5 var(--pc-sans);letter-spacing:.14em;text-transform:uppercase;color:var(--pc-muted)}
+
+/* "See it in a room" and "Click to zoom" */
+.lb .pp-bar{display:flex;align-items:center;justify-content:center;gap:8px;margin-top:8px}
+.lb .pp-toggle,.lb .pp-zoom{position:relative;display:inline-flex;align-items:center;justify-content:center;gap:6px;min-height:44px;padding:0 20px;
+  border:1px solid var(--pc-ink);border-radius:0;background:transparent;color:var(--pc-ink);font:500 14px/1 var(--pc-sans);
+  letter-spacing:0;text-transform:none;cursor:pointer}
+.lb .pp-toggle svg{width:14px;height:14px}
+.lb .pp-toggle:hover,.lb .pp-toggle[aria-pressed="true"],.lb .pp-zoom:hover{background:var(--pc-ink);color:var(--pc-bg)}
+.lb .pp-zoom .z-touch{display:none}
+@media (hover:none),(max-width:760px){ .lb .pp-zoom .z-touch{display:inline} .lb .pp-zoom .z-fine{display:none} }
+
+/* the two views: the painting, the painting in a room */
+.lb .pp-strip{display:flex;flex-wrap:nowrap;justify-content:center;align-items:center;gap:4px;margin:10px auto 0;padding:0;max-width:100%}
+.lb .pp-chip{flex:0 1 48px;width:48px;min-width:44px;height:48px;min-height:44px;padding:4px;border:0;background:transparent;opacity:.7;cursor:pointer;position:relative}
+.lb .pp-chip>img{display:block;width:100%;height:100%;border:1px solid var(--pc-chip);background:#FAF9F6;object-fit:cover}
+.lb .pp-chip:first-child>img{object-fit:contain;padding:2px}
+.lb .pp-chip:hover,.lb .pp-chip[aria-pressed="true"]{opacity:1}
+.lb .pp-chip[aria-pressed="true"]>img{border:2px solid var(--pc-ink);box-shadow:0 0 0 2px var(--pc-bg),0 0 0 3px var(--pc-ink)}
+
+/* ---- the text (PaintingInfo) ---- */
+.lb .pp-text{max-width:680px;margin:8px auto;text-align:center;display:flex;flex-direction:column;align-items:center;gap:6px}
+.lb .pp-text p{margin:0}
+.lb .pp-back{display:inline-flex;align-items:center;min-height:44px;margin:-10px 0 -2px;font:400 15px/1.45 var(--pc-sans);color:var(--pc-ink);
+  text-decoration:none;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;max-width:100%}
+.lb .pp-back:hover{text-decoration:underline;text-underline-offset:4px}
+.lb .pp-title{margin:0;font:500 44px/1.1 var(--pc-serif);letter-spacing:-.01em;color:var(--pc-ink)}
+.lb .pp-facts{font:400 14px/1.5 var(--pc-sans);color:var(--pc-muted)}
+.lb .pp-story{margin-top:4px !important;font:400 18px/1.6 var(--pc-sans);color:var(--pc-ink);text-wrap:pretty;
+  display:block;overflow:visible}
+.lb .pp-status{margin-top:4px !important;display:flex;flex-wrap:wrap;justify-content:center;gap:6px 16px;font:400 14px/1.6 var(--pc-sans);color:var(--pc-muted)}
+.lb .pp-text .status{display:inline-flex;align-items:center;gap:8px;color:var(--pc-ink)}
+.lb .pp-text .status i{width:8px;height:8px;border-radius:50%;flex:none}
+.lb .pp-text .st-free i{background:var(--pc-green)}
+.lb .pp-text .st-sold i{background:#6A615B}
+.lb .pp-text .st-enquire i{background:transparent;box-shadow:inset 0 0 0 1px var(--pc-ink)}
+.lb .pp-price{font:400 14px/1.45 var(--pc-sans);color:var(--pc-muted)}
+.lb .pp-ctas{display:flex;flex-wrap:wrap;justify-content:center;gap:10px;margin-top:10px;width:100%}
+.lb .btn{display:inline-flex;align-items:center;justify-content:center;gap:10px;min-height:44px;padding:0 20px;border:1px solid var(--pc-ink);
+  border-radius:0;font:500 14px/1 var(--pc-sans);letter-spacing:0;text-transform:none;text-decoration:none;color:var(--pc-ink);background:transparent}
+.lb .btn:hover{background:var(--pc-ink);color:var(--pc-bg)}
+.lb .btn-solid{flex:1 1 100%;background:var(--pc-ink);color:var(--pc-bg)}
+.lb .btn-solid:hover{background:var(--pc-muted);border-color:var(--pc-muted);color:#FFFFFF}
+.lb .btn svg{width:18px;height:18px;flex:none}
+.lb .side-small{display:flex;flex-wrap:wrap;justify-content:center;gap:6px 18px;font:400 15px/1.6 var(--pc-sans);color:var(--pc-muted)}
+.lb .side-small a,.lb .side-small button{display:inline-flex;align-items:center;min-height:32px;color:var(--pc-muted);text-decoration:underline;text-underline-offset:4px}
+.lb .side-small a:hover,.lb .side-small button:hover{color:var(--pc-ink)}
+.lb .side-small svg{width:16px;height:16px;margin-right:6px}
+.lb .side-small .share-btn{gap:6px;padding:0;border:0;background:none;cursor:pointer;font:500 14px/1.6 var(--pc-sans);text-decoration-thickness:1px}
+
+/* ---- Previous / Next through the stop ---- */
+.lb-step{flex:none;display:flex;align-items:center;justify-content:space-between;gap:12px;margin:8px clamp(20px,3vw,44px) 0;padding:6px 0 10px;
+  border-top:1px solid #E3DBCF;font:500 14px/1 var(--pc-sans);color:var(--pc-ink)}
+.lb-step button{min-height:44px;background:none;border:0;padding:0;cursor:pointer;color:var(--pc-ink);font:inherit}
+.lb-step button:hover{text-decoration:underline;text-underline-offset:4px}
+.lb-count{color:var(--pc-muted);font-weight:400}
+
+/* ---- the full-screen zoom inside the card (components/site/Zoom) ---- */
+.lb .zoom{position:fixed;inset:0;z-index:100;background:#171412;color:#F3EEE7;display:flex;flex-direction:column}
+.lb .zoom-stage{position:relative;flex:1;min-height:0;display:flex;align-items:center;justify-content:center;padding:clamp(8px,3vw,40px)}
+.lb .zoom-frame{position:relative;line-height:0;cursor:zoom-in;max-width:100%;max-height:100%;touch-action:none}
+.lb .zoom-frame.is-zoomed{overflow:hidden;cursor:zoom-out}
+.lb .zoom-frame img{display:block;max-width:100%;max-height:calc(100svh - 2 * clamp(8px,3vw,40px) - 64px);width:auto;height:auto;will-change:transform;user-select:none;-webkit-user-select:none}
+.lb .zoom-bar{display:flex;align-items:center;gap:16px;padding:10px clamp(12px,3vw,40px) calc(10px + env(safe-area-inset-bottom,0px));min-height:64px}
+.lb .zoom-bar p{display:flex;flex-direction:column;line-height:1.3;margin:0}
+.lb .zoom-bar b{font:600 24px/1.2 var(--pc-serif)}
+.lb .zoom-bar span{font-size:13px;color:#AFA49A}
+.lb .zoom-hint{margin-left:auto !important;font-size:13px;color:#AFA49A}
+.lb .zoom-close{width:48px;height:48px;border-radius:50%;border:1px solid rgba(243,238,230,.4);background:transparent;color:inherit;cursor:pointer;display:grid;place-items:center;flex:0 0 auto}
+.lb .zoom-close svg{width:20px;height:20px}
+.lb .zoom-close:hover{border-color:#F3EEE7}
+.lb .zoom .lb-zoombar{position:absolute;right:18px;top:50%;height:120px;width:22px;margin-top:-60px;pointer-events:none;
+  opacity:0;transition:opacity .6s ease;display:flex;flex-direction:column;align-items:center;gap:8px;line-height:1}
+.lb .zoom .lb-zoombar i{position:relative;flex:1;width:2px;border-radius:2px;background:rgba(240,234,223,.42);overflow:hidden;box-shadow:0 0 0 1px rgba(48,39,34,.12)}
+.lb .zoom .lb-zoombar i::after{content:"";position:absolute;left:0;right:0;bottom:0;height:100%;background:#F0EADF;transform-origin:50% 100%;transform:scaleY(var(--k,0))}
+.lb .zoom .lb-zoombar span{font:400 13px/1 var(--pc-sans);letter-spacing:.04em;color:#F0EADF;text-shadow:0 1px 3px rgba(0,0,0,.45)}
+@media (max-width:640px){ .lb .zoom-hint{display:none} .lb .zoom-close{margin-left:auto} }
+
+/* ---- a computer: the painting large on the left, its card on the right (the painting page at 1100 px and up) ---- */
+@media (min-width:900px){
+  .lb .pp{display:grid;grid-template-columns:auto minmax(0,1fr) 380px;grid-template-areas:"stage stage text" "strip bar text";
+    column-gap:24px;row-gap:12px;align-items:center;max-width:1320px;margin-inline:auto}
+  .lb .pp-stage{grid-area:stage;justify-content:center}
+  .lb .pp-strip{grid-area:strip;margin:0;padding:2px;justify-self:start}
+  .lb .pp-bar{grid-area:bar;margin:0;justify-content:flex-end;justify-self:end}
+  .lb .pp>.pp-text{grid-area:text;align-self:center;margin:0 0 0 32px;max-width:none;text-align:left;align-items:flex-start;gap:10px}
+  .lb .pp-status{justify-content:flex-start}
+  .lb .side-small{justify-content:flex-start}
+  .lb .pp-chip{width:56px;height:56px;flex-basis:56px}
+}
+@media (min-width:900px) and (max-width:1180px){
+  .lb .pp{grid-template-columns:auto minmax(0,1fr) 320px}
+  .lb .pp>.pp-text{margin-left:12px}
+}
+
+/* ---- a phone: the painting page's phone layout, on a sheet from the bottom edge, the house in view above ---- */
+@media (max-width:640px){
+  .lb{--pc-inset:0px}
+  .lb-sheet{top:calc(6svh + env(safe-area-inset-top,0px));border-radius:18px 18px 0 0;padding-bottom:env(safe-area-inset-bottom,0px)}
+  .lb-close{top:calc(6svh + 10px + env(safe-area-inset-top,0px));right:12px}
+  .lb .pp{margin-block:0}
+  .lb .pp{padding:62px 16px 4px;gap:0}
+  .lb .pp-art img{--fp:14px;border-width:4px;padding:3px;
+    width:min(calc(100vw - 40px),calc((min(46svh,430px) - var(--fp)) * var(--ar) + var(--fp)))}
+  .lb .pp-art img.is-small{width:min(calc(100vw - 40px),calc((min(300px,40svh) - var(--fp)) * var(--ar) + var(--fp)))}
+  .lb .room-art img{border-width:5px;padding:5px}
+  .lb .pp-room{width:100%}
+  .lb .pp-strip{order:1;justify-content:center}
+  .lb .pp-bar{order:2;display:grid;grid-template-columns:1fr 1fr;gap:8px;width:100%}
+  .lb .pp-bar>button{width:100%}
+  .lb .pp-bar>button:only-child{grid-column:1 / -1}
+  .lb .pp>.pp-text{order:3}
+  .lb .pp-chip{width:44px;height:44px}
+  .lb .pp-title{font-size:30px}
+  .lb .pp-facts,.lb .pp-price,.lb .pp-status{font-size:13px}
+  .lb .pp-status{gap:2px 12px}
+  .lb .pp-story{font-size:16px;line-height:1.55}
+  .lb .side-small a,.lb .side-small button{min-height:44px}
+  .lb .side-small .share-btn{min-width:44px;justify-content:center}
+  .lb-step{margin:8px 16px 0;padding-bottom:calc(16px + env(safe-area-inset-bottom,0px))}
+}
+
+/* the full-screen zoom has its own close; the card's stays out of its way */
+.lb:has(.zoom) .lb-close{visibility:hidden}
