@@ -78,7 +78,7 @@
 .pp-text a.pp-coll,.pp-text p.pp-attr,.pp-text p.pp-price{font:400 14px/1.45 var(--sans) !important;color:var(--muted) !important;letter-spacing:0;margin:0}
 .pp-text a.pp-coll{text-decoration:none}
 .pp-text a.pp-coll:hover{text-decoration:underline;text-underline-offset:4px}
-.pp-text p.pp-story{display:-webkit-box !important;-webkit-box-orient:vertical;-webkit-line-clamp:4 !important;line-clamp:4;overflow:hidden;margin:4px 0 0 !important}
+.pp-text p.pp-story{display:block !important;-webkit-line-clamp:unset !important;line-clamp:none;overflow:visible;margin:4px 0 0 !important}
 .pp-text p.pp-status{margin:0}
 .pp-ctas .btn-solid{flex:1 1 100%;justify-content:center}
 @media (min-width:1100px){
