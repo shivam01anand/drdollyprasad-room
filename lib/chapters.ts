@@ -124,11 +124,6 @@ export const CHAPTERS: Chapter[] = [
   { id: "cartman", eyebrow: "Gone Are The Days · 2007 to 2018", stop: "Last of the Pedals · Ek Rupaya", room: "The gallery",
     view: "cartman", dusk: 0.5, labelSide: "below", labels: ["cycle-rickshaw", "rickshaw-rest-framed"],
     body: "These two men are in the same trade, one at work and one between fares, and neither gets to stop for long." },
-  { id: "panels", eyebrow: "Gone Are The Days · 2007 to 2018", stop: "Old road, new traffic", room: "The gallery",
-    view: "panels", dusk: 0.52, labelSide: "below",
-    labels: ["horse-cart-and-autorickshaw", "coins-and-clay-bank", "rickshaw-and-autorickshaw", "carriage-and-autorickshaw",
-      "rickshaw-rest", "bullock-cart-and-truck"],
-    body: "Here the tonga, the bullock cart and the hand-pulled rickshaw are still on the road, and an auto or a truck keeps them company." },
   // Faith, either side of the window onto the palm court
   { id: "shrine", eyebrow: "Faith · 2007 to 2026", stop: "Sharan · Aarti", room: "The gallery",
     view: "shrine", dusk: 0.52, labelSide: "below", labels: ["monk-and-green-buddha", "priest-with-flame"],
@@ -154,6 +149,13 @@ export const CHAPTERS: Chapter[] = [
   { id: "doodhwala", eyebrow: "Gone Are The Days · 2007 to 2018", stop: "Before the Chai · Morning Ritual", room: "The gallery",
     view: "doodhwala", dusk: 0.55, labelSide: "below", labels: ["milkman-on-bicycle", "newspaper-reader"],
     body: "Both men are up early, and only one of them has to be anywhere yet." },
+  // the busiest wall, six small canvases, closes the hall: from the north wall the walk turns
+  // east down the hall's middle (hallvia), then on to the south wall, so neither turn is more than a quarter
+  { id: "panels", eyebrow: "Gone Are The Days · 2007 to 2018", stop: "Old road, new traffic", room: "The gallery",
+    view: "panels", via: "hallvia", dusk: 0.56, labelSide: "below",
+    labels: ["horse-cart-and-autorickshaw", "coins-and-clay-bank", "rickshaw-and-autorickshaw", "carriage-and-autorickshaw",
+      "rickshaw-rest", "bullock-cart-and-truck"],
+    body: "Here the tonga, the bullock cart and the hand-pulled rickshaw are still on the road, and an auto or a truck keeps them company." },
   { id: "featured", eyebrow: "Featured", stop: "Featured works", slot: "featured", view: "featured", dusk: 0.45 },
   {
     id: "plan",
@@ -206,7 +208,15 @@ export function viewPose(v: { eye: V3; target: V3 }, prevYaw?: number, back = 1)
 const NARROW_BACK = 1;
 
 /** a portrait screen has its own framing of a view where Blender made one ("n:<view>") */
-const cam = (info: HouseInfo, view: string, narrow: boolean) => (narrow && info.cams[`n:${view}`]) || info.cams[view];
+const cam = (info: HouseInfo, view: string, narrow: boolean) =>
+  (narrow && info.cams[`n:${view}`]) || info.cams[view] || PASSING[view];
+
+/** passing poses the walk needs and the house build has not made (site coordinates: y up, the hall's
+ *  north wall at z 0.45). "hallvia": the middle of the gallery hall, facing east toward the palm
+ *  window, between the north wall and the south one, so the about-turn is two quarter turns */
+const PASSING: Record<string, { eye: V3; target: V3; fov: number }> = {
+  hallvia: { eye: [8.6, 1.62, 4.65], target: [12.6, 1.6, 4.65], fov: 40 },
+};
 
 /**
  * The walk as the rig needs it: one pose per chapter, and for each step
