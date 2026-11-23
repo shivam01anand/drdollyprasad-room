@@ -47,7 +47,7 @@ export default function About() {
             <img src={PORTRAIT_LARGE} alt="Dr Dolly Prasad beside Ek Rupaya at the First International Kala Mela, 2018" />
           </figure>
           <div className="ab-txt">
-            <p className="ab-p">Dr Dolly Prasad is a painter in New Delhi who works mostly in oil on canvas, sometimes with charcoal or pastel. Her subjects come from the ordinary Indian day: a chai boy beside his kettle, two bullocks under one yoke, a temple bell tied with red thread, a woman lost among poppies.</p>
+            <p className="ab-p">Dr Dolly Prasad is a painter in New Delhi who works mostly in oil on canvas, sometimes with charcoal or pastel. Her subjects come from the ordinary Indian day: a chai boy beside his kettle, a red letterbox against a wall of old stamps, a temple bell tied with red thread, a woman lost among poppies.</p>
             <p className="ab-p">Since 2005 her work has been shown at exhibitions and art fairs, most recently at India Habitat Centre in 2026. Her paintings are in private collections in India, the USA and the UK.</p>
           </div>
         </div>

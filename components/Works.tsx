@@ -94,7 +94,7 @@ export function Contact() {
       <div className="contact-grid">
         <div className="contact-bio">
           <p className="about">
-            Her subjects come from the ordinary Indian day: a chai boy beside his kettle, two bullocks under one yoke,
+            Her subjects come from the ordinary Indian day: a chai boy beside his kettle, a red letterbox against a wall of old stamps,
             a temple bell tied with red thread, a woman lost among poppies.
           </p>
           <p className="about">
