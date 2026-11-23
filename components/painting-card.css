@@ -87,7 +87,7 @@
 .lb .pp-title{margin:0;font:500 44px/1.1 var(--pc-serif);letter-spacing:-.01em;color:var(--pc-ink)}
 .lb .pp-facts{font:400 14px/1.5 var(--pc-sans);color:var(--pc-muted)}
 .lb .pp-story{margin-top:4px !important;font:400 18px/1.6 var(--pc-sans);color:var(--pc-ink);text-wrap:pretty;
-  display:-webkit-box;-webkit-box-orient:vertical;-webkit-line-clamp:4;line-clamp:4;overflow:hidden}
+  display:block;overflow:visible}
 .lb .pp-status{margin-top:4px !important;display:flex;flex-wrap:wrap;justify-content:center;gap:6px 16px;font:400 14px/1.6 var(--pc-sans);color:var(--pc-muted)}
 .lb .pp-text .status{display:inline-flex;align-items:center;gap:8px;color:var(--pc-ink)}
 .lb .pp-text .status i{width:8px;height:8px;border-radius:50%;flex:none}
