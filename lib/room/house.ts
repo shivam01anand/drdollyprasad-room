@@ -43,52 +43,63 @@ export type HouseInfo = {
 };
 
 export const HOUSE_DIR = "/house";
+
+/** the house's files are cached for a year (next.config): their address carries a hash of their content */
+const ASSET_V = process.env.NEXT_PUBLIC_ASSET_V;
+export const assetUrl = (url: string) => ASSET_V ? `${url}${url.includes("?") ? "&" : "?"}v=${ASSET_V}` : url;
+
+/** a baked lightmap texture as the house's materials sample it (`like`: copy another's settings) */
+export function prepLightmap(t: THREE.Texture, like?: THREE.Texture) {
+  t.colorSpace = THREE.SRGBColorSpace;
+  t.channel = like?.channel ?? 1;
+  t.flipY = false;
+  t.generateMipmaps = true;
+  t.minFilter = THREE.LinearMipmapLinearFilter;
+  t.anisotropy = 4;
+  t.needsUpdate = true;
+  return t;
+}
 /** the rooms' ceiling height: above it, the roofs lift away for the plan view */
 export const ROOF = 3.6;
 
 export type House = {
   info: HouseInfo;
   scene: THREE.Group;
+  /** replaced once by the full-size afternoon (BakedLight.setDayMap) */
   lmDay: THREE.Texture;
   lmNight: THREE.Texture | null;
 };
 
 export function loadHouseInfo(signal: AbortSignal, tick: () => void): Promise<HouseInfo> {
-  return fetch(`${HOUSE_DIR}/house.json`, { signal }).then((r) => {
+  return fetch(assetUrl(`${HOUSE_DIR}/house.json`), { signal }).then((r) => {
     if (!r.ok) throw new Error(`house.json ${r.status}`);
     return r.json() as Promise<HouseInfo>;
   }).then((info) => { tick(); return info; });
 }
 
+/** The model and the afternoon lightmap at 2k: what the visitor enters on. The evening lightmap
+ *  (`night`, when the visit starts in the evening) and the full-size afternoon follow (Room.afterEntry). */
 export async function loadHouse(
-  small: boolean,
   signal: AbortSignal,
   loadTexture: (url: string) => Promise<THREE.Texture>,
   tick: () => void,
   infoPromise = loadHouseInfo(signal, tick),
+  night = false,
+  /** how much of the model has arrived, 0…1 (it is the largest file by far) */
+  onModel?: (f: number) => void,
 ): Promise<House> {
   const draco = new DRACOLoader().setDecoderPath("/draco/");
   draco.setDecoderConfig({ type: "wasm" });
   // Fetch the decoder while the model is in flight, instead of after it arrives.
   draco.preload();
   const loader = new GLTFLoader().setDRACOLoader(draco);
-  const suffix = small ? "-2k" : "";
   const [info, gltf, lmDay, lmNight] = await Promise.all([
     infoPromise,
-    loader.loadAsync(`${HOUSE_DIR}/house.glb`).then((x) => { tick(); return x; }),
-    loadTexture(`${HOUSE_DIR}/lm-day${suffix}.webp`).then((x) => { tick(); return x; }),
-    loadTexture(`${HOUSE_DIR}/lm-night${suffix}.webp`).then((x) => { tick(); return x; }).catch(() => null),
+    loader.loadAsync(assetUrl(`${HOUSE_DIR}/house.glb`), (e) => { if (e.total) onModel?.(e.loaded / e.total); }).then((x) => { tick(); return x; }),
+    loadTexture(assetUrl(`${HOUSE_DIR}/lm-day-2k.webp`)).then((x) => { tick(); return x; }),
+    night ? loadTexture(assetUrl(`${HOUSE_DIR}/lm-night-2k.webp`)).then((x) => { tick(); return x; }).catch(() => null) : Promise.resolve(null),
   ]).finally(() => draco.dispose());
-  for (const t of [lmDay, lmNight]) {
-    if (!t) continue;
-    t.colorSpace = THREE.SRGBColorSpace;
-    t.channel = 1;
-    t.flipY = false;
-    t.generateMipmaps = true;
-    t.minFilter = THREE.LinearMipmapLinearFilter;
-    t.anisotropy = 4;
-    t.needsUpdate = true;
-  }
+  for (const t of [lmDay, lmNight]) if (t) prepLightmap(t);
   return { info, scene: gltf.scene, lmDay, lmNight };
 }
 
@@ -99,6 +110,11 @@ export class BakedLight {
   readonly nightMap: { value: THREE.Texture | null };
   readonly dayK: number;
   readonly nightK: { value: number };
+
+  /** the afternoon lightmap every baked material samples */
+  dayMap() { return this.house.lmDay; }
+  /** a larger afternoon lightmap, once Room has swapped it into the materials */
+  setDayMap(t: THREE.Texture) { this.house.lmDay = t; }
 
   constructor(private house: House) {
     this.nightMap = { value: house.lmNight };
