@@ -271,7 +271,7 @@ export default async function SeriesStory({ params }: Props) {
 
       {/* B3-5: one ask line, then the collections pager (wrapping round, newest first) */}
       <section className="story-end wrap">
-        <p className="se-ask">Interested in one of these paintings? <Link href="/enquire"><b>Send an enquiry</b></Link></p>
+        <p className="se-ask">Ask about a painting from {s.label}. <Link href="/enquire"><b>Send an enquiry</b></Link></p>
         <PrevNext label="Previous and next collection"
                   prev={{ href: `/series/${nb.prev.slug}`, kicker: "Previous collection", label: nb.prev.label }}
                   next={{ href: `/series/${nb.next.slug}`, kicker: "Next collection", label: nb.next.label }} />

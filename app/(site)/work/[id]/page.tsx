@@ -3,7 +3,7 @@ import Link from "next/link";
 import IndigoBand from "@/components/site/IndigoBand";
 import { notFound } from "next/navigation";
 import { BY_ID, LARGE, SITE, WORKS, inchDims, quoted, workPath, type Work } from "@/lib/works";
-import { SERIES_BY_SLUG, SHOWS, SMALL_PHOTO, showKey, shownYear, statusText, enquireHref, labelLine, neighbours, seriesPath, worksIn } from "@/lib/site";
+import { LOOK, SERIES_BY_SLUG, SHOWS, SMALL_PHOTO, showKey, shownYear, statusText, enquireHref, labelLine, neighbours, seriesPath, worksIn } from "@/lib/site";
 import PrevNext from "@/components/site/PrevNext";
 import manifest from "@/public/art/manifest.json";
 import Card from "@/components/site/Card";
@@ -41,7 +41,9 @@ export async function generateMetadata({ params }: Props): Promise<Metadata> {
   const w = BY_ID.get(id);
   if (!w) return {};
   const title = quoted(w.title);
-  const description = `${quoted(w.title)}, by Dr Dolly Prasad. ${facts(w)}. ${statusText(w)}.`;
+  // content elevate (2026-11-22): the share preview carries the first sentence of its painting line; the facts are on the page
+  const first = LOOK[id]?.match(/^.*?[.!?](?=\s|$)/)?.[0];
+  const description = first ? `${quoted(w.title)}, by Dr Dolly Prasad. ${first}` : `${quoted(w.title)}, by Dr Dolly Prasad. ${facts(w)}. ${statusText(w)}.`;
   return {
     title,
     description,

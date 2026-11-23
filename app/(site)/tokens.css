@@ -194,6 +194,9 @@
   @media (max-width:640px){ .hw-intro h2{font-size:28px !important} .hw-lede{font-size:16px !important;line-height:1.55 !important} .hw-pi b{font-size:16px !important} .hw-pi-t .hw-pi-s{font-size:13px !important} }
   @media (max-width:640px){ .ex-ch .ex-ch-year{font-size:13px !important} .ex-ch .sm-cap{height:auto !important;-webkit-line-clamp:unset !important;line-clamp:none !important} }
 
+  /* content elevate (2026-11-22): the series line under each home tile, on indigo */
+  .series-row .card-line{font:400 15px/1.45 var(--sans) !important;letter-spacing:0 !important;color:var(--on-indigo) !important;
+    max-width:210px !important;text-align:center !important;text-wrap:balance !important;white-space:normal !important;margin-inline:auto !important}
   @media (max-width:640px){
     .story-head h1{font-size:44px !important}
     .wh-card h1{font-size:36px !important}
