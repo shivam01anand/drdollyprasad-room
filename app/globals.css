@@ -160,29 +160,26 @@ html[data-hud="dark"] .hud .brand-target .pre-big{color:#211B17}
 .sheet-works{display:flex;flex-wrap:wrap;gap:8px;margin-bottom:12px}
 .sheet-works .pill{height:44px}
 
-/* ------------------------------------------- a phone's edge arrows and first hint */
-.edge-nav{display:none}
-.coach{display:none}
-@media (max-width:900px) and (pointer:coarse){
-  .edge-nav{display:block;position:fixed;inset:0;z-index:3;pointer-events:none}
-  .edge-btn{position:absolute;top:50%;width:40px;height:64px;margin-top:-32px;padding:0;border:0;pointer-events:auto;
-    display:grid;place-items:center;background:rgba(var(--wash),.42);color:var(--ink);cursor:pointer;
-    -webkit-backdrop-filter:blur(6px);backdrop-filter:blur(6px);transition:opacity .3s ease}
-  .edge-btn.is-prev{left:0;border-radius:0 14px 14px 0}
-  .edge-btn.is-next{right:0;border-radius:14px 0 0 14px}
-  .edge-btn:disabled{opacity:0;pointer-events:none}
-  .edge-btn svg{width:20px;height:20px;fill:none;stroke:currentColor;stroke-width:1.7;stroke-linecap:round;stroke-linejoin:round}
-  html[data-gliding="1"] .edge-btn{opacity:.5}
-  .coach{display:flex;flex-direction:column;align-items:center;gap:6px;position:fixed;left:50%;
-    bottom:calc(var(--hud-bottom) + 34px + env(safe-area-inset-bottom,0px));transform:translateX(-50%);z-index:4;
-    padding:16px 22px 14px;border-radius:18px;background:rgba(var(--wash),.92);border:1px solid var(--line);
-    box-shadow:0 14px 34px -18px rgba(30,20,14,.55);pointer-events:none;white-space:nowrap;animation:coach-in .6s var(--ease) both}
-  @keyframes coach-in{from{opacity:0;transform:translate(-50%,10px)}}
-  .coach-hand{width:22px;height:22px;border-radius:50%;background:var(--ink);opacity:.82;animation:coach-swipe 1.8s ease-in-out infinite}
-  @keyframes coach-swipe{0%{transform:translateY(16px);opacity:0}20%{opacity:.82}70%{transform:translateY(-16px);opacity:.82}100%{transform:translateY(-22px);opacity:0}}
-  .coach-text{font-size:15px;letter-spacing:-.01em;color:var(--ink)}
-  .coach-sub{margin:0}
-}
+/* ------------------------------------------- the walk's arrows and the first visit's hint */
+.walk-wrap{display:flex;align-items:center;gap:12px}
+.walk-nav{display:flex;align-items:center;gap:6px;padding:3px;border-radius:999px;background:var(--chip);border:1px solid var(--line)}
+.walk-n{min-width:5.2em;text-align:center;color:var(--chip-ink);font-variant-numeric:tabular-nums}
+.walk-n i{font-style:normal;opacity:.5}
+.walk-btn{flex:none;width:44px;height:44px;border-radius:50%;padding:0;cursor:pointer;display:grid;place-items:center;
+  background:var(--chip);border:1px solid var(--line);color:var(--chip-ink);
+  transition:background-color .18s var(--ease),color .18s var(--ease),border-color .18s var(--ease),opacity .3s ease}
+.walk-nav .walk-btn{background:transparent;border-color:transparent}
+.walk-btn svg{width:20px;height:20px;fill:none;stroke:currentColor;stroke-width:1.7;stroke-linecap:round;stroke-linejoin:round}
+.walk-btn:not(:disabled):hover,.walk-nav .walk-btn:not(:disabled):hover{background:var(--pill);color:var(--pill-ink);border-color:var(--pill)}
+.walk-btn:disabled{opacity:.3;cursor:default}
+html[data-gliding="1"] .walk-btn:not(:disabled){opacity:.6}
+/* the first visit: the next arrow nudges, twice, toward where the walk goes */
+.walk-btn[data-nudge="1"]{animation:walk-nudge 1.1s var(--ease) .5s 2 both}
+@keyframes walk-nudge{0%,100%{transform:none}35%{transform:translateX(6px)}60%{transform:translateX(-1px)}}
+.coach{margin:0;padding:9px 14px 8px;border-radius:999px;background:var(--pill);color:var(--pill-ink);white-space:nowrap;
+  box-shadow:0 12px 28px -16px rgba(30,20,14,.6);animation:coach-in .6s var(--ease) both}
+@keyframes coach-in{from{opacity:0;transform:translateX(-8px)}}
+@media (prefers-reduced-motion:reduce){ .walk-btn[data-nudge="1"],.coach{animation:none} }
 
 /* ----------------------------------------------------- the phone's dock and sheet */
 .dock{display:none}
@@ -301,7 +298,7 @@ html[data-room="off"] .sec:not(.sec-featured){display:none}
 }
 
 /* ------------------------------------------------------------- the welcome */
-/* warm paper, lamplight from above, her greeting; then an invitation to step inside */
+/* warm paper, lamplight from above, one of her paintings coming into colour as the house loads */
 .pre{position:fixed;inset:0;z-index:150;pointer-events:none}
 .pre-panel{position:absolute;inset:0;background:var(--page);overflow:hidden;pointer-events:auto}
 .pre-light{position:absolute;inset:-20% -10% 0;pointer-events:none;
@@ -309,24 +306,37 @@ html[data-room="off"] .sec:not(.sec-featured){display:none}
              radial-gradient(120% 90% at 50% 120%,rgba(120,80,50,.10),rgba(120,80,50,0) 60%)}
 .pre-welcome{position:absolute;inset:0;display:flex;flex-direction:column;align-items:center;justify-content:center;
   text-align:center;padding:0 var(--gut);gap:0}
-.pre-welcome [data-in]{visibility:visible}
-.pre-namaste{margin:0 0 clamp(10px,1.6vh,18px);font-family:"IBM Plex Sans Devanagari",var(--display);font-weight:500;
-  font-size:clamp(14px,1.1vw,17px);letter-spacing:.06em;color:var(--dim)}
-.pre-hello{margin:0;font-family:"Cormorant Garamond",Georgia,serif;font-style:normal;font-weight:500;
-  font-size:clamp(46px,7.2vw,116px);line-height:1.02;letter-spacing:-.012em;color:var(--ink);text-wrap:balance}
-.pre-hello span{display:inline-block;margin:0 .16em}
-.pre-sign{display:flex;gap:.32em;justify-content:center;margin-top:clamp(18px,3vh,30px)}
+/* her painting, a charcoal sketch filling with colour from the bottom up as the house loads (--pre-p, 0…1) */
+@property --pre-p{syntax:"<number>";inherits:true;initial-value:0}
+.pre-art{margin:0;display:flex;flex-direction:column;align-items:center;gap:clamp(12px,2vh,20px);
+  transition:--pre-p .5s cubic-bezier(.33,1,.68,1)}
+.pre-canvas{position:relative;height:min(58vh,calc((100vw - 2 * var(--gut)) / var(--ar,.765)));aspect-ratio:var(--ar,.765);
+  background:#E6DDCF;box-shadow:0 30px 70px -34px rgba(46,34,32,.45)}
+.pre-canvas img{position:absolute;inset:0;width:100%;height:100%;object-fit:cover;display:block}
+.pre-canvas img:not([src]){visibility:hidden}
+.pre-sketch{filter:grayscale(1) sepia(.12) contrast(1.3) brightness(1.22) blur(.35px);opacity:.82;mix-blend-mode:multiply}
+.pre-colour{--edge:calc(var(--pre-p) * 118% - 18%);
+  -webkit-mask-image:linear-gradient(to top,#000 var(--edge),transparent calc(var(--edge) + 18%));
+  mask-image:linear-gradient(to top,#000 var(--edge),transparent calc(var(--edge) + 18%))}
+/* the brand, made by the welcome and handed to the header (Preloader brandIn) */
 .pre-big{display:block;font-family:var(--display);font-weight:500;color:var(--ink);white-space:nowrap;
   font-size:clamp(20px,1.7vw,26px);line-height:1;letter-spacing:-.02em}
-.pre-note{margin:10px 0 0}
-.pre-foot{position:relative;margin-top:clamp(30px,6vh,64px);min-height:40px;display:flex;flex-direction:column;align-items:center}
-.pre-bar{position:absolute;top:22px;width:140px;height:1px;background:var(--rule);overflow:hidden;transition:opacity .5s ease}
-.pre-bar i{position:absolute;inset:0;background:var(--ink);transform-origin:0 50%;transform:scaleX(.02);transition:transform .4s ease}
-.pre-bar[data-ready="1"]{opacity:0}
-.pre-hero{
-  position:fixed;left:50%;top:50%;width:1px;height:1px;z-index:2;
-  visibility:hidden;opacity:0;object-fit:fill;transform-origin:50% 50%;
-  box-shadow:0 30px 70px -30px rgba(46,34,32,.35);
+.pre-art figcaption{display:flex;flex-direction:column;align-items:center;gap:4px}
+.pre-title{font-family:"Cormorant Garamond",Georgia,serif;font-weight:500;font-size:clamp(20px,1.7vw,26px);line-height:1.1;color:var(--ink)}
+.pre-by{margin:0;color:var(--dim)}
+.pre-foot{position:relative;margin-top:clamp(14px,2.6vh,26px);display:flex;flex-direction:column;align-items:center;gap:10px}
+.pre-bar{position:relative;width:min(220px,60vw);height:1px;background:var(--rule);overflow:hidden}
+.pre-bar i{position:absolute;inset:0;background:var(--ink);transform-origin:0 50%;transition:transform .5s cubic-bezier(.33,1,.68,1)}
+.pre-status{margin:0;color:var(--dim);font-variant-numeric:tabular-nums}
+.pre[data-finishing="1"] .pre-art,.pre[data-finishing="1"] .pre-bar i{transition-duration:.3s}
+.pre{transition:opacity .45s ease}
+.pre[data-out="1"]{opacity:0}
+.pre[data-out="1"] .pre-panel{pointer-events:none}
+@media (prefers-reduced-motion:reduce){
+  .pre-art,.pre-bar i,.pre{transition:none}
+  /* no sweep: the painting is shown in colour, and the line alone counts */
+  .pre-colour{-webkit-mask-image:none;mask-image:none}
+  .pre-sketch{display:none}
 }
 
 /* -------------------------------------------------------------- featured */
@@ -546,6 +556,12 @@ html[data-mode="dark"] .lb-veil{background:rgba(0,0,0,.5)}
   .dock-menu{flex:none;width:50px;height:50px;border-radius:50%;padding:0;cursor:pointer;
     background:var(--chip);border:1px solid var(--line);color:var(--chip-ink);display:grid;place-items:center}
   .dock-menu svg{width:22px;height:22px;stroke:currentColor;stroke-width:1.6;fill:none;stroke-linecap:round}
+  /* the arrows either side of the dock, a thumb's size */
+  .dock .walk-btn{width:50px;height:50px}
+  .walk-nav{display:none}
+  .walk-wrap{display:contents}
+  .coach{position:fixed;right:var(--gut);bottom:calc(var(--gut) + env(safe-area-inset-bottom,0px) + 62px);z-index:2}
+  @keyframes coach-in{from{opacity:0;transform:translateY(8px)}}
   /* the sheet of stops, from the bottom edge */
   .sheet{display:block}
   .pill{font-size:10.5px;height:40px;padding:0 14px}

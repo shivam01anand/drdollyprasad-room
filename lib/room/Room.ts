@@ -9,11 +9,18 @@ import type * as CANNON from "cannon-es";
 import { buildLibrary, textureList, type Library } from "./materials";
 import { Rig } from "./rig";
 import type { Dolly } from "./dolly";
-import { loadHouse, loadHouseInfo, assemble, BakedLight, ROOF, type HouseInfo, type HouseParts, type V3 } from "./house";
+import { loadHouse, loadHouseInfo, assemble, BakedLight, ROOF, HOUSE_DIR, assetUrl, prepLightmap, type HouseInfo, type HouseParts, type V3 } from "./house";
 import { paintMaterial, flatRelief, galleryLight } from "./paint";
 import { ReliefBuilder } from "./relief-builder";
 import { activeVariant, NIGHT } from "./variants";
 import { CHAPTERS, resolveWalk, isNarrow, startPose, messPose, duskAt, HERO_ID } from "../chapters";
+
+/** the stops whose paintings are in the house before the visitor enters; the rest stream in walk order */
+const FIRST_STOPS = 3;
+/** each painting's first stop on the walk (its place in the streaming queue) */
+const STOP_OF = new Map<string, number>();
+CHAPTERS.forEach((c, i) => [...(c.labels ?? []), ...(c.frame ?? [])].forEach((id) => { if (!STOP_OF.has(id)) STOP_OF.set(id, i); }));
+const stopRank = (id: string) => STOP_OF.get(id) ?? CHAPTERS.length;
 
 export type RoomOpts = {
   manifestUrl: string;
@@ -108,8 +115,9 @@ const DEEPA_WICK = 0.14;
 const FRAME = 0.025;
 /** each wall's outward normal on the floor plane, three's (x, z) */
 const SIDE_OUT: Record<string, [number, number]> = { N: [0, 1], S: [0, -1], E: [-1, 0], W: [1, 0] };
-// Reuse the welcome's full-resolution photo instead of downloading it twice.
-const artworkTextureURL = (id: string) => id === HERO_ID ? `/art/large/${id}.jpg` : `/art/room/${id}.jpg`;
+// WebP at the house's own size (scripts/art/textures.py); the JPEG beside it if WebP will not decode
+const artworkTextureURL = (id: string) => assetUrl(`/art/room/${id}.webp`);
+const artworkFallbackURL = (id: string) => assetUrl(`/art/room/${id}.jpg`);
 
 
 export class Room {
@@ -206,6 +214,7 @@ export class Room {
      ====================================================================== */
 
   async init(canvas: HTMLCanvasElement, opts: RoomOpts) {
+    performance.mark("room:init");
     this.canvas = canvas;
     this.opts = opts;
     this.tier = pickTier();
@@ -228,24 +237,32 @@ export class Room {
 
     /* every asset is counted, so the counter means something: the house
        (its plan, its model, two lightmaps), the room's surfaces, the paintings */
-    const texList = textureList(this.tier.small);
+    // every visitor enters on the light set (1k surfaces, the 2k afternoon lightmap); a capable machine
+    // gets the full set after it is inside (upgradeSurfaces), and the evening lightmap streams then too
+    const texList = textureList(true);
     let total = 4 + texList.length + 12;
-    let done = 0;
-    const tick = () => { if (!this.disposed) opts.onProgress(Math.min(1, ++done / total)); };
+    let done = 0, model = 0;
+    // the model weighs as much as a dozen of the other files, and reports as it arrives; the last
+    // stretch (building and warming the house) is the counter's final 8 %
+    const MODEL = 12;
+    const report = () => { if (!this.disposed) opts.onProgress(0.92 * Math.min(1, (done + MODEL * model) / (total + MODEL))); };
+    const tick = () => { done++; report(); };
 
     const texP = Promise.all(texList.map((t) =>
-      this.loadTexture(t.url).then((tex) => { tick(); return [`${t.set}:${t.kind}`, tex] as const; })));
+      this.loadTexture(assetUrl(t.url)).then((tex) => { tick(); return [`${t.set}:${t.kind}`, tex] as const; })));
     const infoP = loadHouseInfo(this.abort.signal, tick);
-    const houseP = loadHouse(this.tier.small, this.abort.signal, (u) => this.loadTexture(u), tick, infoP);
-    // the works near the door load with the house; the gallery's after it has opened (lateArt)
+    const houseP = loadHouse(this.abort.signal, (u) => this.loadTexture(u), tick, infoP, !!V.startDark,
+      (f) => { model = f; report(); });
+    // the works of the first stops load with the house; every other one after it has opened, in walk order (lateArt)
     const artP = infoP.then((info) => {
-      const ids = Object.keys(info.art).filter((id) => !info.art[id].late);
-      total = 4 + texList.length + ids.length;
+      const ids = Object.keys(info.art).filter((id) => this.eager(id, info));
+      total = 3 + (V.startDark ? 1 : 0) + texList.length + ids.length;
       return Promise.all(ids.map((id) =>
-        this.loadTexture(artworkTextureURL(id)).then((tex) => { tick(); return [id, tex] as const; })));
+        this.loadArtwork(id).then((tex) => { tick(); return [id, tex] as const; })));
     });
     // Photos, surfaces and geometry download together; none waits for GLB decode.
     const [house, texPairs, artPairs] = await Promise.all([houseP, texP, artP]);
+    performance.mark("room:fetched");
     if (this.disposed) {
       texPairs.forEach(([, t]) => t.dispose());
       artPairs.forEach(([, t]) => t.dispose());
@@ -290,7 +307,7 @@ export class Room {
     for (const [id, mesh] of this.parts.art) {
       // a study (the canvas on her easel) is painted like the rest, but it is not a work to open
       const pickable = !this.info.art[id]?.study;
-      if (this.info.art[id]?.late) {
+      if (!this.eager(id, this.info)) {
         mesh.material = paintMaterial(ground, this.baked, galleryLight(this.info.art[id]), flat, this.info.art[id]?.lk);
         if (pickable) this.art.push(mesh);
         continue;
@@ -310,13 +327,16 @@ export class Room {
     // development: ?bake=0 shows the live light for comparison
     if (process.env.NODE_ENV !== "production" && new URLSearchParams(location.search).get("bake") === "0") this.baked.bake.value = 0;
 
+    performance.mark("room:assembled");
     this.buildSky();
     this.buildLights();
     this.buildItems();
     this.buildPost();
     this.resize();
     this.syncBakeAO();
+    performance.mark("room:built");
     await this.captureEnvironment();
+    performance.mark("room:environment");
     if (this.disposed) { this.release(); return; }
     this.applyEve();
     if (V.startDark) this.setMode("dark", true);
@@ -340,13 +360,11 @@ export class Room {
     if (this.disposed) { this.release(); return; }
     renderer.shadowMap.needsUpdate = true;
     this.composer!.render();
+    performance.mark("room:ready");
     this.ready = true;
     this.wake = 2;
     this.reliefs();
     this.lateArt();
-    // Prepare her head while the welcome still covers the room, so its first
-    // decode, sort and shader upload do not land on the visitor's first scroll.
-    void this.lateFigure();
     if (process.env.NODE_ENV !== "production") (window as unknown as { __room?: Room }).__room = this;
   }
 
@@ -370,10 +388,129 @@ export class Room {
     }
   }
 
-  /** Keep three requests in flight, replacing each as it finishes. */
+  /** a painting the visitor sees before entering: one at the first stops, the hero, and the canvas on her
+   *  easel (the courtyard's; it is no stop's label) */
+  private eager(id: string, info: HouseInfo) {
+    return id === HERO_ID || !!info.art[id]?.study || stopRank(id) < FIRST_STOPS;
+  }
+
+  private loadArtwork(id: string) {
+    return this.loadTexture(artworkTextureURL(id)).catch(() => this.loadTexture(artworkFallbackURL(id)));
+  }
+
+  /** Keep three requests in flight, replacing each as it finishes, nearest stop first. */
   private lateArt() {
-    this.artQueue = this.art.filter((m) => this.info.art[m.userData.artId]?.late);
+    this.artQueue = this.parts.art.size
+      ? [...this.parts.art].filter(([id]) => !this.eager(id, this.info)).map(([, m]) => m)
+      : [];
+    const rank = (m: THREE.Mesh) => stopRank(m.userData.artId);
+    this.artQueue.sort((a, b) => rank(a) - rank(b));
     this.pumpArt();
+  }
+
+  /** Once the visitor is inside: the evening lightmap, the full-size surfaces, her head. One at a
+   *  time and behind the paintings, each swapped in at rest so a glide never hitches. */
+  private afterEntry() {
+    if (this.entered || this.disposed) return;
+    this.entered = true;
+    const jobs: (() => Promise<unknown>)[] = [];
+    if (!this.baked?.nightMap.value) jobs.push(() => this.loadNight());
+    if (!this.tier.small) {
+      jobs.push(() => this.upgradeLightmap());
+      for (const t of textureList(false)) jobs.push(() => this.upgradeSurface(`${t.set}:${t.kind}`, t.url));
+    }
+    jobs.push(() => this.lateFigure());
+    const next = (): unknown => {
+      const job = jobs.shift();
+      if (!job || this.disposed) return;
+      // the paintings of the next stops go first: their queue is short-lived
+      if (this.artLoads >= 3 && this.artQueue.length > 20) { jobs.unshift(job); setTimeout(next, 400); return; }
+      return job().catch(() => { /* the lighter one stays */ }).finally(next);
+    };
+    void next();
+  }
+  private entered = false;
+
+  /** the evening's light, baked: the evening of the walk and the lit diya wait for it */
+  private nightLoad?: Promise<void>;
+  private loadNight() {
+    return (this.nightLoad ??= this.fetchNight().catch((e) => { this.nightLoad = undefined; throw e; }));
+  }
+  private async fetchNight() {
+    if (this.baked?.nightMap.value) return;
+    const t = await this.loadTexture(assetUrl(`${HOUSE_DIR}/lm-night${this.tier.small ? "-2k" : ""}.webp`));
+    if (this.disposed || !this.baked) { t.dispose(); return; }
+    prepLightmap(t, this.baked.nightMap.value ?? this.baked.dayMap());
+    await this.atRest(() => {
+      this.renderer?.initTexture(t);
+      this.baked!.nightMap.value = t;
+      this.owned.push(t);
+      this.eve.v = -1;
+      this.applyEve();
+    });
+  }
+
+  /** the afternoon lightmap at full size, in place of the 2k one the visitor entered on */
+  private async upgradeLightmap() {
+    const old = this.baked?.dayMap();
+    if (!old) return;
+    const t = await this.loadTexture(assetUrl(`${HOUSE_DIR}/lm-day.webp`));
+    if (this.disposed) { t.dispose(); return; }
+    prepLightmap(t, old);
+    await this.atRest(() => {
+      this.renderer?.initTexture(t);
+      this.swapTexture(old, t);
+      this.baked!.setDayMap(t);
+    });
+  }
+
+  /** one surface photograph at full size, in place of its 1k one */
+  private async upgradeSurface(key: string, url: string) {
+    const old = this.lib?.texture(key);
+    if (!old) return;
+    const img = await new Promise<HTMLImageElement>((res, rej) => {
+      new THREE.ImageLoader().load(assetUrl(url), res, undefined, () => rej(new Error(url)));
+    });
+    if (this.disposed) return;
+    // its settings (wrap, colour space, anisotropy), on a source of its own: a clone would share the
+    // old one's, and the larger photograph would be written into the smaller texture's storage
+    const t = old.clone();
+    t.source = new THREE.Source(img);
+    t.needsUpdate = true;
+    await this.atRest(() => {
+      this.renderer?.initTexture(t);
+      this.swapTexture(old, t);
+      this.lib!.replace(key, t);
+    });
+  }
+
+  /** run once the camera is at rest (the texture upload queue) */
+  private atRest(fn: () => void) {
+    return new Promise<void>((res) => {
+      this.textureUploads.push(() => { if (!this.disposed) fn(); res(); });
+      this.invalidate();
+    });
+  }
+
+  /** every material in the scene that samples `old` samples `t` instead */
+  private swapTexture(old: THREE.Texture, t: THREE.Texture) {
+    const slots = ["map", "normalMap", "aoMap", "roughnessMap", "metalnessMap", "lightMap"] as const;
+    const seen = new Set<THREE.Material>();
+    const fix = (m: THREE.Material) => {
+      if (seen.has(m)) return;
+      seen.add(m);
+      const mm = m as THREE.MeshStandardMaterial;
+      for (const k of slots) if (mm[k] === old) mm[k] = t;
+    };
+    this.lib?.all().forEach(fix);
+    this.scene.traverse((o) => {
+      const m = (o as THREE.Mesh).material;
+      if (!m) return;
+      (Array.isArray(m) ? m : [m]).forEach(fix);
+    });
+    old.dispose();
+    this.owned.push(t);
+    this.invalidate();
   }
 
   private pumpArt() {
@@ -381,7 +518,7 @@ export class Room {
     while (this.artLoads < 3 && this.artQueue.length) {
       const mesh = this.artQueue.shift()!;
       this.artLoads++;
-      void this.loadTexture(artworkTextureURL(mesh.userData.artId)).then((tex) => {
+      void this.loadArtwork(mesh.userData.artId).then((tex) => {
         if (this.disposed) { tex.dispose(); return; }
         tex.colorSpace = THREE.SRGBColorSpace;
         tex.anisotropy = Math.min(8, this.renderer!.capabilities.getMaxAnisotropy());
@@ -874,26 +1011,8 @@ export class Room {
     }
     this.rig.playIntro(startPose(this.info, this.narrow), () => {
       this.opts.onIntroFinished();
-    }, reduce ? 0 : 1.15);
-  }
-
-  /** where Twenty Paise is on screen before the camera moves — the
-   *  preloader puts its photograph exactly there */
-  heroRect() {
-    const hero = this.art.find((m) => m.userData.artId === HERO_ID);
-    if (!hero || !this.renderer) return null;
-    this.rig.pivot.updateMatrixWorld(true);
-    hero.updateMatrixWorld(true);
-    const p = hero.geometry.getAttribute("position");
-    const r = this.canvas.getBoundingClientRect();
-    let x0 = Infinity, y0 = Infinity, x1 = -Infinity, y1 = -Infinity;
-    for (let i = 0; i < p.count; i++) {
-      tmpV.fromBufferAttribute(p, i).applyMatrix4(hero.matrixWorld).project(this.rig.camera);
-      const x = r.left + (tmpV.x * 0.5 + 0.5) * r.width;
-      const y = r.top + (-tmpV.y * 0.5 + 0.5) * r.height;
-      x0 = Math.min(x0, x); x1 = Math.max(x1, x); y0 = Math.min(y0, y); y1 = Math.max(y1, y);
-    }
-    return { left: x0, top: y0, width: x1 - x0, height: y1 - y0 };
+      this.afterEntry();
+    }, 0, 0.9);
   }
 
   scroll(p: number) { this.prepareChapter(Math.round(p * (CHAPTERS.length - 1))); this.rig?.scroll(p); }
@@ -932,6 +1051,7 @@ export class Room {
   setMode(mode: "light" | "dark", instant = false) {
     if (this.disposed || !this.renderer || !this.sun || (mode === this.mode && !instant)) return;
     this.mode = mode;
+    if (mode === "dark" && this.baked && !this.baked.nightMap.value) void this.loadNight().catch(() => {});
     this.fadeBake(instant);
     this.modeTl?.kill();
     const dur = instant || this.opts.reducedMotion ? 0 : 1.1;

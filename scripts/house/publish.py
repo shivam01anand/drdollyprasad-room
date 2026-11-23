@@ -47,14 +47,16 @@ for tag in ("day", "night"):
     im.resize((min(2048, im.width),) * 2, Image.LANCZOS).save(os.path.join(dst, f"lm-{tag}-2k.webp"), quality=88, method=6)
     print(tag, "max", round(mx, 3), os.path.getsize(os.path.join(dst, f"lm-{tag}.webp")) // 1024, "KB")
 
-# the model: textures capped at 1024 and re-encoded as WebP, geometry Draco-compressed
+# the model: textures capped at 1024 and re-encoded as WebP (q72: the props and foliage are seen at
+# a distance, and the model is the longest part of the way in), geometry Draco-compressed
 import subprocess
 G = os.path.join(os.path.dirname(os.path.abspath(__file__)), "node_modules", ".bin", "gltf-transform")
 tmp = os.path.join(src, "_t")
 os.makedirs(tmp, exist_ok=True)
 subprocess.run([G, "resize", os.path.join(src, "house.glb"), f"{tmp}/a.glb", "--width", "1024", "--height", "1024"], check=True)
-subprocess.run([G, "webp", f"{tmp}/a.glb", f"{tmp}/b.glb", "--quality", "82"], check=True)
-subprocess.run([G, "draco", f"{tmp}/b.glb", os.path.join(dst, "house.glb")], check=True)
+subprocess.run([G, "webp", f"{tmp}/a.glb", f"{tmp}/b.glb", "--quality", "72", "--effort", "100"], check=True)
+subprocess.run([G, "draco", f"{tmp}/b.glb", os.path.join(dst, "house.glb"),
+                "--quantize-position", "14", "--quantize-normal", "10", "--quantize-texcoord", "14"], check=True)
 shutil.rmtree(tmp)
 info = json.load(open(os.path.join(build, "house.json")))
 

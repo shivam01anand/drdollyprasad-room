@@ -113,7 +113,7 @@ export class Rig {
    * unbroken dolly with a small rise, position leading and rotation
    * following by a few hundredths, as the original does.
    */
-  playIntro(start: Pose, onDone: () => void, delay = 0) {
+  playIntro(start: Pose, onDone: () => void, delay = 0, duration = 2.6) {
     this.introTl?.kill();
     if (this.reduced) {
       assign(this.pose, this.shots[0]);
@@ -127,9 +127,9 @@ export class Rig {
     const end = this.shots[0];
     const tl = gsap.timeline({ delay, onComplete: () => { this.enabled = true; onDone(); } });
     KEYS.forEach((k, i) =>
-      tl.to(this.pose[k], { 0: end[k][0], 1: end[k][1], 2: end[k][2], duration: 2.6, ease: "power2.inOut" }, i * 0.04)
+      tl.to(this.pose[k], { 0: end[k][0], 1: end[k][1], 2: end[k][2], duration, ease: "power2.inOut" }, i * 0.04)
     );
-    tl.to(this.lens, { fov: end.fov ?? this.baseFov, duration: 2.6, ease: "power2.inOut" }, 0);
+    tl.to(this.lens, { fov: end.fov ?? this.baseFov, duration, ease: "power2.inOut" }, 0);
     this.introTl = tl;
   }
 

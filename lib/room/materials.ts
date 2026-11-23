@@ -192,6 +192,10 @@ export type Library = {
   tile(role: Role): number;
   rotate(role: Role): boolean;
   textures: THREE.Texture[];
+  /** a surface photograph by "set:kind" */
+  texture(key: string): THREE.Texture | undefined;
+  /** a larger photograph, once Room has swapped it into the materials */
+  replace(key: string, t: THREE.Texture): void;
   dispose(): void;
 };
 
@@ -271,6 +275,8 @@ export function buildLibrary(
     tile: (r) => SPECS[r].tile,
     rotate: (r) => !!SPECS[r].rotate,
     textures: [...maps.values(), ...owned],
+    texture: (key) => maps.get(key),
+    replace(key, t) { maps.set(key, t); },
     dispose() {
       mats.forEach((m) => m.dispose());
       maps.forEach((t) => t.dispose());

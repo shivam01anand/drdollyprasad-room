@@ -44,3 +44,23 @@ for wid, a in sorted(art.items()):
         saved += before - b.tell()
         print(f"{wid:28s} {before // 1024:4d}K -> {b.tell() // 1024:4d}K  {im.size}")
 print(f"saved {saved / 1e6:.2f} MB")
+
+# what the house loads: a WebP of each, the same size (the JPEG stays as the fallback, lib/room/Room.ts)
+for wid in sorted(art):
+    p = os.path.join(ROOM, f"{wid}.jpg")
+    if os.path.exists(p):
+        Image.open(p).convert("RGB").save(os.path.join(ROOM, f"{wid}.webp"), "WEBP", quality=84, method=6)
+
+# the studio's welcome (components/Preloader, lib/welcome.ts): small WebPs, under 60 KB each
+WELCOME = os.path.join(ROOT, "public", "art", "welcome")
+os.makedirs(WELCOME, exist_ok=True)
+for wid in ["rickshaw-puller-and-coin", "rickshaw-rest-framed", "mother-and-child"]:
+    src = next(p for p in (os.path.join(ROOT, "public", "art", d, f"{wid}.jpg") for d in ("large", "works")) if os.path.exists(p))
+    im = Image.open(src).convert("RGB")
+    out = os.path.join(WELCOME, f"{wid}.webp")
+    for L, q in [(1000, 74), (960, 70), (900, 66), (800, 64)]:
+        k = min(1, L / max(im.size))
+        im.resize((round(im.width * k), round(im.height * k)), Image.LANCZOS).save(out, "WEBP", quality=q, method=6)
+        if os.path.getsize(out) <= 58 * 1024:
+            break
+    print(f"welcome {wid}: {os.path.getsize(out) // 1024}K")
