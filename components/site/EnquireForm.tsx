@@ -93,7 +93,6 @@ export default function EnquireForm() {
             <label htmlFor="q-kind">I’m asking about</label>
             <select id="q-kind" value={w ? "A painting" : kind} onChange={(e) => { setKind(e.target.value); if (e.target.value !== "A painting") setWork(""); }}>
               <option>A painting</option>
-              <option>A commission</option>
               <option>An exhibition or the press</option>
               <option>Something else</option>
             </select>
@@ -127,7 +126,7 @@ export default function EnquireForm() {
         <div className="field">
           <label htmlFor="q-msg">Message</label>
           <textarea id="q-msg" value={msg} onChange={(e) => setMsg(e.target.value)}
-                    placeholder={w ? `What would you like to know about ${w.title}?` : "Tell us what you are looking for."} />
+                    placeholder={w ? `What would you like to know about ${w.title}?` : "What are you looking for?"} />
         </div>
         <div style={{ display: "flex", gap: 10, flexWrap: "wrap" }}>
           {WHATSAPP && <button type="submit" className="btn btn-wa">Send on WhatsApp</button>}
@@ -156,7 +155,7 @@ export default function EnquireForm() {
           <div className="mail"><code>{EMAIL}</code>
             <button type="button" className="chip" onClick={copy} aria-live="polite">{copied ? "Copied" : "Copy"}</button>
           </div>
-          <p className="meta">Enquiries and commissions are welcome.</p>
+          <p className="meta">Enquiries are welcome.</p>
         </div>
       </aside>
     </div>

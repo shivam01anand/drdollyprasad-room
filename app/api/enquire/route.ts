@@ -39,7 +39,7 @@ export async function POST(req: Request) {
       from: process.env.ENQUIRY_FROM || "Dr Dolly Prasad website <onboarding@resend.dev>",
       to: [process.env.ENQUIRY_TO || EMAIL],
       subject: `${subject} (from ${name})`,
-      text: `${text}\n\n— Sent from the enquiry form on drdollyprasad.com`,
+      text: `${text}\n\nSent from the enquiry form on drdollyprasad.com`,
       ...(isEmail ? { reply_to: reply } : {}),
     }),
   }).catch(() => null);
