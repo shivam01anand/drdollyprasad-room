@@ -57,10 +57,10 @@ export default function About() {
       <section className="ab-band tone-light">
         <div className="wrap ab-split">
           <div className="ab-txt">
-            <p className="eyebrow">Five collections</p>
-            <h2>One painting from each</h2>
+            <p className="eyebrow">The collections</p>
+            <h2>What the everyday holds</h2>
             {STATEMENT.map((ln, i) => <p key={i} className="ab-p">{ln}</p>)}
-            <Link className="btn btn-solid" href="/series">The five collections</Link>
+            <Link className="btn btn-solid" href="/series">See the collections</Link>
           </div>
           <Roll label="One painting from each collection" items={paint(["child-among-flowers", "red-and-teal-door-lock", "milkman-on-bicycle", "elder-woman-portrait", "sacred-tree"])} />
         </div>
@@ -70,9 +70,8 @@ export default function About() {
         <div className="wrap ab-split">
           <div className="ab-txt">
             <p className="eyebrow">Who she paints</p>
-            <h2>People at work, and faces up close</h2>
-            <p className="ab-p">Many of the people she paints are at work, or waiting for the next job.</p>
-            <p className="ab-p">Of the three old men in Portraits, only Garv looks you in the eye.</p>
+            <h2>People from the street, one at a time</h2>
+            <p className="ab-p">Many of the people she paints are at work or waiting for the next job, and few of them would expect anyone to stop and paint them.</p>
           </div>
           <Roll label="People in her paintings" items={paint(["yellow-turban-portrait", "three-veiled-women", "boy-and-kettle", "red-turban-portrait", "mother-and-child"])} />
         </div>

@@ -65,7 +65,7 @@ export default function Home() {
         </div>
       </section>
       {/* R6 (Shubham 20 Oct 22:50): a still, smaller row, every painting at one height, never cropped (the hero above already moves) */}
-      <div className="series-row wrap" role="list" aria-label="The five collections">
+      <div className="series-row wrap" role="list" aria-label="The collections">
         {SERIES_PAGES.map((s) => (
           <Link key={s.slug} className="card m-card" role="listitem" href={`/series/${s.slug}`}>
             <div className="mat">
@@ -88,8 +88,8 @@ export default function Home() {
           <img className="round" src="/site/ex/kala-dolly.jpg" alt="Dr Dolly Prasad beside one of her paintings" loading="lazy" {...dims("/site/ex/kala-dolly.jpg")} />
           <div className="hw-intro">
             <p className="eyebrow">The artist</p>
-            <h2 id="hw-h">Paintings of what India walks past</h2>
-            <p className="hw-lede">Dr Dolly Prasad gives a copper pot or an old man’s worry the long look most people keep for a shrine. She works in New Delhi, mostly in oil, and her paintings are in private collections in India, the USA and the UK.</p>
+            <h2 id="hw-h">Paintings of what India hurries past</h2>
+            <p className="hw-lede">Dr Dolly Prasad gives a milk can or an old man’s worry the long look most people keep for a shrine. She works in New Delhi, mostly in oil, and her paintings are in private collections in India, the USA and the UK.</p>
             <Link className="link" href="/about">Her story →</Link>
           </div>
           <aside className="hw-press" aria-labelledby="hw-press-h">
@@ -145,7 +145,7 @@ export default function Home() {
         <div className="sec-head">
           <div>
             <h2>Available now</h2>
-            <p className="sec-line">Originals still with the artist.</p>
+            <p className="sec-line">Originals still with the artist, waiting for a wall of their own.</p>
           </div>
           <Link className="link" href="/works?status=available">All available →</Link>
         </div>

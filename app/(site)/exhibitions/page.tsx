@@ -30,7 +30,7 @@ export default function Exhibitions() {
   return (
     <>
     <WallHero columns={SHOW_WALL} label="Her exhibitions" eyebrow="2005 to 2026" title="Exhibitions" red="Exhibitions"
-              held="Nineteen exhibitions and art fairs, most in Delhi, others in Gurgaon, Jaipur and Bombay.">
+              held="Since 2005 the paintings have left home for nineteen exhibitions and art fairs, most of them in Delhi, others in Gurgaon, Jaipur and Bombay.">
       <a className="btn btn-solid" href={`#${shows[0].id}`}>See the shows</a>
       <a className="btn" href="#record">List of exhibitions</a>
     </WallHero>
@@ -103,7 +103,7 @@ export default function Exhibitions() {
           <div>
             <p className="eyebrow">List of exhibitions</p>
             <h2>{RECORD_LINE}</h2>
-            <p className="sec-line">Newest first. Some entries give only a place and a date.</p>
+            <p className="sec-line">The list runs from Sacred Fragments back to her first shows in 2005. Where the record is thin, an entry gives only a place and a date.</p>
           </div>
         </div>
         <ol className="timeline">

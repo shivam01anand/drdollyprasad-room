@@ -55,7 +55,7 @@ export const THEME = `Each painting in this house starts with something seen eve
 
 export const CHAPTERS: Chapter[] = [
   { id: "presence", eyebrow: "Bahaar · 2024 to 2025", stop: "Khwaab", room: "The courtyard", view: "presence", labels: ["woman-with-poppies"],
-    body: "The walk starts here in the courtyard and goes on through the house one room at a time." },
+    body: "Come in. The house begins in the courtyard, where spring got here first." },
   {
     id: "floral",
     eyebrow: "Bahaar · 2024 to 2025",
@@ -67,7 +67,7 @@ export const CHAPTERS: Chapter[] = [
   },
   { id: "canopy", eyebrow: "Bahaar · 2024 to 2025", stop: "Under Canopy of Greens", room: "The courtyard", view: "canopy", dusk: 0.04, labels: ["boy-with-bananas"],
     labelSide: "left",
-    body: "He is the only one in Bahaar with a load to carry, and even he has stopped to look straight back at you." },
+    body: "Even the boy under the banana leaves has stopped for spring, one hand steadying the bunch on his head." },
   // her corner by the banana: she paints at her easel, the theme paragraph beside her
   { id: "easel", eyebrow: "The everyday", stop: "At her easel", room: "The courtyard", body: THEME, view: "easel",
     via: "easelvia", dusk: 0.12,
@@ -97,7 +97,7 @@ export const CHAPTERS: Chapter[] = [
     via: "streetvia",
     // the framed print on its easel is 0.64 × 0.48 m (scripts/house/build.py press_easel)
     asides: [{ anchor: "press", title: "The artist, in conversation", line: "Beside “Before the Engines”, at her exhibition", size: [0.64, 0.48] }],
-    body: "The Red Room belongs to Gone Are The Days, and it opens with one painting from indoors and one from the road.",
+    body: "The Red Room belongs to the old street. It starts in the kitchen and goes out to the road.",
     ink: "light",
     view: "street",
     dusk: 0.38,
@@ -124,18 +124,18 @@ export const CHAPTERS: Chapter[] = [
   { id: "cartman", eyebrow: "Gone Are The Days · 2007 to 2018", stop: "Last of the Pedals · Ek Rupaya", room: "The gallery",
     view: "cartman", dusk: 0.5, labelSide: "below", labels: ["cycle-rickshaw", "rickshaw-rest-framed"],
     body: "These two men are in the same trade, one at work and one between fares, and neither gets to stop for long." },
-  { id: "panels", eyebrow: "Gone Are The Days · 2007 to 2018", stop: "Then and now", room: "The gallery",
+  { id: "panels", eyebrow: "Gone Are The Days · 2007 to 2018", stop: "Old road, new traffic", room: "The gallery",
     view: "panels", dusk: 0.52, labelSide: "below",
     labels: ["horse-cart-and-autorickshaw", "coins-and-clay-bank", "rickshaw-and-autorickshaw", "carriage-and-autorickshaw",
       "rickshaw-rest", "bullock-cart-and-truck"],
-    body: "Four of the six paintings here put the old way of getting about next to the engine that replaced it." },
+    body: "Here the tonga, the bullock cart and the hand-pulled rickshaw are still on the road, and an auto or a truck keeps them company." },
   // Faith, either side of the window onto the palm court
   { id: "shrine", eyebrow: "Faith · 2007 to 2026", stop: "Sharan · Aarti", room: "The gallery",
     view: "shrine", dusk: 0.52, labelSide: "below", labels: ["monk-and-green-buddha", "priest-with-flame"],
     body: "One man worships alone, and the other leads it for whoever comes." },
   { id: "gayatri", eyebrow: "Faith · 2007 to 2026", stop: "Gayatri · Vakratunda", room: "The gallery",
     view: "gayatri", dusk: 0.53, labelSide: "below", labels: ["prayer-and-scripture", "offering-of-light"],
-    body: "In these two, worship is the same words repeated until they belong to the person saying them." },
+    body: "Here prayer is something written down, then said until nobody needs the page." },
   {
     id: "portraits",
     ink: "light",

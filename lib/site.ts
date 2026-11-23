@@ -83,7 +83,7 @@ export const LINES: Record<string, string> = {
 /** the About "Five collections" paragraph: one painting from each collection, Shubham’s words, shown unsigned
  *  (content elevate 2026-11-22). The studio easel has its own text (lib/chapters.ts THEME); the two no longer share. */
 export const STATEMENT = [
-  "A little girl looks out at us from a wall of flowers. One door has not been opened in years. A milkman in a red turban rides off down a blue road. An old woman with white marks across her forehead does not smile for anyone. Someone has left marigolds at the foot of a peepal.",
+  "A little girl peeks sideways out of a wall of flowers. Nobody has come back yet to open a locked door, and a milkman in a red turban rides off along a blue road. An old woman with white marks across her forehead does not smile for anyone, and someone has left marigolds at the foot of a peepal.",
 ];
 
 export type Chapter = {

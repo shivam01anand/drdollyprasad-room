@@ -20,7 +20,7 @@ export default function Enquire() {
       </section>
       <EnquireForm />
     </div>
-    <IndigoBand title="The collections" line="Not sure which painting yet? Start with the five collections." href="/series" label="All collections">
+    <IndigoBand title="The collections" line="Not sure which painting yet? Spend a while with the collections first." href="/series" label="All collections">
       <div className="ibnd-chips">{SERIES_PAGES.map((s) => <Link key={s.slug} className="btn btn-light" href={`/series/${s.slug}`}>{s.label}</Link>)}</div>
     </IndigoBand>
     </>
