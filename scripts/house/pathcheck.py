@@ -15,10 +15,12 @@ import sys
 
 info = json.load(open(sys.argv[1]))
 NARROW = len(sys.argv) > 2 and sys.argv[2] == "narrow"
-ORDER = ["presence", "floral", "canopy", "easel", "bodhi", "faith", "street", "redwall",
-         "gallery", "rupaya", "cartman", "shrine", "gayatri", "portraits", "kadhai", "doodhwala", "panels", "featured", "plan"]
-VIA = {"easel": "easelvia", "bodhi": "threshold", "faith": "faithvia", "street": "streetvia", "redwall": "redvia", "gallery": "galleryvia",
-       "panels": "hallvia"}
+ORDER = ["presence", "floral", "canopy", "easel", "gallery", "rupaya", "cartman", "shrine", "gayatri", "portraits",
+         "kadhai", "doodhwala", "panels", "street", "redwall", "bodhi", "faith", "featured", "plan"]
+# the chapter "gallery" frames the view "hall" since the front doors opened (lib/chapters.ts)
+VIEW = {"gallery": "hall"}
+VIA = {"easel": "easelvia", "gallery": "frontdoor", "panels": "hallvia", "street": "redin", "redwall": "redvia",
+       "bodhi": "redout", "faith": "faithvia", "featured": "archout"}
 # passing poses the site defines itself (lib/chapters.ts PASSING), here in Blender coordinates
 PASSING = {"hallvia": {"eye": [8.6, -4.65, 1.62], "target": [12.6, -4.65, 1.6]}}
 cams = {k: (info["cams"].get(f"n:{k}") if NARROW else None) or v for k, v in info["cams"].items() if not k.startswith("n:")}
@@ -88,7 +90,7 @@ for i, k in enumerate(ORDER):
         if v:
             prev = v["yaw"]
         vias.append(v)
-    p = pose(cams[k], prev)
+    p = pose(cams[VIEW.get(k, k)], prev)
     prev = p["yaw"]
     poses.append(p)
 
