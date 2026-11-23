@@ -15,7 +15,7 @@ import sys
 
 info = json.load(open(sys.argv[1]))
 NARROW = len(sys.argv) > 2 and sys.argv[2] == "narrow"
-ORDER = ["presence", "floral", "canopy", "easel", "bodhi", "faith", "street", "redwall", "doors",
+ORDER = ["presence", "floral", "canopy", "easel", "bodhi", "faith", "street", "redwall",
          "gallery", "rupaya", "cartman", "shrine", "gayatri", "portraits", "kadhai", "doodhwala", "panels", "featured", "plan"]
 VIA = {"easel": "easelvia", "bodhi": "threshold", "faith": "faithvia", "street": "streetvia", "redwall": "redvia", "gallery": "galleryvia",
        "panels": "hallvia"}

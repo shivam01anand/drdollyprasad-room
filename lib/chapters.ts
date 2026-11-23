@@ -103,15 +103,15 @@ export const CHAPTERS: Chapter[] = [
     dusk: 0.38,
     labels: ["terracotta-pots", "bulls-and-wheel"],
   },
-  { id: "redwall", eyebrow: "Gone Are The Days · 2007 to 2018", stop: "Shree 420 · Evening at the Ghat", room: "The Red Room", view: "redwall",
-    via: "redvia", dusk: 0.45, labels: ["shree-420-and-milk-cans", "riverside-figures"],
-    body: "The day had its fixed points then, and this wall keeps the first and the last of them." },
-  // Bandh Darwaze, four doors a foot square on the Red Room’s north wall: a stop of their own,
-  // square on, so all four are seen and named together
-  { id: "doors", eyebrow: "Bandh Darwaze · 2018", stop: "Bandh Darwaze I to IV", room: "The Red Room", view: "doors",
-    dusk: 0.47, labelSide: "below",
-    labels: ["weathered-door-ring", "red-and-teal-door-lock", "teal-door-bolt", "carved-door-knocker"],
-    body: "Four shut doors, and behind each one a house waiting for a knock or for someone to come home." },
+  // Shree 420 and Evening at the Ghat on the east wall, Bandh Darwaze on the north wall to the left: one stop
+  // since the walk was shortened (2026-11-23). The view is the east wall's; the four doors come into it at the
+  // edge, are seen whole on the turn in from the street, and keep their labels here, so the list of stops,
+  // a painting's "See it in the studio" and a click still reach them. A phone frames the east wall (frame).
+  { id: "redwall", eyebrow: "Gone Are The Days · Bandh Darwaze · 2007 to 2018", stop: "Shree 420 · Bandh Darwaze", room: "The Red Room",
+    view: "redwall", via: "redvia", dusk: 0.45,
+    labels: ["shree-420-and-milk-cans", "riverside-figures", "weathered-door-ring", "red-and-teal-door-lock", "teal-door-bolt", "carved-door-knocker"],
+    frame: ["shree-420-and-milk-cans", "riverside-figures"],
+    body: "This corner is where the old street goes quiet, its doors shut for the night and its picture long since over." },
   // through the Red Room’s east doorway: the gallery hall, where the rest of her work hangs as an
   // exhibition hangs, one line at eye level, a series to a wall (scripts/house/build.py)
   { id: "gallery", ink: "light", eyebrow: "The gallery", stop: "The gallery", room: "The gallery",
