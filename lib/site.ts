@@ -351,6 +351,11 @@ const CAP: Record<string, string> = {
   "kala-painting": "Ek Rupaya, Kala Mela",
   "kala-selfie": "A visitor’s selfie with the paintings, Kala Mela",
   "kala-booklet": "The First International Kala Mela booklet",
+  "sf-01": "Dr Dolly Prasad between Under Canopy of Greens and Threads of Faith, India Habitat Centre",
+  "sf-02": "Dr Dolly Prasad beside the exhibition poster, India Habitat Centre",
+  "sf-03": "A visitor at the two paintings, India Habitat Centre",
+  "sf-04": "Dr Dolly Prasad and a visitor at Under Canopy of Greens, India Habitat Centre",
+  "sf-05": "A visitor photographs Under Canopy of Greens, India Habitat Centre",
 };
 const ph = (n: string, alt: string): Photo => ({ src: `/site/ex/${n}.jpg`, alt, ...(CAP[n] ? { cap: CAP[n] } : {}) });
 
@@ -367,6 +372,29 @@ export const NOW = {
   when: "18 to 21 October 2026", until: "2026-10-21",
   line: "Showing Threads of Faith and Under Canopy of Greens.",
   works: ["temple-bells", "boy-with-bananas"],
+};
+
+/**
+ * Sacred Fragments as a show with photographs (Shubham, 22 Nov 2026: Exhibitions and About lead with it).
+ * Kept out of SHOWS so the home page and the painting pages stay as they were.
+ * Photographs: 06_EXHIBITION_PHOTOS/New exhibition pics (sf-01 from the Under Canopy of Greens carousel,
+ * sf-03 to sf-05 from Sacred Fragments Reel 1), resized only.
+ */
+export const SACRED_FRAGMENTS: Show = {
+  id: NOW.id, title: "India Habitat Centre", name: NOW.title, kind: "Art exhibition",
+  where: `${NOW.venue}, ${NOW.city} · ${NOW.when}`,
+  venue: NOW.venue, city: NOW.city, when: NOW.when, year: "2026",
+  lede: "Under Canopy of Greens and Threads of Faith at the Visual Arts Gallery, India Habitat Centre.",
+  works: ["boy-with-bananas", "temple-bells"],
+  albums: [
+    { title: "The exhibition", line: "18 to 21 October 2026, Visual Arts Gallery.", photos: [
+      ph("sf-01", "Dr Dolly Prasad stands between her paintings Under Canopy of Greens and Threads of Faith at the Visual Arts Gallery, India Habitat Centre."),
+      ph("sf-02", "Dr Dolly Prasad beside the poster for Sacred Fragments: A Journey Home, 18 to 21 October 2026, at India Habitat Centre."),
+      ph("sf-03", "A visitor looks at Under Canopy of Greens and Threads of Faith."),
+      ph("sf-04", "Dr Dolly Prasad points to a detail of Under Canopy of Greens for a visitor."),
+      ph("sf-05", "A visitor photographs Under Canopy of Greens on his phone, Threads of Faith beside it."),
+    ] },
+  ],
 };
 
 /** the shows as first recorded (the Exhibitions hero wall keeps this column order and its tones) */
@@ -454,7 +482,7 @@ export const PRESS = {
 /** her record, as she lists it (drdollyprasad.wordpress.com/about), newest first */
 export type RecordEntry = { year: string; month?: string; venue: string; city: string; show?: string };
 export const RECORD: RecordEntry[] = [
-  { year: "2026", month: "October", venue: "Sacred Fragments: A Journey Home, Visual Arts Gallery, India Habitat Centre", city: "New Delhi" },
+  { year: "2026", month: "October", venue: "Sacred Fragments: A Journey Home, Visual Arts Gallery, India Habitat Centre", city: "New Delhi", show: "sacred-fragments" },
   { year: "2018", month: "October", venue: "International Art Fair", city: "Jaipur" },
   { year: "2018", month: "February", venue: "International Lalit Kala Art Fair (First International Kala Mela)", city: "Delhi", show: "kala-mela-2018" },
   { year: "2016", month: "March", venue: "Cabinet Secretariat Gallery", city: "Delhi" },
