@@ -301,7 +301,7 @@ html[data-room="off"] .sec:not(.sec-featured){display:none}
 }
 
 /* ------------------------------------------------------------- the welcome */
-/* warm paper, lamplight from above, her greeting; then an invitation to step inside */
+/* warm paper, lamplight from above, one of her paintings coming into colour as the house loads */
 .pre{position:fixed;inset:0;z-index:150;pointer-events:none}
 .pre-panel{position:absolute;inset:0;background:var(--page);overflow:hidden;pointer-events:auto}
 .pre-light{position:absolute;inset:-20% -10% 0;pointer-events:none;
@@ -309,24 +309,37 @@ html[data-room="off"] .sec:not(.sec-featured){display:none}
              radial-gradient(120% 90% at 50% 120%,rgba(120,80,50,.10),rgba(120,80,50,0) 60%)}
 .pre-welcome{position:absolute;inset:0;display:flex;flex-direction:column;align-items:center;justify-content:center;
   text-align:center;padding:0 var(--gut);gap:0}
-.pre-welcome [data-in]{visibility:visible}
-.pre-namaste{margin:0 0 clamp(10px,1.6vh,18px);font-family:"IBM Plex Sans Devanagari",var(--display);font-weight:500;
-  font-size:clamp(14px,1.1vw,17px);letter-spacing:.06em;color:var(--dim)}
-.pre-hello{margin:0;font-family:"Cormorant Garamond",Georgia,serif;font-style:normal;font-weight:500;
-  font-size:clamp(46px,7.2vw,116px);line-height:1.02;letter-spacing:-.012em;color:var(--ink);text-wrap:balance}
-.pre-hello span{display:inline-block;margin:0 .16em}
-.pre-sign{display:flex;gap:.32em;justify-content:center;margin-top:clamp(18px,3vh,30px)}
+/* her painting, a charcoal sketch filling with colour from the bottom up as the house loads (--pre-p, 0…1) */
+@property --pre-p{syntax:"<number>";inherits:true;initial-value:0}
+.pre-art{margin:0;display:flex;flex-direction:column;align-items:center;gap:clamp(12px,2vh,20px);
+  transition:--pre-p .5s cubic-bezier(.33,1,.68,1)}
+.pre-canvas{position:relative;height:min(58vh,calc((100vw - 2 * var(--gut)) / var(--ar,.765)));aspect-ratio:var(--ar,.765);
+  background:#E6DDCF;box-shadow:0 30px 70px -34px rgba(46,34,32,.45)}
+.pre-canvas img{position:absolute;inset:0;width:100%;height:100%;object-fit:cover;display:block}
+.pre-canvas img:not([src]){visibility:hidden}
+.pre-sketch{filter:grayscale(1) sepia(.12) contrast(1.3) brightness(1.22) blur(.35px);opacity:.82;mix-blend-mode:multiply}
+.pre-colour{--edge:calc(var(--pre-p) * 118% - 18%);
+  -webkit-mask-image:linear-gradient(to top,#000 var(--edge),transparent calc(var(--edge) + 18%));
+  mask-image:linear-gradient(to top,#000 var(--edge),transparent calc(var(--edge) + 18%))}
+/* the brand, made by the welcome and handed to the header (Preloader brandIn) */
 .pre-big{display:block;font-family:var(--display);font-weight:500;color:var(--ink);white-space:nowrap;
   font-size:clamp(20px,1.7vw,26px);line-height:1;letter-spacing:-.02em}
-.pre-note{margin:10px 0 0}
-.pre-foot{position:relative;margin-top:clamp(30px,6vh,64px);min-height:40px;display:flex;flex-direction:column;align-items:center}
-.pre-bar{position:absolute;top:22px;width:140px;height:1px;background:var(--rule);overflow:hidden;transition:opacity .5s ease}
-.pre-bar i{position:absolute;inset:0;background:var(--ink);transform-origin:0 50%;transform:scaleX(.02);transition:transform .4s ease}
-.pre-bar[data-ready="1"]{opacity:0}
-.pre-hero{
-  position:fixed;left:50%;top:50%;width:1px;height:1px;z-index:2;
-  visibility:hidden;opacity:0;object-fit:fill;transform-origin:50% 50%;
-  box-shadow:0 30px 70px -30px rgba(46,34,32,.35);
+.pre-art figcaption{display:flex;flex-direction:column;align-items:center;gap:4px}
+.pre-title{font-family:"Cormorant Garamond",Georgia,serif;font-weight:500;font-size:clamp(20px,1.7vw,26px);line-height:1.1;color:var(--ink)}
+.pre-by{margin:0;color:var(--dim)}
+.pre-foot{position:relative;margin-top:clamp(14px,2.6vh,26px);display:flex;flex-direction:column;align-items:center;gap:10px}
+.pre-bar{position:relative;width:min(220px,60vw);height:1px;background:var(--rule);overflow:hidden}
+.pre-bar i{position:absolute;inset:0;background:var(--ink);transform-origin:0 50%;transition:transform .5s cubic-bezier(.33,1,.68,1)}
+.pre-status{margin:0;color:var(--dim);font-variant-numeric:tabular-nums}
+.pre[data-finishing="1"] .pre-art,.pre[data-finishing="1"] .pre-bar i{transition-duration:.3s}
+.pre{transition:opacity .45s ease}
+.pre[data-out="1"]{opacity:0}
+.pre[data-out="1"] .pre-panel{pointer-events:none}
+@media (prefers-reduced-motion:reduce){
+  .pre-art,.pre-bar i,.pre{transition:none}
+  /* no sweep: the painting is shown in colour, and the line alone counts */
+  .pre-colour{-webkit-mask-image:none;mask-image:none}
+  .pre-sketch{display:none}
 }
 
 /* -------------------------------------------------------------- featured */

@@ -529,7 +529,6 @@ export default function Studio({ dims }: { dims: Dims }) {
   }, []);
 
   /* the preloader's callbacks are stable, so a re-render can never cut it off */
-  const getHeroRect = useCallback(() => roomRef.current?.heroRect() ?? null, []);
   const onLift = useCallback(() => { roomRef.current?.playIntro(); }, []);
   const onPreDone = useCallback(() => {}, []);
 
@@ -724,7 +723,7 @@ export default function Studio({ dims }: { dims: Dims }) {
       </div>
 
       <Preloader key={loadEpoch} ref={preRef} pct={pct} loaded={loaded} failed={failed}
-                 getHeroRect={getHeroRect} onLift={onLift} onDone={onPreDone} />
+                 onLift={onLift} onDone={onPreDone} />
 
       {/* always on screen, from the first frame: the way back to the website */}
       <a className="studio-exit" href="/" aria-label="Exit the studio and go back to the website">
