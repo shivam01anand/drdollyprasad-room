@@ -5,6 +5,7 @@ import { CHAPTERS } from "@/lib/chapters";
 import { BY_ID, details, quoted, statusLabel, type Work } from "@/lib/works";
 import { gsap, reducedMotion, scrambleTo } from "@/lib/motion";
 import type { Room } from "@/lib/room/Room";
+import { clearWalkEdges } from "@/lib/walk-edges";
 
 /**
  * The wall labels. Each canvas in a chapter's framing gets a small printed
@@ -31,8 +32,8 @@ const DENSE = new Set(CHAPTERS.filter((c) => c.labelSide === "below").flatMap((c
 const ASIDES = CHAPTERS.flatMap((c) => (c.asides ?? []).map((a) => ({ key: `${c.id}:${a.anchor}`, chapter: c.id, ...a })));
 /** the medium, on a close group's short card, only where it is not the usual oil on canvas */
 const denseLine = (w: Work) => [w.medium === "Oil on canvas" ? "" : w.medium, details(w)].filter(Boolean).join(" · ");
-/** what a card must stand clear of: the chapter's words, the header, the controls, the side tab */
-const CHROME = ".copy-panel[data-on='1'], .brand, .hud-meta, .hud-mail, .diya-btn, .studio-exit, .hud-bottom > *, .qi[data-live='1'] .qi-tab";
+/** what a card must stand clear of: the chapter's words, the header, the controls, the side tab, the walk's edge arrows */
+const CHROME = ".copy-panel[data-on='1'], .brand, .hud-meta, .hud-mail, .diya-btn, .studio-exit, .hud-bottom > *, .qi[data-live='1'] .qi-tab, .walk-edge:not(:disabled), .walk-hint";
 type Rect = { x0: number; y0: number; x1: number; y1: number };
 type Side = "right" | "left" | "below" | "above";
 const GAP = 18;
@@ -214,6 +215,8 @@ export default function WallLabels({ room, active, live, onOpen }: {
       const first = !placed;
       const redo = !!placed && resized;
       resized = false;
+      // (the walk's arrows first find their place, so the cards stand clear of it)
+      if (!placed || redo) clearWalkEdges(R.artRects());
       if (!placed) placed = place(rects, [...R.artRects(), ...things]);
       else if (redo) {
         // placed again for the new size: a card that no longer fits goes, one that now fits comes
