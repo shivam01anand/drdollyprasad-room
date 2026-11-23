@@ -21,7 +21,7 @@ export default function WorksPage() {
   return (
     <>
     <WallHero columns={WORKS_WALL} label="Her paintings" title="Works" red="Works"
-              held={`All ${WORKS.length} paintings, in five collections.`}>
+              held={`All ${WORKS.length} paintings on one wall. Walk it at your own pace.`}>
       <a className="btn btn-solid" href="#all">See the paintings</a>
     </WallHero>
     <section id="all" style={{ scrollMarginTop: 110 }}>
@@ -34,10 +34,10 @@ export default function WorksPage() {
           <b>Follow {INSTAGRAM.handle} on Instagram</b>
           <span className="link" style={{ display: "inline-flex", gap: 8, alignItems: "center" }}><InstagramIcon />{INSTAGRAM.handle} →</span>
         </a>
-        <p className="meta" style={{ marginTop: 18 }}>Looking for something in particular? <Link href="/enquire">Ask about a painting</Link>, or see <Link href="/series">the five collections</Link>.</p>
+        <p className="meta" style={{ marginTop: 18 }}>Looking for one painting in particular? <Link href="/enquire">Ask about it</Link>, or read <Link href="/series">the stories behind the collections</Link>.</p>
       </section>
     </div>
-    <IndigoBand title="The collections" line="Read the story of each collection, from Bahaar to Faith." href="/series" label="All collections">
+    <IndigoBand title="The collections" line="Each collection tells its own story. Start with the painting that stopped you." href="/series" label="All collections">
       <div className="ibnd-chips">{SERIES_PAGES.map((s) => <Link key={s.slug} className="btn btn-light" href={`/series/${s.slug}`}>{s.label}</Link>)}</div>
     </IndigoBand>
     </>
