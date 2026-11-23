@@ -724,7 +724,7 @@ export default function Studio({ dims }: { dims: Dims }) {
   // the chapter in view, for the header's "you are here"
   const here = ready ? CHAPTERS[active]?.id : undefined;
 
-  // a link to one painting (its own page's "See it in her studio", or a shared /#work=<id>): once
+  // a link to one painting (its own page's "See it in the studio", or a shared /#work=<id>): once
   // the house is open, walk to the wall it hangs on and open it there; /#works goes to the collage
   useEffect(() => {
     if (!ready || failed) return;

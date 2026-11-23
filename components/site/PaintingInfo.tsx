@@ -35,7 +35,7 @@ export default function PaintingInfo({ w, place = "page", titleId }: { w: Work; 
       <div className="side-small">
         <a href={INSTAGRAM.url} target="_blank" rel="noopener noreferrer"><InstagramIcon />Instagram</a>
         {place === "page"
-          ? <a href={`${STUDIO_PATH}#work=${w.id}`}>In her studio →</a>
+          ? <a href={`${STUDIO_PATH}#work=${w.id}`}>See it in the studio →</a>
           : <Link href={workPath(w.id)}>See the painting →</Link>}
         <Share title={`${quoted(w.title)} · Dr Dolly Prasad`} path={workPath(w.id)} className="link share-btn" />
       </div>

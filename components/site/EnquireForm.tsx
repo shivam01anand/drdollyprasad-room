@@ -1,8 +1,8 @@
 "use client";
 
 import { useEffect, useRef, useState } from "react";
-import { EMAIL, SITE, WHATSAPP, quoted, workPath } from "@/lib/site";
-import { BY_ID, WORKS } from "@/lib/works";
+import { EMAIL, SERIES_PAGES, SITE, WHATSAPP, collectionOrder, quoted, workPath } from "@/lib/site";
+import { BY_ID } from "@/lib/works";
 import { paintingProperties, track } from "@/lib/analytics";
 
 /**
@@ -101,7 +101,8 @@ export default function EnquireForm() {
             <label htmlFor="q-work">Painting (optional)</label>
             <select id="q-work" value={work} onChange={(e) => setWork(e.target.value)}>
               <option value="">Choose a painting</option>
-              {WORKS.map((x) => <option key={x.id} value={x.id}>{x.title}{x.status === "Sold" ? " (in a private collection)" : ""}</option>)}
+              {/* newest collection first, each in its chapter order */}
+              {SERIES_PAGES.flatMap((s) => collectionOrder(s.slug)).map((id) => BY_ID.get(id)!).map((x) => <option key={x.id} value={x.id}>{x.title}{x.status === "Sold" ? " (in a private collection)" : ""}</option>)}
             </select>
           </div>
         </div>

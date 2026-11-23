@@ -62,7 +62,7 @@ export default function About() {
             {STATEMENT.map((ln, i) => <p key={i} className="ab-p">{ln}</p>)}
             <Link className="btn btn-solid" href="/series">The five collections</Link>
           </div>
-          <Roll label="One painting from each collection" items={paint(["red-and-teal-door-lock", "milkman-on-bicycle", "sacred-tree", "elder-woman-portrait", "child-among-flowers"])} />
+          <Roll label="One painting from each collection" items={paint(["child-among-flowers", "red-and-teal-door-lock", "milkman-on-bicycle", "elder-woman-portrait", "sacred-tree"])} />
         </div>
       </section>
 
@@ -74,7 +74,7 @@ export default function About() {
             <p className="ab-p">Many of the people she paints are at work, or waiting for the next job.</p>
             <p className="ab-p">Of the three old men in Portraits, only Garv looks you in the eye.</p>
           </div>
-          <Roll label="People in her paintings" items={paint(["red-turban-portrait", "three-veiled-women", "boy-and-kettle", "yellow-turban-portrait", "mother-and-child"])} />
+          <Roll label="People in her paintings" items={paint(["yellow-turban-portrait", "three-veiled-women", "boy-and-kettle", "red-turban-portrait", "mother-and-child"])} />
         </div>
       </section>
 

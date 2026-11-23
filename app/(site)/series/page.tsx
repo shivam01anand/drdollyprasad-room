@@ -24,7 +24,7 @@ export default function SeriesIndex() {
   return (
     <>
       <WallHero size="dir" columns={SERIES_HERO_WALL} label="The five collections" eyebrow="Five collections" title="Collections" red="Collections"
-                sub={<>Forty-one paintings in five <span className="red">collections</span>, newest first.</>}>
+                sub={<>Forty-one paintings in five collections, newest first.</>}>
         <Link className="btn btn-solid" href="/series/bahaar">Start with Bahaar</Link>
       </WallHero>
 
@@ -34,7 +34,8 @@ export default function SeriesIndex() {
         const works = worksIn(s.label);
         // the row opens on the collection's lead painting (unchanged), then the rest, sold last
         const lead = LEAD[s.slug] ?? s.hero;
-        const rest = works.filter((w) => w.id !== lead && !SMALL_PHOTO.has(w.id))
+        // Sabr opens the Portraits story (2026-11-22), so its small photo stays in the band; the other small photos stay out
+        const rest = works.filter((w) => w.id !== lead && (w.id === "elder-woman-portrait" || !SMALL_PHOTO.has(w.id)))
           .sort((a, b) => Number(a.status === "Sold") - Number(b.status === "Sold"));
         const row = [...works.filter((w) => w.id === lead), ...rest];
         return (

@@ -159,7 +159,6 @@ export default function Home() {
         <div className="wrap ig-in">
           <div className="txt">
             <h2>Follow {INSTAGRAM.handle}</h2>
-            <p className="meta ig-sub">The paintings go up one at a time, each with a few lines of its story.</p>
             <div className="ig-ctas">
               <a className="btn btn-solid" href={INSTAGRAM.url} target="_blank" rel="noopener noreferrer"><InstagramIcon />Open Instagram</a>
               <Link className="btn" href="/enquire">Enquire</Link>
