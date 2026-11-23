@@ -111,7 +111,7 @@ export const CHAPTERS: Chapter[] = [
     view: "redwall", via: "redvia", dusk: 0.45,
     labels: ["shree-420-and-milk-cans", "riverside-figures", "weathered-door-ring", "red-and-teal-door-lock", "teal-door-bolt", "carved-door-knocker"],
     frame: ["shree-420-and-milk-cans", "riverside-figures"],
-    body: "This corner is where the old street goes quiet, its doors shut for the night and its picture long since over." },
+    body: "The day winds down in this corner, the film on the poster long over, and on the wall beside it the doors stay shut to the lane." },
   // through the Red Room’s east doorway: the gallery hall, where the rest of her work hangs as an
   // exhibition hangs, one line at eye level, a series to a wall (scripts/house/build.py)
   { id: "gallery", ink: "light", eyebrow: "The gallery", stop: "The gallery", room: "The gallery",
