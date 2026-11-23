@@ -61,9 +61,9 @@ export default function QuickIndex({ active, live, onStop, onWorks, onPlan, onCo
         <div className="qi-works">
           <button type="button" onClick={go(() => onWorks("all"))}>All her work <span>{n("all")}</span></button>
           <button type="button" onClick={go(() => onWorks("available"))}>Available <span>{n("available")}</span></button>
-          <button type="button" onClick={go(() => onWorks("sold"))}>Sold <span>{n("sold")}</span></button>
+          <button type="button" onClick={go(() => onWorks("sold"))}>In private collections <span>{n("sold")}</span></button>
         </div>
-        <p className="lab qi-h">The house</p>
+        <p className="lab qi-h">The walk</p>
         <ol className="qi-stops">
           {walk.map((c) => {
             const i = CHAPTERS.indexOf(c);

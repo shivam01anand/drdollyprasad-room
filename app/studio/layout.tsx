@@ -6,7 +6,7 @@ import "../globals.css";
 
 export const metadata: Metadata = {
   title: "The studio",
-  description: "Walk through Dr Dolly Prasad’s studio: a courtyard, a quiet room, a red room and a gallery, with her paintings on the walls.",
+  description: "A virtual house hung with Dr Dolly Prasad’s paintings at their true size: a courtyard, a quiet room, a red room and a gallery.",
   alternates: { canonical: "/studio" },
 };
 

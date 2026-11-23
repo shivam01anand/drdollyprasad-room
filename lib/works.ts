@@ -33,21 +33,21 @@ const W = (id: string, title: string, series: string, status: Status, extra: Par
   ({ id, title, series, status, medium: OIL, ...extra });
 
 const CATALOGUE: Work[] = [
-  // Gone Are The Days: 2010 to 2018
-  W("rickshaw-puller-and-coin", "Twenty Paise", "Gone Are The Days", "Available", { year: "2016", size: "48 × 36 in", inches: 48, medium: "Oil and charcoal" }),
-  W("carriage-and-autorickshaw", "Aakhri Savaari", "Gone Are The Days", "Available", { year: "2016", size: "24 × 24 in", inches: 24 }),
-  W("bullock-cart-and-truck", "Dheere Dheere", "Gone Are The Days", "Available", { year: "2016", size: "24 × 24 in", inches: 24 }),
-  W("rickshaw-rest-framed", "Ek Rupaya", "Gone Are The Days", "Available", { year: "2016", size: "48 × 36 in", inches: 48, medium: "Oil and charcoal" }),
+  // Gone Are The Days: 2007 to 2018 (01-04, 06, 08, 14 re-dated to 2010 from the IHC photos, Shubham 2026-11-22)
+  W("rickshaw-puller-and-coin", "Twenty Paise", "Gone Are The Days", "Available", { year: "2010", size: "48 × 36 in", inches: 48, medium: "Oil and charcoal" }),
+  W("carriage-and-autorickshaw", "Aakhri Savaari", "Gone Are The Days", "Available", { year: "2010", size: "24 × 24 in", inches: 24 }),
+  W("bullock-cart-and-truck", "Dheere Dheere", "Gone Are The Days", "Available", { year: "2010", size: "24 × 24 in", inches: 24 }),
+  W("rickshaw-rest-framed", "Ek Rupaya", "Gone Are The Days", "Available", { year: "2010", size: "48 × 36 in", inches: 48, medium: "Oil and charcoal" }),
   W("coins-and-clay-bank", "Gullak", "Gone Are The Days", "Available", { year: "2010", size: "36 × 36 in", inches: 36 }),
-  W("postbox-and-stamps", "Patra Petika", "Gone Are The Days", "Available", { year: "2017", size: "48 × 36 in", inches: 48 }),
+  W("postbox-and-stamps", "Patra Petika", "Gone Are The Days", "Available", { year: "2010", size: "48 × 36 in", inches: 48 }),
   W("mother-india-and-kettles", "Mother India", "Gone Are The Days", "Available", { year: "2017", size: "48 × 36 in", inches: 48 }),
-  W("shree-420-and-milk-cans", "Shree 420", "Gone Are The Days", "Available", { year: "2017", size: "48 × 36 in", inches: 48 }),
+  W("shree-420-and-milk-cans", "Shree 420", "Gone Are The Days", "Available", { year: "2010", size: "48 × 36 in", inches: 48 }),
   W("bulls-and-wheel", "Before the Engines", "Gone Are The Days", "Available", { year: "2010", size: "48 × 48 in", inches: 48 }),
   W("cycle-rickshaw", "Last of the Pedals", "Gone Are The Days", "Available", { year: "2018", size: "36 × 48 in", inches: 48 }),
   W("rickshaw-rest", "Thodi Der", "Gone Are The Days", "Sold", { year: "2018", size: "36 × 36 in", inches: 36 }),
   W("horse-cart-and-autorickshaw", "A Ride Together", "Gone Are The Days", "Available", { year: "2016", size: "24 × 24 in", inches: 24 }),
   W("rickshaw-and-autorickshaw", "Guzra Zamana", "Gone Are The Days", "Available", { year: "2016", size: "24 × 24 in", inches: 24 }),
-  W("terracotta-pots", "Mitti", "Gone Are The Days", "Available", { year: "2015", size: "36 × 36 in", inches: 36 }),
+  W("terracotta-pots", "Mitti", "Gone Are The Days", "Available", { year: "2010", size: "36 × 36 in", inches: 36 }),
   // Bandh Darwaze: 2018, one foot square
   W("weathered-door-ring", "Bandh Darwaze I", "Bandh Darwaze", "Available", { year: "2018", size: "12 × 12 in", inches: 12 }),
   W("red-and-teal-door-lock", "Bandh Darwaze II", "Bandh Darwaze", "Available", { year: "2018", size: "12 × 12 in", inches: 12 }),
@@ -110,12 +110,13 @@ export const WORKS: Work[] = CATALOGUE.map(shapeSize);
 
 export const BY_ID = new Map(WORKS.map((w) => [w.id, w]));
 
+/** the studio's Works section, newest first like every collection listing (kb/decisions.md 2026-11-22) */
 export const SERIES: { label: string; note: string }[] = [
-  { label: "Gone Are The Days", note: "2007 to 2018 · oil on canvas" },
-  { label: "Bandh Darwaze", note: "Closed Doors · 2018 · 12 × 12 in each" },
-  { label: "Faith", note: "2007 to 2026" },
-  { label: "Portraits", note: "2007 to 2012" },
   { label: "Bahaar", note: "2024 to 2025" },
+  { label: "Bandh Darwaze", note: "Closed Doors · 2018 · 12 × 12 in each" },
+  { label: "Gone Are The Days", note: "2007 to 2018 · oil on canvas" },
+  { label: "Portraits", note: "2007 to 2012" },
+  { label: "Faith", note: "2007 to 2026" },
 ];
 
 /** the featured row, in hanging order; the large files exist for these */
@@ -164,8 +165,9 @@ export const quoted = (title: string) => `“${title}”`;
 /** a caption's second line: her stated size and the year, where known */
 export const details = (w: Work) => [w.size, w.year].filter(Boolean).join(" · ");
 
-/** the status as a caption states it; a sold work also carries the gallery's red dot */
-export const statusLabel = (w: Work) => (w.status === "Enquire" ? "On enquiry" : w.status);
+/** the status as a caption states it; a sold work also carries the gallery's red dot.
+ *  "In a private collection" replaces "Sold" (kb/decisions.md 2026-11-22), as on the website and the painting card */
+export const statusLabel = (w: Work) => (w.status === "Enquire" ? "On enquiry" : w.status === "Sold" ? "In a private collection" : w.status);
 
 /** what the status pill says */
 export const pill = (w: Work) => (w.status === "Enquire" ? "Enquire ↗" : w.status);

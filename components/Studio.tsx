@@ -844,7 +844,7 @@ export default function Studio({ dims }: { dims: Dims }) {
             {/* (kept in place, unseen, at the first stop, so the wall labels already stand clear of it) */}
             {(coach || active === 0) && (
               <p className="walk-hint lab" role="status" data-on={coach ? "1" : "0"}>
-                {coarse.current ? "Swipe or tap › to walk" : "Scroll, use ← → or click ›"}
+                {coarse.current ? "Swipe or tap › to walk" : "Scroll, press ← → or click › to walk"}
               </p>
             )}
           </div>
@@ -887,7 +887,7 @@ export default function Studio({ dims }: { dims: Dims }) {
               <Featured dims={dims} onOpen={(id, img) => lbRef.current?.open(id, img, FEATURED)} />
             </section>
           ) : (
-            <section className="sec" key={c.id} data-chapter={c.id} aria-label={c.eyebrow}>
+            <section className="sec" key={c.id} data-chapter={c.id} aria-label={c.stop}>
               {(c.body || c.verse) && (
                 <div className="chapter-text">
                   <h2 className="lab">{c.eyebrow}</h2>
