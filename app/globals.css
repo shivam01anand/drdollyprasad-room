@@ -274,33 +274,32 @@ html[data-gliding="1"]{scroll-snap-type:none}
 .poem{margin:0;font-size:clamp(18px,1.45vw,21px);line-height:1.4;letter-spacing:-.008em}
 .poem-line{display:block;min-height:1.42em}
 
-/* the wall labels: a printed card beside each canvas, as a gallery hangs it */
+/* the wall labels: lettered on the wall under each frame, left edge to left edge, as a gallery sets
+   them. No card: their ink is read from the wall behind them (components/WallLabels: data-ink) */
 .wall-labels{position:fixed;inset:0;z-index:2;pointer-events:none;overflow:hidden}
-/* a hang in one line (the gallery's walls): narrower cards, centred under their canvases */
-.wall-labels[data-dense="1"] .wall-label{max-width:170px;padding:7px 10px 8px}
-/* a close group's cards keep a short line: size and year, no medium (components/WallLabels) */
-.wall-labels[data-dense="1"] .cap-status{margin-top:2px}
+.wall-label,.label-rest{--cap:#211B17;--cap-halo:243,238,229;color:var(--cap);
+  text-shadow:0 0 2px rgba(var(--cap-halo),.65),0 0 8px rgba(var(--cap-halo),.6),0 0 18px rgba(var(--cap-halo),.42);
+  transition:color .3s ease,text-shadow .3s ease}
+.wall-label[data-ink="light"],.label-rest[data-ink="light"]{--cap:#F4EEE3;--cap-halo:20,14,10}
 .wall-label{position:absolute;left:0;top:0;display:flex;flex-direction:column;gap:1px;max-width:214px;
-  padding:9px 12px 10px;margin:0;border:0;border-radius:1px;background:#F3EEE5;text-align:left;font:inherit;
-  box-shadow:0 1px 1px rgba(48,32,22,.14),0 8px 16px -10px rgba(48,32,22,.45);
+  padding:0;margin:0;border:0;border-radius:0;background:none;text-align:left;font:inherit;
   cursor:pointer;pointer-events:auto;visibility:hidden;opacity:0;will-change:transform}
-.wall-label .cap-title{font-size:13.5px;color:#302722;min-height:0}
-.wall-label .cap-details,.wall-label .cap-status{font-size:11.5px;letter-spacing:.01em;text-transform:none;color:#6c5f54;min-height:0}
-.wall-label .cap-status{margin-top:3px}
+/* (a finger needs more than a line of type to land on) */
+.wall-label::after{content:"";position:absolute;inset:-9px -8px}
+.wall-label .cap-title{font-size:14px;line-height:1.28;color:inherit;min-height:0;text-wrap:wrap}
+.wall-label .cap-details,.wall-label .cap-status{font-size:13px;line-height:1.4;letter-spacing:0;text-transform:none;color:inherit;opacity:.9;min-height:0}
+.wall-label .cap-status{margin-top:1px}
 .wall-label:focus-visible{outline:2px solid var(--oxide);outline-offset:3px}
-.wall-label.is-aside{cursor:default;pointer-events:none;background:rgba(243,238,229,.92)}
-html[data-mode="dark"] .wall-label{background:#DDD4C6;box-shadow:0 1px 1px rgba(0,0,0,.3),0 8px 18px -10px rgba(0,0,0,.6)}
-/* a card with no room for its details keeps its title (components/WallLabels) */
+.wall-label.is-aside{cursor:default;pointer-events:none}
+/* a crowded wall is lettered with titles alone: the rest is on the painting's card (components/WallLabels) */
 .wall-label[data-compact="1"] .cap-details,.wall-label[data-compact="1"] .cap-status{display:none}
-/* the works at a stop with no room for a card at all, named in a line along the foot */
-.label-rest{position:absolute;left:0;top:0;display:flex;flex-wrap:wrap;align-items:baseline;gap:2px 12px;width:max-content;
-  padding:8px 12px 9px;background:#F3EEE5;border-radius:1px;box-shadow:0 1px 1px rgba(48,32,22,.14),0 8px 16px -10px rgba(48,32,22,.45);
-  visibility:hidden;opacity:0;pointer-events:auto;will-change:transform}
-.label-rest-h{font-size:10px;color:#6c5f54;margin-right:2px}
-.label-rest button{background:none;border:0;padding:0;font:inherit;font-family:var(--display);font-size:13px;color:#302722;cursor:pointer}
+/* the works at a stop with no room for a label at all, named in a line along the foot */
+.label-rest{position:absolute;left:0;top:0;display:flex;flex-wrap:wrap;align-items:baseline;gap:2px 14px;width:max-content;
+  padding:0;visibility:hidden;opacity:0;pointer-events:auto;will-change:transform}
+.label-rest-h{font-size:13px;letter-spacing:.04em;color:inherit;opacity:.84;margin-right:2px}
+.label-rest button{background:none;border:0;padding:0;font:inherit;font-family:var(--display);font-size:14px;color:inherit;text-shadow:inherit;cursor:pointer}
 .label-rest button[hidden]{display:none}
 .label-rest button:hover{text-decoration:underline;text-underline-offset:3px}
-html[data-mode="dark"] .label-rest{background:#DDD4C6}
 html[data-room="off"] .wall-labels{display:none}
 
 .room-off{position:relative;z-index:2;margin:0;padding:calc(var(--hud-top) + 24px) var(--gut) 0;color:var(--ink)}
@@ -499,11 +498,8 @@ html[data-room="off"] .sec:not(.sec-featured){display:none}
   .pill{font-size:10.5px;height:40px;padding:0 14px}
   .diya-btn{width:42px;height:42px}
   .copy-panel{left:var(--gut);right:var(--gut);width:auto;max-width:none;bottom:calc(var(--hud-bottom) + 14px)}
-  .wall-label{max-width:176px;padding:7px 10px 8px}
-  .wall-labels[data-dense="1"] .wall-label{max-width:176px}
   /* the music joins the diya in the corner on a phone */
   .hud-top{grid-template-columns:1fr auto auto}
-  .wall-label .cap-title{font-size:12.5px}
   .copy-head{margin-bottom:5px}
   .lede{font-size:16px;line-height:1.5}
   .poem{font-size:17px;line-height:1.36}
