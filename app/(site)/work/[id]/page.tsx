@@ -77,7 +77,7 @@ export default async function WorkPage({ params }: Props) {
     .sort((a, b) => Number(a.status === "Sold") - Number(b.status === "Sold")).slice(0, 4);
 
   // elevate (26 Nov 2026): a stable @id, the painting's own line (kb/paintings.json description, as shown on this page),
-  // the largest file, her one Person @id, and the availability the page itself states (nothing where it says "on enquiry")
+  // the largest file, her one Person @id
   const ld = {
     "@context": "https://schema.org",
     "@type": "VisualArtwork",
@@ -89,7 +89,6 @@ export default async function WorkPage({ params }: Props) {
     artform: "Painting",
     artMedium: w.medium,
     creator: { "@type": "Person", "@id": PERSON_ID, name: "Dr Dolly Prasad", url: SITE },
-    ...(w.status === "Available" || sold ? { offers: { "@type": "Offer", url: `${SITE}${workPath(id)}`, availability: `https://schema.org/${sold ? "SoldOut" : "InStock"}` } } : {}),
     ...(shownYear(w) ? { dateCreated: shownYear(w) } : {}),
     ...(size ? {
       width: { "@type": "QuantitativeValue", value: size.width, unitCode: "INH" },
