@@ -4,6 +4,9 @@ import { useEffect, useRef, useState } from "react";
 import { EMAIL, SERIES_PAGES, SITE, WHATSAPP, collectionOrder, quoted, workPath } from "@/lib/site";
 import { BY_ID } from "@/lib/works";
 import { paintingProperties, track } from "@/lib/analytics";
+import { dims } from "@/lib/images";
+import { altOf } from "@/lib/alt";
+import Pic from "./Pic";
 
 /**
  * An enquiry, written once and sent the way the visitor prefers: WhatsApp
@@ -12,6 +15,8 @@ import { paintingProperties, track } from "@/lib/analytics";
  * is not set up (or fails), the visitor's mail app opens with the message
  * ready, as before. The message names the painting and links its page. The
  * email address is always shown as text with a copy button.
+ * Arriving from a painting (?work=), the form opens on that painting, framed, with its title and size;
+ * the two pickers stay folded behind "Change" (elevate, 26 Nov 2026).
  */
 export default function EnquireForm() {
   const [work, setWork] = useState("");
@@ -24,6 +29,8 @@ export default function EnquireForm() {
   const [sent, setSent] = useState<"" | "wa" | "mail" | "sending" | "sent">("");
   const [trap, setTrap] = useState("");
   const started = useRef(false);
+  // the pickers are folded away while the form shows the painting it was opened for
+  const [picking, setPicking] = useState(false);
 
   useEffect(() => {
     const id = new URLSearchParams(location.search).get("work");
@@ -88,7 +95,17 @@ export default function EnquireForm() {
   return (
     <div className="enq">
       <form onFocusCapture={start} onSubmit={WHATSAPP ? (e) => { e.preventDefault(); viaWa(); } : viaMail}>
-        <div className="two">
+        {w && !picking && (
+          <div className="enq-about">
+            <Pic className="framed thin" src={`/site/thumbs/${w.id}.jpg`} alt={altOf(w)} sizes="120px" eager {...dims(`/site/thumbs/${w.id}.jpg`)} />
+            <p>
+              <b>{w.title}</b>
+              {w.size && <span className="meta">{w.size}</span>}
+              <button type="button" className="link" onClick={() => setPicking(true)}>Change</button>
+            </p>
+          </div>
+        )}
+        <div className="two" hidden={!!w && !picking}>
           <div className="field">
             <label htmlFor="q-kind">I’m asking about</label>
             <select id="q-kind" value={w ? "A painting" : kind} onChange={(e) => { setKind(e.target.value); if (e.target.value !== "A painting") setWork(""); }}>
@@ -151,7 +168,7 @@ export default function EnquireForm() {
       </form>
 
       <aside>
-        <div className="note">
+        <div className="note note-plain">
           <b>Write directly</b>
           <div className="mail"><code>{EMAIL}</code>
             <button type="button" className="chip" onClick={copy} aria-live="polite">{copied ? "Copied" : "Copy"}</button>
