@@ -49,6 +49,9 @@ type Spec = {
    *  for metals, where the colour is the metal and the photograph is wear */
   detail?: SetName;
   detailTile?: number;
+  /** below this height (the open ground round the house, seen whole from above at the plan) the
+   *  photograph is mixed with a second, larger and turned sample of itself, so its repeat makes no grid */
+  breakBelow?: number;
 };
 
 export const SPECS: Record<Role, Spec> = {
@@ -59,7 +62,7 @@ export const SPECS: Record<Role, Spec> = {
   field:     { set: "plaster", tint: [0.66, 0.135, 0.07], tile: 2.0, macro: 0.08, grime: true, normal: 0.5, env: 0.7 },
   court:     { set: "plaster", tint: [1.84, 1.8, 1.6], tile: 2.4, macro: 0.12, grime: true, env: 0.6 },
   floor:     { set: "floor", tint: 0xf3ebe0, tile: 2.8, macro: 0.07, env: 0.8, roughness: 1.0 },
-  stone:     { set: "floor", tint: 0xe2d6c4, tile: 1.6, macro: 0.05, env: 0.8 },
+  stone:     { set: "floor", tint: 0xe2d6c4, tile: 1.6, macro: 0.05, env: 0.8, breakBelow: -0.004 },
   sandstone: { set: "sandstone", tint: 0xf2dcc0, tile: 1.4, macro: 0.04, env: 0.8 },
   ram:       { set: "sandstone", tint: 0xf2dcc0, tile: 1.4, env: 0.8 },
   timber:    { set: "timber", tint: [1.25, 1.1, 0.95], tile: 2.0, macro: 0.05, env: 0.6 },
@@ -110,6 +113,28 @@ export function textureList(small: boolean) {
   for (const set of sets)
     for (const kind of ["diff", "nor", "arm"] as const)
       out.push({ set, kind, url: SET_TILE_PATH(set, kind, small) });
+  return out;
+}
+
+/** a set no first stop can see (the Red Room's lane door): a single texel of its average colour at the
+ *  door, its photographs once the walk nears it (Room.afterEntry). It is one door leaf: never the 2k set */
+export const LATE_SETS = new Set<SetName>(["door"]);
+/** the sets a wide screen takes at full size once inside */
+export const FULL_SETS = new Set<SetName>((Object.values(SPECS).map((s) => s.set).filter(Boolean) as SetName[]).filter((s) => !LATE_SETS.has(s)));
+const TEXEL: Record<string, Record<"diff" | "nor" | "arm", string>> = {
+  door: { diff: "rgb(85,101,101)", nor: "rgb(128,128,255)", arm: "rgb(206,135,0)" },
+};
+/** stand-ins for the late sets, by "set:kind": the same material programs, one texel each */
+export function placeholderMaps(sets: Set<SetName>) {
+  const out: (readonly [string, THREE.Texture])[] = [];
+  for (const set of sets) for (const kind of ["diff", "nor", "arm"] as const) {
+    const c = document.createElement("canvas");
+    c.width = c.height = 2;
+    const g = c.getContext("2d")!;
+    g.fillStyle = TEXEL[set]?.[kind] ?? (kind === "nor" ? "rgb(128,128,255)" : kind === "arm" ? "rgb(255,200,0)" : "rgb(128,128,128)");
+    g.fillRect(0, 0, 2, 2);
+    out.push([`${set}:${kind}`, new THREE.Texture(c)] as const);
+  }
   return out;
 }
 
@@ -265,6 +290,7 @@ export function buildLibrary(
       macroMap: macro,
       macroScale: s.tile / 8.0,
       roomHeight,
+      breakBelow: s.set ? s.breakBelow : undefined,
     });
     mats.set(role, m);
   }
@@ -304,10 +330,11 @@ function tune(c: THREE.Color, sat: number, tint: THREE.Color) {
  */
 function patch(
   m: THREE.MeshStandardMaterial,
-  o: { macro: number; grime: boolean; sat: number; macroMap: THREE.Texture; macroScale: number; roomHeight: number }
+  o: { macro: number; grime: boolean; sat: number; macroMap: THREE.Texture; macroScale: number; roomHeight: number; breakBelow?: number }
 ) {
-  if (!o.macro && !o.grime && o.sat === 1) return;
-  const key = `room:${o.macro > 0 ? 1 : 0}:${o.grime ? 1 : 0}:${o.sat !== 1 ? 1 : 0}`;
+  const brk = o.breakBelow !== undefined;
+  if (!o.macro && !o.grime && o.sat === 1 && !brk) return;
+  const key = `room:${o.macro > 0 ? 1 : 0}:${o.grime ? 1 : 0}:${o.sat !== 1 ? 1 : 0}:${brk ? 1 : 0}`;
   m.customProgramCacheKey = () => key;
   m.onBeforeCompile = (shader) => {
     shader.uniforms.uMacro = { value: o.macroMap };
@@ -334,6 +361,26 @@ function patch(
        uniform float uRoomH;`
     );
     const lines: string[] = [];
+    if (brk) {
+      shader.uniforms.uBreakY = { value: o.breakBelow };
+      frag = frag.replace("uniform float uRoomH;", "uniform float uRoomH;\n       uniform float uBreakY;");
+      lines.push(`
+        #ifdef USE_MAP
+          // the open ground: where a slow noise says so, the same photograph larger and turned a
+          // quarter, so no two neighbouring repeats match and the plan shows no grid
+          // (sampled everywhere and chosen by height: a texture read inside a branch has no mip level)
+          vec4 gFar = texture2D(map, vMapUv.yx * 0.283 + vec2(0.37, 0.11));
+          vec4 gMid = texture2D(map, vec2(-vMapUv.y, vMapUv.x) * 0.61 + vec2(0.13, 0.57));
+          float gW1 = smoothstep(0.30, 0.56, texture2D(uMacro, vMapUv * uMacroScale * 0.83 + vec2(0.21, 0.67)).r);
+          float gW2 = smoothstep(0.34, 0.62, texture2D(uMacro, vMapUv.yx * uMacroScale * 0.31 + vec2(0.53, 0.19)).r);
+          vec3 gBroken = mix(mix(sampledDiffuseColor.rgb, gMid.rgb, 0.75 + 0.25 * gW1), gFar.rgb, 0.45 + 0.5 * gW2);
+          // what grid is left is the grout, a line every repeat: the ground seen from this high is kept to its
+          // blurred colour (three mip levels down, at a turned and unrelated scale), the grout softened out of it
+          vec3 gSoft = texture2D(map, vec2(vMapUv.x * 0.171 + vMapUv.y * 0.092, vMapUv.y * 0.171 - vMapUv.x * 0.092) + vec2(0.71, 0.29), 3.0).rgb;
+          gBroken = mix(gBroken, gSoft, 0.6);
+          diffuseColor.rgb *= mix(vec3(1.0), gBroken / max(sampledDiffuseColor.rgb, vec3(0.02)), step(vWorldY, uBreakY));
+        #endif`);
+    }
     if (o.macro > 0) {
       lines.push(`
         #ifdef USE_MAP

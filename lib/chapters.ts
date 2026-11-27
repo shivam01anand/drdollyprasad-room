@@ -43,6 +43,8 @@ export type Chapter = {
   /** captions for things in the framing that are not her works (a house anchor and its words,
    *  and the thing’s size in metres, so no wall label covers it) */
   asides?: { anchor: string; title: string; line: string; size: [number, number] }[];
+  /** the wall about her is set at this stop (components/HerWall, lib/her-wall.ts) */
+  herWall?: boolean;
   /** which side of its canvas a label tries first (a door or a corner on the other) */
   labelSide?: "left" | "right" | "below";
   /** the stop’s short name, for the phone’s dock and the list of stops */
@@ -70,11 +72,9 @@ export const CHAPTERS: Chapter[] = [
   { id: "canopy", eyebrow: "Bahaar · 2024 to 2025", stop: "Under Canopy of Greens", room: "The courtyard", view: "canopy", dusk: 0.04, labels: ["boy-with-bananas"],
     labelSide: "left",
     body: "Even the boy under the banana leaves has stopped for spring, one hand steadying the bunch on his head." },
-  // her corner by the banana: she paints at her easel, the theme paragraph beside her
-  { id: "easel", eyebrow: "The everyday", stop: "At her easel", room: "The courtyard", body: THEME, view: "easel",
-    via: "easelvia", dusk: 0.12,
-    // the canvas she is working on, from her own photograph (scripts/figure/make.py)
-    asides: [{ anchor: "easel", title: "On her easel", line: "A new painting, in progress", size: [1.28, 1.06] }] },
+  // the wall about her, where her easel stood (2026-11-26): the courtyard's north wall, square on (lib/her-wall.ts)
+  { id: "easel", eyebrow: "The everyday", stop: "About the painter", room: "The courtyard", body: THEME, view: "herwall",
+    via: "easelvia", dusk: 0.12, herWall: true },
   // through the courtyard's front doors, open since 2026-11-23: the gallery hall, where her work hangs as an
   // exhibition hangs, one line at eye level, a series to a wall (scripts/house/build.py)
   { id: "gallery", ink: "light", eyebrow: "The gallery", stop: "The gallery", room: "The gallery",
@@ -219,6 +219,8 @@ const cam = (info: HouseInfo, view: string, narrow: boolean) =>
  *  window, between the north wall and the south one, so the about-turn is two quarter turns */
 const PASSING: Record<string, { eye: V3; target: V3; fov: number }> = {
   hallvia: { eye: [8.6, 1.62, 4.65], target: [12.6, 1.6, 4.65], fov: 40 },
+  // the courtyard's north wall (z -6) square on, where her easel stood: the wall about her (lib/her-wall.ts)
+  herwall: { eye: [2.05, 1.45, -2.4], target: [2.05, 1.45, -6], fov: 40 },
 };
 
 const NEAR_PIVOT = new Set(["street", "redwall"]);
@@ -234,9 +236,9 @@ const nearTarget = (eye: V3, target: V3, d: number): V3 => {
  * between two chapters the pose it passes through, or null. Yaw is unwrapped
  * along the whole path, through the passing poses too.
  */
-export function resolveWalk(info: HouseInfo, narrow = false, aspect = 390 / 844): { shots: Pose[]; vias: (Pose | null)[] } {
+export function resolveWalk(info: HouseInfo, narrow = false, aspect = 390 / 844): { shots: Pose[]; vias: (Pose | null)[]; views: { eye: V3; target: V3; fov?: number }[] } {
   let prev: number | undefined;
-  const shots: Pose[] = [], vias: (Pose | null)[] = [];
+  const shots: Pose[] = [], vias: (Pose | null)[] = [], views: { eye: V3; target: V3; fov?: number }[] = [];
   CHAPTERS.forEach((c, i) => {
     if (i > 0) {
       // a passing pose the house has (an older build may not): otherwise straight on
@@ -260,8 +262,9 @@ export function resolveWalk(info: HouseInfo, narrow = false, aspect = 390 / 844)
     if (group) p.fov = group.fov;
     prev = p.pivotRot[1];
     shots.push(p);
+    views.push({ eye: view.eye, target: view.target, fov: group?.fov });
   });
-  return { shots, vias };
+  return { shots, vias, views };
 }
 
 /** the establishing shot: the hero’s wall, from the courtyard’s far side */
