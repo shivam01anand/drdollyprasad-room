@@ -1,4 +1,5 @@
 import type { Metadata } from "next";
+import { pageOg } from "@/lib/og";
 import Link from "next/link";
 import IndigoBand from "@/components/site/IndigoBand";
 import { SERIES_PAGES } from "@/lib/site";
@@ -9,10 +10,14 @@ import { INSTAGRAM } from "@/lib/site";
 import { WORKS } from "@/lib/works";
 import { InstagramIcon } from "@/components/site/Icons";
 
+const TITLE = "Works";
+const DESCRIPTION = `All ${WORKS.length} paintings by Dr Dolly Prasad, in five collections: Bahaar, Bandh Darwaze, Gone Are The Days, Portraits and Faith.`;
 export const metadata: Metadata = {
-  title: "Works",
-  description: `All ${WORKS.length} paintings by Dr Dolly Prasad, in five collections: Bahaar, Bandh Darwaze, Gone Are The Days, Portraits and Faith.`,
+  title: TITLE,
+  description: DESCRIPTION,
   alternates: { canonical: "/works" },
+  // the link preview carries this page's own title, line and address (elevate, 26 Nov 2026)
+  openGraph: pageOg(TITLE, DESCRIPTION, "/works"),
 };
 
 

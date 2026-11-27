@@ -2,7 +2,8 @@ import type { Metadata } from "next";
 import Link from "next/link";
 import IndigoBand from "@/components/site/IndigoBand";
 import { notFound } from "next/navigation";
-import { BY_ID, LARGE, SITE, WORKS, inchDims, quoted, workPath, type Work } from "@/lib/works";
+import { BY_ID, LARGE, PERSON_ID, SITE, WORKS, inchDims, quoted, workPath, type Work } from "@/lib/works";
+import { altOf } from "@/lib/alt";
 import { LOOK, SERIES_BY_SLUG, SHOWS, SMALL_PHOTO, showKey, shownYear, statusText, enquireHref, labelLine, neighbours, seriesPath, worksIn } from "@/lib/site";
 import PrevNext from "@/components/site/PrevNext";
 import manifest from "@/public/art/manifest.json";
@@ -50,7 +51,7 @@ export async function generateMetadata({ params }: Props): Promise<Metadata> {
     alternates: { canonical: workPath(id) },
     openGraph: {
       type: "website", url: workPath(id), siteName: "Dr Dolly Prasad", title: `${title} · Dr Dolly Prasad`, description, locale: "en_IN",
-      images: [{ url: `/og/${id}.jpg`, width: 1200, height: 630, alt: `${w.title}, ${w.medium.toLowerCase()}, by Dr Dolly Prasad` }],
+      images: [{ url: `/og/${id}.jpg`, width: 1200, height: 630, alt: altOf(w) }],
     },
     twitter: { card: "summary_large_image" },
   };
@@ -75,15 +76,20 @@ export default async function WorkPage({ params }: Props) {
   const more = worksIn(w.series).filter((x) => x.id !== id && !SMALL_PHOTO.has(x.id))
     .sort((a, b) => Number(a.status === "Sold") - Number(b.status === "Sold")).slice(0, 4);
 
+  // elevate (26 Nov 2026): a stable @id, the painting's own line (kb/paintings.json description, as shown on this page),
+  // the largest file, her one Person @id, and the availability the page itself states (nothing where it says "on enquiry")
   const ld = {
     "@context": "https://schema.org",
     "@type": "VisualArtwork",
+    "@id": `${SITE}${workPath(id)}#artwork`,
     name: w.title,
     url: `${SITE}${workPath(id)}`,
-    image: `${SITE}/art/works/${id}.jpg`,
+    image: `${SITE}${src}`,
+    ...(LOOK[id] ? { description: LOOK[id] } : {}),
     artform: "Painting",
     artMedium: w.medium,
-    creator: { "@type": "Person", name: "Dr Dolly Prasad", url: SITE },
+    creator: { "@type": "Person", "@id": PERSON_ID, name: "Dr Dolly Prasad", url: SITE },
+    ...(w.status === "Available" || sold ? { offers: { "@type": "Offer", url: `${SITE}${workPath(id)}`, availability: `https://schema.org/${sold ? "SoldOut" : "InStock"}` } } : {}),
     ...(shownYear(w) ? { dateCreated: shownYear(w) } : {}),
     ...(size ? {
       width: { "@type": "QuantitativeValue", value: size.width, unitCode: "INH" },
@@ -126,7 +132,7 @@ export default async function WorkPage({ params }: Props) {
 
       {more.length > 0 && (
         <IndigoBand id="more-from" title={`More from ${w.series}`} href={seriesPath(w.series)} label="The collection’s story">
-          <div className="grid">{more.map((x) => <Card key={x.id} w={x} eager />)}</div>
+          <div className="grid">{more.map((x) => <Card key={x.id} w={x} />)}</div>
         </IndigoBand>
       )}
 

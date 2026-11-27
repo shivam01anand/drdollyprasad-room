@@ -1,4 +1,5 @@
 import type { Metadata } from "next";
+import { pageOg } from "@/lib/og";
 import { Fragment } from "react";
 import IndigoBand from "@/components/site/IndigoBand";
 import Link from "next/link";
@@ -9,10 +10,14 @@ import CollectionsSwitcher from "@/components/site/CollectionsSwitcher";
 import WallHero from "@/components/site/WallHero";
 import { SERIES_HERO_WALL } from "@/components/site/Collage";
 
+const TITLE = "Collections";
+const DESCRIPTION = "Dr Dolly Prasad’s five collections: Bahaar, Bandh Darwaze, Gone Are The Days, Portraits and Faith. Forty-one paintings of the everyday, held sacred.";
 export const metadata: Metadata = {
-  title: "Collections",
-  description: "Dr Dolly Prasad’s five collections: Bahaar, Bandh Darwaze, Gone Are The Days, Portraits and Faith. Forty-one paintings of the everyday, held sacred.",
+  title: TITLE,
+  description: DESCRIPTION,
   alternates: { canonical: "/series" },
+  // the link preview carries this page's own title, line and address (elevate, 26 Nov 2026)
+  openGraph: pageOg(TITLE, DESCRIPTION, "/series"),
 };
 
 

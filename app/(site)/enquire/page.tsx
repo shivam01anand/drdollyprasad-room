@@ -1,13 +1,18 @@
 import type { Metadata } from "next";
+import { pageOg } from "@/lib/og";
 import EnquireForm from "@/components/site/EnquireForm";
 import IndigoBand from "@/components/site/IndigoBand";
 import Link from "next/link";
 import { SERIES_PAGES } from "@/lib/site";
 
+const TITLE = "Enquire";
+const DESCRIPTION = "Ask Dr Dolly Prasad about a painting or an exhibition.";
 export const metadata: Metadata = {
-  title: "Enquire",
-  description: "Ask Dr Dolly Prasad about a painting or an exhibition.",
+  title: TITLE,
+  description: DESCRIPTION,
   alternates: { canonical: "/enquire" },
+  // the link preview carries this page's own title, line and address (elevate, 26 Nov 2026)
+  openGraph: pageOg(TITLE, DESCRIPTION, "/enquire"),
 };
 
 export default function Enquire() {

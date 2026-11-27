@@ -1,5 +1,6 @@
 import type { Metadata, Viewport } from "next";
 import Analytics from "@/components/Analytics";
+import { HOME_CARD } from "@/lib/og";
 
 const DESCRIPTION =
   "Oil paintings by Dr Dolly Prasad, New Delhi: the everyday, held sacred. Nineteen exhibitions and art fairs since 2005, and paintings in private collections in India, the USA and the UK.";
@@ -16,7 +17,7 @@ export const metadata: Metadata = {
     title: "Dr Dolly Prasad",
     description: DESCRIPTION,
     locale: "en_IN",
-    images: [{ url: "/og.jpg", width: 1200, height: 630, alt: "Threads of Faith, oil on canvas, by Dr Dolly Prasad" }],
+    images: [HOME_CARD],
   },
   twitter: { card: "summary_large_image" },
 };
