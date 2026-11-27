@@ -49,6 +49,9 @@ type Spec = {
    *  for metals, where the colour is the metal and the photograph is wear */
   detail?: SetName;
   detailTile?: number;
+  /** below this height (the open ground round the house, seen whole from above at the plan) the
+   *  photograph is mixed with a second, larger and turned sample of itself, so its repeat makes no grid */
+  breakBelow?: number;
 };
 
 export const SPECS: Record<Role, Spec> = {
@@ -110,6 +113,28 @@ export function textureList(small: boolean) {
   for (const set of sets)
     for (const kind of ["diff", "nor", "arm"] as const)
       out.push({ set, kind, url: SET_TILE_PATH(set, kind, small) });
+  return out;
+}
+
+/** a set no first stop can see (the Red Room's lane door): a single texel of its average colour at the
+ *  door, its photographs once the walk nears it (Room.afterEntry). It is one door leaf: never the 2k set */
+export const LATE_SETS = new Set<SetName>(["door"]);
+/** the sets a wide screen takes at full size once inside */
+export const FULL_SETS = new Set<SetName>((Object.values(SPECS).map((s) => s.set).filter(Boolean) as SetName[]).filter((s) => !LATE_SETS.has(s)));
+const TEXEL: Record<string, Record<"diff" | "nor" | "arm", string>> = {
+  door: { diff: "rgb(85,101,101)", nor: "rgb(128,128,255)", arm: "rgb(206,135,0)" },
+};
+/** stand-ins for the late sets, by "set:kind": the same material programs, one texel each */
+export function placeholderMaps(sets: Set<SetName>) {
+  const out: (readonly [string, THREE.Texture])[] = [];
+  for (const set of sets) for (const kind of ["diff", "nor", "arm"] as const) {
+    const c = document.createElement("canvas");
+    c.width = c.height = 2;
+    const g = c.getContext("2d")!;
+    g.fillStyle = TEXEL[set]?.[kind] ?? (kind === "nor" ? "rgb(128,128,255)" : kind === "arm" ? "rgb(255,200,0)" : "rgb(128,128,128)");
+    g.fillRect(0, 0, 2, 2);
+    out.push([`${set}:${kind}`, new THREE.Texture(c)] as const);
+  }
   return out;
 }
 
@@ -265,6 +290,7 @@ export function buildLibrary(
       macroMap: macro,
       macroScale: s.tile / 8.0,
       roomHeight,
+      breakBelow: s.set ? s.breakBelow : undefined,
     });
     mats.set(role, m);
   }
@@ -304,10 +330,11 @@ function tune(c: THREE.Color, sat: number, tint: THREE.Color) {
  */
 function patch(
   m: THREE.MeshStandardMaterial,
-  o: { macro: number; grime: boolean; sat: number; macroMap: THREE.Texture; macroScale: number; roomHeight: number }
+  o: { macro: number; grime: boolean; sat: number; macroMap: THREE.Texture; macroScale: number; roomHeight: number; breakBelow?: number }
 ) {
-  if (!o.macro && !o.grime && o.sat === 1) return;
-  const key = `room:${o.macro > 0 ? 1 : 0}:${o.grime ? 1 : 0}:${o.sat !== 1 ? 1 : 0}`;
+  const brk = o.breakBelow !== undefined;
+  if (!o.macro && !o.grime && o.sat === 1 && !brk) return;
+  const key = `room:${o.macro > 0 ? 1 : 0}:${o.grime ? 1 : 0}:${o.sat !== 1 ? 1 : 0}:${brk ? 1 : 0}`;
   m.customProgramCacheKey = () => key;
   m.onBeforeCompile = (shader) => {
     shader.uniforms.uMacro = { value: o.macroMap };

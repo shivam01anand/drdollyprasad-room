@@ -1,6 +1,7 @@
 import * as THREE from "three";
 import { DropInViewer, SceneRevealMode } from "@mkkellogg/gaussian-splats-3d";
 import placement from "./dolly-head-placement.json";
+import { HEAD_URL } from "./dolly-url";
 
 /** Her captured head, fitted to the existing figure that holds the brush. */
 export class Dolly {
@@ -15,6 +16,8 @@ export class Dolly {
   // Includes every captured Gaussian and its visible support (measured < 0.20 m).
   private bounds = new THREE.Sphere(new THREE.Vector3(), 0.35);
   private worldBounds = new THREE.Sphere();
+  /** frames still to be drawn with the head on, wherever the camera looks (warm) */
+  private warming = 0;
 
   constructor(private night: { value: number }, dpr: number, wake: () => void) {
     const object = this.object = new DropInViewer({
@@ -47,7 +50,7 @@ export class Dolly {
   async load() {
     const position = placement.position;
     this.anchor.set(placement.head_center[0], placement.head_center[2], -placement.head_center[1]);
-    await this.object.addSplatScene("/art/figure/dolly-head.splat", {
+    await this.object.addSplatScene(HEAD_URL, {
       showLoadingUI: false,
       splatAlphaRemovalThreshold: 9,
       position,
@@ -70,9 +73,15 @@ export class Dolly {
 
   show(on: boolean) { this.shown = on; this.object.visible = this.loaded && !this.disposed && on; }
 
+  /** Draw the head for a few frames now, out of view: its program, its data and its first sort are
+   *  then done while the visitor stands still, not on the frame the easel comes into view. */
+  warm(frames = 3) { this.warming = frames; }
+  get isWarming() { return this.warming > 0; }
+
   /** DropInViewer's callback is never frustum-culled; keep it off-screen too. */
   updateVisibility(camera: THREE.Camera) {
     if (!this.loaded || this.disposed || !this.shown) { this.object.visible = false; return; }
+    if (this.warming > 0) { this.warming--; this.object.visible = true; return; }
     this.bounds.center.copy(this.anchor);
     this.worldBounds.copy(this.bounds);
     if (this.object.parent) this.worldBounds.applyMatrix4(this.object.parent.matrixWorld);

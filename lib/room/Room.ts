@@ -6,8 +6,9 @@ import { OutputPass } from "three/examples/jsm/postprocessing/OutputPass.js";
 import { GTAOPass } from "three/examples/jsm/postprocessing/GTAOPass.js";
 import type * as CANNON from "cannon-es";
 
-import { buildLibrary, textureList, type Library } from "./materials";
+import { buildLibrary, textureList, placeholderMaps, LATE_SETS, FULL_SETS, type Library } from "./materials";
 import { Rig } from "./rig";
+import { HEAD_URL } from "./dolly-url";
 import type { Dolly } from "./dolly";
 import { loadHouse, loadHouseInfo, assemble, BakedLight, ROOF, HOUSE_DIR, assetUrl, prepLightmap, type HouseInfo, type HouseParts, type V3 } from "./house";
 import { paintMaterial, flatRelief, galleryLight } from "./paint";
@@ -21,6 +22,15 @@ const FIRST_STOPS = 3;
 const STOP_OF = new Map<string, number>();
 CHAPTERS.forEach((c, i) => [...(c.labels ?? []), ...(c.frame ?? [])].forEach((id) => { if (!STOP_OF.has(id)) STOP_OF.set(id, i); }));
 const stopRank = (id: string) => STOP_OF.get(id) ?? CHAPTERS.length;
+/** the rooms whose paintings are wanted while the walk stands at each stop: its own, the one before it
+ *  and those of the next two stops (a room's whole hang is in view from its door, so a room loads as
+ *  one). `null`: all of them (the house seen from above, at the walk's end) */
+const ROOMS_AT: (Set<string> | null)[] = CHAPTERS.map((_, i) => {
+  const near = [i - 1, i, i + 1, i + 2].filter((k) => k >= 0 && k < CHAPTERS.length).map((k) => CHAPTERS[k].room);
+  return near.every((r): r is string => !!r) ? new Set(near) : null;
+});
+/** the stop from which a surface set kept back at the door is wanted (the Red Room's lane door) */
+const LATE_SET_STOP = Math.max(0, CHAPTERS.findIndex((c) => c.room === "The Red Room") - 3);
 
 export type RoomOpts = {
   manifestUrl: string;
@@ -37,10 +47,11 @@ export type RoomOpts = {
   onRearrangeError?(error: unknown): void;
 };
 
-type Tier = { small: boolean; dpr: number; msaa: number; ao: boolean; shadow: number; phone: boolean };
+type Tier = { small: boolean; dpr: number; msaa: number; ao: boolean; shadow: number; phone: boolean; light: boolean };
 
 /** one quality decision, made once: weak machines get 1k textures, the 2k
- *  lightmaps, no AO and a low pixel ratio; phones the full set, sharp, without
+ *  lightmaps, no AO and a low pixel ratio; phones the same light files (on a screen
+ *  that narrow the larger ones add megabytes, not detail), drawn sharp, without
  *  AO; everything else the full set with AO */
 function pickTier(): Tier {
   const mem = (navigator as Navigator & { deviceMemory?: number }).deviceMemory ?? 8;
@@ -54,6 +65,8 @@ function pickTier(): Tier {
   return {
     small,
     phone,
+    // the files a phone stays on: 1k surfaces, the 2k lightmaps (a tablet gets the full set)
+    light: small || (phone && Math.min(innerWidth, innerHeight) < 600),
     // a phone's screen is small and close: it needs its own pixels (the frames' thin
     // lines stair-step at 1.25×) and real antialiasing; it skips the screen-space AO
     dpr: Math.min(devicePixelRatio || 1, small ? 1.25 : phone ? 2 : 1.5),
@@ -177,6 +190,8 @@ export class Room {
   private artQueue: THREE.Mesh[] = [];
   private artLoads = 0;
   private artPriority = -1;
+  /** the stop the walk is at (or heading for): what streams in follows it */
+  private artStop = 0;
   private reliefBuilder = new ReliefBuilder();
   /** One texture upload at rest; background work must not interrupt a glide. */
   private textureUploads: (() => void)[] = [];
@@ -196,8 +211,9 @@ export class Room {
   private last = 0;
   private wake = 0;
   /** readings asked of the next frame drawn, each under its own name: how light it is behind a part of the screen */
-  private lumaAsks = new Map<string, { rect: { x0: number; y0: number; x1: number; y1: number }; cb: (luma: number) => void }>();
-  private readbackPending = false;
+  private lumaAsks = new Map<string, { rect: { x0: number; y0: number; x1: number; y1: number }; cb: (luma: number, range: { lo: number; hi: number }) => void }>();
+  /** readings in flight (each has its own pixel buffer; a few at once: the header, the copy, a wall's labels) */
+  private readbacks = 0;
   private readbackPixels = new Uint8Array(0);
   private aliveUntil = 0;
   private shadowsUntil = 0;
@@ -245,7 +261,8 @@ export class Room {
        (its plan, its model, two lightmaps), the room's surfaces, the paintings */
     // every visitor enters on the light set (1k surfaces, the 2k afternoon lightmap); a capable machine
     // gets the full set after it is inside (upgradeSurfaces), and the evening lightmap streams then too
-    const texList = textureList(true);
+    // (a set no first stop can see is a single texel until the walk nears it: LATE_SETS, lateSurfaces)
+    const texList = textureList(true).filter((t) => !LATE_SETS.has(t.set));
     let total = 4 + texList.length + 12;
     let done = 0, model = 0;
     // the model weighs as much as a dozen of the other files, and reports as it arrives; the last
@@ -284,7 +301,7 @@ export class Room {
     this.scene.add(this.rig.pivot, this.world);
 
     const anisotropy = Math.min(8, renderer.capabilities.getMaxAnisotropy());
-    const lib = buildLibrary(new Map(texPairs), V, anisotropy, ROOF);
+    const lib = buildLibrary(new Map([...texPairs, ...placeholderMaps(LATE_SETS)]), V, anisotropy, ROOF);
     this.lib = lib;
     this.owned.push(lib);
 
@@ -386,6 +403,8 @@ export class Room {
       this.parts.figureHeads.forEach(head => { head.visible = false; });
       dolly.show(true);
       this.ao?.refreshExclusions();
+      // its first frames (program, upload, sort) while the camera stands still, before her easel is in view
+      await this.atRest(() => { dolly.warm(4); this.wake = Math.max(this.wake, 5); });
       this.invalidate();
     } catch {
       this.dolly?.dispose();
@@ -414,28 +433,65 @@ export class Room {
     this.pumpArt();
   }
 
-  /** Once the visitor is inside: the evening lightmap, the full-size surfaces, her head. One at a
-   *  time and behind the paintings, each swapped in at rest so a glide never hitches. */
+  /** Once the visitor is inside: the full-size afternoon lightmap and surfaces (a wide screen's only),
+   *  each when the walk is near enough to want it. One at a time and behind the paintings, each
+   *  swapped in at rest so a glide never hitches. The evening lightmap and her head have their own
+   *  moments (needNight, needFigure). */
   private afterEntry() {
     if (this.entered || this.disposed) return;
     this.entered = true;
-    const jobs: (() => Promise<unknown>)[] = [];
-    if (!this.baked?.nightMap.value) jobs.push(() => this.loadNight());
-    if (!this.tier.small) {
-      jobs.push(() => this.upgradeLightmap());
-      for (const t of textureList(false)) jobs.push(() => this.upgradeSurface(`${t.set}:${t.kind}`, t.url));
+    // the surfaces kept back at the door, at the size the visitor entered on
+    for (const t of textureList(true).filter((x) => LATE_SETS.has(x.set)))
+      this.jobs.push({ from: LATE_SET_STOP, run: () => this.upgradeSurface(`${t.set}:${t.kind}`, t.url) });
+    if (!this.tier.light) {
+      this.jobs.push({ from: 0, run: () => this.upgradeLightmap() });
+      // the courtyard's surfaces first; the hall's as its paintings begin to load
+      const court = new Set(["plaster", "terracotta", "teak", "timber", "sandstone"]);
+      const full = textureList(false).filter((t) => FULL_SETS.has(t.set));
+      for (const t of [...full.filter((x) => court.has(x.set)), ...full.filter((x) => !court.has(x.set))])
+        this.jobs.push({ from: court.has(t.set) ? 0 : 2, run: () => this.upgradeSurface(`${t.set}:${t.kind}`, t.url) });
     }
-    jobs.push(() => this.lateFigure());
-    const next = (): unknown => {
-      const job = jobs.shift();
-      if (!job || this.disposed) return;
-      // the paintings of the next stops go first: their queue is short-lived
-      if (this.artLoads >= 3 && this.artQueue.length > 20) { jobs.unshift(job); setTimeout(next, 400); return; }
-      return job().catch(() => { /* the lighter one stays */ }).finally(next);
-    };
-    void next();
+    this.pumpJobs();
+    this.needs();
   }
   private entered = false;
+  private jobs: { from: number; run: () => Promise<unknown> }[] = [];
+  private jobRunning = false;
+  private jobTimer = 0;
+  /** the next background file the walk has reached, once no painting is waiting on the line */
+  private pumpJobs() {
+    if (this.jobRunning || this.disposed || !this.entered) return;
+    const at = this.jobs.findIndex((j) => this.artStop >= j.from || ROOMS_AT[this.artStop] === null);
+    if (at < 0) return;
+    // the paintings of the next stops go first
+    if (this.artLoads > 0) { clearTimeout(this.jobTimer); this.jobTimer = window.setTimeout(() => this.pumpJobs(), 400); return; }
+    const [job] = this.jobs.splice(at, 1);
+    this.jobRunning = true;
+    void job.run().catch(() => { /* the lighter one stays */ }).finally(() => { this.jobRunning = false; this.pumpJobs(); });
+  }
+
+  /** what the walk asks for as it goes: the evening's light once the afternoon starts to go (or the
+   *  diya is lit), her head a stop or two before her easel */
+  private needs() {
+    if (!this.entered || this.disposed) return;
+    if (this.artStop >= 1 || this.eve.walk > 1e-3 || this.mode === "dark") this.needNight();
+    if (this.artStop >= 1) this.needFigure();
+  }
+  private nightAsked = false;
+  private needNight() {
+    if (this.nightAsked || this.baked?.nightMap.value) return;
+    this.nightAsked = true;
+    void this.loadNight().catch(() => { setTimeout(() => { this.nightAsked = false; }, 5000); });
+  }
+  private figureAsked = false;
+  private needFigure() {
+    if (this.figureAsked) return;
+    this.figureAsked = true;
+    // the file first (it is held in the browser's cache), then the head is built from it while the
+    // camera stands still: neither the download nor the build lands on the walk up to her easel
+    void fetch(HEAD_URL, { signal: this.abort.signal }).then((r) => r.arrayBuffer()).catch(() => null)
+      .then(() => this.atRest(() => { void this.lateFigure(); }));
+  }
 
   /** the evening's light, baked: the evening of the walk and the lit diya wait for it */
   private nightLoad?: Promise<void>;
@@ -444,7 +500,7 @@ export class Room {
   }
   private async fetchNight() {
     if (this.baked?.nightMap.value) return;
-    const t = await this.loadTexture(assetUrl(`${HOUSE_DIR}/lm-night${this.tier.small ? "-2k" : ""}.webp`));
+    const t = await this.loadTexture(assetUrl(`${HOUSE_DIR}/lm-night${this.tier.light ? "-2k" : ""}.webp`));
     if (this.disposed || !this.baked) { t.dispose(); return; }
     prepLightmap(t, this.baked.nightMap.value ?? this.baked.dayMap());
     await this.atRest(() => {
@@ -521,8 +577,12 @@ export class Room {
 
   private pumpArt() {
     if (this.disposed) return;
-    while (this.artLoads < 3 && this.artQueue.length) {
-      const mesh = this.artQueue.shift()!;
+    while (this.artLoads < 3) {
+      // only the rooms the walk is in or near: the rest wait for the visitor to get there
+      const rooms = ROOMS_AT[this.artStop];
+      const k = this.artQueue.findIndex((m) => !rooms || rooms.has(CHAPTERS[stopRank(m.userData.artId)]?.room ?? ""));
+      if (k < 0) break;
+      const [mesh] = this.artQueue.splice(k, 1);
       this.artLoads++;
       void this.loadArtwork(mesh.userData.artId).then((tex) => {
         if (this.disposed) { tex.dispose(); return; }
@@ -546,12 +606,14 @@ export class Room {
   prepareChapter(index: number) {
     if (index === this.artPriority) return;
     this.artPriority = index;
+    this.artStop = Math.max(0, Math.min(CHAPTERS.length - 1, index));
     const wanted = [index, index + 1, index - 1, index + 2].flatMap((i) => CHAPTERS[i]?.labels ?? []);
     const rank = (mesh: THREE.Mesh) => {
       const at = wanted.indexOf(mesh.userData.artId);
       return at < 0 ? wanted.length : at;
     };
     this.artQueue.sort((a, b) => rank(a) - rank(b));
+    if (this.ready) { this.pumpArt(); this.pumpJobs(); this.needs(); }
   }
 
   private async addRelief(mesh: THREE.Mesh, longest: number) {
@@ -1057,7 +1119,23 @@ export class Room {
   setMode(mode: "light" | "dark", instant = false) {
     if (this.disposed || !this.renderer || !this.sun || (mode === this.mode && !instant)) return;
     this.mode = mode;
-    if (mode === "dark" && this.baked && !this.baked.nightMap.value) void this.loadNight().catch(() => {});
+    const turn = ++this.modeTurn;
+    // the evening's baked light is fetched when it is first wanted: the room waits a moment for it, so
+    // the walls go down with the sky instead of a beat after it
+    if (mode === "dark" && !instant && this.baked && !this.baked.nightMap.value && this.entered) {
+      this.needNight();
+      const arrived = this.nightLoad?.catch(() => {}) ?? Promise.resolve();
+      void Promise.race([arrived, new Promise((res) => setTimeout(res, 3000))]).then(() => {
+        if (!this.disposed && this.modeTurn === turn) this.turnMode(mode, instant);
+      });
+      return;
+    }
+    if (mode === "dark") this.needNight();
+    this.turnMode(mode, instant);
+  }
+  private modeTurn = 0;
+  private turnMode(mode: "light" | "dark", instant: boolean) {
+    if (this.disposed || !this.renderer || !this.sun) return;
     this.fadeBake(instant);
     this.modeTl?.kill();
     const dur = instant || this.opts.reducedMotion ? 0 : 1.1;
@@ -1382,6 +1460,7 @@ export class Room {
     const walk = duskAt(this.rig.progress);
     if (Math.abs(walk - this.eve.walk) > 1e-4) {
       this.eve.walk = walk;
+      if (walk > 1e-3 && !this.nightAsked) this.needs();
       this.applyEve();
       draw = true;
     }
@@ -1433,7 +1512,7 @@ export class Room {
       this.lumaAsks.clear();
       for (const ask of asks) {
         void this.readLuma(ask.rect).then((l) => {
-          if (!this.disposed && l !== null) ask.cb(l);
+          if (!this.disposed && l !== null) ask.cb(l.mean, l);
         }).catch(() => { /* keep the current ink if a context is being lost */ });
       }
     }
@@ -1444,13 +1523,13 @@ export class Room {
    * 0 to 1, read from the next frame drawn (`now`: draw one for it). The header chooses its ink by
    * it — the same wall sits behind the header on one screen and not on another.
    */
-  readLumaBehind(name: string, rect: { x0: number; y0: number; x1: number; y1: number }, cb: (luma: number) => void, now = false) {
+  readLumaBehind(name: string, rect: { x0: number; y0: number; x1: number; y1: number }, cb: (luma: number, range: { lo: number; hi: number }) => void, now = false) {
     this.lumaAsks.set(name, { rect, cb });
     if (now) this.wake = Math.max(this.wake, 1);
   }
 
   private async readLuma(r: { x0: number; y0: number; x1: number; y1: number }) {
-    if (this.readbackPending || this.disposed) return null;
+    if (this.readbacks >= 24 || this.disposed) return null;
     const gl = this.renderer!.getContext();
     if (!(gl instanceof WebGL2RenderingContext)) return null;
     const W = gl.drawingBufferWidth, H = gl.drawingBufferHeight;
@@ -1466,7 +1545,7 @@ export class Room {
     const buffer = gl.createBuffer();
     if (!buffer) return null;
     let sync: WebGLSync | null = null;
-    this.readbackPending = true;
+    this.readbacks++;
     try {
       // The same displayed pixels, read through a WebGL 2 pixel buffer. A fence
       // lets the GPU finish them without stopping the animation/main thread.
@@ -1491,14 +1570,25 @@ export class Room {
       if (!complete) return null;
       gl.bindBuffer(gl.PIXEL_PACK_BUFFER, buffer);
       gl.getBufferSubData(gl.PIXEL_PACK_BUFFER, 0, px);
+      // the mean, and the darkest and lightest of eight upright bands across it (words set over a wall's
+      // edge must hold on both sides of it)
       let sum = 0, n = 0;
-      for (let i = 0; i < px.length; i += 16) { sum += 0.2126 * px[i] + 0.7152 * px[i + 1] + 0.0722 * px[i + 2]; n++; }
-      return n ? sum / n / 255 : null;
+      const band = new Float32Array(8), count = new Uint32Array(8);
+      for (let i = 0; i < px.length; i += 16) {
+        const l = 0.2126 * px[i] + 0.7152 * px[i + 1] + 0.0722 * px[i + 2];
+        sum += l; n++;
+        const k = Math.min(7, Math.floor(((i >> 2) % w) / w * 8));
+        band[k] += l; count[k]++;
+      }
+      if (!n) return null;
+      let lo = Infinity, hi = -Infinity;
+      for (let k = 0; k < 8; k++) if (count[k]) { const m = band[k] / count[k] / 255; lo = Math.min(lo, m); hi = Math.max(hi, m); }
+      return { mean: sum / n / 255, lo, hi };
     } finally {
       gl.bindBuffer(gl.PIXEL_PACK_BUFFER, null);
       gl.deleteBuffer(buffer);
       if (sync) gl.deleteSync(sync);
-      this.readbackPending = false;
+      this.readbacks--;
     }
   }
 
@@ -1604,6 +1694,8 @@ export class Room {
     clearTimeout(this.resizeTimer);
     this.reliefBuilder.dispose();
     this.textureUploads.length = 0;
+    clearTimeout(this.jobTimer);
+    this.jobs.length = 0;
     this.dolly?.dispose();
     this.abort.abort();
     this.modeTl?.kill();
