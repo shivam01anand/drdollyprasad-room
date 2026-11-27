@@ -269,7 +269,8 @@
    halo in the wall's tone, so it reads as passing under the card, never as clipped. */
 /* (R6 perf fix 2: no mask on the moving wall; this rule was already overridden by fix-tech.css's bottom-only fade,
    which is now a still overlay in fix-tech.css) */
-.wh .wh-card.namecard{box-shadow:0 0 0 12px rgba(245,244,240,.72),0 0 28px 16px rgba(245,244,240,.55),var(--paper-shadow,0 0 0 transparent)}
+/* elevate (26 Nov 2026): the halo round the card is gone (no glass, kb/taste.md); the card keeps the one small --lift */
+.wh .wh-card.namecard{box-shadow:var(--lift)}
 
 /* R4 fix 7 (consultant P1-6): hero photograph tiles wait out of sight until their file arrives (components/site/WallDrift) */
 .wh .collage .xcard{transition:opacity .45s ease}
