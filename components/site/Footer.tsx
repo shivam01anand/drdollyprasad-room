@@ -10,7 +10,7 @@ export default function Footer() {
       <div className="wrap ftr-in">
         <div className="ftr-id">
           {/* eslint-disable-next-line @next/next/no-img-element */}
-          <img src={PORTRAIT} alt="" width={44} height={44} />
+          <img src={PORTRAIT} alt="" width={44} height={44} loading="lazy" decoding="async" />
           <div>
             <b>Dr Dolly Prasad</b>
             <span className="meta">Paintings in oil, New Delhi</span>

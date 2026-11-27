@@ -53,8 +53,11 @@ export default {
     ...["/house/:path*", "/tex/:path*", "/art/room/:path*", "/art/welcome/:path*"].map((source) => ({
       source, headers: [{ key: "Cache-Control", value: YEAR }],
     })),
+    // the lighter copies of her photographs (scripts/images/variants.cjs): the name carries a hash of the source, so a year and immutable
+    { source: "/i/:path*", headers: [{ key: "Cache-Control", value: YEAR }] },
     // her other photographs and the decoders keep their plain names: a day fresh, then revalidated in the background
-    ...["/art/large/:path*", "/art/works/:path*", "/art/xl/:path*", "/art/rooms/:path*", "/art/figure/:path*", "/draco/:path*"].map((source) => ({
+    // (the website's own pictures in /site and the share cards in /og joined this rule on 26 Nov 2026; they were re-checked on every visit)
+    ...["/site/:path*", "/og/:path*", "/og.jpg", "/art/large/:path*", "/art/works/:path*", "/art/xl/:path*", "/art/rooms/:path*", "/art/figure/:path*", "/draco/:path*"].map((source) => ({
       source, headers: [{ key: "Cache-Control", value: "public, max-age=86400, stale-while-revalidate=604800" }],
     }))];
   },

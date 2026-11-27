@@ -2,6 +2,8 @@ import Link from "next/link";
 import { shownYear, statusText } from "@/lib/site";
 import { quoted, workPath, type Work } from "@/lib/works";
 import { dims } from "@/lib/images";
+import Pic from "./Pic";
+import { altOf } from "@/lib/alt";
 
 export const thumb = (id: string) => `/site/thumbs/${id}.jpg`;
 
@@ -11,6 +13,9 @@ export const thumb = (id: string) => `/site/thumbs/${id}.jpg`;
  * a green dot; "On enquiry" as the data says. A status the data does not know
  * shows nothing.
  */
+/** how wide a card's painting is drawn: two to a row on a phone, three or four on a wider screen */
+const CARD_SIZES = "(max-width: 640px) 44vw, (max-width: 1100px) 30vw, 300px";
+
 const KIND: Record<string, string> = { Sold: "sold", Available: "free", Enquire: "enquire" };
 
 /** a painting in its frame on a wall-coloured mat, its title, its label and whether it is free */
@@ -21,9 +26,7 @@ export default function Card({ w, label = true, eager = false }: { w: Work; labe
   return (
     <Link className={`card${w.status === "Sold" ? " is-sold" : ""}`} href={workPath(w.id)}>
       <div className="mat">
-        {/* eslint-disable-next-line @next/next/no-img-element */}
-        <img className="framed thin" src={thumb(w.id)} alt={`${w.title}, ${w.medium.toLowerCase()}, by Dr Dolly Prasad`}
-             loading={eager ? "eager" : "lazy"} decoding="async" {...d} style={ar} />
+        <Pic className="framed thin" src={thumb(w.id)} alt={altOf(w)} sizes={CARD_SIZES} eager={eager} {...d} style={ar} />
       </div>
       <span className="card-t">{w.title}</span>
       {label && (

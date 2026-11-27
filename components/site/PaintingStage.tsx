@@ -5,10 +5,12 @@ import { useCallback, useEffect, useRef, useState } from "react";
 import { roomsFor, type RoomView } from "@/lib/rooms";
 import { inchDims, type Work } from "@/lib/works";
 import { paintingProperties, track } from "@/lib/analytics";
+import Pic from "./Pic";
+import { altOf } from "@/lib/alt";
 
 const Zoom = dynamic(() => import("./Zoom"), { ssr: false });
 
-const nameOf = (w: Work) => `${w.title}, ${w.medium.toLowerCase()}, by Dr Dolly Prasad`;
+const nameOf = (w: Work) => altOf(w);
 type View = { k: "full" } | { k: "room"; id: string };
 
 /**
@@ -29,6 +31,9 @@ export default function PaintingStage({ w, src, dims, small, sub, children }: {
   const strip = useRef<HTMLDivElement>(null);
   const open = useCallback(() => { track("painting_zoomed", paintingProperties(w)); setZoom(true); }, [w]);
   const name = nameOf(w);
+  // how wide the painting is drawn (site.css .pp-art img: at most 72% of the screen's height and 1100 px wide), so a phone takes a small copy
+  const ar = dims ? dims.w / dims.h : 1;
+  const stageSizes = `(max-width: 640px) min(92vw, ${Math.round(72 * ar)}vh), min(88vw, ${Math.round(72 * ar)}vh, ${Math.round(Math.min(1100, 780 * ar))}px)`;
   const size = inchDims(w, dims);
   const rv = view.k === "room" ? rooms.find((r) => r.room.id === view.id) ?? rooms[0] : undefined;
   const inRoom = !!rv;
@@ -41,7 +46,8 @@ export default function PaintingStage({ w, src, dims, small, sub, children }: {
   const same = (v: View) => v.k === view.k && (v.k === "room" ? (view as { id: string }).id === v.id : true);
 
   const items: { v: View; label: string; thumb: React.ReactNode }[] = [
-    { v: { k: "full" }, label: "The painting", thumb: <img src={src} alt="" loading="lazy" /> },
+    // the chip is 56 px wide: the small thumbnail, never a second copy of the large file
+    { v: { k: "full" }, label: "The painting", thumb: <Pic src={`/site/thumbs/${w.id}.jpg`} alt="" sizes="56px" /> },
     // R6 (Shubham, 20 Oct): just the two, the painting and the room; no close-up crops
     ...rooms.slice(0, 1).map((r) => ({ v: { k: "room", id: r.room.id } as View, label: r.room.label, thumb: <img src={r.room.thumb} alt="" loading="lazy" /> })),
   ];
@@ -53,7 +59,7 @@ export default function PaintingStage({ w, src, dims, small, sub, children }: {
           <button type="button" className="pp-art" onClick={open} aria-label={`Zoom ${w.title}`}>
             {/* eslint-disable-next-line @next/next/no-img-element */}
             {/* --ar reserves the picture's box before it loads (no blip, CLS): see fix-tech.css */}
-            <img ref={art} src={src} alt={name} width={dims?.w} height={dims?.h} loading="eager" fetchPriority="high" decoding="async"
+            <Pic imgRef={art} src={src} alt={name} width={dims?.w} height={dims?.h} eager fetchPriority="high" sizes={stageSizes}
                  onLoad={() => setReady(true)}
                  className={[small ? "is-small" : "", ready ? "" : "is-loading"].filter(Boolean).join(" ") || undefined}
                  style={dims ? { ["--ar" as string]: `${dims.w} / ${dims.h}` } : undefined} />
@@ -72,7 +78,7 @@ export default function PaintingStage({ w, src, dims, small, sub, children }: {
                   ...(rv.room.shadow ? { ["--shx" as string]: rv.room.shadow.x, ["--shy" as string]: rv.room.shadow.y, ["--shb" as string]: rv.room.shadow.blur, ["--shc" as string]: rv.room.shadow.color } : {}),
                 }}>
                   {/* eslint-disable-next-line @next/next/no-img-element */}
-                  <img src={src} alt={name} />
+                  <Pic src={src} alt="" eager sizes="(max-width: 640px) 45vw, 360px" />
                 </span>
               )}
             </div>
