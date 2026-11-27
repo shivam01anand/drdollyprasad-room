@@ -2,6 +2,7 @@
 
 import { useEffect, useRef, type CSSProperties, type ReactNode } from "react";
 import { driftWall } from "@/lib/drift";
+import { loadRestWhenSettled } from "@/lib/lazy-rest";
 
 /** the moving wall's columns, which also move by hand (lib/drift: driftWall) */
 export default function WallDrift({ n, children }: { n: number; children: ReactNode }) {
@@ -25,6 +26,9 @@ export default function WallDrift({ n, children }: { n: number; children: ReactN
     });
     return () => off.forEach((f) => f());
   }, []);
+  // elevate (26 Nov 2026): tiles outside the first screen are lazy, so the page opens on a fraction of the wall's files;
+  // the rest are fetched once the page has settled, before they drift into view
+  useEffect(() => (ref.current ? loadRestWhenSettled(ref.current) : undefined), []);
   return (
     // the moving wall repeats real links found elsewhere on the page; keyboard users skip it, the mouse and finger can use it
     <div ref={ref} className="cols" aria-hidden="true" style={{ ["--n" as string]: n } as CSSProperties}>

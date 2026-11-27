@@ -63,7 +63,7 @@ export default function WorksBrowser() {
   const n = (f: (w: Work) => boolean) => all.filter(f).length;
 
   // one portfolio of every painting (Shubham, 20 Oct); the collection is a filter, not a section
-  const SECTION_OPEN = 8; // the first eight paintings load at once; the rest as you scroll
+  const SECTION_OPEN = 4; // the first row loads at once; the rest as you scroll
   const PER = 12;
   const pages = Math.max(1, Math.ceil(shown.length / PER));
   const at = Math.min(page, pages);

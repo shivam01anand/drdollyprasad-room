@@ -2,6 +2,7 @@
 
 import { useEffect, useRef, type CSSProperties, type ReactNode } from "react";
 import { driftRow } from "@/lib/drift";
+import { loadRestWhenSettled } from "@/lib/lazy-rest";
 
 /**
  * A row that keeps drifting sideways, seamlessly, on a computer and a phone.
@@ -34,6 +35,9 @@ export default function Marquee({ children, seconds = 60, copies = 4, reverse = 
     t.style.setProperty("--copies", String(need));
     return driftRow(v, t, { seconds, copies: need, reverse, pauseOnHover: true });
   }, [seconds, copies, reverse]);
+
+  // its pictures are lazy; the ones still out of view are fetched once the page has settled
+  useEffect(() => (view.current ? loadRestWhenSettled(view.current) : undefined), []);
 
   return (
     <div ref={view} className={`marq ${className}`} role={label ? "region" : undefined} aria-label={label}>
