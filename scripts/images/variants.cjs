@@ -21,6 +21,8 @@ const sharp = require("sharp");
 const root = path.join(__dirname, "..", "..");
 const pub = path.join(root, "public");
 const OUT = path.join(pub, "i");
+// Vercel keeps .next/cache between builds, so copies made once are reused: only new or changed photographs are encoded.
+const CACHE = path.join(root, ".next", "cache", "image-variants");
 
 /** folder, the widths wanted below the full width */
 const SETS = [
@@ -61,10 +63,17 @@ const WEBP = { quality: 80, effort: 5, smartSubsample: true };
           const rel = path.join(dir, `${f.slice(0, -4)}.${hash}.${w}.${ext}`);
           const out = path.join(OUT, rel);
           keep.add(rel);
+          const cached = path.join(CACHE, rel);
           if (!fs.existsSync(out)) {
-            const img = sharp(buf).resize({ width: w, withoutEnlargement: true, kernel: "lanczos3" });
-            fs.writeFileSync(out, await (ext === "avif" ? img.avif(opt) : img.webp(opt)).toBuffer());
-            made++;
+            fs.mkdirSync(path.dirname(out), { recursive: true });
+            if (fs.existsSync(cached)) fs.copyFileSync(cached, out);
+            else {
+              const img = sharp(buf).resize({ width: w, withoutEnlargement: true, kernel: "lanczos3" });
+              fs.writeFileSync(out, await (ext === "avif" ? img.avif(opt) : img.webp(opt)).toBuffer());
+              fs.mkdirSync(path.dirname(cached), { recursive: true });
+              fs.copyFileSync(out, cached);
+              made++;
+            }
           }
           if (w === meta.width) bytes[ext] += fs.statSync(out).size;
         }
