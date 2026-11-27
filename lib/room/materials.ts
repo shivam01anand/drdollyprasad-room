@@ -62,7 +62,7 @@ export const SPECS: Record<Role, Spec> = {
   field:     { set: "plaster", tint: [0.66, 0.135, 0.07], tile: 2.0, macro: 0.08, grime: true, normal: 0.5, env: 0.7 },
   court:     { set: "plaster", tint: [1.84, 1.8, 1.6], tile: 2.4, macro: 0.12, grime: true, env: 0.6 },
   floor:     { set: "floor", tint: 0xf3ebe0, tile: 2.8, macro: 0.07, env: 0.8, roughness: 1.0 },
-  stone:     { set: "floor", tint: 0xe2d6c4, tile: 1.6, macro: 0.05, env: 0.8 },
+  stone:     { set: "floor", tint: 0xe2d6c4, tile: 1.6, macro: 0.05, env: 0.8, breakBelow: -0.004 },
   sandstone: { set: "sandstone", tint: 0xf2dcc0, tile: 1.4, macro: 0.04, env: 0.8 },
   ram:       { set: "sandstone", tint: 0xf2dcc0, tile: 1.4, env: 0.8 },
   timber:    { set: "timber", tint: [1.25, 1.1, 0.95], tile: 2.0, macro: 0.05, env: 0.6 },
@@ -361,6 +361,22 @@ function patch(
        uniform float uRoomH;`
     );
     const lines: string[] = [];
+    if (brk) {
+      shader.uniforms.uBreakY = { value: o.breakBelow };
+      frag = frag.replace("uniform float uRoomH;", "uniform float uRoomH;\n       uniform float uBreakY;");
+      lines.push(`
+        #ifdef USE_MAP
+          // the open ground: where a slow noise says so, the same photograph larger and turned a
+          // quarter, so no two neighbouring repeats match and the plan shows no grid
+          // (sampled everywhere and chosen by height: a texture read inside a branch has no mip level)
+          vec4 gFar = texture2D(map, vMapUv.yx * 0.283 + vec2(0.37, 0.11));
+          vec4 gMid = texture2D(map, vec2(-vMapUv.y, vMapUv.x) * 0.61 + vec2(0.13, 0.57));
+          float gW1 = smoothstep(0.30, 0.56, texture2D(uMacro, vMapUv * uMacroScale * 0.83 + vec2(0.21, 0.67)).r);
+          float gW2 = smoothstep(0.34, 0.62, texture2D(uMacro, vMapUv.yx * uMacroScale * 0.31 + vec2(0.53, 0.19)).r);
+          vec3 gBroken = mix(mix(sampledDiffuseColor.rgb, gMid.rgb, 0.75 + 0.25 * gW1), gFar.rgb, 0.45 + 0.5 * gW2);
+          diffuseColor.rgb *= mix(vec3(1.0), gBroken / max(sampledDiffuseColor.rgb, vec3(0.02)), step(vWorldY, uBreakY));
+        #endif`);
+    }
     if (o.macro > 0) {
       lines.push(`
         #ifdef USE_MAP
