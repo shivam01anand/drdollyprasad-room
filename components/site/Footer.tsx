@@ -21,7 +21,7 @@ export default function Footer() {
           <a className="ftr-ig" href={INSTAGRAM.url} target="_blank" rel="noopener noreferrer" aria-label={`Instagram ${INSTAGRAM.handle}`}>
             <InstagramIcon /><span>{INSTAGRAM.handle}</span>
           </a>
-          <a href={STUDIO_PATH}>Walk through the studio</a>
+          <a href={STUDIO_PATH}>Walk through the house</a>
           <MotionToggle />
         </nav>
       </div>

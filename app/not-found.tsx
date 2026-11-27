@@ -12,8 +12,8 @@ export default function NotFound() {
         <h1 className="page-title">This page isn’t on the walls.</h1>
         <div className="lost-ctas">
           <a className="btn btn-solid" href="/">Home</a>
-          <a className="btn" href="/works">All her work</a>
-          <a className="btn" href="/studio">Walk through the studio</a>
+          <a className="btn" href="/works">All the paintings</a>
+          <a className="btn" href="/studio">Walk through the house</a>
           <a className="btn" href="/enquire">Enquire</a>
         </div>
       </section>

@@ -6,7 +6,7 @@ import "../fonts.css";
 import "../globals.css";
 
 const TITLE = "The studio";
-const DESCRIPTION = "A virtual house hung with Dr Dolly Prasad’s paintings at their true size: a courtyard, a quiet room, a red room and a gallery.";
+const DESCRIPTION = "A house hung with Dr Dolly Prasad’s paintings at their true size: a courtyard, a quiet room, a red room and a gallery.";
 export const metadata: Metadata = {
   title: TITLE,
   description: DESCRIPTION,

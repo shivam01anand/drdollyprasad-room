@@ -21,7 +21,7 @@ export default function Enquire() {
     <div className="wrap">
       <section className="page-head">
         <h1 className="page-title">Enquire</h1>
-        <p className="lede">A painting you would like to know more about, an exhibition, or the press. Prices are on request.</p>
+        <p className="lede">A painting you would like to know more about, an exhibition, or the press. Your message goes to her by email, and prices are on request.</p>
       </section>
       <EnquireForm />
     </div>

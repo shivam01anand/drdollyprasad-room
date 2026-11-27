@@ -878,7 +878,7 @@ export default function Studio({ dims }: { dims: Dims }) {
                   onClick={() => go(failed ? "#works" : "[data-chapter='featured']")}>Works<span className="arr"> →</span></button></span>
             {!failed && (
               <span className="mask"><button type="button" className="pill hud-pill" aria-current={here === "plan" || undefined}
-                    onClick={() => go("[data-chapter='plan']", true)}>Exhibitions<span className="arr"> →</span></button></span>
+                    onClick={() => go("[data-chapter='plan']", true)}>From above<span className="arr"> →</span></button></span>
             )}
             <span className="mask"><button type="button" className="pill hud-pill" onClick={() => go("#contact")}>Contact<span className="arr"> →</span></button></span>
           </nav>

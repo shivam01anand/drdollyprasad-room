@@ -28,7 +28,7 @@ export default function SeriesIndex() {
   return (
     <>
       <PageHead eyebrow={<>The everyday, held <span className="red">sacred</span></>} title="Collections" red="Collections"
-                line="From a thought kept back in spring to a prayer said at sunrise, by way of a shut door, a street on its way out and a face looked at up close.">
+                line="Each collection keeps to one side of the same ordinary day and stays there long enough to see what it holds, beginning with a thought kept back in spring.">
         <Link className="btn btn-solid" href="/series/bahaar">Start with Bahaar</Link>
       </PageHead>
 

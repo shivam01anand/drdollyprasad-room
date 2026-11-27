@@ -78,7 +78,7 @@ export default function HerWall({ room, active, live }: { room: React.RefObject<
 
   const h = HER_WALL, more = herWallMore();
   return (
-    <div className="her-wall" ref={root} aria-label={`About ${h.heading}`} data-placeholder={h.placeholder ? "1" : undefined}>
+    <div className="her-wall" ref={root} aria-label={`About ${h.heading}`}>
       <figure className="hw-photo">
         <span className="hw-frame">
           {/* eslint-disable-next-line @next/next/no-img-element */}
@@ -94,7 +94,7 @@ export default function HerWall({ room, active, live }: { room: React.RefObject<
         <h3>{h.exhibitionsHeading}</h3>
         <ul>
           {h.exhibitions.map((e) => <li key={e.year + e.line}><b>{e.year}</b> {e.line}</li>)}
-          <li className="hw-more">and {more} more</li>
+          <li className="hw-more">and {more} more since 2005</li>
         </ul>
       </div>
       <div className="hw-lines">

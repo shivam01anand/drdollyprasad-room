@@ -5,8 +5,8 @@ import Roll, { type RollItem } from "@/components/site/Roll";
 import PageHead from "@/components/site/PageHead";
 import PressRow from "@/components/site/PressRow";
 import { PRESS_ALL } from "@/lib/press";
-import { LOOK, STATEMENT, PORTRAIT_LARGE, STUDIO_PATH, shownYear } from "@/lib/site";
-import { BY_ID, workPath } from "@/lib/works";
+import { LOOK, PORTRAIT_LARGE, STUDIO_PATH, shownYear } from "@/lib/site";
+import { BY_ID, WORKS, workPath } from "@/lib/works";
 
 const TITLE = "About";
 const DESCRIPTION = "Dr Dolly Prasad paints in New Delhi, mostly in oil. Nineteen exhibitions and art fairs since 2005, and paintings in private collections in India, the USA and the UK.";
@@ -56,19 +56,6 @@ export default function About() {
         </div>
       </section>
 
-      {/* content elevate (2026-11-22): the theme, one painting from each collection, moved up in place of the old band */}
-      <section className="ab-band tone-light">
-        <div className="wrap ab-split">
-          <div className="ab-txt">
-            <p className="eyebrow">The collections</p>
-            <h2>What the everyday holds</h2>
-            {STATEMENT.map((ln, i) => <p key={i} className="ab-p">{ln}</p>)}
-            <Link className="btn btn-solid" href="/series">See the collections</Link>
-          </div>
-          <Roll label="One painting from each collection" items={paint(["child-among-flowers", "red-and-teal-door-lock", "milkman-on-bicycle", "elder-woman-portrait", "sacred-tree"])} />
-        </div>
-      </section>
-
       <section className="ab-band tone-light">
         <div className="wrap ab-split">
           <div className="ab-txt">
@@ -85,7 +72,7 @@ export default function About() {
           <p className="eyebrow">The work</p>
           <h2>Small things, kept at their true weight</h2>
           <p className="ab-p">Her paintings start with what people walk past every day, a twenty-paise coin or a padlock on a door, and give it the size it has in someone’s life. Twenty Paise stands four feet tall.</p>
-          <p className="ab-p">A prayer said at sunrise gets the care of a portrait. A stranger’s patience gets a canvas of its own.</p>
+          <p className="ab-p">A stranger’s patience gets a canvas of its own.</p>
         </div>
       </section>
 
@@ -107,9 +94,10 @@ export default function About() {
           <div className="ab-txt">
             <p className="eyebrow">On the walls, and in the news</p>
             <h2>Nineteen exhibitions and art fairs</h2>
-            <p className="ab-p">In 2005 her paintings were shown at Sriram Centre in New Delhi and at Indraprastha Art Gallery. They have since hung at India Habitat Centre four times, at the Indian Council for Cultural Relations, Triveni Kala Sangam, Travancore Art Gallery and Nehru Art Gallery in Bombay, and at art fairs in Delhi and Jaipur. The most recent was Sacred Fragments: A Journey Home, at the Visual Arts Gallery, India Habitat Centre, from 18 to 21 October 2026.</p>
-            <p className="ab-p">Television cameras were at the gallery in June 2010, and Delhi Times listed a Travancore group show she was in under Must See, Must Do.</p>
-            <Link className="btn btn-solid" href="/exhibitions">See the exhibitions</Link>
+            <p className="ab-p">2026 · Sacred Fragments: A Journey Home, Visual Arts Gallery, India Habitat Centre, New Delhi</p>
+            <p className="ab-p">2010 · Open Palm Court, India Habitat Centre, New Delhi</p>
+            <p className="ab-p">and 17 more since 2005</p>
+            <Link className="btn btn-solid" href="/exhibitions">All nineteen, on Exhibitions →</Link>
           </div>
           <Roll label="Her exhibitions" items={SHOW_PHOTOS} shape="wide" />
         </div>
@@ -117,10 +105,11 @@ export default function About() {
 
       <section className="ab-band tone-wall">
         <div className="wrap ab-close">
+          <p className="ab-p">Questions about a painting go straight to her, by email.</p>
           <div className="ab-ctas">
-            <Link className="btn btn-solid" href="/works">See her work</Link>
-            <Link className="btn" href="/enquire">Enquire</Link>
-            <a className="btn" href={STUDIO_PATH}>Walk through the studio</a>
+            <Link className="btn btn-solid" href="/enquire">Ask about a painting</Link>
+            <Link className="btn" href="/works">See all {WORKS.length} paintings</Link>
+            <a className="btn" href={STUDIO_PATH}>Walk through the house</a>
           </div>
         </div>
       </section>

@@ -54,10 +54,10 @@ export default function Home() {
     <>
       <WallHero columns={HOME} label="Dr Dolly Prasad" size="home" eyebrow="Paintings in oil · New Delhi"
                 title="Dr Dolly Prasad" red="Dolly" tagline={<>The everyday, held <span className="red">sacred</span>.</>}
-                sub="Paintings of what India hurries past"
-                proof="Nineteen exhibitions and art fairs, 2005 to 2026">
-        <Link className="btn btn-solid" href="/works">See all {total} works</Link>
-        <a className="btn" href={STUDIO_PATH}><span className="lbl-wide">Walk through the studio</span><span className="lbl-phone">Enter the studio</span></a>
+                sub="She gives a milk can or an old man’s worry the long look most people keep for a shrine."
+                proof="In private collections in India, the USA and the UK.">
+        <Link className="btn btn-solid" href="/works">See all {total} paintings</Link>
+        <a className="btn" href={STUDIO_PATH}><span className="lbl-wide">Walk through the house</span><span className="lbl-phone">Enter the house</span></a>
       </WallHero>
 
       {NOW_SHOWING_CONFIRMED && <Until until={now.until}>
@@ -99,7 +99,7 @@ export default function Home() {
           <div className="hw-intro">
             <p className="eyebrow">The artist</p>
             <h2 id="hw-h">Paintings of what India hurries past</h2>
-            <p className="hw-lede">Dr Dolly Prasad gives a milk can or an old man’s worry the long look most people keep for a shrine. She works in New Delhi, mostly in oil, and her paintings are in private collections in India, the USA and the UK.</p>
+            <p className="hw-lede">Dr Dolly Prasad works in New Delhi, mostly in oil on canvas, sometimes with charcoal or pastel, and has shown her paintings at exhibitions and art fairs since 2005.</p>
             <Link className="link" href="/about">Her story →</Link>
           </div>
           <aside className="hw-press" aria-labelledby="hw-press-h">
