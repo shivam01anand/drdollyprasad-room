@@ -20,7 +20,6 @@ export default function Pic({ src, sizes, set, eager = false, imgRef, ...img }: 
   return (
     <picture>
       <source type="image/avif" srcSet={s.avif} sizes={sizes} />
-      <source type="image/webp" srcSet={s.webp} sizes={sizes} />
       {el}
     </picture>
   );
