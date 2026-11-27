@@ -246,19 +246,28 @@ html[data-gliding="1"]{scroll-snap-type:none}
 /* ------------------------------------------------------------- copy slot */
 .copy{position:fixed;inset:0;z-index:2;pointer-events:none;transition:opacity .35s ease}
 .copy[data-yield="1"]{opacity:0}
-/* each chapter's words sit on a wall label: a flat paper card, square and
-   bounded, so the room around it stays untouched */
+/* each chapter's words are a caption along the foot of the screen, above the controls: no card, so
+   nothing of the room (and no frame) is covered. Their ink is read from the room behind them
+   (components/Studio: data-ink), with a soft halo of the other tone so they hold on a patterned floor */
 .copy-panel{
-  position:absolute;left:var(--gut);bottom:calc(var(--hud-bottom) + 32px);
-  width:min(31rem,42vw);max-height:calc(100vh - var(--hud-top) - var(--hud-bottom) - 64px);
-  padding:20px 24px 22px;background:var(--page);border:1px solid var(--rule);
+  position:absolute;left:var(--gut);bottom:calc(var(--hud-bottom) + 14px);
+  width:fit-content;max-width:min(60rem,calc(100vw - var(--gut) * 2));max-height:calc(100vh - var(--hud-top) - var(--hud-bottom) - 64px);
+  padding:0;--cap:#211B17;--cap-halo:240,234,223;color:var(--cap);
+  text-shadow:0 0 2px rgba(var(--cap-halo),.7),0 0 9px rgba(var(--cap-halo),.65),0 0 22px rgba(var(--cap-halo),.5);
+  transition:color .35s ease,text-shadow .35s ease;
   visibility:hidden;opacity:0;
 }
+.copy[data-ink="light"] .copy-panel{--cap:#F4EEE3;--cap-halo:20,14,10}
+.copy-panel .lab,.copy-panel .lede,.copy-panel .poem{color:inherit}
+.copy-panel .lab{font-size:12px;opacity:.86}
+/* (the stop's number is in the controls beneath: once is enough) */
+.copy-panel .copy-idx{display:none}
 /* a verse label hugs the verse; prose keeps the measure */
 .copy-panel:has(.poem){width:auto;min-width:min(21rem,42vw)}
-.copy-head{display:flex;justify-content:space-between;align-items:baseline;gap:16px;margin-bottom:14px}
+.copy-head{display:flex;justify-content:space-between;align-items:baseline;gap:16px;margin-bottom:6px}
 .copy-idx{flex:none;opacity:.75;font-variant-numeric:tabular-nums}
 .lede{font-size:clamp(16px,1.2vw,18px);line-height:1.55;letter-spacing:-.005em;margin:0;color:var(--ink);max-width:34em;text-wrap:pretty}
+.copy-panel .lede{max-width:none;line-height:1.45}
 /* a label that is only her words: no rule above them, set a little larger */
 .copy-head + .quote{margin-top:0;padding-top:0;border-top:0;font-size:clamp(16px,1.25vw,19px);line-height:1.5}
 .quote{margin:16px 0 0;padding-top:14px;border-top:1px solid var(--rule);font-size:clamp(15px,1.1vw,17px);line-height:1.55;font-style:normal;color:var(--ink);max-width:34em}
@@ -489,13 +498,13 @@ html[data-room="off"] .sec:not(.sec-featured){display:none}
   .sheet{display:block}
   .pill{font-size:10.5px;height:40px;padding:0 14px}
   .diya-btn{width:42px;height:42px}
-  .copy-panel{left:var(--gut);right:var(--gut);width:auto;bottom:calc(var(--hud-bottom) + 12px);padding:16px 18px 18px}
+  .copy-panel{left:var(--gut);right:var(--gut);width:auto;max-width:none;bottom:calc(var(--hud-bottom) + 14px)}
   .wall-label{max-width:176px;padding:7px 10px 8px}
   .wall-labels[data-dense="1"] .wall-label{max-width:176px}
   /* the music joins the diya in the corner on a phone */
   .hud-top{grid-template-columns:1fr auto auto}
   .wall-label .cap-title{font-size:12.5px}
-  .copy-head{margin-bottom:10px}
+  .copy-head{margin-bottom:5px}
   .lede{font-size:16px;line-height:1.5}
   .poem{font-size:17px;line-height:1.36}
   /* on a phone the row is a carousel for the thumb: one painting large, the next one
@@ -528,8 +537,7 @@ html[data-room="off"] .sec:not(.sec-featured){display:none}
    the poem — two stanzas of five lines — in two columns, so all of it stays clear
    of the painting above it. Last in the sheet, so it wins over the phone rules. */
 @media (max-width:900px) and (max-height:760px){
-  .copy-panel{padding:13px 16px 15px}
-  .copy-head{margin-bottom:8px}
+  .copy-head{margin-bottom:4px}
   .poem{font-size:15px;line-height:1.3;columns:2;column-gap:14px}
   .poem-line{break-inside:avoid}
   .lede{font-size:15px;line-height:1.45}
