@@ -57,7 +57,7 @@ export default function About() {
       <section className="ab2-sec wrap" aria-labelledby="ab2-press">
         <h2 id="ab2-press" className="ab2-h">Press</h2>
         <ul className="ab2-press">
-          {PRESS_HOME.map((p) => {
+          {PRESS_HOME.filter((p) => p.id !== "ihc-press-01").map((p) => {
             const src = p.kind === "video" ? p.poster! : p.src;
             return (
               <li key={p.id}>
