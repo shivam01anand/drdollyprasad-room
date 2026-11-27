@@ -9,9 +9,9 @@ import { WORKS, type Work, EMAIL, INSTAGRAM, SITE, quoted, workPath } from "./wo
 
 export { EMAIL, INSTAGRAM, SITE, quoted, workPath };
 
-/** her WhatsApp number in international form without "+" (e.g. "9198xxxxxxxx").
- *  Empty until she chooses the number: the WhatsApp buttons then go to the enquiry page. */
-export const WHATSAPP = "";
+/** one delivery line, shown with the way to enquire (Enquire page and painting page). Empty until the writer
+ *  supplies the wording; nothing shows while it is empty. */
+export const DELIVERY_LINE = "";
 
 export const STUDIO_PATH = "/studio";
 
@@ -273,14 +273,6 @@ export const labelLine = (w: Work) => [w.medium, w.size, shownYear(w)].filter(Bo
 
 /** a painting shows one year: the year recorded, or the latest year of the series' range */
 export const shownYear = (w: Work) => w.year?.match(/\d{4}(?!.*\d{4})/)?.[0];
-
-const waText = (w?: Work) =>
-  w ? `Hello Dr Prasad, I saw ${quoted(w.title)} on your website and would like to know more. ${SITE}${workPath(w.id)}`
-    : "Hello Dr Prasad, I saw your paintings on your website and would like to know more.";
-
-/** the WhatsApp link, with the painting named, or the enquiry page when no number is set */
-export const whatsappHref = (w?: Work) =>
-  WHATSAPP ? `https://wa.me/${WHATSAPP}?text=${encodeURIComponent(waText(w))}` : enquireHref(w);
 
 export const enquireHref = (w?: Work) => (w ? `/enquire?work=${w.id}` : "/enquire");
 

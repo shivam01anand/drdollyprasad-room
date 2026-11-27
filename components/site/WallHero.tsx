@@ -1,36 +1,34 @@
 import { Wall, type Item } from "./Collage";
 
 /**
- * A page opening: the moving wall, and a small white card centred on it with
- * the paintings running all round it (CR-006, Shubham: on a phone and a
- * computer alike). Every landing uses this same card, same size and place.
- * `face` is kept for callers; the portrait is in the header.
+ * The home opening: the name block on plain Khadi ground, then the moving wall
+ * below it, uncovered (elevate, 26 Nov 2026: nothing laid over paintings, no
+ * pale card). Slots, top to bottom: eyebrow, name, tagline, sub-line, proof
+ * line, buttons. Final words come in the words round.
  */
-export default function WallHero({ columns, label, face, eyebrow, title, red, held, sub, children, size = "page", speed }: {
+export default function WallHero({ columns, label, eyebrow, title, red, tagline, sub, proof, children, size = "home", speed }: {
   columns: Item[][];
   label: string;
-  face?: string;
   eyebrow?: React.ReactNode;
   title: string;
   /** the ONE word of the title set in blood red */
   red?: string;
-  held?: string;
+  tagline?: React.ReactNode;
   sub?: React.ReactNode;
+  proof?: React.ReactNode;
   children?: React.ReactNode;
-  /** "dir": a directory page (R4 B3-1, /series): the "page" hero at a shorter height on >=641 */
-  size?: "home" | "page" | "dir";
+  size?: "home" | "page";
   speed?: number;
-  /** kept for callers; the wall is never blurred now */
-  soft?: boolean;
 }) {
   return (
-    <section className={`wh wh-${size === "dir" ? "page wh-dir" : size}`} aria-label={label}>
-      {/* CR-006: one small white card, the same on every landing: eyebrow, title, one short line, the buttons */}
-      <div className="wh-card namecard">
+    <section className={`wh wh-${size}`} aria-label={label}>
+      <div className="wh-head wrap">
         {eyebrow && <p className="eyebrow">{eyebrow}</p>}
         <h1>{red && title.includes(red) ? <>{title.split(red)[0]}<span className="red">{red}</span>{title.split(red)[1]}</> : title}</h1>
-        {(held || sub) && <p className="wh-line">{held ?? sub}</p>}
-        {children && <div className="ctas">{children}</div>}
+        {tagline && <p className="wh-tag">{tagline}</p>}
+        {sub && <p className="wh-sub">{sub}</p>}
+        {proof && <p className="wh-proof">{proof}</p>}
+        {children && <div className="wh-btns">{children}</div>}
       </div>
       <div className="wh-wall collage">
         <Wall columns={columns} speed={speed} />

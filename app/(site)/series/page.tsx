@@ -7,8 +7,7 @@ import Card from "@/components/site/Card";
 import { LEAD, SERIES_PAGES, SMALL_PHOTO, worksIn } from "@/lib/site";
 import Marquee from "@/components/site/Marquee";
 import CollectionsSwitcher from "@/components/site/CollectionsSwitcher";
-import WallHero from "@/components/site/WallHero";
-import { SERIES_HERO_WALL } from "@/components/site/Collage";
+import PageHead from "@/components/site/PageHead";
 
 const TITLE = "Collections";
 const DESCRIPTION = "Dr Dolly Prasad’s five collections: Bahaar, Bandh Darwaze, Gone Are The Days, Portraits and Faith. Forty-one paintings of the everyday, held sacred.";
@@ -28,10 +27,10 @@ export const metadata: Metadata = {
 export default function SeriesIndex() {
   return (
     <>
-      <WallHero size="dir" columns={SERIES_HERO_WALL} label="Paintings from the collections" eyebrow={<>The everyday, held <span className="red">sacred</span></>} title="Collections" red="Collections"
-                sub={<>From a thought kept back in spring to a prayer said at sunrise, by way of a shut door, a street on its way out and a face looked at up close.</>}>
+      <PageHead eyebrow={<>The everyday, held <span className="red">sacred</span></>} title="Collections" red="Collections"
+                line="From a thought kept back in spring to a prayer said at sunrise, by way of a shut door, a street on its way out and a face looked at up close.">
         <Link className="btn btn-solid" href="/series/bahaar">Start with Bahaar</Link>
-      </WallHero>
+      </PageHead>
 
       <CollectionsSwitcher />
 

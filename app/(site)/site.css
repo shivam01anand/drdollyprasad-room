@@ -76,8 +76,6 @@ p{margin:0}
 .btn:hover{background:var(--ink);color:var(--bg)}
 .btn-solid{background:var(--ink);color:var(--bg)}
 .btn-solid:hover{background:var(--rust);border-color:var(--rust);color:var(--rust-ink)}
-.btn-wa{background:var(--green);border-color:var(--green);color:#F5F4F0}
-.btn-wa:hover{background:#245637;border-color:#245637;color:#F5F4F0}
 .btn-light{border-color:var(--dark-ink);color:var(--dark-ink)}
 .btn-light:hover{background:var(--dark-ink);color:var(--dark)}
 .btn svg{width:18px;height:18px;flex:none}
@@ -106,7 +104,6 @@ p{margin:0}
 .nav .ig svg{width:22px;height:22px}
 .hdr-cta{display:flex;gap:10px}
 .menu{display:none}
-@media (max-width:1180px){ .hdr-cta .btn-wa{display:none} }
 @media (max-width:999px){
   .nav,.hdr-cta{display:none}
   .brand img{width:40px;height:40px}
@@ -124,14 +121,7 @@ p{margin:0}
 }
 @media (max-width:420px){ .brand-t b{font-size:24px} .brand-t i{font-size:15px} }
 
-/* the sticky WhatsApp on phones */
-.float-ask{display:none}
-@media (max-width:760px){
-  .float-ask{display:flex;position:fixed;left:14px;right:14px;bottom:14px;z-index:25;min-height:52px;box-shadow:0 10px 26px rgba(0,0,0,.28)}
-  .site{padding-bottom:76px}
-  .float-ask{transition:opacity .25s ease,transform .25s ease}
-  .float-ask.is-away{opacity:0;transform:translateY(16px);pointer-events:none;visibility:hidden}
-}
+@media (max-width:760px){ .site{padding-bottom:76px} }
 
 /* ---- paintings in their frames ---- */
 .framed{display:block;border:6px solid var(--frame);box-shadow:var(--lift);background:var(--frame)}
@@ -1065,8 +1055,7 @@ h1,h2,h3{font-weight:500;letter-spacing:-.005em}
   .wp-bar .btn{min-height:44px;flex:none}
   .site:has(.wp-bar){padding-bottom:72px}
   .wp-bar.is-away{transform:translateY(110%);pointer-events:none;visibility:hidden;transition:transform .4s var(--ease),visibility 0s .4s}
-  body:has(.wp-bar) .float-ask{display:none}
-}
+  body:has(.wp-bar) }
 
 /* ---- the painting, full screen ---- */
 .zoom{position:fixed;inset:0;z-index:100;background:#181513;color:var(--dark-ink);display:flex;flex-direction:column;animation:zoom-in .35s ease}

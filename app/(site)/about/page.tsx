@@ -2,8 +2,7 @@ import type { Metadata } from "next";
 import { pageOg } from "@/lib/og";
 import Link from "next/link";
 import Roll, { type RollItem } from "@/components/site/Roll";
-import WallHero from "@/components/site/WallHero";
-import { ABOUT_WALL } from "@/components/site/Collage";
+import PageHead from "@/components/site/PageHead";
 import PressRow from "@/components/site/PressRow";
 import { PRESS_ALL } from "@/lib/press";
 import { LOOK, STATEMENT, PORTRAIT_LARGE, STUDIO_PATH, shownYear } from "@/lib/site";
@@ -40,11 +39,10 @@ const SHOW_PHOTOS: RollItem[] = [
 export default function About() {
   return (
     <>
-      {/* CR-006: About opens like every landing, the white card centred on a wall of her paintings */}
-      <WallHero columns={ABOUT_WALL} label="About the artist" eyebrow="About the artist" title="Dr Dolly Prasad" red="Dolly" held="Painter, New Delhi.">
+      <PageHead eyebrow="About the artist" title="Dr Dolly Prasad" red="Dolly" line="Painter, New Delhi.">
         <a className="btn btn-solid" href="#story">Her story</a>
         <Link className="btn" href="/works">See her work</Link>
-      </WallHero>
+      </PageHead>
       <section id="story" className="ab-band ab-hero">
         <div className="wrap ab-hero-in">
           <figure className="ab-portrait">

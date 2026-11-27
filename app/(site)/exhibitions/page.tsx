@@ -6,8 +6,7 @@ import Until from "@/components/Until";
 import ShowMedia from "@/components/site/ShowMedia";
 import PressRow from "@/components/site/PressRow";
 import { PRESS_ALL } from "@/lib/press";
-import WallHero from "@/components/site/WallHero";
-import { SHOW_WALL } from "@/components/site/Collage";
+import PageHead from "@/components/site/PageHead";
 import { NOW, NOW_SHOWING_CONFIRMED, RECORD, RECORD_LINE, SACRED_FRAGMENTS, SHOWS } from "@/lib/site";
 import { BY_ID, workPath } from "@/lib/works";
 import { dims } from "@/lib/images";
@@ -34,11 +33,11 @@ const PRESS_AFTER = "india-habitat-centre-2010";
 export default function Exhibitions() {
   return (
     <>
-    <WallHero columns={SHOW_WALL} label="Her exhibitions" eyebrow="2005 to 2026" title="Exhibitions" red="Exhibitions"
-              held="Since 2005 the paintings have left home for nineteen exhibitions and art fairs, most of them in Delhi, others in Gurgaon, Jaipur and Bombay.">
+    <PageHead eyebrow="2005 to 2026" title="Exhibitions" red="Exhibitions"
+              line="Since 2005 the paintings have left home for nineteen exhibitions and art fairs, most of them in Delhi, others in Gurgaon, Jaipur and Bombay.">
       <a className="btn btn-solid" href={`#${shows[0].id}`}>See the shows</a>
       <a className="btn" href="#record">List of exhibitions</a>
-    </WallHero>
+    </PageHead>
     <div className="wrap">
       {NOW_SHOWING_CONFIRMED && <Until until={NOW.until}>
         <section id={NOW.id} className="now-line" aria-label="Now showing">

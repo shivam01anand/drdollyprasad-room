@@ -1,8 +1,8 @@
 import Link from "next/link";
 import { quoted, workPath, type Work } from "@/lib/works";
-import { INSTAGRAM, LOOK, SERIES_BY_SLUG, STUDIO_PATH, WHATSAPP, enquireHref, neighbours, shownYear, statusText, whatsappHref } from "@/lib/site";
+import { DELIVERY_LINE, INSTAGRAM, LOOK, SERIES_BY_SLUG, STUDIO_PATH, enquireHref, neighbours, shownYear, statusText } from "@/lib/site";
 import Share from "@/components/Share";
-import { ChatIcon, InstagramIcon } from "@/components/site/Icons";
+import { InstagramIcon } from "@/components/site/Icons";
 
 /**
  * The one painting card: what a painting says about itself, wherever it is
@@ -30,8 +30,8 @@ export default function PaintingInfo({ w, place = "page", titleId }: { w: Work; 
       {!sold && <p className="pp-price">Prices on request.</p>}
       <div className="pp-ctas">
         <Link className="btn btn-solid" href={enquireHref(w)}>{sold ? "Ask about her work" : "Enquire about this painting"}</Link>
-        {WHATSAPP && <a className="btn" href={whatsappHref(w)}><ChatIcon />WhatsApp</a>}
       </div>
+      {DELIVERY_LINE && <p className="pp-delivery meta">{DELIVERY_LINE}</p>}
       <div className="side-small">
         <a href={INSTAGRAM.url} target="_blank" rel="noopener noreferrer"><InstagramIcon />Instagram</a>
         {place === "page"

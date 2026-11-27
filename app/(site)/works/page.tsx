@@ -3,8 +3,6 @@ import { pageOg } from "@/lib/og";
 import Link from "next/link";
 import IndigoBand from "@/components/site/IndigoBand";
 import { SERIES_PAGES } from "@/lib/site";
-import WallHero from "@/components/site/WallHero";
-import { WORKS_WALL } from "@/components/site/Collage";
 import WorksBrowser from "@/components/site/WorksBrowser";
 import { INSTAGRAM } from "@/lib/site";
 import { WORKS } from "@/lib/works";
@@ -25,10 +23,6 @@ export const metadata: Metadata = {
 export default function WorksPage() {
   return (
     <>
-    <WallHero columns={WORKS_WALL} label="Her paintings" title="Works" red="Works"
-              held={`All ${WORKS.length} paintings on one wall. Walk it at your own pace.`}>
-      <a className="btn btn-solid" href="#all">See the paintings</a>
-    </WallHero>
     <section id="all" style={{ scrollMarginTop: 110 }}>
       <WorksBrowser />
     </section>

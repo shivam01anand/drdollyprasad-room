@@ -12,7 +12,7 @@ const tiles = [
   ["Traffic sources", "Where visitors arrive from.", "bars"],
   ["Paintings opened", "Unique visitors for each painting.", "bars"],
   ["From visit to contact", "In the same session, within one hour.", "funnel"],
-  ["Enquiry form journey", "Form viewed → started → email or WhatsApp opened.", "funnel"],
+  ["Enquiry form journey", "Form viewed → started → email opened.", "funnel"],
   ["Inside the studio", "Studio started → ready → painting opened.", "funnel"],
   ["Pages visitors follow", "Observed page-to-page journeys, with query strings removed.", "paths"],
   ["Recent visitor sessions", "Anonymous browsers, paintings and contact handoffs.", "table"],
@@ -91,6 +91,6 @@ export default function Dashboard() {
     <div className="tile-grid">{[0, 6, 1, 2, 3, 4, 5].map(i => <Tile key={i} index={i} days={days} refresh={refresh} />)}</div>
     <div className="section-heading"><h2>From curiosity to conversation</h2></div><div className="tile-grid">{[7, 8, 9, 10].map(i => <Tile key={i} index={i} days={days} refresh={refresh} />)}</div>
     <div className="section-heading"><h2>A closer look at each visit</h2></div><div className="tile-grid">{[11, 12, 13].map(i => <Tile key={i} index={i} days={days} refresh={refresh} />)}</div>
-    <footer className="analytics-footer"><p>Visitors are anonymous browsers, not verified people. A contact handoff means email or WhatsApp was opened; it doesn’t confirm a message was sent. Locations are approximate.</p><p>Counts may be small while tracking is new. The saved dashboard uses these same production filters and query definitions.</p></footer>
+    <footer className="analytics-footer"><p>Visitors are anonymous browsers, not verified people. A contact handoff means email was opened; it doesn’t confirm a message was sent. Locations are approximate.</p><p>Counts may be small while tracking is new. The saved dashboard uses these same production filters and query definitions.</p></footer>
   </main>;
 }

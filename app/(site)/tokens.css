@@ -250,3 +250,33 @@
     .pnx-t{font-size:28px !important}
   }
 }
+
+/* ---- elevate (26 Nov 2026): type and colour for the home name block, the plain title block and the Works chips.
+   Layout lives in elevate.css. ---- */
+@layer final {
+  .wh-head .eyebrow,.ph .eyebrow{font:500 14px/1.3 var(--sans) !important;letter-spacing:.22em !important;text-transform:uppercase !important;color:#6A615B !important}
+  .wh-head h1{font-family:var(--serif) !important;font-weight:500 !important;font-size:clamp(46px,6vw,88px) !important;line-height:1.02 !important;letter-spacing:-.01em !important;color:#1A1614 !important}
+  .wh-head h1 .red,.ph .page-title .red,.wh-head .wh-tag .red{color:var(--red) !important}
+  .wh-head .wh-tag{font:500 clamp(21px,2vw,28px)/1.25 var(--serif) !important;font-style:normal !important;letter-spacing:0 !important;color:#1A1614 !important}
+  .wh-head .wh-tag .red{font:inherit !important}
+  .wh-head .wh-sub{font:400 18px/1.5 var(--sans) !important;color:#4A423D !important}
+  .wh-head .wh-proof{font:400 16px/1.5 var(--sans) !important;color:#6A615B !important}
+  .wh-head .wh-btns .btn{letter-spacing:.14em !important}
+  .ph .page-title{font-size:clamp(44px,5.4vw,76px) !important;color:#1A1614 !important}
+  .ph .lede{color:#4A423D !important}
+  .wtitle .page-title{font-size:clamp(40px,4.6vw,64px) !important;color:#1A1614 !important}
+  .wtitle .lede{font-size:18px !important;color:#4A423D !important}
+  .wchip{font:500 16px/1 var(--sans) !important;letter-spacing:.02em !important;text-transform:none !important;color:#6A615B !important;min-height:44px !important;padding-inline:12px !important}
+  .wchip:hover,.wchip.is-on{color:#1A1614 !important}
+  .wcount{font-size:15px !important}
+  @media (max-width:640px){
+    .wh-head h1{font-size:42px !important}
+    .wh-head .wh-tag{font-size:21px !important}
+    .wh-head .wh-sub{font-size:17px !important}
+    .wh-head .wh-btns .btn{font-size:14px !important;letter-spacing:.04em !important}
+    .ph .page-title{font-size:38px !important}
+    .wchip{font-size:15px !important;padding-inline:10px !important}
+    .pf-grid.works-grid .card .meta-parts{font-size:15px !important;line-height:1.35 !important}
+    .pf-grid.works-grid .card-t{font-size:19px !important}
+  }
+}

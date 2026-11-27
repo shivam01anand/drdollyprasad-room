@@ -1,7 +1,6 @@
 import Link from "next/link";
-import { EMAIL, INSTAGRAM, PORTRAIT, STUDIO_PATH, WHATSAPP, whatsappHref } from "@/lib/site";
+import { EMAIL, INSTAGRAM, PORTRAIT, STUDIO_PATH } from "@/lib/site";
 import { InstagramIcon } from "./Icons";
-import FloatAsk from "./FloatAsk";
 import MotionToggle from "./MotionToggle";
 
 export default function Footer() {
@@ -18,7 +17,6 @@ export default function Footer() {
         </div>
         <nav className="ftr-links" aria-label="Contact">
           <Link href="/enquire">Enquire</Link>
-          {WHATSAPP && <a href={whatsappHref()}>WhatsApp</a>}
           <a href={`mailto:${EMAIL}`}>{EMAIL}</a>
           <a className="ftr-ig" href={INSTAGRAM.url} target="_blank" rel="noopener noreferrer" aria-label={`Instagram ${INSTAGRAM.handle}`}>
             <InstagramIcon /><span>{INSTAGRAM.handle}</span>
@@ -30,7 +28,6 @@ export default function Footer() {
       <div className="wrap" style={{ paddingBottom: 18 }}>
         <p className="meta">© {new Date().getFullYear()} Dr Dolly Prasad</p>
       </div>
-      {WHATSAPP && <FloatAsk href={whatsappHref()} />}
     </footer>
   );
 }
