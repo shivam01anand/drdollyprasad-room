@@ -10,6 +10,7 @@ import Featured from "./Featured";
 import Lightbox, { type LightboxHandle } from "./Lightbox";
 import Cursor, { roomCursorLabel } from "./Cursor";
 import WallLabels from "./WallLabels";
+import HerWall from "./HerWall";
 import Stops from "./Stops";
 import Until from "./Until";
 import QuickIndex from "./QuickIndex";
@@ -20,7 +21,7 @@ import { activeVariant } from "@/lib/room/variants";
 import { BY_ID, EMAIL, FEATURED } from "@/lib/works";
 import { rebaseWalkScroll, walkProgress } from "@/lib/walk-layout";
 import { clearWalkEdges } from "@/lib/walk-edges";
-import { fitCaptionAt, inkFor } from "@/lib/caption-fit";
+import { fitCaptionAt, inkPlan } from "@/lib/caption-fit";
 import { paintingProperties, track } from "@/lib/analytics";
 
 type Dims = Record<string, { w: number; h: number }>;
@@ -493,11 +494,15 @@ export default function Studio({ dims }: { dims: Dims }) {
       const at = lastActive;
       r.readLumaBehind("caption", { x0: b.left, y0: b.top, x1: b.right, y1: b.bottom }, (l, range) => {
         if (r.landed) capStop = at;
-        const light = inkFor(l, range, capLight);
-        if (light !== capLight) { capLight = light; slot.dataset.ink = light ? "light" : "dark"; }
+        const plan = inkPlan(l, range, capLight);
+        if (plan.light !== capLight) { capLight = plan.light; slot.dataset.ink = plan.light ? "light" : "dark"; }
+        slot.dataset.halo = plan.halo ? "1" : "";
       }, fresh);
     };
     gsap.ticker.add(capInk);
+    // the light changed (the evening's lightmap arrived, the diya lit): both inks are read again
+    const onLight = () => { capStop = -1; inkStop = -1; capAt = 0; inkAt = 0; };
+    addEventListener("studio:light", onLight);
 
     const ro = new ResizeObserver(() => measure());
     ro.observe(document.body);
@@ -535,6 +540,7 @@ export default function Studio({ dims }: { dims: Dims }) {
       clearTimeout(timeout);
       gsap.ticker.remove(frame);
       gsap.ticker.remove(ink);
+      removeEventListener("studio:light", onLight);
       gsap.ticker.remove(capInk);
       canvas.removeEventListener("webglcontextlost", onContextLost);
       history.scrollRestoration = prevRestoration;
@@ -916,6 +922,8 @@ export default function Studio({ dims }: { dims: Dims }) {
 
       <WallLabels room={roomRef} active={active} live={ready && !failed}
                   onOpen={(id) => lbRef.current?.open(id, null, WALK_ORDER)} />
+
+      <HerWall room={roomRef} active={active} live={ready && !failed} />
 
       {failed && (
         <p className="room-off lab" role="status">

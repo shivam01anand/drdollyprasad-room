@@ -1,3 +1,4 @@
+import { HER_WALL } from "./her-wall";
 import type { Room } from "./room/Room";
 import { CHAPTERS } from "./chapters";
 
@@ -27,8 +28,10 @@ export function captionObstacles(room: Room, index: number): Rect[] {
     const r = room.anchorRect(a.anchor, a.size[0], a.size[1]);
     if (r) out.push(r);
   }
-  const her = room.anchorRect("dolly", 0.85, 1.35);
-  if (her && room.anchorSeen("dolly")) out.push(her);
+  if (CHAPTERS[index]?.herWall) {
+    const w = room.wallRect(HER_WALL.wall);
+    if (w) out.push(w);
+  }
   return out.filter((r) => r.x1 > 0 && r.y1 > 0 && r.x0 < innerWidth && r.y0 < innerHeight);
 }
 
@@ -75,4 +78,26 @@ export function fitCaptionAt(room: Room, index: number): Rect | null {
 export function inkFor(mean: number, range: { lo: number; hi: number }, was: boolean | null = null) {
   const v = (mean + (range.lo + range.hi) / 2) / 2;
   return was === null ? v < 0.5 : was ? v < 0.55 : v < 0.45;
+}
+
+/** the lettering's inks, as relative luminance (#211B17 and #F4EEE3) */
+const L_DARK = 0.013, L_LIGHT = 0.86;
+const lin = (v: number) => Math.pow(Math.max(0, Math.min(1, v)), 2.2);
+export const WCAG = 4.8;   // the target is 4.5:1; a margin for a reading that is the mean of bands
+/**
+ * The ink for lettering over a stretch of the room as drawn (mean light and the darkest and lightest
+ * of its bands, 0 to 1 as displayed): dark or light, whichever holds best on the worst part behind it,
+ * with the middling bands held steady by `was`. `halo`: neither reaches 4.5:1 (WCAG) on the worst band, so
+ * the letters carry a soft shadow of the opposite tone, thicker, which is what they are then read against.
+ * Never a box.
+ */
+export function inkPlan(mean: number, range: { lo: number; hi: number }, was: boolean | null = null) {
+  const dark = (lin(range.lo) + 0.05) / (L_DARK + 0.05);       // dark ink, on the darkest band
+  const light = (L_LIGHT + 0.05) / (lin(range.hi) + 0.05);     // light ink, on the lightest band
+  let useLight = inkFor(mean, range, was);
+  // where the heuristic's choice fails the target and the other does not, take the other
+  if (useLight && light < WCAG && dark >= WCAG) useLight = false;
+  else if (!useLight && dark < WCAG && light >= WCAG) useLight = true;
+  const ratio = useLight ? light : dark;
+  return { light: useLight, halo: ratio < WCAG, ratio };
 }

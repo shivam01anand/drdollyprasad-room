@@ -18,11 +18,12 @@ NARROW = len(sys.argv) > 2 and sys.argv[2] == "narrow"
 ORDER = ["presence", "floral", "canopy", "easel", "gallery", "rupaya", "cartman", "shrine", "gayatri", "portraits",
          "kadhai", "doodhwala", "panels", "street", "redwall", "bodhi", "faith", "featured", "plan"]
 # the chapter "gallery" frames the view "hall" since the front doors opened (lib/chapters.ts)
-VIEW = {"gallery": "hall"}
+VIEW = {"gallery": "hall", "easel": "herwall"}
 VIA = {"easel": "easelvia", "gallery": "frontdoor", "panels": "hallvia", "street": "redin", "redwall": "redvia",
        "bodhi": "redout", "faith": "faithvia", "featured": "archout"}
 # passing poses the site defines itself (lib/chapters.ts PASSING), here in Blender coordinates
-PASSING = {"hallvia": {"eye": [8.6, -4.65, 1.62], "target": [12.6, -4.65, 1.6]}}
+PASSING = {"hallvia": {"eye": [8.6, -4.65, 1.62], "target": [12.6, -4.65, 1.6]},
+           "herwall": {"eye": [2.05, 2.4, 1.45], "target": [2.05, 6.0, 1.45]}}
 cams = {k: (info["cams"].get(f"n:{k}") if NARROW else None) or v for k, v in info["cams"].items() if not k.startswith("n:")}
 if NARROW:   # views a portrait screen alone has (a passing pose only it needs)
     cams.update({k[2:]: v for k, v in info["cams"].items() if k.startswith("n:") and k[2:] not in cams})

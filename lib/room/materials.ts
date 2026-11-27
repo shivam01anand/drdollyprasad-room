@@ -374,6 +374,10 @@ function patch(
           float gW1 = smoothstep(0.30, 0.56, texture2D(uMacro, vMapUv * uMacroScale * 0.83 + vec2(0.21, 0.67)).r);
           float gW2 = smoothstep(0.34, 0.62, texture2D(uMacro, vMapUv.yx * uMacroScale * 0.31 + vec2(0.53, 0.19)).r);
           vec3 gBroken = mix(mix(sampledDiffuseColor.rgb, gMid.rgb, 0.75 + 0.25 * gW1), gFar.rgb, 0.45 + 0.5 * gW2);
+          // what grid is left is the grout, a line every repeat: the ground seen from this high is kept to its
+          // blurred colour (three mip levels down, at a turned and unrelated scale), the grout softened out of it
+          vec3 gSoft = texture2D(map, vec2(vMapUv.x * 0.171 + vMapUv.y * 0.092, vMapUv.y * 0.171 - vMapUv.x * 0.092) + vec2(0.71, 0.29), 3.0).rgb;
+          gBroken = mix(gBroken, gSoft, 0.6);
           diffuseColor.rgb *= mix(vec3(1.0), gBroken / max(sampledDiffuseColor.rgb, vec3(0.02)), step(vWorldY, uBreakY));
         #endif`);
     }

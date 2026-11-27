@@ -6,7 +6,7 @@ import { BY_ID, details, quoted, statusLabel, type Work } from "@/lib/works";
 import { gsap, reducedMotion, scrambleTo } from "@/lib/motion";
 import type { Room } from "@/lib/room/Room";
 import { clearWalkEdges } from "@/lib/walk-edges";
-import { fitCaptionAt, inkFor } from "@/lib/caption-fit";
+import { fitCaptionAt, inkPlan } from "@/lib/caption-fit";
 
 /**
  * The wall labels. Each canvas in a chapter's framing gets its label set on the wall itself, as a
@@ -33,6 +33,8 @@ const DENSE = new Set(CHAPTERS.filter((c) => c.room === "The gallery").flatMap((
 const CROWDED = 4;
 /** a label is as wide as its frame, but never narrower than this */
 const MIN_W = 132;
+/** and no wider than this, where the wall has room */
+const WIDE_MAX = 300;
 /** captions for what is not her work (her photograph on its easel), keyed chapter:anchor */
 const ASIDES = CHAPTERS.flatMap((c) => (c.asides ?? []).map((a) => ({ key: `${c.id}:${a.anchor}`, chapter: c.id, ...a })));
 /** the medium, on a close group's short card, only where it is not the usual oil on canvas */
@@ -117,7 +119,15 @@ export default function WallLabels({ room, active, live, onOpen }: {
     /** the line along the foot that names the works with no card: above the chapter's words and
      *  the controls, clear of every card */
     const putRest = (cards: Rect[]) => {
-      restEl.querySelectorAll<HTMLElement>("[data-rest]").forEach((b) => { b.hidden = !rest.includes(b.dataset.rest!); });
+      // a numbered set (Bandh Darwaze I to IV) names its stem once: “Bandh Darwaze I” “II” “III” “IV”
+      let stem = "";
+      restEl.querySelectorAll<HTMLElement>("[data-rest]").forEach((b) => {
+        b.hidden = !rest.includes(b.dataset.rest!);
+        if (b.hidden) return;
+        const t = b.dataset.title ?? "", m = /^(.*\S) (I{1,3}|IV|V|VI{0,3})$/.exec(t);
+        b.textContent = m && stem === m[1] ? quoted(m[2]) : quoted(t);
+        stem = m ? m[1] : "";
+      });
       const was = restEl.dataset.on === "1";
       if (!rest.length) {
         if (was) { restEl.dataset.on = "0"; gsap.to(restEl, { autoAlpha: 0, duration: quick ? 0 : 0.2, overwrite: true }); }
@@ -160,12 +170,21 @@ export default function WallLabels({ room, active, live, onOpen }: {
       // left to right, as the eye reads a wall
       const order = [...rects].sort((a, b) => a[1].x0 - b[1].x0);
       const dress = (compact: boolean) => {
-        for (const [id, f] of order) {
+        order.forEach(([id, f], k) => {
           const n = nodes.get(id)!;
           n.dataset.compact = compact ? "1" : "";
-          n.style.maxWidth = `${Math.round(Math.max(f.x1 - f.x0, MIN_W))}px`;
-        }
+          // a full label may run wider than its frame where the wall beside it is free, up to the next frame
+          // (or the screen's edge): its details then stand on one line instead of breaking in a narrow column
+          const next = order[k + 1]?.[1];
+          const room = (next ? next.x0 - 16 : vw - gut) - f.x0;
+          const wide = compact ? 0 : Math.min(WIDE_MAX, room);
+          n.style.maxWidth = `${Math.round(Math.max(f.x1 - f.x0, MIN_W, wide))}px`;
+        });
       };
+      /** whether a label's rectangle may stand there: on the screen, clear of every frame, label and the chapter's words */
+      const clear = (r: Rect, taken: Rect[]) =>
+        !(r.x0 < gut || r.x1 > vw - gut || r.y0 < gut || r.y1 > vh - gut)
+        && !frames.some((o) => overlaps(r, o, 3)) && !taken.some((o) => overlaps(r, o, 6)) && !avoid.some((o) => overlaps(r, o, 6));
       const attempt = (side: Side, compact: boolean) => {
         dress(compact);
         const out = new Map<string, Side>();
@@ -177,19 +196,18 @@ export default function WallLabels({ room, active, live, onOpen }: {
           if (!compact && h > 62) continue;
           const p = spot(side, f, w, h);
           const r = { x0: p.x, y0: p.y, x1: p.x + w, y1: p.y + h };
-          if (r.x0 < gut || r.x1 > vw - gut || r.y0 < gut || r.y1 > vh - gut) continue;
-          if (frames.some((o) => overlaps(r, o, 3))) continue;
-          if (taken.some((o) => overlaps(r, o, 6))) continue;
-          if (avoid.some((o) => overlaps(r, o, 6))) continue;
+          if (!clear(r, taken)) continue;
           out.set(id, side);
           taken.push(r);
         }
         return out;
       };
       const crowded = order.length >= CROWDED;
+      // full labels first, under the frames, then over them; only then titles alone (a wall of four or more
+      // is lettered with titles alone to begin with)
       const tries: [Side, boolean][] = crowded
         ? [["below", true], ["above", true]]
-        : [["below", false], ["below", true], ["above", false], ["above", true]];
+        : [["below", false], ["above", false], ["below", true], ["above", true]];
       let best: { out: Map<string, Side>; compact: boolean } | null = null;
       for (const [side, compact] of tries) {
         const out = attempt(side, compact);
@@ -200,6 +218,30 @@ export default function WallLabels({ room, active, live, onOpen }: {
       dress(best?.compact ?? false);
       for (const id of ids) if (!rects.has(id)) nodes.get(id)!.dataset.compact = "";
       const out = best?.out ?? new Map<string, Side>();
+      // a work the wall's rule left without a label (a frame stacked over another, a label's way blocked)
+      // takes its title on whichever side of its own frame is free, before it is left to the line along the foot
+      if (out.size < order.length) {
+        const taken: Rect[] = [];
+        for (const [id, side] of out) {
+          const n = nodes.get(id)!, f = rects.get(id)!, p = spot(side, f, n.offsetWidth, n.offsetHeight);
+          taken.push({ x0: p.x, y0: p.y, x1: p.x + n.offsetWidth, y1: p.y + n.offsetHeight });
+        }
+        for (const [id, f] of order) {
+          if (out.has(id)) continue;
+          const n = nodes.get(id)!;
+          n.dataset.compact = "1";
+          n.style.maxWidth = `${Math.round(Math.max(f.x1 - f.x0, MIN_W))}px`;
+          for (const side of ["below", "above"] as Side[]) {
+            const p = spot(side, f, n.offsetWidth, n.offsetHeight);
+            const r = { x0: p.x, y0: p.y, x1: p.x + n.offsetWidth, y1: p.y + n.offsetHeight };
+            if (!clear(r, taken)) continue;
+            out.set(id, side);
+            taken.push(r);
+            break;
+          }
+          if (!out.has(id)) n.dataset.compact = "";
+        }
+      }
       if (process.env.NODE_ENV !== "production" && out.size < order.length)
         console.debug("[labels] no room for", order.filter(([id]) => !out.has(id)).map(([id]) => id).join(", "));
       // the works left without a label (no room, or not wholly in view), in the order the stop lists them
@@ -218,7 +260,9 @@ export default function WallLabels({ room, active, live, onOpen }: {
         const b = n.getBoundingClientRect();
         if (!b.width || !b.height) return;
         R.readLumaBehind(`label:${key}`, { x0: b.left, y0: b.top, x1: b.right, y1: b.bottom }, (l, range) => {
-          n.dataset.ink = inkFor(l, range) ? "light" : "dark";
+          const plan = inkPlan(l, range, n.dataset.ink ? n.dataset.ink === "light" : null);
+          n.dataset.ink = plan.light ? "light" : "dark";
+          n.dataset.halo = plan.halo ? "1" : "";
         }, k === 0);
       });
     };
@@ -339,20 +383,15 @@ export default function WallLabels({ room, active, live, onOpen }: {
       if (inkDue > 0 && --inkDue === 0) inks();
     };
 
-    // the diya lit or put out: the walls change under the labels, so their ink is read again as they do
-    const modeTimers: number[] = [];
-    const mo = new MutationObserver(() => {
-      modeTimers.forEach(clearTimeout);
-      modeTimers.length = 0;
-      for (const ms of [450, 900, 1500]) modeTimers.push(window.setTimeout(() => { if (placed) inks(); }, ms));
-    });
-    mo.observe(document.documentElement, { attributes: true, attributeFilter: ["data-mode"] });
+    // the light has changed under the labels (the diya lit or put out, the evening's lightmap arrived): their
+    // ink is read again from the next frame drawn, not after a guess of a delay (Room dispatches studio:light)
+    const onLight = () => { if (placed) inks(); };
+    addEventListener("studio:light", onLight);
 
     gsap.ticker.add(tick);
     return () => {
       gsap.ticker.remove(tick);
-      mo.disconnect();
-      modeTimers.forEach(clearTimeout);
+      removeEventListener("studio:light", onLight);
       removeEventListener("resize", onResize);
       clearTimeout(resizeTimer);
       hide(true);
@@ -381,7 +420,7 @@ export default function WallLabels({ room, active, live, onOpen }: {
         {IDS.map((id) => {
           const w = BY_ID.get(id);
           return w ? (
-            <button type="button" key={id} data-rest={id} tabIndex={-1} hidden data-cursor="View" onClick={() => onOpen(id)}>
+            <button type="button" key={id} data-rest={id} data-title={w.title} tabIndex={-1} hidden data-cursor="View" onClick={() => onOpen(id)}>
               {quoted(w.title)}
             </button>
           ) : null;

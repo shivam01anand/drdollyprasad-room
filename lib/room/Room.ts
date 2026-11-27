@@ -7,9 +7,7 @@ import { GTAOPass } from "three/examples/jsm/postprocessing/GTAOPass.js";
 import type * as CANNON from "cannon-es";
 
 import { buildLibrary, textureList, placeholderMaps, LATE_SETS, FULL_SETS, type Library } from "./materials";
-import { Rig } from "./rig";
-import { HEAD_URL } from "./dolly-url";
-import type { Dolly } from "./dolly";
+import { Rig, fieldOfView } from "./rig";
 import { loadHouse, loadHouseInfo, assemble, BakedLight, ROOF, HOUSE_DIR, assetUrl, prepLightmap, type HouseInfo, type HouseParts, type V3 } from "./house";
 import { paintMaterial, flatRelief, galleryLight } from "./paint";
 import { ReliefBuilder } from "./relief-builder";
@@ -164,7 +162,6 @@ export class Room {
   private ceiling = new THREE.Group();
   private info!: HouseInfo;
   private parts!: HouseParts;
-  private dolly?: Dolly;
 
   private sun!: THREE.DirectionalLight;
   private hemi!: THREE.HemisphereLight;
@@ -192,6 +189,8 @@ export class Room {
   private artPriority = -1;
   /** the stop the walk is at (or heading for): what streams in follows it */
   private artStop = 0;
+  /** the works each stop's camera can see (in its view, facing it, through doorways too): wanted at once, whatever room they hang in */
+  private seenAt: Set<string>[] = [];
   private reliefBuilder = new ReliefBuilder();
   /** One texture upload at rest; background work must not interrupt a glide. */
   private textureUploads: (() => void)[] = [];
@@ -297,6 +296,7 @@ export class Room {
     const aspect = (canvas.clientWidth || innerWidth) / Math.max(1, canvas.clientHeight || innerHeight);
     this.narrow = isNarrow(aspect);
     const walk = resolveWalk(this.info, this.narrow, aspect);
+    this.seenAt = this.seenFrom(walk.views, aspect);
     this.rig = new Rig(walk.shots, startPose(this.info, this.narrow), messPose(this.info), aspect, opts.reducedMotion, walk.vias);
     this.scene.add(this.rig.pivot, this.world);
 
@@ -391,28 +391,6 @@ export class Room {
     if (process.env.NODE_ENV !== "production") (window as unknown as { __room?: Room }).__room = this;
   }
 
-  /** Fit her real head after loading; the painting body and brush stay visible. */
-  private async lateFigure() {
-    try {
-      const { Dolly } = await import("./dolly");
-      if (this.disposed) return;
-      const dolly = this.dolly = new Dolly(this.baked!.night, this.tier.dpr, () => this.invalidate());
-      await dolly.load();
-      if (this.disposed) { dolly.dispose(); return; }
-      this.world.add(dolly.object);
-      this.parts.figureHeads.forEach(head => { head.visible = false; });
-      dolly.show(true);
-      this.ao?.refreshExclusions();
-      // its first frames (program, upload, sort) while the camera stands still, before her easel is in view
-      await this.atRest(() => { dolly.warm(4); this.wake = Math.max(this.wake, 5); });
-      this.invalidate();
-    } catch {
-      this.dolly?.dispose();
-      this.dolly = undefined;
-      this.parts.figureHeads.forEach(head => { head.visible = true; });
-    }
-  }
-
   /** a painting the visitor sees before entering: one at the first stops, the hero, and the canvas on her
    *  easel (the courtyard's; it is no stop's label) */
   private eager(id: string, info: HouseInfo) {
@@ -420,7 +398,31 @@ export class Room {
   }
 
   private loadArtwork(id: string) {
-    return this.loadTexture(artworkTextureURL(id)).catch(() => this.loadTexture(artworkFallbackURL(id)));
+    // the painting, then its lighter file, then the painting once more after a pause (a dropped connection)
+    return this.loadTexture(artworkTextureURL(id)).catch(() => this.loadTexture(artworkFallbackURL(id)))
+      .catch(() => new Promise<void>((r) => setTimeout(r, 900)).then(() => this.loadTexture(artworkTextureURL(id))));
+  }
+
+  /** per stop, the works its camera sees: in the frustum (a little wider than the lens, for the sway) and
+   *  facing the eye. A wall does not hide one: a doorway shows the room beyond it */
+  private seenFrom(views: { eye: V3; target: V3; fov?: number }[], aspect: number) {
+    const cam = new THREE.PerspectiveCamera(40, aspect, 0.05, 60), frustum = new THREE.Frustum(), m = new THREE.Matrix4();
+    return views.map((v) => {
+      const out = new Set<string>();
+      cam.fov = Math.min(100, (v.fov ?? fieldOfView(aspect)) + 10);
+      cam.updateProjectionMatrix();
+      cam.position.set(...v.eye);
+      cam.lookAt(...v.target);
+      cam.updateMatrixWorld(true);
+      frustum.setFromProjectionMatrix(m.multiplyMatrices(cam.projectionMatrix, cam.matrixWorldInverse));
+      for (const [id, a] of Object.entries(this.info.art)) {
+        if (a.study) continue;
+        const [nx, nz] = SIDE_OUT[a.side] ?? [0, 1];
+        if ((v.eye[0] - a.centre[0]) * nx + (v.eye[2] - a.centre[2]) * nz <= 0) continue;
+        if (frustum.intersectsSphere(new THREE.Sphere(new THREE.Vector3(...a.centre), Math.hypot(a.w, a.h) / 2))) out.add(id);
+      }
+      return out;
+    });
   }
 
   /** Keep three requests in flight, replacing each as it finishes, nearest stop first. */
@@ -436,7 +438,7 @@ export class Room {
   /** Once the visitor is inside: the full-size afternoon lightmap and surfaces (a wide screen's only),
    *  each when the walk is near enough to want it. One at a time and behind the paintings, each
    *  swapped in at rest so a glide never hitches. The evening lightmap and her head have their own
-   *  moments (needNight, needFigure). */
+   *  moments (needNight). */
   private afterEntry() {
     if (this.entered || this.disposed) return;
     this.entered = true;
@@ -471,11 +473,10 @@ export class Room {
   }
 
   /** what the walk asks for as it goes: the evening's light once the afternoon starts to go (or the
-   *  diya is lit), her head a stop or two before her easel */
+   *  diya is lit) */
   private needs() {
     if (!this.entered || this.disposed) return;
     if (this.artStop >= 1 || this.eve.walk > 1e-3 || this.mode === "dark") this.needNight();
-    if (this.artStop >= 1) this.needFigure();
   }
   private nightAsked = false;
   private needNight() {
@@ -483,16 +484,6 @@ export class Room {
     this.nightAsked = true;
     void this.loadNight().catch(() => { setTimeout(() => { this.nightAsked = false; }, 5000); });
   }
-  private figureAsked = false;
-  private needFigure() {
-    if (this.figureAsked) return;
-    this.figureAsked = true;
-    // the file first (it is held in the browser's cache), then the head is built from it while the
-    // camera stands still: neither the download nor the build lands on the walk up to her easel
-    void fetch(HEAD_URL, { signal: this.abort.signal }).then((r) => r.arrayBuffer()).catch(() => null)
-      .then(() => this.atRest(() => { void this.lateFigure(); }));
-  }
-
   /** the evening's light, baked: the evening of the walk and the lit diya wait for it */
   private nightLoad?: Promise<void>;
   private loadNight() {
@@ -509,7 +500,15 @@ export class Room {
       this.owned.push(t);
       this.eve.v = -1;
       this.applyEve();
+      this.lightChanged();
     });
+  }
+
+  /** the room's light has changed: lettering over it reads its ink again from the next frame drawn */
+  private lightChanged() {
+    this.wake = Math.max(this.wake, 2);
+    this.invalidate();
+    requestAnimationFrame(() => requestAnimationFrame(() => { if (!this.disposed) window.dispatchEvent(new Event("studio:light")); }));
   }
 
   /** the afternoon lightmap at full size, in place of the 2k one the visitor entered on */
@@ -580,7 +579,10 @@ export class Room {
     while (this.artLoads < 3) {
       // only the rooms the walk is in or near: the rest wait for the visitor to get there
       const rooms = ROOMS_AT[this.artStop];
-      const k = this.artQueue.findIndex((m) => !rooms || rooms.has(CHAPTERS[stopRank(m.userData.artId)]?.room ?? ""));
+      // a work the camera sees from this stop or the next comes first, wherever it hangs
+      const seen = (id: string) => this.seenAt[this.artStop]?.has(id) || this.seenAt[this.artStop + 1]?.has(id);
+      let k = this.artQueue.findIndex((m) => seen(m.userData.artId));
+      if (k < 0) k = this.artQueue.findIndex((m) => !rooms || rooms.has(CHAPTERS[stopRank(m.userData.artId)]?.room ?? ""));
       if (k < 0) break;
       const [mesh] = this.artQueue.splice(k, 1);
       this.artLoads++;
@@ -1139,7 +1141,7 @@ export class Room {
     this.fadeBake(instant);
     this.modeTl?.kill();
     const dur = instant || this.opts.reducedMotion ? 0 : 1.1;
-    const tl = gsap.timeline({ onUpdate: () => this.applyEve(), onComplete: () => this.applyEve() });
+    const tl = gsap.timeline({ onUpdate: () => this.applyEve(), onComplete: () => { this.applyEve(); this.lightChanged(); } });
     tl.to(this.eve, { mode: mode === "dark" ? 1 : 0, duration: dur, ease: "power2.inOut" });
     if (dur === 0) tl.progress(1);
     this.modeTl = tl;
@@ -1433,7 +1435,9 @@ export class Room {
     this.narrow = isNarrow(aspect);
     const walk = resolveWalk(this.info, this.narrow, aspect);
     this.rig.setShots(walk.shots, walk.vias);
+    this.seenAt = this.seenFrom(walk.views, aspect);
     this.wake = 2;
+    this.pumpArt();
   };
 
   /* ======================================================================
@@ -1505,7 +1509,6 @@ export class Room {
       this.ceiling.visible = ceilingOn;
       this.renderer.shadowMap.needsUpdate = true;   // the roof casts too
     }
-    this.dolly?.updateVisibility(this.rig.camera);
     this.composer.render(dt / 1000);
     if (this.lumaAsks.size) {
       const asks = [...this.lumaAsks.values()];
@@ -1665,6 +1668,22 @@ export class Room {
     return { x0, y0, x1, y1 };
   }
 
+  /** a stretch of the courtyard's north wall (plane z), x0..x1 by y0..y1 metres, on screen in CSS pixels;
+   *  null unless wholly in front of the camera */
+  wallRect(w: { z: number; x0: number; x1: number; y0: number; y1: number }) {
+    if (!this.rig || !this.canvas) return null;
+    const r = this.viewport;
+    let x0 = Infinity, y0 = Infinity, x1 = -Infinity, y1 = -Infinity;
+    for (const x of [w.x0, w.x1])
+      for (const y of [w.y0, w.y1]) {
+        tmpV.set(x, y, w.z).project(this.rig.camera);
+        if (tmpV.z < -1 || tmpV.z > 1) return null;
+        const px = r.left + (tmpV.x * 0.5 + 0.5) * r.width, py = r.top + (0.5 - tmpV.y * 0.5) * r.height;
+        x0 = Math.min(x0, px); x1 = Math.max(x1, px); y0 = Math.min(y0, py); y1 = Math.max(y1, py);
+      }
+    return { x0, y0, x1, y1 };
+  }
+
   /** a canvas with its frame, on screen in CSS pixels; null unless wholly in front of the camera */
   artRect(id: string) {
     const a = this.info?.art[id];
@@ -1696,7 +1715,6 @@ export class Room {
     this.textureUploads.length = 0;
     clearTimeout(this.jobTimer);
     this.jobs.length = 0;
-    this.dolly?.dispose();
     this.abort.abort();
     this.modeTl?.kill();
     this.dropTl?.kill();
