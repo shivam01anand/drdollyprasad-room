@@ -135,6 +135,8 @@ export const LARGE = new Set([
 ]);
 
 export const SITE = "https://drdollyprasad.com";
+/** her one identity in the site's structured data: the home page states it, every painting points at it */
+export const PERSON_ID = `${SITE}/#artist`;
 
 /** a painting's own page */
 export const workPath = (id: string) => `/work/${id}`;

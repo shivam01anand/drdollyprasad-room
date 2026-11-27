@@ -1,4 +1,5 @@
 import type { Metadata } from "next";
+import { pageOg } from "@/lib/og";
 import Link from "next/link";
 import Roll, { type RollItem } from "@/components/site/Roll";
 import WallHero from "@/components/site/WallHero";
@@ -8,10 +9,14 @@ import { PRESS_ALL } from "@/lib/press";
 import { LOOK, STATEMENT, PORTRAIT_LARGE, STUDIO_PATH, shownYear } from "@/lib/site";
 import { BY_ID, workPath } from "@/lib/works";
 
+const TITLE = "About";
+const DESCRIPTION = "Dr Dolly Prasad paints in New Delhi, mostly in oil. Nineteen exhibitions and art fairs since 2005, and paintings in private collections in India, the USA and the UK.";
 export const metadata: Metadata = {
-  title: "About",
-  description: "Dr Dolly Prasad paints in New Delhi, mostly in oil. Nineteen exhibitions and art fairs since 2005, and paintings in private collections in India, the USA and the UK.",
+  title: TITLE,
+  description: DESCRIPTION,
   alternates: { canonical: "/about" },
+  // the link preview carries this page's own title, line and address (elevate, 26 Nov 2026)
+  openGraph: pageOg(TITLE, DESCRIPTION, "/about"),
 };
 
 /** paintings for a roll: the painting, its title and year, and its one line */

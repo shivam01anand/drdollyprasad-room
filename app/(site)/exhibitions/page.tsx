@@ -1,4 +1,5 @@
 import type { Metadata } from "next";
+import { pageOg } from "@/lib/og";
 import Link from "next/link";
 import { Fragment } from "react";
 import Until from "@/components/Until";
@@ -11,10 +12,14 @@ import { NOW, NOW_SHOWING_CONFIRMED, RECORD, RECORD_LINE, SACRED_FRAGMENTS, SHOW
 import { BY_ID, workPath } from "@/lib/works";
 import { dims } from "@/lib/images";
 
+const TITLE = "Exhibitions";
+const DESCRIPTION = "Nineteen exhibitions and art fairs by Dr Dolly Prasad since 2005, most recently Sacred Fragments: A Journey Home at India Habitat Centre, New Delhi, in October 2026.";
 export const metadata: Metadata = {
-  title: "Exhibitions",
-  description: "Nineteen exhibitions and art fairs by Dr Dolly Prasad since 2005, most recently Sacred Fragments: A Journey Home at India Habitat Centre, New Delhi, in October 2026.",
+  title: TITLE,
+  description: DESCRIPTION,
   alternates: { canonical: "/exhibitions" },
+  // the link preview carries this page's own title, line and address (elevate, 26 Nov 2026)
+  openGraph: pageOg(TITLE, DESCRIPTION, "/exhibitions"),
 };
 
 const years = [...new Set(RECORD.map((r) => r.year))];
