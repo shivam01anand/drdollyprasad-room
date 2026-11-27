@@ -280,3 +280,18 @@
     .pf-grid.works-grid .card-t{font-size:19px !important}
   }
 }
+
+/* ---- About, gallery artist page (27 Nov 2026): type and colour ---- */
+@layer final {
+  .ab2-text .eyebrow{font:500 15px/1.3 var(--sans) !important;letter-spacing:.2em !important;text-transform:uppercase !important;color:#6A615B !important}
+  .ab2-text .page-title{font-size:clamp(44px,5.2vw,76px) !important;color:#1A1614 !important;line-height:1.03 !important}
+  .ab2-text .page-title .red{color:var(--red) !important}
+  .ab2-p{font:400 18px/1.65 var(--sans) !important;color:#1A1614 !important}
+  .ab2-link{font:500 16px/1.2 var(--sans) !important;letter-spacing:.04em !important;color:#1A1614 !important}
+  .ab2-h{font:500 clamp(28px,3vw,40px)/1.1 var(--serif) !important;color:#1A1614 !important}
+  .ab2-yr{font:500 17px/1.5 var(--sans) !important;color:#6A615B !important}
+  .ab2-list b,.ab2-press b{font:500 18px/1.4 var(--sans) !important;color:#1A1614 !important}
+  .ab2-venue{font:400 16px/1.5 var(--sans) !important;color:#4A423D !important}
+  .ab2-coll{font:500 clamp(22px,2.2vw,30px)/1.3 var(--serif) !important;color:#1A1614 !important}
+  @media (max-width:640px){ .ab2-text .page-title{font-size:40px !important} .ab2-p{font-size:17px !important} }
+}
