@@ -82,7 +82,8 @@
 .ab2-list li{display:grid;grid-template-columns:clamp(64px,9vw,120px) minmax(0,1fr);gap:0 16px;padding-block:14px;border-bottom:1px solid #E4DED5}
 .ab2-list b,.ab2-press b{display:block;font-weight:500}
 .ab2-venue{display:block}
-.ab2-press{list-style:none;margin:0;padding:0;display:grid;grid-template-columns:repeat(2,minmax(0,420px));justify-content:center;gap:clamp(16px,2.4vw,32px);align-items:start}
+.ab2-press-intro{margin:0 0 clamp(16px,2vw,24px);color:var(--muted)}
+.ab2-press{list-style:none;margin:0;padding:0;display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:clamp(16px,2.4vw,32px);align-items:start}
 .ab2-press a{display:block;text-decoration:none;color:inherit}
 .ab2-pimg{display:block;aspect-ratio:4 / 3;box-sizing:border-box;border:8px solid #111;padding:8px;background:#F2EDE5;margin-bottom:14px;box-shadow:0 1px 2px rgba(0,0,0,.18),0 6px 14px rgba(0,0,0,.10)}
 .ab2-pimg picture,.ab2-pimg img{display:block;width:100%;height:100%;object-fit:cover}
@@ -91,14 +92,17 @@
 .ab2-links{margin:0}
 @media (max-width:760px){
   .ab2-open{grid-template-columns:minmax(0,1fr);gap:28px}
-  .ab2-press{grid-template-columns:minmax(0,1fr)}
+  .ab2-press{display:flex;overflow-x:auto;scroll-snap-type:x proximity;gap:16px;padding-bottom:12px;-webkit-overflow-scrolling:touch}
+  .ab2-press li{flex:0 0 72%;scroll-snap-align:start}
 }
 .ab2-cap{margin-top:12px;color:var(--muted)}
 
 /* ---- Exhibitions: the key shows' photographs, then the other exhibitions in one slow row ---- */
 .ks{padding-block:clamp(24px,3vw,44px) clamp(28px,4vw,56px)}
-.ks-h{margin:0 0 clamp(16px,2vw,28px)}
-.ks-grid{display:grid;grid-template-columns:minmax(0,1fr) minmax(0,1fr);gap:clamp(16px,2.4vw,40px)}
+.ks-head{display:flex;align-items:baseline;justify-content:space-between;gap:16px;margin:0 0 clamp(16px,2vw,28px)}
+.ks-h{margin:0}
+.ks-head .ks-all{margin-right:0}
+.ks-grid{display:grid;grid-template-columns:minmax(0,1fr) minmax(0,1fr);gap:clamp(16px,2.4vw,40px);max-width:880px;margin-inline:auto}
 .ks-show{margin:0}
 .ks-stage{position:relative;aspect-ratio:3/2;background:#EDE8DF;overflow:hidden}
 .ks-stage img{position:absolute;inset:0;width:100%;height:100%;object-fit:contain;opacity:0;transition:opacity .7s ease}
@@ -110,6 +114,13 @@
 .ks-show figcaption small{min-height:2.8em}
 .ks-more-h{margin:clamp(22px,3vw,40px) 0 10px;color:var(--muted)}
 .ks-row{border-top:1px solid #CFC8BE;border-bottom:1px solid #CFC8BE;padding-block:16px;overflow:hidden}
-.ks-item{flex:none;display:flex;flex-direction:column;gap:2px;padding-inline:clamp(18px,2vw,32px);border-left:1px solid #CFC8BE;white-space:nowrap}
+.ks-item{flex:none;box-sizing:border-box;width:150px;display:flex;flex-direction:column;gap:1px;padding-inline:12px;border-left:1px solid #CFC8BE;white-space:normal}
 .ks-item span,.ks-item small{color:var(--muted)}
-@media (max-width:760px){ .ks-grid{grid-template-columns:minmax(0,1fr)} }
+@media (max-width:760px){ .ks-grid{grid-template-columns:minmax(0,1fr);gap:22px} .ks-stage{aspect-ratio:16/10} .ks-item{width:120px;padding-inline:10px} .ks-show figcaption small{min-height:0} }
+.ab2-all{margin:0 0 clamp(28px,4vw,56px)}
+
+/* phone: record-list links and the walls' links reach a 44px tap target without moving the layout */
+@media (max-width:760px){
+  .timeline .tl-photos,.timeline ul li > a{display:inline-flex !important;align-items:center;min-height:44px !important;margin-block:-8px !important}
+  .sm-walls a{display:inline-flex !important;align-items:center;min-width:44px !important;min-height:44px !important;justify-content:center}
+}

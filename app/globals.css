@@ -659,3 +659,10 @@ html[data-room="off"] .her-wall{display:none}
 .her-wall{font-size:max(17px,calc(var(--u)*.054))}
 .her-wall h2{font-size:1.55em;font-weight:500}
 .her-wall h3{font-size:max(17px,1em);text-transform:none}
+
+/* dark ink on the light courtyard plaster: the hairline 500 serif thins out against the mottled wall, where light ink on a dark wall
+   reads bold on its own. Set heavier and a touch larger, in a deeper ink, with a tighter halo, so the courtyard lettering reads as elevated as the gallery's */
+.wall-label:not([data-ink="light"]),.label-rest:not([data-ink="light"]){--cap:#17110D}
+.wall-label:not([data-ink="light"]) .cap-title,.label-rest:not([data-ink="light"]) button{font-weight:600;font-size:17px;letter-spacing:.005em}
+.wall-label:not([data-ink="light"]) .cap-details,.wall-label:not([data-ink="light"]) .cap-status,.label-rest:not([data-ink="light"]) .label-rest-h{font-weight:600;font-size:15px;letter-spacing:.005em}
+.wall-label:not([data-ink="light"]):not([data-halo="1"]){text-shadow:0 0 1px rgba(var(--cap-halo),.9),0 0 4px rgba(var(--cap-halo),.8),0 0 12px rgba(var(--cap-halo),.55)}
