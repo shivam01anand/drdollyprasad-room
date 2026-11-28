@@ -55,9 +55,9 @@ export default function Home() {
       <WallHero columns={HOME} label="Dr Dolly Prasad" size="home" eyebrow="Paintings in oil · New Delhi"
                 title="Dr Dolly Prasad" red="Dolly" tagline={<>The everyday, held <span className="red">sacred</span>.</>}
                 sub="Paintings of the small things that hold an Indian day together."
-                proof="Nineteen exhibitions and art fairs since 2005.">
+                proof="Nearly twenty exhibitions and art fairs since 2005.">
         <Link className="btn btn-solid" href="/works">See all {total} paintings</Link>
-        <a className="btn" href={STUDIO_PATH}><span className="lbl-wide">Walk through the house</span><span className="lbl-phone">Enter the house</span></a>
+        <a className="btn" href={STUDIO_PATH}><span className="lbl-wide">Walk through her studio</span><span className="lbl-phone">Her studio</span></a>
       </WallHero>
 
       {NOW_SHOWING_CONFIRMED && <Until until={now.until}>
@@ -99,7 +99,7 @@ export default function Home() {
           <div className="hw-intro">
             <p className="eyebrow">The artist</p>
             <h2 id="hw-h">Everyday India, given its time</h2>
-            <p className="hw-lede">A milkman pedals out before first light, and a priest lifts the aarti flame at dusk. Dr Dolly Prasad paints the hours in between, mostly in oil, and gives them the time a hurried city never could. She works in New Delhi, and her paintings are in private collections in India, the USA and the UK.</p>
+            <p className="hw-lede">A milkman pedals out before first light, and a priest lifts the aarti flame at dusk. Dr Dolly Prasad paints the hours in between, mostly in oil, and gives them the time a hurried city never could. She works in New Delhi. Her paintings have been shown at nearly twenty exhibitions and art fairs, and are in private collections in India and abroad.</p>
             <Link className="link" href="/about">Her story →</Link>
           </div>
           <aside className="hw-press" aria-labelledby="hw-press-h">

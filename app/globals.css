@@ -649,3 +649,13 @@ html[data-room="off"] .her-wall{display:none}
    a thicker soft shadow of the opposite tone, never a box */
 .wall-label[data-halo="1"],.label-rest[data-halo="1"],.copy[data-halo="1"] .copy-panel,.her-wall[data-halo="1"]{
   text-shadow:0 0 1px rgba(var(--cap-halo),1),0 0 3px rgba(var(--cap-halo),.95),0 0 8px rgba(var(--cap-halo),.85),0 0 16px rgba(var(--cap-halo),.7),0 0 28px rgba(var(--cap-halo),.5)}
+
+/* one elevated lettering for every wall, indoors and in the courtyard: the same serif for the wall labels and the wall about her */
+.wall-label .cap-title,.label-rest button,.her-wall h2,.her-wall h3,.her-wall p,.her-wall li,.her-wall figcaption{font-family:"Cormorant Garamond",Georgia,serif;font-weight:500;letter-spacing:0}
+.wall-label .cap-title{font-size:16px;line-height:1.22}
+.wall-label .cap-details,.wall-label .cap-status{font-family:"Cormorant Garamond",Georgia,serif;font-weight:500;font-size:14.5px;line-height:1.3}
+.label-rest-h{font-family:"Cormorant Garamond",Georgia,serif;font-weight:500;font-size:14.5px}
+.label-rest button{font-size:16px}
+.her-wall{font-size:max(17px,calc(var(--u)*.054))}
+.her-wall h2{font-size:1.55em;font-weight:500}
+.her-wall h3{font-size:max(17px,1em);text-transform:none}

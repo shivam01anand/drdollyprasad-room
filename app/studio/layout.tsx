@@ -6,7 +6,7 @@ import "../fonts.css";
 import "../globals.css";
 
 const TITLE = "The studio";
-const DESCRIPTION = "Walk through a house hung with Dr Dolly Prasad’s paintings at their true size, from the courtyard to the gallery.";
+const DESCRIPTION = "Walk through her studio, hung with Dr Dolly Prasad’s paintings at their true size, from the courtyard to the gallery.";
 export const metadata: Metadata = {
   title: TITLE,
   description: DESCRIPTION,

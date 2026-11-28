@@ -7,7 +7,7 @@ import { HER_WALL } from "@/lib/her-wall";
 import { PRESS_HOME } from "@/lib/press";
 
 const TITLE = "About";
-const DESCRIPTION = "Dr Dolly Prasad, a painter in New Delhi, works mostly in oil on what everyday India walks past. Since 2005 her paintings have hung at nineteen exhibitions and art fairs.";
+const DESCRIPTION = "Dr Dolly Prasad, a painter in New Delhi, works mostly in oil on what everyday India walks past. Since 2005 her paintings have hung at nearly twenty exhibitions and art fairs.";
 export const metadata: Metadata = {
   title: TITLE,
   description: DESCRIPTION,
@@ -32,19 +32,20 @@ export default function About() {
       <section className="ab2-open wrap">
         <figure className="ab2-portrait">
           {/* eslint-disable-next-line @next/next/no-img-element */}
-          <img src={ph.src} alt={ph.alt} width={ph.width} height={ph.height} />
+          <img src={ph.large} alt={ph.alt} width={ph.largeWidth} height={ph.largeHeight} />
+          <figcaption className="ab2-cap">Open Palm Court, India Habitat Centre, 2010. {ph.caption}</figcaption>
         </figure>
         <div className="ab2-text">
           <p className="eyebrow">About the artist</p>
           <h1 className="page-title">Dr <span className="red">Dolly</span> Prasad</h1>
           <p className="ab2-p">Dr Dolly Prasad paints what everyday India walks past, a twenty-paise coin or a stranger's worry, and gives it the time a passer-by never does. Across five collections, from the old street of Gone Are The Days to the spring of Bahaar, the aim stays the same. Look long enough at the ordinary, and it turns out to be sacred.</p>
-          <p className="ab2-p">She works in New Delhi, mostly in oil on canvas, sometimes with charcoal or pastel. Since 2005 her paintings have been shown at nineteen exhibitions and art fairs.</p>
+          <p className="ab2-p">She works in New Delhi, mostly in oil on canvas, sometimes with charcoal or pastel. Her paintings have been shown at nearly twenty exhibitions and art fairs, and are in private collections in India and abroad.</p>
           <p><Link className="ab2-link" href="/enquire">Ask about a painting</Link></p>
         </div>
       </section>
 
       <section className="ab2-sec wrap" aria-labelledby="ab2-ex">
-        <h2 id="ab2-ex" className="ab2-h">Selected exhibitions</h2>
+        <h2 id="ab2-ex" className="ab2-h">Key exhibitions</h2>
         <ol className="ab2-list">
           {SHOWS.map((e) => (
             <li key={e.year + e.title}><span className="ab2-yr">{e.year}</span><span><b>{e.title}</b><span className="ab2-venue">{e.venue}</span></span></li>
@@ -74,7 +75,6 @@ export default function About() {
 
       <section className="ab2-close">
         <div className="wrap">
-          <p className="ab2-coll">In private collections in India, the USA and the UK.</p>
           <p className="ab2-links"><Link className="ab2-link" href="/works">Works</Link><Link className="ab2-link" href="/enquire">Enquire</Link></p>
         </div>
       </section>

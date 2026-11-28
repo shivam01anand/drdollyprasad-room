@@ -1,13 +1,13 @@
 import type { Metadata } from "next";
 import Link from "next/link";
-import { Fragment, type CSSProperties } from "react";
+import { type CSSProperties } from "react";
 import IndigoBand from "@/components/site/IndigoBand";
 import CollectionsSwitcher from "@/components/site/CollectionsSwitcher";
 import PrevNext from "@/components/site/PrevNext";
 import RoomThumb from "@/components/site/RoomThumb";
 import { notFound } from "next/navigation";
 import Card from "@/components/site/Card";
-import { LEAD, SERIES_BY_SLUG, SERIES_PAGES, featuredIds, seriesNeighbours, shownYear, statusText, worksIn, type Chapter } from "@/lib/site";
+import { LEAD, SERIES_BY_SLUG, SERIES_PAGES, featuredIds, seriesNeighbours, shownYear, worksIn, type Chapter } from "@/lib/site";
 import { TAILORED } from "@/lib/rooms";
 import { BY_ID, LARGE, workPath, type Work } from "@/lib/works";
 import manifest from "@/public/art/manifest.json";
@@ -57,19 +57,8 @@ function Words({ c }: { c: Chapter }) {
   );
 }
 
-/** facts for a pair shown together: both titles, then what they share (medium, size each, status) */
-function pairFacts(ws: Work[]) {
-  const same = (f: (w: Work) => string) => (ws.every((w) => f(w) === f(ws[0])) ? f(ws[0]) : "");
-  const st = same((w) => (w.status === "Sold" ? "In a private collection" : statusText(w)));
-  // titles that share their opening words read once: "Bandh Darwaze I and II" (keeps the line short, G5b)
-  const words = ws.map((w) => w.title.split(" "));
-  let k = 0; while (words.every((t) => t.length > k + 1 && t[k] === words[0][k])) k++;
-  const titles = k ? `${words[0].slice(0, k).join(" ")} ${words.map((t) => t.slice(k).join(" ")).join(" and ")}` : ws.map((w) => w.title).join(" and ");
-  return [titles, same((w) => w.medium), same((w) => w.size ?? "") && `${ws[0].size} each`, st].filter(Boolean).join(" · ");
-}
-
-/** Chief Content lock (20 Oct): the caption for a cover painting's room view, shown in place of a second large showing */
-const roomCap = (title: string) => `${title}, in an imagined room. A virtual room study, not a photograph.`;
+/** the one caption under every painting on a collection page: Title · Medium · Size · Year (an unconfirmed medium reads "Oil") */
+const fullCap = (w: Work) => [w.title, w.medium || "Oil", w.size, shownYear(w)].filter(Boolean).join(" · ");
 const roomOf = (id: string) => TAILORED.find((r) => r.work === id && r.inPhoto);
 
 function Room({ c, works, cover }: { c: Chapter; works: Work[]; cover: string }) {
@@ -80,7 +69,7 @@ function Room({ c, works, cover }: { c: Chapter; works: Work[]; cover: string })
   if (!w || !room) return null;
   const where = room.label.replace(/^An? /, (a) => a.toLowerCase());
   return <RoomThumb src={room.src} thumb={room.thumb} alt={`${w.title} in ${where}`}
-                    line={`${w.title}, in ${where}. A room study, not a photograph.`} />;
+                    line={fullCap(w)} />;
 }
 
 /**
@@ -98,7 +87,7 @@ function ChapterView({ c, n, flip, cover }: { c: Chapter; n: number; flip: boole
   const head = (<><span className="chv-n">{ROMAN[n]}</span><h2 className="chv-t">{c.title}</h2></>);
   if (works.length === 1) {
     const w = works[0];
-    const facts = [w.title !== c.title ? w.title : "", w.medium, w.size, w.status === "Sold" ? "In a private collection" : statusText(w)].filter(Boolean).join(" · ");
+    const facts = fullCap(w);
     const isCover = w.id === cover;
     const room = isCover ? roomOf(w.id) : undefined;
     const small = isCover && !room;
@@ -113,7 +102,6 @@ function ChapterView({ c, n, flip, cover }: { c: Chapter; n: number; flip: boole
                   <img className="room-img" src={room.src} alt={`${w.title} in ${room.label.replace(/^An? /, (a) => a.toLowerCase())}, a room study`} loading="lazy" decoding="async"
                        width={room.w} height={room.h} style={{ ["--ar" as string]: (room.w / room.h).toFixed(4) } as CSSProperties} />
                 </Link>
-                <figcaption>{roomCap(w.title)}</figcaption>
               </figure>
             ) : (
             <Link href={workPath(w.id)}>
@@ -163,7 +151,7 @@ function ChapterView({ c, n, flip, cover }: { c: Chapter; n: number; flip: boole
                   <img className="room-img" src={coverRoom.src} alt={`${w.title}, in an imagined room, a virtual room study`} loading="lazy" decoding="async"
                        width={coverRoom.w} height={coverRoom.h} style={{ ["--ar" as string]: (coverRoom.w / coverRoom.h).toFixed(4) } as CSSProperties} />
                 </Link>
-                <figcaption>{roomCap(w.title)}</figcaption>
+                <figcaption>{fullCap(w)}</figcaption>
               </figure>
             ) : (
             <figure key={w.id}>
@@ -171,7 +159,7 @@ function ChapterView({ c, n, flip, cover }: { c: Chapter; n: number; flip: boole
                 {/* eslint-disable-next-line @next/next/no-img-element */}
                 <img className="framed thin" src={`/site/thumbs/${w.id}.jpg`} alt={alt(w)} loading="lazy" decoding="async" {...wh(w.id)} style={arStyle(w.id)} />
               </Link>
-              <figcaption>{w.title}</figcaption>
+              <figcaption>{fullCap(w)}</figcaption>
             </figure>
             )
           ))}
@@ -227,17 +215,19 @@ export default async function SeriesStory({ params }: Props) {
                 <div className="so-pair" key={c.title}>
                   <div className="so-grid">
                     {ws.map((w) => (
-                      <Link key={w.id} href={workPath(w.id)}>
-                        {/* eslint-disable-next-line @next/next/no-img-element */}
-                        <img className="framed" src={img(w.id)} alt={alt(w)} fetchPriority="high" {...wh(w.id)} style={arStyle(w.id)} />
-                      </Link>
+                      <figure key={w.id}>
+                        <Link href={workPath(w.id)}>
+                          {/* eslint-disable-next-line @next/next/no-img-element */}
+                          <img className="framed" src={img(w.id)} alt={alt(w)} fetchPriority="high" {...wh(w.id)} style={arStyle(w.id)} />
+                        </Link>
+                        <figcaption className="meta">{fullCap(w)}</figcaption>
+                      </figure>
                     ))}
                   </div>
                   <div className="so-pcap" data-chapter>
                     <span className="chv-n">{ROMAN[i]}</span>
                     <h2 className="so-pt">{c.title}</h2>
                     <div className="chv-words"><Words c={c} /></div>
-                    <p className="chv-facts">{pairFacts(ws)}</p>
                   </div>
                 </div>
               ))}
@@ -248,10 +238,7 @@ export default async function SeriesStory({ params }: Props) {
                 {/* eslint-disable-next-line @next/next/no-img-element */}
                 <img className="framed" src={img(cover.id)} alt={alt(cover)} fetchPriority="high" {...wh(cover.id)} style={arStyle(cover.id)} />
               </Link>
-              <figcaption className="meta">{[cover.title, cover.medium, cover.size, shownYear(cover)].filter(Boolean).map((x, i, a) => (
-                // each part stays whole; the space sits between the parts (R4 B1-1), so the caption wraps
-                <Fragment key={i}><span style={{ whiteSpace: "nowrap" }}>{String(x)}{i < a.length - 1 ? " ·" : ""}</span>{i < a.length - 1 ? " " : ""}</Fragment>
-              ))}</figcaption>
+              <figcaption className="meta">{fullCap(cover)}</figcaption>
             </figure>
           )}
         </div>
@@ -265,7 +252,7 @@ export default async function SeriesStory({ params }: Props) {
 
       {also.length > 0 && (
         <IndigoBand title="Also in this collection">
-          <div className="also-row" data-also>{also.map((w) => <Card key={w.id} w={w} label={false} />)}</div>
+          <div className="also-row" data-also>{also.map((w) => <Card key={w.id} w={w} />)}</div>
         </IndigoBand>
       )}
 
