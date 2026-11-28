@@ -43,8 +43,7 @@ export default function About() {
       </section>
 
       <div className="wrap">
-        <KeyShows shows={KEY_SHOWS} others={OTHER_SHOWS} />
-        <p className="ab2-all"><Link className="ab2-link" href="/exhibitions">All exhibitions</Link></p>
+        <KeyShows shows={KEY_SHOWS} others={OTHER_SHOWS} allHref="/exhibitions" />
       </div>
 
       <section className="ab2-sec wrap" aria-labelledby="ab2-press">

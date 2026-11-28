@@ -1,6 +1,7 @@
 "use client";
 
 import { useEffect, useState, type ReactNode } from "react";
+import Link from "next/link";
 import Marquee from "./Marquee";
 import { motionPaused } from "@/lib/motion-rules";
 import type { Photo } from "@/lib/site";
@@ -45,9 +46,10 @@ function ShowCarousel({ name, where, photos, id }: { name: string; where: string
 export type OtherShow = { name: string; venue: string; year: string };
 
 /** the key shows' two photo carousels side by side, then every other exhibition in one slow row */
-export default function KeyShows({ shows, others }: {
+export default function KeyShows({ shows, others, allHref }: {
   shows: { id: string; name: string; where: string; photos: Photo[] }[];
   others: OtherShow[];
+  allHref?: string;
 }): ReactNode {
   const [hover, setHover] = useState(false);
   const [reduced, setReduced] = useState(false);
@@ -60,7 +62,10 @@ export default function KeyShows({ shows, others }: {
   }, []);
   return (
     <section className="ks" aria-labelledby="ks-h">
-      <h2 id="ks-h" className="ks-h">Key exhibitions</h2>
+      <div className="ks-head">
+        <h2 id="ks-h" className="ks-h">Key exhibitions</h2>
+        {allHref && <Link className="ab2-link ks-all" href={allHref}>All exhibitions</Link>}
+      </div>
       <div className="ks-grid">
         {shows.map((s) => <ShowCarousel key={s.id} id={s.id} name={s.name} where={s.where} photos={s.photos} />)}
       </div>

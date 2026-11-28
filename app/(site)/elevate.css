@@ -99,7 +99,9 @@
 
 /* ---- Exhibitions: the key shows' photographs, then the other exhibitions in one slow row ---- */
 .ks{padding-block:clamp(24px,3vw,44px) clamp(28px,4vw,56px)}
-.ks-h{margin:0 0 clamp(16px,2vw,28px)}
+.ks-head{display:flex;align-items:baseline;justify-content:space-between;gap:16px;margin:0 0 clamp(16px,2vw,28px)}
+.ks-h{margin:0}
+.ks-head .ks-all{margin-right:0}
 .ks-grid{display:grid;grid-template-columns:minmax(0,1fr) minmax(0,1fr);gap:clamp(16px,2.4vw,40px);max-width:880px;margin-inline:auto}
 .ks-show{margin:0}
 .ks-stage{position:relative;aspect-ratio:3/2;background:#EDE8DF;overflow:hidden}
