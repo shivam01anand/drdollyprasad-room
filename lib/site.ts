@@ -322,7 +322,7 @@ const CAP: Record<string, string> = {
   "ihc-press-b": "Dr Dolly Prasad in an interview, India Habitat Centre",
   "ihc-01": "The room, a lamp at its centre, India Habitat Centre",
   "ihc-07": "Before the Engines and Twenty Paise, with a rickshaw puller painting between them, India Habitat Centre",
-  "ihc-room-a": "Aakhri Savaari, Dheere Dheere and Mitti, India Habitat Centre",
+  "ihc-room-a": "Aakhri Savaari, Dheere Dheere and Kadhai, India Habitat Centre",
   "ihc-room-b": "A rickshaw puller painting and Twenty Paise, behind the brass lamp, India Habitat Centre",
   "ihc-room-c": "“Before the Engines” on the wall, India Habitat Centre",
   "ihc-room-e": "Gullak, India Habitat Centre",

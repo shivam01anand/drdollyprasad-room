@@ -11,7 +11,7 @@ A gallery inside a Delhi home, in three spaces seen one through the next:
                  "Threads of Faith"; a high slit lets the afternoon in
                  through a peepal
   the Red Room   by the lane: Gone Are The Days. "Before the Engines" on a red
-                 wall, "Shree 420", "Evening at the Ghat", "Mitti"; Bandh
+                 wall, "Shree 420", "Evening at the Ghat", "Kadhai"; Bandh
                  Darwaze on the north wall; the turquoise door ajar
   the gallery    through the Red Room's east door: the rest, a series to a group
 
