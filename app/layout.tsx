@@ -3,7 +3,7 @@ import Analytics from "@/components/Analytics";
 import { HOME_CARD } from "@/lib/og";
 
 const DESCRIPTION =
-  "Dr Dolly Prasad paints the everyday, held sacred, mostly in oil in New Delhi. Her paintings are in private collections in India, the USA and the UK.";
+  "Dr Dolly Prasad is a New Delhi painter who works mostly in oil and finds the sacred in everyday India. Her paintings are in private collections in India, the USA and the UK.";
 
 export const metadata: Metadata = {
   metadataBase: new URL("https://drdollyprasad.com"),

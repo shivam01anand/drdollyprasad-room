@@ -98,7 +98,7 @@ export default function Home() {
           <Pic className="round" src="/site/ex/kala-dolly.jpg" alt="Dr Dolly Prasad beside one of her paintings" sizes="(max-width: 640px) 60vw, 320px" {...dims("/site/ex/kala-dolly.jpg")} />
           <div className="hw-intro">
             <p className="eyebrow">The artist</p>
-            <h2 id="hw-h">Paintings of what India hurries past</h2>
+            <h2 id="hw-h">Everyday India, given its time</h2>
             <p className="hw-lede">A milkman pedals out before first light, and a priest lifts the aarti flame at dusk. Dr Dolly Prasad paints the hours in between, mostly in oil, and gives them the time a hurried city never could. She works in New Delhi, and her paintings are in private collections in India, the USA and the UK.</p>
             <Link className="link" href="/about">Her story →</Link>
           </div>

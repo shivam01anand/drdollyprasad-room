@@ -7,7 +7,7 @@ import { HER_WALL } from "@/lib/her-wall";
 import { PRESS_HOME } from "@/lib/press";
 
 const TITLE = "About";
-const DESCRIPTION = "Dr Dolly Prasad paints what everyday India walks past, mostly in oil, in New Delhi. Since 2005 her paintings have hung at nineteen exhibitions and art fairs.";
+const DESCRIPTION = "Dr Dolly Prasad, a painter in New Delhi, works mostly in oil on what everyday India walks past. Since 2005 her paintings have hung at nineteen exhibitions and art fairs.";
 export const metadata: Metadata = {
   title: TITLE,
   description: DESCRIPTION,

@@ -65,7 +65,7 @@ export const CHAPTERS: Chapter[] = [
     eyebrow: "Bahaar · 2024 to 2025",
     stop: "Bahaar",
     room: "The courtyard",
-    body: "Every flower here is a feeling given colour. In a girl it is a first secret held behind her hand, and in a grown woman it is a calm she has learned to keep.",
+    body: "Here each flower is a feeling given colour. In a girl it is a first secret held behind her hand, and in a grown woman it is a calm she has learned to keep.",
     view: "floral",
     labels: ["child-among-flowers", "woman-with-red-flower", "woman-with-bird"],
   },
@@ -86,14 +86,14 @@ export const CHAPTERS: Chapter[] = [
     body: "In those years a few paise went a long way, across town on a rickshaw or home to a mother in a letter. Few coins have ever carried so much." },
   { id: "cartman", eyebrow: "Gone Are The Days · 2007 to 2018", stop: "Last of the Pedals · Ek Rupaya", room: "The gallery",
     view: "cartman", dusk: 0.22, labelSide: "below", labels: ["cycle-rickshaw", "rickshaw-rest-framed"],
-    body: "A whole city once got to work on the strength of a rickshaw man's legs. He has earned his place on this wall, in the thick of the traffic and in the short rest between fares." },
+    body: "A whole city once got to work on the strength of a rickshaw man's legs. These two have earned their place on this wall, one in the thick of the traffic and one in the short rest between fares." },
   // Faith, either side of the window onto the palm court
   { id: "shrine", eyebrow: "Faith · 2007 to 2026", stop: "Sharan · Aarti", room: "The gallery",
     view: "shrine", dusk: 0.24, labelSide: "below", labels: ["monk-and-green-buddha", "priest-with-flame"],
     body: "This wall belongs to Faith, prayer as Indian homes and temples keep it, at the same hour every day. Stand a moment behind the figures here, and the quiet they keep becomes yours." },
   { id: "gayatri", eyebrow: "Faith · 2007 to 2026", stop: "Gayatri · Vakratunda", room: "The gallery",
     view: "gayatri", dusk: 0.26, labelSide: "below", labels: ["prayer-and-scripture", "offering-of-light"],
-    body: "Every prayer we say without thinking was once new to a child. Here a boy lifts his lamp to the words, and a man who has said them all his life still sits before them with the same care." },
+    body: "The prayers we say without thinking were once new to a child. Here a boy lifts his lamp to the words, and a man who has said them all his life still sits before them with the same care." },
   {
     id: "portraits",
     ink: "light",
@@ -118,7 +118,7 @@ export const CHAPTERS: Chapter[] = [
     view: "panels", via: "hallvia", dusk: 0.34, labelSide: "below",
     labels: ["horse-cart-and-autorickshaw", "coins-and-clay-bank", "rickshaw-and-autorickshaw", "carriage-and-autorickshaw",
       "rickshaw-rest", "bullock-cart-and-truck"],
-    body: "For a few short years the old road and the new shared the same street. These paintings stay with the old one, still earning its day, and honour how long it held on." },
+    body: "This wall closes the hall with the slower life the engines overtook, from the tonga on the road to the gullak at home. Each small canvas honours how long that life held on." },
   {
     id: "street",
     eyebrow: "Gone Are The Days · 2007 to 2018",
@@ -128,7 +128,7 @@ export const CHAPTERS: Chapter[] = [
     via: "redin",
     // the framed print on its easel is 0.64 × 0.48 m (scripts/house/build.py press_easel)
     asides: [{ anchor: "press", title: "The artist, in conversation", line: "Beside “Before the Engines”, at her exhibition", size: [0.64, 0.48] }],
-    body: "In the Red Room the old street comes indoors, copper kadhais from a busy kitchen and a pair of bullocks who pulled side by side for years. Nothing here is polished, because every worn edge is a lifetime of honest work.",
+    body: "In the Red Room the old street comes indoors, copper kadhais from a busy kitchen and a pair of bullocks who pulled side by side for years. Each was looked after with pride, because a family's living depended on it.",
     ink: "light",
     view: "street",
     dusk: 0.38,
@@ -142,7 +142,7 @@ export const CHAPTERS: Chapter[] = [
     view: "redwall", via: "redvia", dusk: 0.42,
     labels: ["shree-420-and-milk-cans", "riverside-figures", "weathered-door-ring", "red-and-teal-door-lock", "teal-door-bolt", "carved-door-knocker"],
     frame: ["shree-420-and-milk-cans", "riverside-figures"],
-    body: "This corner is the street at rest once the day's work is done. A film poster hangs on years after its last show, and the doors beside it wait for their families, because a street holds on to what it loves." },
+    body: "This corner is evening, once the day's work is done. A film poster hangs on years after its last show, and beside it four old doors keep faith with their families, home or away." },
   // from the Red Room through the Quiet Room’s door, turning to the peepal on its west wall
   { id: "bodhi", eyebrow: "Faith · 2007 to 2026", stop: "Mannat", room: "The Quiet Room",
     view: "bodhi", via: "redout", dusk: 0.46, labels: ["sacred-tree"],
