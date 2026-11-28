@@ -7,7 +7,10 @@ import type { Photo } from "@/lib/site";
 
 const SLIDE_MS = 4200;
 
-/** one key show: its photographs, one at a time, moving on by themselves (and by hand) */
+/** one key show: its photographs, one at a time, moving on by themselves (and by hand).
+ *  It holds only while a button inside has keyboard focus. It used to hold on mouse-over too, and the
+ *  pointer rests over the left-hand show, so Sacred Fragments looked stuck while the other kept going
+ *  (and on a phone a tap left the hover on for good). The footer's Pause movement link is the visitor's stop. */
 function ShowCarousel({ name, where, photos, id }: { name: string; where: string; photos: Photo[]; id: string }) {
   const [i, setI] = useState(0);
   const [held, setHeld] = useState(false);
@@ -20,7 +23,7 @@ function ShowCarousel({ name, where, photos, id }: { name: string; where: string
   const p = photos[i];
   return (
     <figure className="ks-show" aria-roledescription="carousel" aria-label={`Photographs: ${name}`}
-            onMouseEnter={() => setHeld(true)} onMouseLeave={() => setHeld(false)}>
+            onFocus={() => setHeld(true)} onBlur={() => setHeld(false)}>
       <div className="ks-stage">
         {photos.map((x, k) => (
           // eslint-disable-next-line @next/next/no-img-element
