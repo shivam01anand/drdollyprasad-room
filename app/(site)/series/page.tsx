@@ -10,7 +10,7 @@ import CollectionsSwitcher from "@/components/site/CollectionsSwitcher";
 import PageHead from "@/components/site/PageHead";
 
 const TITLE = "Collections";
-const DESCRIPTION = "Dr Dolly Prasad’s five collections: Bahaar, Bandh Darwaze, Gone Are The Days, Portraits and Faith. Forty-one paintings of the everyday, held sacred.";
+const DESCRIPTION = "Forty-one paintings of the everyday, held sacred, gathered by Dr Dolly Prasad into five collections.";
 export const metadata: Metadata = {
   title: TITLE,
   description: DESCRIPTION,
@@ -28,7 +28,7 @@ export default function SeriesIndex() {
   return (
     <>
       <PageHead eyebrow={<>The everyday, held <span className="red">sacred</span></>} title="Collections" red="Collections"
-                line="Each collection keeps to one side of the same ordinary day and stays there long enough to see what it holds, beginning with a thought kept back in spring.">
+                line="Ordinary moments of Indian life, each painted until we recognise a feeling we have carried all along.">
         <Link className="btn btn-solid" href="/series/bahaar">Start with Bahaar</Link>
       </PageHead>
 

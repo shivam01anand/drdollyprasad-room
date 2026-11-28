@@ -1,7 +1,7 @@
 "use client";
 
 import { useEffect, useRef, useState } from "react";
-import { EMAIL, SERIES_PAGES, SITE, DELIVERY_LINE, collectionOrder, quoted, workPath } from "@/lib/site";
+import { EMAIL, SERIES_PAGES, SITE, collectionOrder, quoted, workPath } from "@/lib/site";
 import { BY_ID } from "@/lib/works";
 import { paintingProperties, track } from "@/lib/analytics";
 import { dims } from "@/lib/images";
@@ -151,14 +151,14 @@ export default function EnquireForm() {
         </div>
         {sent === "mail" && (
           <div className="done" role="status">
-            <p>The form could not send directly, so your message is ready to send from your own mail app. Tap the button below.</p>
+            <p>Sorry, the form could not send this time. Your message is ready to go from your mail app. Tap below to send it.</p>
             <p><a className="btn btn-solid" href={mailto}>Open your mail app</a></p>
             <p>If nothing opens, copy the message and send it to <b>{EMAIL}</b> from any email account.</p>
           </div>
         )}
         {sent === "sent" && (
           <p className="done" role="status">
-            Thank you{name ? `, ${name.split(" ")[0]}` : ""}. Your enquiry has been sent, and the reply will come to {reply}.
+            Thank you{name ? `, ${name.split(" ")[0]}` : ""}. Your message is on its way, and the reply will come to {reply}.
           </p>
         )}
       </form>
@@ -170,7 +170,6 @@ export default function EnquireForm() {
             <button type="button" className="chip" onClick={copy} aria-live="polite">{copied ? "Copied" : "Copy"}</button>
           </div>
           <p className="meta">Enquiries are welcome.</p>
-          {DELIVERY_LINE && <p className="meta">{DELIVERY_LINE}</p>}
         </div>
       </aside>
     </div>

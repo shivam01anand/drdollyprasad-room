@@ -34,7 +34,7 @@ export default function Exhibitions() {
   return (
     <>
     <PageHead eyebrow="2005 to 2026" title="Exhibitions" red="Exhibitions"
-              line="Since 2005 the paintings have left home for nineteen exhibitions and art fairs, most of them in Delhi, others in Gurgaon, Jaipur and Bombay.">
+              line="Since 2005 her paintings have hung at nineteen exhibitions and art fairs, from Sriram Centre in New Delhi to Nehru Art Gallery in Bombay. The most recent, Sacred Fragments, was at India Habitat Centre in October 2026.">
       <a className="btn btn-solid" href={`#${shows[0].id}`}>See the shows</a>
       <a className="btn" href="#record">List of exhibitions</a>
     </PageHead>
@@ -107,7 +107,7 @@ export default function Exhibitions() {
           <div>
             <p className="eyebrow">List of exhibitions</p>
             <h2>{RECORD_LINE}</h2>
-            <p className="sec-line">The list runs from Sacred Fragments back to her first shows in 2005. Where the record is thin, an entry gives only a place and a date.</p>
+            <p className="sec-line">Where the record is thin, an entry gives only a place and a date.</p>
           </div>
         </div>
         <ol className="timeline">

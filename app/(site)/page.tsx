@@ -54,8 +54,8 @@ export default function Home() {
     <>
       <WallHero columns={HOME} label="Dr Dolly Prasad" size="home" eyebrow="Paintings in oil · New Delhi"
                 title="Dr Dolly Prasad" red="Dolly" tagline={<>The everyday, held <span className="red">sacred</span>.</>}
-                sub="She gives a milk can or an old man’s worry the long look most people keep for a shrine."
-                proof="In private collections in India, the USA and the UK.">
+                sub="Paintings of the small things that hold an Indian day together."
+                proof="Nineteen exhibitions and art fairs since 2005.">
         <Link className="btn btn-solid" href="/works">See all {total} paintings</Link>
         <a className="btn" href={STUDIO_PATH}><span className="lbl-wide">Walk through the house</span><span className="lbl-phone">Enter the house</span></a>
       </WallHero>
@@ -71,7 +71,7 @@ export default function Home() {
         <div className="sec-head">
           <div>
             <h2>Waiting and wishing, worship and whispers</h2>
-            <p className="sec-line">A flame lifted at the same hour every day, and a door bolted from outside that keeps the house till someone comes back.</p>
+            <p className="sec-line">Five collections, each a corner of India we know by heart.</p>
           </div>
           <Link className="link" href="/series">All collections →</Link>
         </div>
@@ -99,7 +99,7 @@ export default function Home() {
           <div className="hw-intro">
             <p className="eyebrow">The artist</p>
             <h2 id="hw-h">Paintings of what India hurries past</h2>
-            <p className="hw-lede">Dr Dolly Prasad works in New Delhi, mostly in oil on canvas, sometimes with charcoal or pastel, and has shown her paintings at exhibitions and art fairs since 2005.</p>
+            <p className="hw-lede">A milkman pedals out before first light, and a priest lifts the aarti flame at dusk. Dr Dolly Prasad paints the hours in between, mostly in oil, and gives them the time a hurried city never could. She works in New Delhi, and her paintings are in private collections in India, the USA and the UK.</p>
             <Link className="link" href="/about">Her story →</Link>
           </div>
           <aside className="hw-press" aria-labelledby="hw-press-h">
@@ -129,7 +129,7 @@ export default function Home() {
         <div className="sec-head">
           <div>
             <h2>On the walls</h2>
-            <p className="sec-line">Nineteen exhibitions and art fairs, 2005 to 2026, most recently Sacred Fragments at India Habitat Centre, New Delhi.</p>
+            <p className="sec-line">Most recently Sacred Fragments, at India Habitat Centre, New Delhi, in October 2026.</p>
           </div>
           <Link className="link" href="/exhibitions">All exhibitions →</Link>
         </div>

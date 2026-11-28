@@ -6,7 +6,7 @@ import Link from "next/link";
 import { SERIES_PAGES } from "@/lib/site";
 
 const TITLE = "Enquire";
-const DESCRIPTION = "Ask Dr Dolly Prasad about a painting or an exhibition.";
+const DESCRIPTION = "Write to ask about a painting by Dr Dolly Prasad, its price and details, or an exhibition. Every painting can be shipped worldwide.";
 export const metadata: Metadata = {
   title: TITLE,
   description: DESCRIPTION,
@@ -21,7 +21,7 @@ export default function Enquire() {
     <div className="wrap">
       <section className="page-head">
         <h1 className="page-title">Enquire</h1>
-        <p className="lede">A painting you would like to know more about, an exhibition, or the press. Your message goes to her by email, and prices are on request.</p>
+        <p className="lede">Found a painting you would like to live with? Write by email for its price and details. Every painting can be shipped worldwide.</p>
       </section>
       <EnquireForm />
     </div>

@@ -9,7 +9,7 @@ export default function NotFound() {
     <SiteLayout>
       <section className="wrap lost">
         <p className="eyebrow">Not here</p>
-        <h1 className="page-title">This page isn’t on the walls.</h1>
+        <h1 className="page-title">This page isn’t on the walls, but the paintings are only a step away.</h1>
         <div className="lost-ctas">
           <a className="btn btn-solid" href="/">Home</a>
           <a className="btn" href="/works">All the paintings</a>

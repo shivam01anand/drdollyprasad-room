@@ -9,7 +9,7 @@ import { WORKS } from "@/lib/works";
 import { InstagramIcon } from "@/components/site/Icons";
 
 const TITLE = "Works";
-const DESCRIPTION = `All ${WORKS.length} paintings by Dr Dolly Prasad, in five collections: Bahaar, Bandh Darwaze, Gone Are The Days, Portraits and Faith.`;
+const DESCRIPTION = `All ${WORKS.length} paintings by Dr Dolly Prasad, from Gone Are The Days to Bahaar, each with the story behind it.`;
 export const metadata: Metadata = {
   title: TITLE,
   description: DESCRIPTION,

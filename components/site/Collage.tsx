@@ -180,7 +180,7 @@ function Tile({ it, first, lead = false }: { it: Item; first: boolean; lead?: bo
           <b>{w.title}</b>
           <small>{labelLine(w)}</small>
           {line && <i>{line}</i>}
-          <span className="go">View the painting</span>
+          <span className="go">See the painting</span>
         </span>
       </span>
     </Link>

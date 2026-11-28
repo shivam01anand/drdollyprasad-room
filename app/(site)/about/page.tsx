@@ -7,7 +7,7 @@ import { HER_WALL } from "@/lib/her-wall";
 import { PRESS_HOME } from "@/lib/press";
 
 const TITLE = "About";
-const DESCRIPTION = "Dr Dolly Prasad paints in New Delhi, mostly in oil. Nineteen exhibitions and art fairs since 2005, and paintings in private collections in India, the USA and the UK.";
+const DESCRIPTION = "Dr Dolly Prasad paints what everyday India walks past, mostly in oil, in New Delhi. Since 2005 her paintings have hung at nineteen exhibitions and art fairs.";
 export const metadata: Metadata = {
   title: TITLE,
   description: DESCRIPTION,
@@ -37,8 +37,8 @@ export default function About() {
         <div className="ab2-text">
           <p className="eyebrow">About the artist</p>
           <h1 className="page-title">Dr <span className="red">Dolly</span> Prasad</h1>
-          <p className="ab2-p">Dr Dolly Prasad is a painter in New Delhi who works mostly in oil on canvas, sometimes with charcoal or pastel. Her subjects come from the ordinary Indian day: a chai boy beside his kettle, a red letterbox against a wall of old stamps, a temple bell tied with red thread, a woman lost among poppies.</p>
-          <p className="ab2-p">Since 2005 her work has been shown at exhibitions and art fairs, most recently at India Habitat Centre in 2026. Her paintings are in private collections in India, the USA and the UK.</p>
+          <p className="ab2-p">Dr Dolly Prasad paints what everyday India walks past, a twenty-paise coin or a stranger's worry, and gives it the time a passer-by never does. Across five collections, from the old street of Gone Are The Days to the spring of Bahaar, the aim stays the same. Look long enough at the ordinary, and it turns out to be sacred.</p>
+          <p className="ab2-p">She works in New Delhi, mostly in oil on canvas, sometimes with charcoal or pastel. Since 2005 her paintings have been shown at nineteen exhibitions and art fairs.</p>
           <p><Link className="ab2-link" href="/enquire">Ask about a painting</Link></p>
         </div>
       </section>
