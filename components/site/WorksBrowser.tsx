@@ -70,7 +70,7 @@ export default function WorksBrowser() {
       <div className="wrap wfilters">
         <header className="wtitle">
           <h1 className="page-title">Works</h1>
-          <p className="lede">Every painting, in one scroll.</p>
+          <p className="lede">Forty-one paintings of the India we pass every day.</p>
         </header>
         <div className="wchips" role="group" aria-label="Filter the works">
           <div className="wchip-row" role="group" aria-label="Collection">

@@ -97,7 +97,7 @@ export function Contact() {
             She paints the small things an Indian day is made of, a coin saved in a gullak or a thread tied for a wish.
           </p>
           <p className="about">
-            Since 2005 her paintings have been shown at nineteen exhibitions and art fairs, most recently Sacred Fragments at India Habitat Centre in October 2026.
+            Her paintings have been shown at nearly twenty exhibitions and art fairs, most recently Sacred Fragments at India Habitat Centre in October 2026, and are in private collections in India and abroad.
           </p>
         </div>
         <div className="contact-side">

@@ -7,12 +7,13 @@ import ShowMedia from "@/components/site/ShowMedia";
 import PressRow from "@/components/site/PressRow";
 import { PRESS_ALL } from "@/lib/press";
 import PageHead from "@/components/site/PageHead";
+import KeyShows from "@/components/site/KeyShows";
 import { NOW, NOW_SHOWING_CONFIRMED, RECORD, RECORD_LINE, SACRED_FRAGMENTS, SHOWS } from "@/lib/site";
 import { BY_ID, workPath } from "@/lib/works";
 import { dims } from "@/lib/images";
 
 const TITLE = "Exhibitions";
-const DESCRIPTION = "Nineteen exhibitions and art fairs by Dr Dolly Prasad since 2005, most recently Sacred Fragments: A Journey Home at India Habitat Centre, New Delhi, in October 2026.";
+const DESCRIPTION = "Nearly twenty exhibitions and art fairs by Dr Dolly Prasad since 2005, most recently Sacred Fragments: A Journey Home at India Habitat Centre, New Delhi, in October 2026.";
 export const metadata: Metadata = {
   title: TITLE,
   description: DESCRIPTION,
@@ -30,15 +31,23 @@ const ORDER = ["india-habitat-centre-2010", "a-lifetime-to-paint", "kala-mela-20
 const shows = [SACRED_FRAGMENTS, ...ORDER.map((id) => SHOWS.find((s) => s.id === id)!)];
 const PRESS_AFTER = "india-habitat-centre-2010";
 
+// the key shows lead the page with their photographs; every other entry on her record runs in the slow row below them
+const KEY_SHOWS = [SACRED_FRAGMENTS, SHOWS.find((x) => x.id === "india-habitat-centre-2010")!].map((x) => ({
+  id: x.id, name: x.name ?? x.title, where: x.where ?? `${x.venue}, ${x.city} · ${x.when}`, photos: x.albums.flatMap((a) => a.photos),
+}));
+const OTHERS = RECORD.filter((r) => r.show !== "sacred-fragments" && r.show !== "india-habitat-centre-2010")
+  .map((r) => ({ name: r.venue, venue: r.city || "India", year: r.month ? `${r.month} ${r.year}` : r.year }));
+
 export default function Exhibitions() {
   return (
     <>
     <PageHead eyebrow="2005 to 2026" title="Exhibitions" red="Exhibitions"
-              line="Since 2005 her paintings have hung at nineteen exhibitions and art fairs, from Sriram Centre in New Delhi to Nehru Art Gallery in Bombay. The most recent, Sacred Fragments, was at India Habitat Centre in October 2026.">
+              line="Since 2005 her paintings have hung at nearly twenty exhibitions and art fairs, from Sriram Centre in New Delhi to Nehru Art Gallery in Bombay. The most recent, Sacred Fragments, was at India Habitat Centre in October 2026.">
       <a className="btn btn-solid" href={`#${shows[0].id}`}>See the shows</a>
       <a className="btn" href="#record">List of exhibitions</a>
     </PageHead>
     <div className="wrap">
+      <KeyShows shows={KEY_SHOWS} others={OTHERS} />
       {NOW_SHOWING_CONFIRMED && <Until until={NOW.until}>
         <section id={NOW.id} className="now-line" aria-label="Now showing">
           <span className="live"><i aria-hidden="true" />Now showing</span>
