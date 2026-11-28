@@ -52,13 +52,15 @@
   /* section H2 */
   .sec-head h2,#more-from h2,.ab-txt h2,.ab-statement h2,.five-head h2,.ig-band h2,.txt>h2{font-family:var(--serif) !important;font-weight:500 !important;font-size:44px !important;line-height:1.12 !important}
   /* H3 role: exhibition chapter, Collections band, series chapter title */
-  .ex-ch-head h2,.sband h2,.chap-h h2{font-family:var(--serif) !important;font-weight:500 !important;font-size:36px !important;line-height:1.12 !important}
+  .ex-ch-head h2,.sband h2{font-family:var(--serif) !important;font-weight:500 !important;font-size:36px !important;line-height:1.12 !important}
+  /* type pass (28 Nov 2026, variant B): chapter title is a quiet heading; the chapter big line below it leads */
+  .chap-h h2{font-family:var(--serif) !important;font-weight:500 !important;font-size:24px !important;line-height:1.2 !important}
   /* feature quote (one per page) */
   .story-quote .quote{font:500 40px/1.25 var(--serif) !important;font-style:normal !important}
   /* inline quote: her words inside a block */
   .pp-story,.pp-text p.pp-story,.ex-quote blockquote,.tabpanel .quote,.series-sum-q,.ab-quote,.chap-big.hers,.qcard blockquote{font:500 24px/1.4 var(--serif) !important;font-style:normal !important;color:var(--ink) !important}
   /* chapter big line (ours) */
-  .chap-big:not(.hers){font:500 32px/1.25 var(--serif) !important}
+  .chap-big:not(.hers){font:500 40px/1.2 var(--serif) !important}
   .chap-dark .chap-big:not(.hers){color:inherit !important}
   /* hero line in the collage card */
   .wh-line{font:500 19px/1.35 var(--serif) !important;letter-spacing:0 !important}
@@ -131,7 +133,7 @@
   .ab-p{color:var(--ink) !important}
   .ab-band.tone-dark .ab-p,.band-indigo .ab-p{color:var(--on-indigo) !important}
   .ab-band.tone-dark .eyebrow,.band-indigo .eyebrow{color:var(--muted-on-indigo) !important}
-  .chap-small{font:400 18px/1.6 var(--sans) !important;color:var(--ink) !important}
+  .chap-small{font:400 18px/1.65 var(--sans) !important;color:var(--ink) !important}
   .chap-dark .chap-small{color:var(--on-indigo) !important}
   /* story chapters on indigo: quiet numeral, white heading, no retired peach/cream (review #2 P1) */
   .chap-dark .chap-h span,.band-indigo .chap-h span{color:var(--muted-on-indigo) !important}
@@ -164,11 +166,14 @@
   /* ---- R4 B3-2 to B3-5: story opening, chapters, room thumbnail, ask line (type and colour) ---- */
   .story-open h1{font:500 88px/1 var(--serif) !important;letter-spacing:-.02em !important;color:var(--ink) !important}
   .so-epi,.so-epi p{font:500 24px/1.4 var(--serif) !important;font-style:normal !important;color:var(--ink) !important}
+  .so-epi.held,.so-epi.held p{font-size:32px !important;line-height:1.25 !important}
+  .story-open .lede{font-size:20px !important;line-height:1.5 !important;max-width:56ch !important}
+  .page-head .lede{max-width:62ch !important}
   .so-epi p.so-sig,.so-photo figcaption,.so-art figcaption,.chv-n,.chv-facts,.room-th span{font:400 15px/1.45 var(--sans) !important;letter-spacing:0 !important;text-transform:none !important;color:var(--muted) !important}
   .room-th span{font-weight:500 !important;color:var(--ink) !important}
   .so-p{font:400 18px/1.6 var(--sans) !important;color:var(--ink) !important;text-wrap:pretty !important}
   .chv-t{font:500 36px/1.12 var(--serif) !important;color:var(--ink) !important}
-  .chv-row figcaption{font:400 15px/1.4 var(--sans) !important;color:var(--muted) !important;letter-spacing:0 !important}
+  .chv-row figcaption{font:400 16px/1.4 var(--sans) !important;color:var(--ink) !important;letter-spacing:0 !important}
   .se-ask{font:400 16px/1.5 var(--sans) !important;color:var(--ink) !important}
   /* R4 fix 3: Bandh caption blocks (H3 C 24, line, facts J 14) and the GATD room caption */
   .so-pt{font:500 24px/1.2 var(--serif) !important;color:var(--ink) !important}
@@ -180,6 +185,8 @@
   @media (max-width:760px){
     .story-open h1{font-size:44px !important}
     .so-epi,.so-epi p{font-size:20px !important}
+    .so-epi.held,.so-epi.held p{font-size:26px !important}
+    .story-open .lede{font-size:17px !important}
     .so-p{font-size:16px !important;line-height:1.55 !important}
     .chv-t{font-size:28px !important}
   }
@@ -224,10 +231,11 @@
     .page-title{font-size:32px !important}
     .pp-title{font-size:30px !important}
     .sec-head h2,#more-from h2,#more-from .sec-head>div>h2,.ab-txt h2,.ab-statement h2,.five-head h2,.ig-band h2,.txt>h2{font-size:28px !important}
-    .ex-ch-head h2,.sband h2,.chap-h h2{font-size:26px !important}
+    .ex-ch-head h2,.sband h2{font-size:26px !important}
+    .chap-h h2{font-size:20px !important}
     .story-quote .quote{font-size:26px !important}
     .pp-story,.pp-text p.pp-story,.ex-quote blockquote,.tabpanel .quote,.series-sum-q,.ab-quote,.chap-big.hers,.qcard blockquote{font-size:20px !important}
-    .chap-big:not(.hers){font-size:24px !important}
+    .chap-big:not(.hers){font-size:28px !important}
     .wh-line{font-size:17px !important}
     .card-t,.card .card-t,.series-row .m-card b,.five-t,.press figcaption b{font-size:17px !important}
     .next-series .ask b{font-size:24px !important}
