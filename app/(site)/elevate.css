@@ -113,3 +113,10 @@
 .ks-item{flex:none;display:flex;flex-direction:column;gap:2px;padding-inline:clamp(18px,2vw,32px);border-left:1px solid #CFC8BE;white-space:nowrap}
 .ks-item span,.ks-item small{color:var(--muted)}
 @media (max-width:760px){ .ks-grid{grid-template-columns:minmax(0,1fr)} }
+.ab2-all{margin:0 0 clamp(28px,4vw,56px)}
+
+/* phone: record-list links and the walls' links reach a 44px tap target without moving the layout */
+@media (max-width:760px){
+  .timeline .tl-photos,.timeline ul li > a{display:inline-flex !important;align-items:center;min-height:44px !important;margin-block:-8px !important}
+  .sm-walls a{display:inline-flex !important;align-items:center;min-width:44px !important;min-height:44px !important;justify-content:center}
+}

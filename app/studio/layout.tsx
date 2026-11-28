@@ -2,6 +2,7 @@ import type { Metadata } from "next";
 import { pageOg } from "@/lib/og";
 import WELCOME_FONTS from "@/lib/welcome-fonts.json";
 import "@fontsource/cormorant-garamond/500.css";
+import "@fontsource/cormorant-garamond/600.css";
 import "../fonts.css";
 import "../globals.css";
 

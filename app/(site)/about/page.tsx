@@ -5,6 +5,8 @@ import Pic from "@/components/site/Pic";
 import { dims } from "@/lib/images";
 import { HER_WALL } from "@/lib/her-wall";
 import { PRESS_HOME } from "@/lib/press";
+import KeyShows from "@/components/site/KeyShows";
+import { KEY_SHOWS, OTHER_SHOWS } from "@/lib/key-shows";
 
 const TITLE = "About";
 const DESCRIPTION = "Dr Dolly Prasad, a painter in New Delhi, works mostly in oil on what everyday India walks past. Since 2005 her paintings have hung at nearly twenty exhibitions and art fairs.";
@@ -20,10 +22,6 @@ export const metadata: Metadata = {
  * All words are Shubham’s. No line on this page is presented as hers.
  * A serious gallery's artist page: a strict grid, no text wrapped round an image (elevate, 27 Nov 2026).
  */
-const SHOWS = [
-  { year: "2026", title: "Sacred Fragments: A Journey Home", venue: "Visual Arts Gallery, India Habitat Centre, New Delhi" },
-  { year: "2010", title: "Open Palm Court", venue: "India Habitat Centre, New Delhi" },
-];
 
 export default function About() {
   const ph = HER_WALL.photo;
@@ -44,16 +42,10 @@ export default function About() {
         </div>
       </section>
 
-      <section className="ab2-sec wrap" aria-labelledby="ab2-ex">
-        <h2 id="ab2-ex" className="ab2-h">Key exhibitions</h2>
-        <ol className="ab2-list">
-          {SHOWS.map((e) => (
-            <li key={e.year + e.title}><span className="ab2-yr">{e.year}</span><span><b>{e.title}</b><span className="ab2-venue">{e.venue}</span></span></li>
-          ))}
-          <li><span className="ab2-yr" aria-hidden="true" /><span className="ab2-venue">and 17 more since 2005</span></li>
-        </ol>
-        <p><Link className="ab2-link" href="/exhibitions">All exhibitions</Link></p>
-      </section>
+      <div className="wrap">
+        <KeyShows shows={KEY_SHOWS} others={OTHER_SHOWS} />
+        <p className="ab2-all"><Link className="ab2-link" href="/exhibitions">All exhibitions</Link></p>
+      </div>
 
       <section className="ab2-sec wrap" aria-labelledby="ab2-press">
         <h2 id="ab2-press" className="ab2-h">Press</h2>
