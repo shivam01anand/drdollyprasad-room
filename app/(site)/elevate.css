@@ -1,0 +1,95 @@
+/* elevate (26 Nov 2026): home opens on plain Khadi ground with the wall below it, uncovered; no collage on other pages;
+   Works is one scroll with text-chip filters. Loaded last. */
+
+/* ---- home: name block on plain ground, collage below ---- */
+.wh.wh-home{display:block;position:relative;background:#F5F4F0;overflow:visible}
+.wh-head{display:flex;flex-direction:column;align-items:center;text-align:center;padding-block:clamp(28px,4.5vw,64px) clamp(22px,3vw,40px);gap:0}
+.wh-head .eyebrow{margin:0 0 12px;}
+.wh-head h1{margin:0;line-height:1.02;}
+.wh-head h1 .red{}
+.wh-head .wh-tag{margin:14px 0 0;font-style:normal;}
+.wh-head .wh-tag .red{}
+.wh-head .wh-sub{margin:10px 0 0;max-width:34em}
+.wh-head .wh-proof{margin:6px 0 0;max-width:34em}
+.wh-head .wh-btns{display:flex;flex-wrap:wrap;justify-content:center;gap:12px;margin-top:clamp(18px,2.4vw,28px)}
+.wh-head .wh-btns .btn{min-height:48px;padding-inline:26px;white-space:nowrap}
+.wh.wh-home .wh-wall.collage{height:min(calc(100svh - 120px),640px) !important;min-height:0 !important}
+@media (max-width:640px){
+  .wh-head{padding-block:22px 20px;padding-inline:var(--gut,20px)}
+  .wh-head h1{}
+  .wh-head .wh-tag{}
+  .wh-head .wh-sub{}
+  .wh-head .wh-btns{display:grid;grid-template-columns:1fr 1fr;gap:8px;width:100%}
+  .wh-head .wh-btns .btn{padding-inline:8px;min-height:48px;}
+  .wh.wh-home .wh-wall.collage{height:min(62svh,520px) !important}
+}
+
+/* ---- plain title block (collections, exhibitions, about) ---- */
+.ph{padding-block:clamp(28px,4vw,56px) clamp(18px,2.4vw,32px)}
+.ph .eyebrow{margin:0 0 10px;}
+.ph .page-title{margin:0;}
+.ph .page-title .red{}
+.ph .lede{margin:14px 0 0;max-width:46em;text-align:left;}
+.ph-btns{display:flex;flex-wrap:wrap;gap:12px;margin-top:20px}
+.ph-btns .btn{min-height:48px;white-space:nowrap}
+@media (max-width:640px){ .ph-btns .btn{flex:1 1 auto} .ph .page-title{} }
+
+/* ---- works: one title row, quiet chips, then the grid ---- */
+.wfilters{padding-top:clamp(20px,3vw,40px)}
+.wtitle{display:flex;align-items:baseline;flex-wrap:wrap;gap:6px clamp(16px,3vw,40px)}
+.wtitle .page-title{margin:0;}
+.wtitle .lede{margin:0;}
+.wchips{display:flex;flex-direction:column;gap:2px;margin-top:14px}
+.wchip-row{display:flex;flex-wrap:wrap;align-items:center;gap:0 4px}
+.wchip{appearance:none;-webkit-appearance:none;background:none;border:0;border-bottom:1px solid transparent;border-radius:0;
+  min-height:44px;padding:0 12px;cursor:pointer}
+.wchip:hover{}
+.wchip.is-on{border-bottom-color:#1A1614}
+.wchip:focus-visible{outline:2px solid #1A1614;outline-offset:-2px}
+.wchip-gap{width:16px}
+.wcount{margin:6px 0 0 12px;}
+@media (max-width:640px){
+  .wchip{padding:0 10px;}
+  .wchip-row:first-child{margin-left:-10px}
+  .wchip-row:last-child{margin-left:-10px}
+  .wchip-gap{display:none}
+  .wcount{margin-left:0}
+}
+.portfolio{padding-top:clamp(8px,1.4vw,16px)}
+
+/* phone rhythm: one large card, then two side by side; title plus one quiet line */
+@media (max-width:640px){
+  .pf-grid.works-grid{grid-template-columns:repeat(2,minmax(0,1fr)) !important;gap:26px 12px !important}
+  .pf-grid.works-grid > .card:nth-child(3n+1){grid-column:1 / -1}
+  .pf-grid.works-grid .card .meta-parts{display:flex !important;line-height:1.35}
+  .pf-grid.works-grid .card .meta-parts .mp-med,.pf-grid.works-grid .card .meta-parts .mp-med + .mp::before{display:none}
+  .pf-grid.works-grid .card .status{display:none}
+  .pf-grid.works-grid .card-t{}
+}
+
+/* ---- About: a gallery artist page (27 Nov 2026). Strict grid, nothing wrapped round an image, no overlays. ---- */
+.ab2-open{display:grid;grid-template-columns:minmax(0,45fr) minmax(0,55fr);gap:clamp(32px,6vw,96px);align-items:start;padding-block:clamp(32px,5vw,72px) clamp(36px,5vw,72px)}
+.ab2-portrait{margin:0}
+.ab2-portrait img{display:block;width:100%;height:auto;box-sizing:border-box;border:10px solid #111;padding:16px;background:#F2EDE5;
+  box-shadow:0 1px 2px rgba(0,0,0,.18),0 6px 14px rgba(0,0,0,.10)}
+.ab2-text .eyebrow{margin:0 0 10px}
+.ab2-text .page-title{margin:0 0 clamp(18px,2vw,28px)}
+.ab2-p{margin:0 0 1.1em;max-width:34em}
+.ab2-link{display:inline-block;padding-block:12px;border-bottom:1px solid currentColor;margin-right:28px;text-decoration:none}
+.ab2-sec{padding-block:clamp(28px,4vw,56px);border-top:1px solid #CFC8BE}
+.ab2-h{margin:0 0 clamp(18px,2.4vw,32px)}
+.ab2-list{list-style:none;margin:0 0 12px;padding:0}
+.ab2-list li{display:grid;grid-template-columns:clamp(64px,9vw,120px) minmax(0,1fr);gap:0 16px;padding-block:14px;border-bottom:1px solid #E4DED5}
+.ab2-list b,.ab2-press b{display:block;font-weight:500}
+.ab2-venue{display:block}
+.ab2-press{list-style:none;margin:0;padding:0;display:grid;grid-template-columns:repeat(2,minmax(0,420px));justify-content:center;gap:clamp(16px,2.4vw,32px);align-items:start}
+.ab2-press a{display:block;text-decoration:none;color:inherit}
+.ab2-pimg{display:block;aspect-ratio:4 / 3;box-sizing:border-box;border:8px solid #111;padding:8px;background:#F2EDE5;margin-bottom:14px;box-shadow:0 1px 2px rgba(0,0,0,.18),0 6px 14px rgba(0,0,0,.10)}
+.ab2-pimg picture,.ab2-pimg img{display:block;width:100%;height:100%;object-fit:cover}
+.ab2-close{padding-block:clamp(36px,5vw,72px);background:#EFEBE4;border-top:1px solid #CFC8BE}
+.ab2-coll{margin:0 0 16px}
+.ab2-links{margin:0}
+@media (max-width:760px){
+  .ab2-open{grid-template-columns:minmax(0,1fr);gap:28px}
+  .ab2-press{grid-template-columns:minmax(0,1fr)}
+}

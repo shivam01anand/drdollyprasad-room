@@ -1,124 +1,81 @@
 import type { Metadata } from "next";
+import { pageOg } from "@/lib/og";
 import Link from "next/link";
-import Roll, { type RollItem } from "@/components/site/Roll";
-import WallHero from "@/components/site/WallHero";
-import { ABOUT_WALL } from "@/components/site/Collage";
-import PressRow from "@/components/site/PressRow";
-import { PRESS_ALL } from "@/lib/press";
-import { LOOK, STATEMENT, PORTRAIT_LARGE, STUDIO_PATH, shownYear } from "@/lib/site";
-import { BY_ID, workPath } from "@/lib/works";
+import Pic from "@/components/site/Pic";
+import { dims } from "@/lib/images";
+import { HER_WALL } from "@/lib/her-wall";
+import { PRESS_HOME } from "@/lib/press";
 
+const TITLE = "About";
+const DESCRIPTION = "Dr Dolly Prasad, a painter in New Delhi, works mostly in oil on what everyday India walks past. Since 2005 her paintings have hung at nineteen exhibitions and art fairs.";
 export const metadata: Metadata = {
-  title: "About",
-  description: "Dr Dolly Prasad paints in New Delhi, mostly in oil. Nineteen exhibitions and art fairs since 2005, and paintings in private collections in India, the USA and the UK.",
+  title: TITLE,
+  description: DESCRIPTION,
   alternates: { canonical: "/about" },
+  // the link preview carries this page's own title, line and address (elevate, 26 Nov 2026)
+  openGraph: pageOg(TITLE, DESCRIPTION, "/about"),
 };
-
-/** paintings for a roll: the painting, its title and year, and its one line */
-const paint = (ids: string[]): RollItem[] => ids.map((id) => {
-  const w = BY_ID.get(id)!;
-  return { src: `/site/thumbs/${id}.jpg`, title: `${w.title}${shownYear(w) ? `, ${shownYear(w)}` : ""}`, sub: LOOK[id], href: workPath(id) };
-});
-
-const SHOW_PHOTOS: RollItem[] = [
-  { src: "/site/ex/sf-01.jpg", title: "Sacred Fragments: A Journey Home, 2026", sub: "With the two paintings she showed there, Under Canopy of Greens and Threads of Faith.", href: "/exhibitions#sacred-fragments", framed: false },
-  { src: "/site/ex/ihc-03.jpg", title: "India Habitat Centre, 2010", sub: "The opening, guests gathered round the brass lamp.", href: "/exhibitions#india-habitat-centre-2010", framed: false },
-  { src: "/site/ex/iccr-speech.jpg", title: "A Lifetime to Paint, ICCR, 2010", sub: "Speaking at the opening, Dhyan behind her.", href: "/exhibitions#a-lifetime-to-paint", framed: false },
-  { src: "/site/ex/ihc-press-b.jpg", title: "In front of the cameras", sub: "An interview beside “Before the Engines”.", href: "/exhibitions#india-habitat-centre-2010", framed: false },
-  { src: "/site/ex/kala-dolly.jpg", title: "First International Kala Mela, 2018", sub: "Beside Ek Rupaya, at the art fair organised by Lalit Kala Akademi.", href: "/exhibitions#kala-mela-2018", framed: false },
-];
 
 /*
  * All words are Shubham’s. No line on this page is presented as hers.
+ * A serious gallery's artist page: a strict grid, no text wrapped round an image (elevate, 27 Nov 2026).
  */
+const SHOWS = [
+  { year: "2026", title: "Sacred Fragments: A Journey Home", venue: "Visual Arts Gallery, India Habitat Centre, New Delhi" },
+  { year: "2010", title: "Open Palm Court", venue: "India Habitat Centre, New Delhi" },
+];
 
 export default function About() {
+  const ph = HER_WALL.photo;
   return (
     <>
-      {/* CR-006: About opens like every landing, the white card centred on a wall of her paintings */}
-      <WallHero columns={ABOUT_WALL} label="About the artist" eyebrow="About the artist" title="Dr Dolly Prasad" red="Dolly" held="Painter, New Delhi.">
-        <a className="btn btn-solid" href="#story">Her story</a>
-        <Link className="btn" href="/works">See her work</Link>
-      </WallHero>
-      <section id="story" className="ab-band ab-hero">
-        <div className="wrap ab-hero-in">
-          <figure className="ab-portrait">
-            {/* eslint-disable-next-line @next/next/no-img-element */}
-            <img src={PORTRAIT_LARGE} alt="Dr Dolly Prasad beside Ek Rupaya at the First International Kala Mela, 2018" />
-          </figure>
-          <div className="ab-txt">
-            <p className="ab-p">Dr Dolly Prasad is a painter in New Delhi who works mostly in oil on canvas, sometimes with charcoal or pastel. Her subjects come from the ordinary Indian day: a chai boy beside his kettle, a red letterbox against a wall of old stamps, a temple bell tied with red thread, a woman lost among poppies.</p>
-            <p className="ab-p">Since 2005 her work has been shown at exhibitions and art fairs, most recently at India Habitat Centre in 2026. Her paintings are in private collections in India, the USA and the UK.</p>
-          </div>
+      <section className="ab2-open wrap">
+        <figure className="ab2-portrait">
+          {/* eslint-disable-next-line @next/next/no-img-element */}
+          <img src={ph.src} alt={ph.alt} width={ph.width} height={ph.height} />
+        </figure>
+        <div className="ab2-text">
+          <p className="eyebrow">About the artist</p>
+          <h1 className="page-title">Dr <span className="red">Dolly</span> Prasad</h1>
+          <p className="ab2-p">Dr Dolly Prasad paints what everyday India walks past, a twenty-paise coin or a stranger's worry, and gives it the time a passer-by never does. Across five collections, from the old street of Gone Are The Days to the spring of Bahaar, the aim stays the same. Look long enough at the ordinary, and it turns out to be sacred.</p>
+          <p className="ab2-p">She works in New Delhi, mostly in oil on canvas, sometimes with charcoal or pastel. Since 2005 her paintings have been shown at nineteen exhibitions and art fairs.</p>
+          <p><Link className="ab2-link" href="/enquire">Ask about a painting</Link></p>
         </div>
       </section>
 
-      {/* content elevate (2026-11-22): the theme, one painting from each collection, moved up in place of the old band */}
-      <section className="ab-band tone-light">
-        <div className="wrap ab-split">
-          <div className="ab-txt">
-            <p className="eyebrow">The collections</p>
-            <h2>What the everyday holds</h2>
-            {STATEMENT.map((ln, i) => <p key={i} className="ab-p">{ln}</p>)}
-            <Link className="btn btn-solid" href="/series">See the collections</Link>
-          </div>
-          <Roll label="One painting from each collection" items={paint(["child-among-flowers", "red-and-teal-door-lock", "milkman-on-bicycle", "elder-woman-portrait", "sacred-tree"])} />
-        </div>
+      <section className="ab2-sec wrap" aria-labelledby="ab2-ex">
+        <h2 id="ab2-ex" className="ab2-h">Selected exhibitions</h2>
+        <ol className="ab2-list">
+          {SHOWS.map((e) => (
+            <li key={e.year + e.title}><span className="ab2-yr">{e.year}</span><span><b>{e.title}</b><span className="ab2-venue">{e.venue}</span></span></li>
+          ))}
+          <li><span className="ab2-yr" aria-hidden="true" /><span className="ab2-venue">and 17 more since 2005</span></li>
+        </ol>
+        <p><Link className="ab2-link" href="/exhibitions">All exhibitions</Link></p>
       </section>
 
-      <section className="ab-band tone-light">
-        <div className="wrap ab-split">
-          <div className="ab-txt">
-            <p className="eyebrow">Who she paints</p>
-            <h2>People from the street, one at a time</h2>
-            <p className="ab-p">Many of the people she paints are at work or waiting for the next job, and few of them would expect anyone to stop and paint them.</p>
-          </div>
-          <Roll label="People in her paintings" items={paint(["yellow-turban-portrait", "three-veiled-women", "boy-and-kettle", "red-turban-portrait", "mother-and-child"])} />
-        </div>
+      <section className="ab2-sec wrap" aria-labelledby="ab2-press">
+        <h2 id="ab2-press" className="ab2-h">Press</h2>
+        <ul className="ab2-press">
+          {PRESS_HOME.map((p) => {
+            const src = p.kind === "video" ? p.poster! : p.src;
+            return (
+              <li key={p.id}>
+                <Link href="/exhibitions#press">
+                  <span className="ab2-pimg"><Pic src={src} alt={p.alt} sizes="(max-width: 640px) 90vw, 30vw" {...dims(src)} /></span>
+                  <b>{p.home.t}</b>
+                  <span className="ab2-venue">{p.home.s}</span>
+                </Link>
+              </li>
+            );
+          })}
+        </ul>
       </section>
 
-      <section className="ab-band tone-dark">
-        <div className="wrap ab-statement">
-          <p className="eyebrow">The work</p>
-          <h2>Small things, kept at their true weight</h2>
-          <p className="ab-p">Her paintings start with what people walk past every day, a twenty-paise coin or a padlock on a door, and give it the size it has in someone’s life. Twenty Paise stands four feet tall.</p>
-          <p className="ab-p">A prayer said at sunrise gets the care of a portrait. A stranger’s patience gets a canvas of its own.</p>
-        </div>
-      </section>
-
-      {/* In the press (R3): the same moving row of every item as Exhibitions, linking on to it */}
-      <section className="ab-band tone-dark band-indigo ab-press" aria-labelledby="ab-press-h">
+      <section className="ab2-close">
         <div className="wrap">
-          <div className="sec-head">
-            <div>
-              <p className="eyebrow">From the archive</p>
-              <h2 id="ab-press-h">In the press</h2>
-            </div>
-          </div>
-          <PressRow items={PRESS_ALL} more={{ href: "/exhibitions#press", label: "All the press, on Exhibitions" }} />
-        </div>
-      </section>
-
-      <section className="ab-band tone-light">
-        <div className="wrap ab-split">
-          <div className="ab-txt">
-            <p className="eyebrow">On the walls, and in the news</p>
-            <h2>Nineteen exhibitions and art fairs</h2>
-            <p className="ab-p">In 2005 her paintings were shown at Sriram Centre in New Delhi and at Indraprastha Art Gallery. They have since hung at India Habitat Centre four times, at the Indian Council for Cultural Relations, Triveni Kala Sangam, Travancore Art Gallery and Nehru Art Gallery in Bombay, and at art fairs in Delhi and Jaipur. The most recent was Sacred Fragments: A Journey Home, at the Visual Arts Gallery, India Habitat Centre, from 18 to 21 October 2026.</p>
-            <p className="ab-p">Television cameras were at the gallery in June 2010, and Delhi Times listed a Travancore group show she was in under Must See, Must Do.</p>
-            <Link className="btn btn-solid" href="/exhibitions">See the exhibitions</Link>
-          </div>
-          <Roll label="Her exhibitions" items={SHOW_PHOTOS} shape="wide" />
-        </div>
-      </section>
-
-      <section className="ab-band tone-wall">
-        <div className="wrap ab-close">
-          <div className="ab-ctas">
-            <Link className="btn btn-solid" href="/works">See her work</Link>
-            <Link className="btn" href="/enquire">Enquire</Link>
-            <a className="btn" href={STUDIO_PATH}>Walk through the studio</a>
-          </div>
+          <p className="ab2-coll">In private collections in India, the USA and the UK.</p>
+          <p className="ab2-links"><Link className="ab2-link" href="/works">Works</Link><Link className="ab2-link" href="/enquire">Enquire</Link></p>
         </div>
       </section>
     </>

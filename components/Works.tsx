@@ -94,12 +94,10 @@ export function Contact() {
       <div className="contact-grid">
         <div className="contact-bio">
           <p className="about">
-            Her subjects come from the ordinary Indian day: a chai boy beside his kettle, a red letterbox against a wall of old stamps,
-            a temple bell tied with red thread, a woman lost among poppies.
+            She paints the small things an Indian day is made of, a coin saved in a gullak or a thread tied for a wish.
           </p>
           <p className="about">
-            Since 2005 her work has been shown at exhibitions and art fairs, most recently at India Habitat Centre
-            in 2026. Her paintings are in private collections in India, the USA and the UK.
+            Since 2005 her paintings have been shown at nineteen exhibitions and art fairs, most recently Sacred Fragments at India Habitat Centre in October 2026.
           </p>
         </div>
         <div className="contact-side">

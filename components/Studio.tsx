@@ -10,6 +10,7 @@ import Featured from "./Featured";
 import Lightbox, { type LightboxHandle } from "./Lightbox";
 import Cursor, { roomCursorLabel } from "./Cursor";
 import WallLabels from "./WallLabels";
+import HerWall from "./HerWall";
 import Stops from "./Stops";
 import Until from "./Until";
 import QuickIndex from "./QuickIndex";
@@ -20,6 +21,7 @@ import { activeVariant } from "@/lib/room/variants";
 import { BY_ID, EMAIL, FEATURED } from "@/lib/works";
 import { rebaseWalkScroll, walkProgress } from "@/lib/walk-layout";
 import { clearWalkEdges } from "@/lib/walk-edges";
+import { fitCaptionAt, inkPlan } from "@/lib/caption-fit";
 import { paintingProperties, track } from "@/lib/analytics";
 
 type Dims = Record<string, { w: number; h: number }>;
@@ -477,6 +479,31 @@ export default function Studio({ dims }: { dims: Dims }) {
     };
     gsap.ticker.add(ink);
 
+    /* The caption's ink, the same way: the chapter's words have no card, so they are light where the
+       floor behind them is dark and dark where it is light, read as the walk goes and on arriving. */
+    let capAt = 0, capLight: boolean | null = null, capStop = -1;
+    const capInk = () => {
+      const r = room, slot = copyRef.current;
+      if (!r || dead || !slot || !r.introDone || slot.dataset.yield === "1") return;
+      const now = performance.now();
+      const fresh = r.landed && capStop !== lastActive;
+      if (!fresh && now - capAt < 350) return;
+      const b = slot.querySelector<HTMLElement>(`.copy-panel[data-i='${lastActive}']`)?.getBoundingClientRect();
+      if (!b || !b.width || !b.height) return;
+      capAt = now;
+      const at = lastActive;
+      r.readLumaBehind("caption", { x0: b.left, y0: b.top, x1: b.right, y1: b.bottom }, (l, range) => {
+        if (r.landed) capStop = at;
+        const plan = inkPlan(l, range, capLight);
+        if (plan.light !== capLight) { capLight = plan.light; slot.dataset.ink = plan.light ? "light" : "dark"; }
+        slot.dataset.halo = plan.halo ? "1" : "";
+      }, fresh);
+    };
+    gsap.ticker.add(capInk);
+    // the light changed (the evening's lightmap arrived, the diya lit): both inks are read again
+    const onLight = () => { capStop = -1; inkStop = -1; capAt = 0; inkAt = 0; };
+    addEventListener("studio:light", onLight);
+
     const ro = new ResizeObserver(() => measure());
     ro.observe(document.body);
     addEventListener("resize", measure);
@@ -513,6 +540,8 @@ export default function Studio({ dims }: { dims: Dims }) {
       clearTimeout(timeout);
       gsap.ticker.remove(frame);
       gsap.ticker.remove(ink);
+      removeEventListener("studio:light", onLight);
+      gsap.ticker.remove(capInk);
       canvas.removeEventListener("webglcontextlost", onContextLost);
       history.scrollRestoration = prevRestoration;
       for (const k of ["room", "hud"] as const) {
@@ -585,8 +614,8 @@ export default function Studio({ dims }: { dims: Dims }) {
     return () => tweens.forEach((t) => t.kill());
   }, [ready, failed]);
 
-  /* one panel of copy at a time, in one fixed slot that the header can
-     never overlap: the old panel goes, then the new one types in */
+  /* one caption at a time, along the foot of the screen: the old one goes as the walk moves on; the
+     new one types in once the camera has landed, fitted clear of the frames in view (lib/caption-fit) */
   useEffect(() => {
     const slot = copyRef.current;
     if (!slot || !ready) return;
@@ -594,13 +623,16 @@ export default function Studio({ dims }: { dims: Dims }) {
     const next = panels.find((p) => p.dataset.i === String(active));
     const showing = panels.filter((p) => p.dataset.on === "1" && p !== next);
     const reduce = reducedMotion();
-    const tl = gsap.timeline();
+    const out = gsap.timeline();
     if (showing.length) {
-      tl.to(showing, { autoAlpha: 0, y: -8, duration: reduce ? 0 : 0.25, ease: "power1.in" });
-      tl.add(() => showing.forEach((p) => (p.dataset.on = "0")));
+      out.to(showing, { autoAlpha: 0, y: -8, duration: reduce ? 0 : 0.25, ease: "power1.in" });
+      out.add(() => showing.forEach((p) => (p.dataset.on = "0")));
     }
     slot.dataset.has = next ? "1" : "0";
 
+    const tl = gsap.timeline({ paused: true });
+    let wait: (() => void) | null = null;
+    let refit: (() => void) | null = null;
     if (next && next.dataset.on !== "1") {
       tl.add(() => { next.dataset.on = "1"; });
       tl.fromTo(next, { autoAlpha: 0, y: 10 }, { autoAlpha: 1, y: 0, duration: reduce ? 0 : 0.55, ease: "power2.out" });
@@ -608,9 +640,27 @@ export default function Studio({ dims }: { dims: Dims }) {
       if (eyebrow) tl.add(scrambleTo(eyebrow, eyebrow.dataset.eyebrow!, { speed: 2, duration: 0.8 }), "<");
       next.querySelectorAll<HTMLElement>("[data-line]").forEach((ln, i) =>
         tl.add(scrambleTo(ln, ln.dataset.line!, { speed: 0.6, duration: 1.1, anagram: true }), `<+${i === 0 ? 0.1 : 0.07}`));
+      // (a camera that never settles, or no room at all: the words come anyway)
+      const giveUp = performance.now() + 3200;
+      wait = () => {
+        const r = roomRef.current;
+        if (r && !r.landed && performance.now() < giveUp) return;
+        gsap.ticker.remove(wait!);
+        wait = null;
+        if (r) fitCaptionAt(r, active);
+        tl.play();
+      };
+      gsap.ticker.add(wait);
+      // a new window size: fitted again where it stands
+      let timer = 0;
+      refit = () => { clearTimeout(timer); timer = window.setTimeout(() => { const r = roomRef.current; if (r?.landed) fitCaptionAt(r, active); }, 180); };
+      addEventListener("resize", refit);
     }
     return () => {
+      out.kill();
       tl.kill();
+      if (wait) gsap.ticker.remove(wait);
+      if (refit) removeEventListener("resize", refit);
       // an interrupted hand-over must not strand a half-faded or half-typed panel
       for (const panel of panels) {
         gsap.set(panel, { autoAlpha: 0, y: 0 });
@@ -828,7 +878,7 @@ export default function Studio({ dims }: { dims: Dims }) {
                   onClick={() => go(failed ? "#works" : "[data-chapter='featured']")}>Works<span className="arr"> →</span></button></span>
             {!failed && (
               <span className="mask"><button type="button" className="pill hud-pill" aria-current={here === "plan" || undefined}
-                    onClick={() => go("[data-chapter='plan']", true)}>Exhibitions<span className="arr"> →</span></button></span>
+                    onClick={() => go("[data-chapter='plan']", true)}>From above<span className="arr"> →</span></button></span>
             )}
             <span className="mask"><button type="button" className="pill hud-pill" onClick={() => go("#contact")}>Contact<span className="arr"> →</span></button></span>
           </nav>
@@ -872,6 +922,8 @@ export default function Studio({ dims }: { dims: Dims }) {
 
       <WallLabels room={roomRef} active={active} live={ready && !failed}
                   onOpen={(id) => lbRef.current?.open(id, null, WALK_ORDER)} />
+
+      <HerWall room={roomRef} active={active} live={ready && !failed} />
 
       {failed && (
         <p className="room-off lab" role="status">

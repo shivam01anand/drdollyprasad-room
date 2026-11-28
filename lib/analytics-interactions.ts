@@ -42,8 +42,6 @@ export function observeAnalyticsInteractions() {
     const contact = { ...painting, source, from_path: location.pathname };
     if (destination.protocol === "mailto:") {
       track("enquiry_handoff", { ...contact, method: "email" });
-    } else if (["wa.me", "api.whatsapp.com", "web.whatsapp.com"].includes(destination.hostname)) {
-      track("enquiry_handoff", { ...contact, method: "whatsapp" });
     } else if (destination.origin === location.origin) {
       const clicked = pagePainting(destination.pathname);
       if (clicked) track("painting_clicked", { ...paintingProperties(clicked), source, from_path: location.pathname });

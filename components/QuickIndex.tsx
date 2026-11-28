@@ -78,7 +78,7 @@ export default function QuickIndex({ active, live, onStop, onWorks, onPlan, onCo
         </ol>
         <div className="qi-more">
           <button type="button" className="pill" onClick={go(() => onStop(CHAPTERS.findIndex((c) => c.id === "featured")))}>Featured</button>
-          <button type="button" className="pill" onClick={go(onPlan)}>Exhibitions</button>
+          <button type="button" className="pill" onClick={go(onPlan)}>From above</button>
           <button type="button" className="pill" onClick={go(onContact)}>Contact</button>
         </div>
       </div>

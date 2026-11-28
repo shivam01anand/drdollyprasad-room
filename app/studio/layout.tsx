@@ -1,13 +1,18 @@
 import type { Metadata } from "next";
+import { pageOg } from "@/lib/og";
 import WELCOME_FONTS from "@/lib/welcome-fonts.json";
 import "@fontsource/cormorant-garamond/500.css";
 import "../fonts.css";
 import "../globals.css";
 
+const TITLE = "The studio";
+const DESCRIPTION = "Walk through a house hung with Dr Dolly Prasad’s paintings at their true size, from the courtyard to the gallery.";
 export const metadata: Metadata = {
-  title: "The studio",
-  description: "A virtual house hung with Dr Dolly Prasad’s paintings at their true size: a courtyard, a quiet room, a red room and a gallery.",
+  title: TITLE,
+  description: DESCRIPTION,
   alternates: { canonical: "/studio" },
+  // the link preview carries this page's own title, line and address (elevate, 26 Nov 2026)
+  openGraph: pageOg(TITLE, DESCRIPTION, "/studio"),
 };
 
 /** the 3D house, as it was the whole site: its own fonts and styles, loaded only here */

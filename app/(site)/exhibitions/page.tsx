@@ -1,20 +1,24 @@
 import type { Metadata } from "next";
+import { pageOg } from "@/lib/og";
 import Link from "next/link";
 import { Fragment } from "react";
 import Until from "@/components/Until";
 import ShowMedia from "@/components/site/ShowMedia";
 import PressRow from "@/components/site/PressRow";
 import { PRESS_ALL } from "@/lib/press";
-import WallHero from "@/components/site/WallHero";
-import { SHOW_WALL } from "@/components/site/Collage";
+import PageHead from "@/components/site/PageHead";
 import { NOW, NOW_SHOWING_CONFIRMED, RECORD, RECORD_LINE, SACRED_FRAGMENTS, SHOWS } from "@/lib/site";
 import { BY_ID, workPath } from "@/lib/works";
 import { dims } from "@/lib/images";
 
+const TITLE = "Exhibitions";
+const DESCRIPTION = "Nineteen exhibitions and art fairs by Dr Dolly Prasad since 2005, most recently Sacred Fragments: A Journey Home at India Habitat Centre, New Delhi, in October 2026.";
 export const metadata: Metadata = {
-  title: "Exhibitions",
-  description: "Nineteen exhibitions and art fairs by Dr Dolly Prasad since 2005, most recently Sacred Fragments: A Journey Home at India Habitat Centre, New Delhi, in October 2026.",
+  title: TITLE,
+  description: DESCRIPTION,
   alternates: { canonical: "/exhibitions" },
+  // the link preview carries this page's own title, line and address (elevate, 26 Nov 2026)
+  openGraph: pageOg(TITLE, DESCRIPTION, "/exhibitions"),
 };
 
 const years = [...new Set(RECORD.map((r) => r.year))];
@@ -29,11 +33,11 @@ const PRESS_AFTER = "india-habitat-centre-2010";
 export default function Exhibitions() {
   return (
     <>
-    <WallHero columns={SHOW_WALL} label="Her exhibitions" eyebrow="2005 to 2026" title="Exhibitions" red="Exhibitions"
-              held="Since 2005 the paintings have left home for nineteen exhibitions and art fairs, most of them in Delhi, others in Gurgaon, Jaipur and Bombay.">
+    <PageHead eyebrow="2005 to 2026" title="Exhibitions" red="Exhibitions"
+              line="Since 2005 her paintings have hung at nineteen exhibitions and art fairs, from Sriram Centre in New Delhi to Nehru Art Gallery in Bombay. The most recent, Sacred Fragments, was at India Habitat Centre in October 2026.">
       <a className="btn btn-solid" href={`#${shows[0].id}`}>See the shows</a>
       <a className="btn" href="#record">List of exhibitions</a>
-    </WallHero>
+    </PageHead>
     <div className="wrap">
       {NOW_SHOWING_CONFIRMED && <Until until={NOW.until}>
         <section id={NOW.id} className="now-line" aria-label="Now showing">
@@ -103,7 +107,7 @@ export default function Exhibitions() {
           <div>
             <p className="eyebrow">List of exhibitions</p>
             <h2>{RECORD_LINE}</h2>
-            <p className="sec-line">The list runs from Sacred Fragments back to her first shows in 2005. Where the record is thin, an entry gives only a place and a date.</p>
+            <p className="sec-line">Where the record is thin, an entry gives only a place and a date.</p>
           </div>
         </div>
         <ol className="timeline">

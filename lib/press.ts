@@ -54,8 +54,8 @@ const RAW: PressItem[] = [
     alt: "A television excerpt: the camera moves from her paintings to Dr Dolly Prasad, speaking in the exhibition.",
     title: "On screen · June 2010",
     line: "The date on screen reads 12 June 2010. The camera moves off the paintings and onto her as she speaks.",
-    source: "Television archive", credit: "NCR television. Original broadcast sound.", card: "NCR television · 12 June 2010",
-    home: { t: "NCR television", s: "On screen · 12 June 2010" },
+    source: "Television archive", credit: "Television. Original broadcast sound.", card: "Television · 12 June 2010",
+    home: { t: "Television", s: "12 June 2010" },
   },
   ph("ihc-press-06", "Dr Dolly Prasad answers a reporter beside “Before the Engines”.",
     "Beside “Before the Engines”",
@@ -84,7 +84,7 @@ export const PRESS_ITEMS: PressItem[] = ORDER.map((id) => RAW.find((p) => p.id =
 
 /** R6 (Shubham 20 Oct 22:50, "a small In the press so people take her seriously"): the three named outlets or venues
  *  shown beside the artist on Home; Chief Content R6 §2 wording, from each item's `home` field */
-export const PRESS_HOME = ["tv-ncr-2010", "delhi-times", "ihc-press-01"].map((id) => RAW.find((x) => x.id === id)!) as (PressItem & { home: { t: string; s: string } })[];
+export const PRESS_HOME = ["tv-ncr-2010", "delhi-times"].map((id) => RAW.find((x) => x.id === id)!) as (PressItem & { home: { t: string; s: string } })[];
 
 /** every item, for the moving press row on Exhibitions and About (R3, Shubham 20 Oct: all the press, all the accolades):
  *  the five above first, in their order, then "Listening" (ihc-press-b). Content elevate (Shubham 2026-11-22): the three

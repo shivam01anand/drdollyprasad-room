@@ -13,34 +13,31 @@ const sizeOf = (w: Work): Size | null => (!w.inches ? null : w.inches < 24 ? "sm
 const isFree = (w: Work) => w.status !== "Sold";
 
 /**
- * every painting, newest series first, filtered by series, status and size (the
- * filter is kept in the address). Two to a row on a computer and a phone alike
- * (Shubham, PR #11 review), each painting whole with its title under it.
+ * all the paintings in one scroll (elevate, 26 Nov 2026: no pager), filtered by collection,
+ * status and size with quiet text chips (the filter is kept in the address). On a phone the
+ * grid runs one large card, then two side by side.
  */
 export default function WorksBrowser() {
   const [series, setSeries] = useState("all");
   const [status, setStatus] = useState<Status>("all");
   const [size, setSize] = useState<Size>("all");
-  const [page, setPage] = useState(1);
 
   useEffect(() => {
     const q = new URLSearchParams(location.search);
     const s = q.get("series"); if (s && SERIES_PAGES.some((x) => x.slug === s)) setSeries(s);
     const st = q.get("status"); if (st === "available" || st === "sold") setStatus(st);
     const z = q.get("size"); if (z === "small" || z === "medium" || z === "large") setSize(z);
-    const pg = Number(q.get("page")); if (pg > 1) setPage(pg);
   }, []);
   useEffect(() => {
     // Retain campaign attribution and the verification flag while updating only filters.
     const q = new URLSearchParams(location.search);
-    for (const key of ["series", "status", "size", "page"]) q.delete(key);
+    for (const key of ["series", "status", "size"]) q.delete(key);
     if (series !== "all") q.set("series", series);
     if (status !== "all") q.set("status", status);
     if (size !== "all") q.set("size", size);
-    if (page > 1) q.set("page", String(page));
     const s = q.toString();
     history.replaceState(null, "", s ? `?${s}` : location.pathname);
-  }, [series, status, size, page]);
+  }, [series, status, size]);
 
   // one continuous flow, the collections mixed (Shubham, 20 Oct): a fixed shuffle, so the order is
   // the same on every visit and on the server and in the browser
@@ -62,63 +59,42 @@ export default function WorksBrowser() {
     (size === "all" || sizeOf(w) === size));
   const n = (f: (w: Work) => boolean) => all.filter(f).length;
 
-  // one portfolio of every painting (Shubham, 20 Oct); the collection is a filter, not a section
-  const SECTION_OPEN = 8; // the first eight paintings load at once; the rest as you scroll
-  const PER = 12;
-  const pages = Math.max(1, Math.ceil(shown.length / PER));
-  const at = Math.min(page, pages);
-  const slice = shown.slice((at - 1) * PER, at * PER);
-  const go = (n: number) => { setPage(n); track("works_page_changed", { page: n }); document.querySelector(".wfilters")?.scrollIntoView({ behavior: "smooth", block: "start" }); };
-  const Pager = ({ where }: { where: string }) => pages < 2 ? null : (
-    <nav className={`pf-pager ${where}`} aria-label="Pages of paintings">
-      <button type="button" className="btn" disabled={at === 1} onClick={() => go(at - 1)}>← Previous</button>
-      <span className="meta">Page {at} of {pages}</span>
-      <button type="button" className="btn btn-solid" disabled={at === pages} onClick={() => go(at + 1)}>Next page →</button>
-    </nav>
+  const SECTION_OPEN = 4; // the first row loads at once; the rest as you scroll (native lazy images)
+  const pick = (filter: string, value: string, set: () => void) => { track("works_filter_changed", { filter, value }); set(); };
+  const Chip = ({ on, onClick, children }: { on: boolean; onClick: () => void; children: React.ReactNode }) => (
+    <button type="button" className={`wchip${on ? " is-on" : ""}`} aria-pressed={on} onClick={onClick}>{children}</button>
   );
 
   return (
     <>
       <div className="wrap wfilters">
-      <div className="filters filters-line" role="group" aria-label="Filter the works">
-        <label className="fsel">
-          <span>Collection</span>
-          <select value={series} onChange={(e) => { track("works_filter_changed", { filter: "collection", value: e.target.value }); setSeries(e.target.value); setPage(1); }}>
-            <option value="all">All</option>
-            {SERIES_PAGES.map((s) => <option key={s.slug} value={s.slug}>{s.label} ({n((w) => w.series === s.label)})</option>)}
-          </select>
-        </label>
-        <label className="fsel">
-          <span>Status</span>
-          <select value={status} onChange={(e) => { track("works_filter_changed", { filter: "status", value: e.target.value }); setStatus(e.target.value as Status); setPage(1); }}>
-            <option value="all">All</option>
-            <option value="available">Available</option>
-            <option value="sold">In private collections</option>
-          </select>
-        </label>
-        <label className="fsel">
-          <span>Size</span>
-          <select value={size} onChange={(e) => { track("works_filter_changed", { filter: "size", value: e.target.value }); setSize(e.target.value as Size); setPage(1); }}>
-            <option value="all">All</option>
-            <option value="small">S · under 24 in</option>
-            <option value="medium">M · 24 to 36 in</option>
-            <option value="large">L · over 36 in</option>
-          </select>
-        </label>
-      </div>
-      <div className="count-row">
-        <p className="meta" aria-live="polite">
+        <header className="wtitle">
+          <h1 className="page-title">Works</h1>
+          <p className="lede">Every painting, in one scroll.</p>
+        </header>
+        <div className="wchips" role="group" aria-label="Filter the works">
+          <div className="wchip-row" role="group" aria-label="Collection">
+            <Chip on={series === "all"} onClick={() => pick("collection", "all", () => setSeries("all"))}>All</Chip>
+            {SERIES_PAGES.map((s) => <Chip key={s.slug} on={series === s.slug} onClick={() => pick("collection", s.slug, () => setSeries(s.slug))}>{s.label}</Chip>)}
+          </div>
+          <div className="wchip-row" role="group" aria-label="Status and size">
+            <Chip on={status === "available"} onClick={() => pick("status", "available", () => setStatus(status === "available" ? "all" : "available"))}>Available</Chip>
+            <Chip on={status === "sold"} onClick={() => pick("status", "sold", () => setStatus(status === "sold" ? "all" : "sold"))}>In private collections</Chip>
+            <span className="wchip-gap" aria-hidden="true" />
+            <Chip on={size === "small"} onClick={() => pick("size", "small", () => setSize(size === "small" ? "all" : "small"))}>Small</Chip>
+            <Chip on={size === "medium"} onClick={() => pick("size", "medium", () => setSize(size === "medium" ? "all" : "medium"))}>Medium</Chip>
+            <Chip on={size === "large"} onClick={() => pick("size", "large", () => setSize(size === "large" ? "all" : "large"))}>Large</Chip>
+          </div>
+        </div>
+        <p className="meta wcount" aria-live="polite">
           {shown.length} {shown.length === 1 ? "painting" : "paintings"}
           {size !== "all" && " · only works with a confirmed size"}
         </p>
-        <Pager where="pf-top" />
-      </div>
       </div>
       {shown.length ? (
         <section className="wgroup band-white portfolio" aria-label="All the paintings">
           <div className="wrap">
-            <div className="grid works-grid pf-grid">{slice.map((w, i) => <Card key={w.id} w={w} eager={i < SECTION_OPEN} />)}</div>
-            <Pager where="pf-bottom" />
+            <div className="grid works-grid pf-grid">{shown.map((w, i) => <Card key={w.id} w={w} eager={i < SECTION_OPEN} />)}</div>
           </div>
         </section>
       ) : <div className="wrap"><p className="empty">No paintings match these filters.</p></div>}

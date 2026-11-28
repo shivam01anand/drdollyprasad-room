@@ -1,4 +1,5 @@
 import type { Metadata } from "next";
+import { pageOg } from "@/lib/og";
 import { Fragment } from "react";
 import IndigoBand from "@/components/site/IndigoBand";
 import Link from "next/link";
@@ -6,13 +7,16 @@ import Card from "@/components/site/Card";
 import { LEAD, SERIES_PAGES, SMALL_PHOTO, worksIn } from "@/lib/site";
 import Marquee from "@/components/site/Marquee";
 import CollectionsSwitcher from "@/components/site/CollectionsSwitcher";
-import WallHero from "@/components/site/WallHero";
-import { SERIES_HERO_WALL } from "@/components/site/Collage";
+import PageHead from "@/components/site/PageHead";
 
+const TITLE = "Collections";
+const DESCRIPTION = "Forty-one paintings of the everyday, held sacred, gathered by Dr Dolly Prasad into five collections.";
 export const metadata: Metadata = {
-  title: "Collections",
-  description: "Dr Dolly Prasad’s five collections: Bahaar, Bandh Darwaze, Gone Are The Days, Portraits and Faith. Forty-one paintings of the everyday, held sacred.",
+  title: TITLE,
+  description: DESCRIPTION,
   alternates: { canonical: "/series" },
+  // the link preview carries this page's own title, line and address (elevate, 26 Nov 2026)
+  openGraph: pageOg(TITLE, DESCRIPTION, "/series"),
 };
 
 
@@ -23,10 +27,10 @@ export const metadata: Metadata = {
 export default function SeriesIndex() {
   return (
     <>
-      <WallHero size="dir" columns={SERIES_HERO_WALL} label="Paintings from the collections" eyebrow={<>The everyday, held <span className="red">sacred</span></>} title="Collections" red="Collections"
-                sub={<>From a thought kept back in spring to a prayer said at sunrise, by way of a shut door, a street on its way out and a face looked at up close.</>}>
+      <PageHead eyebrow={<>The everyday, held <span className="red">sacred</span></>} title="Collections" red="Collections"
+                line="Ordinary moments of Indian life, each painted until we recognise a feeling we have carried all along.">
         <Link className="btn btn-solid" href="/series/bahaar">Start with Bahaar</Link>
-      </WallHero>
+      </PageHead>
 
       <CollectionsSwitcher />
 

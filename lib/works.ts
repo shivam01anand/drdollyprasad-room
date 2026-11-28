@@ -47,7 +47,7 @@ const CATALOGUE: Work[] = [
   W("rickshaw-rest", "Thodi Der", "Gone Are The Days", "Sold", { year: "2018", size: "36 × 36 in", inches: 36 }),
   W("horse-cart-and-autorickshaw", "A Ride Together", "Gone Are The Days", "Available", { year: "2016", size: "24 × 24 in", inches: 24 }),
   W("rickshaw-and-autorickshaw", "Guzra Zamana", "Gone Are The Days", "Available", { year: "2016", size: "24 × 24 in", inches: 24 }),
-  W("terracotta-pots", "Mitti", "Gone Are The Days", "Available", { year: "2010", size: "36 × 36 in", inches: 36 }),
+  W("terracotta-pots", "Kadhai", "Gone Are The Days", "Available", { year: "2010", size: "36 × 36 in", inches: 36 }),
   // Bandh Darwaze: 2018, one foot square
   W("weathered-door-ring", "Bandh Darwaze I", "Bandh Darwaze", "Available", { year: "2018", size: "12 × 12 in", inches: 12 }),
   W("red-and-teal-door-lock", "Bandh Darwaze II", "Bandh Darwaze", "Available", { year: "2018", size: "12 × 12 in", inches: 12 }),
@@ -135,6 +135,8 @@ export const LARGE = new Set([
 ]);
 
 export const SITE = "https://drdollyprasad.com";
+/** her one identity in the site's structured data: the home page states it, every painting points at it */
+export const PERSON_ID = `${SITE}/#artist`;
 
 /** a painting's own page */
 export const workPath = (id: string) => `/work/${id}`;

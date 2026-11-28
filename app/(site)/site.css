@@ -76,8 +76,6 @@ p{margin:0}
 .btn:hover{background:var(--ink);color:var(--bg)}
 .btn-solid{background:var(--ink);color:var(--bg)}
 .btn-solid:hover{background:var(--rust);border-color:var(--rust);color:var(--rust-ink)}
-.btn-wa{background:var(--green);border-color:var(--green);color:#F5F4F0}
-.btn-wa:hover{background:#245637;border-color:#245637;color:#F5F4F0}
 .btn-light{border-color:var(--dark-ink);color:var(--dark-ink)}
 .btn-light:hover{background:var(--dark-ink);color:var(--dark)}
 .btn svg{width:18px;height:18px;flex:none}
@@ -88,7 +86,7 @@ p{margin:0}
 .share-btn:hover{color:var(--rust)}
 
 /* ---- header ---- */
-.hdr{position:sticky;top:0;z-index:20;background:rgba(245,244,240,.96);backdrop-filter:blur(6px);border-bottom:1px solid var(--line)}
+.hdr{position:sticky;top:0;z-index:20;background:var(--bg);border-bottom:1px solid var(--line)}
 .hdr-in{display:flex;align-items:center;justify-content:space-between;gap:20px;padding-block:12px}
 .brand{display:flex;align-items:center;gap:14px;text-decoration:none;min-width:0}
 .brand img{width:52px;height:52px;border-radius:50%;object-fit:cover;border:2px solid var(--ink);flex:none}
@@ -106,7 +104,6 @@ p{margin:0}
 .nav .ig svg{width:22px;height:22px}
 .hdr-cta{display:flex;gap:10px}
 .menu{display:none}
-@media (max-width:1180px){ .hdr-cta .btn-wa{display:none} }
 @media (max-width:999px){
   .nav,.hdr-cta{display:none}
   .brand img{width:40px;height:40px}
@@ -124,14 +121,7 @@ p{margin:0}
 }
 @media (max-width:420px){ .brand-t b{font-size:24px} .brand-t i{font-size:15px} }
 
-/* the sticky WhatsApp on phones */
-.float-ask{display:none}
-@media (max-width:760px){
-  .float-ask{display:flex;position:fixed;left:14px;right:14px;bottom:14px;z-index:25;min-height:52px;box-shadow:0 10px 26px rgba(0,0,0,.28)}
-  .site{padding-bottom:76px}
-  .float-ask{transition:opacity .25s ease,transform .25s ease}
-  .float-ask.is-away{opacity:0;transform:translateY(16px);pointer-events:none;visibility:hidden}
-}
+@media (max-width:760px){ .site{padding-bottom:76px} }
 
 /* ---- paintings in their frames ---- */
 .framed{display:block;border:6px solid var(--frame);box-shadow:var(--lift);background:var(--frame)}
@@ -529,12 +519,23 @@ p{margin:0}
 @media (max-width:560px){ .two{grid-template-columns:1fr} }
 .note{background:var(--wall);padding:20px;display:flex;flex-direction:column;gap:10px;font-size:15px}
 .note b{font-family:var(--serif);font-size:24px}
+/* elevate (26 Nov 2026): the form shows the painting it was opened for; its pickers match the Works filters; "Write directly" sits on the page, unboxed */
+.enq-about{display:flex;align-items:center;gap:18px;padding-bottom:18px;border-bottom:1px solid var(--rule,var(--hair))}
+.enq-about img{flex:none;width:auto;height:auto;max-width:112px;max-height:112px;margin:0}
+.enq-about p{display:flex;flex-direction:column;align-items:flex-start;gap:4px;margin:0;min-width:0}
+.enq-about .link{background:none;border:0;padding:0;margin-top:4px;cursor:pointer;color:var(--ink);min-height:0}
+.enq .two[hidden]{display:none}
+.field select{appearance:none;-webkit-appearance:none;cursor:pointer;background-color:var(--bg);padding-right:36px;
+  background-image:url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='12' height='8'%3E%3Cpath d='M1 1l5 5 5-5' fill='none' stroke='%2326211D' stroke-width='1.6'/%3E%3C/svg%3E");
+  background-repeat:no-repeat;background-position:right 14px center}
+.field select:hover{border-color:var(--ink)}
 .mail{display:flex;gap:8px;align-items:center;flex-wrap:wrap;font-size:17px}
 .mail code{font-family:var(--sans);font-weight:500}
 .done{background:#E9F0EA;border:1px solid #9DB8A3;padding:16px;font-size:15px}
 
 /* ---- not found ---- */
 .lost{padding-block:80px;display:flex;flex-direction:column;gap:18px;align-items:flex-start}
+.lost-ctas{display:flex;gap:10px;flex-wrap:wrap}
 
 .ftr-line{display:block;font-family:var(--serif);font-style:italic;font-size:17px;color:var(--muted);margin:2px 0}
 .wp-lead{font-family:var(--serif);font-size:clamp(24px,2vw,28px);line-height:1.38;font-weight:500;max-width:720px;margin-top:10px}
@@ -638,7 +639,6 @@ p{margin:0}
 .roll-dots button[aria-current="true"]{background:var(--ink)}
 @media (prefers-reduced-motion:reduce){ .roll-stage img{transition:none} }
 
-.is-soft .collage::after{content:"";position:absolute;inset:0;background:rgba(237,230,219,.18);-webkit-backdrop-filter:blur(1.4px);backdrop-filter:blur(1.4px);pointer-events:none;z-index:1}
 
 
 
@@ -854,8 +854,8 @@ h1,h2,h3{font-weight:500;letter-spacing:-.005em}
 .link:hover{text-decoration-thickness:2px}
 
 /* ---- header: full at the top, slim once the page moves ---- */
-.hdr{background:rgba(245,244,240,.9);-webkit-backdrop-filter:saturate(1.4) blur(12px);backdrop-filter:saturate(1.4) blur(12px);border-bottom-color:transparent;transition:border-color .3s ease,box-shadow .3s ease}
-.is-scrolled .hdr{border-bottom-color:var(--hair);box-shadow:0 6px 24px -18px rgba(38,33,29,.5)}
+.hdr{background:var(--bg);border-bottom-color:transparent;transition:border-color .3s ease}
+.is-scrolled .hdr{border-bottom-color:var(--hair)}
 .hdr-in{padding-block:14px;transition:padding .35s var(--ease)}
 .is-scrolled .hdr-in{padding-block:8px}
 .brand img{border-width:1px;transition:width .35s var(--ease),height .35s var(--ease)}
@@ -994,7 +994,7 @@ h1,h2,h3{font-weight:500;letter-spacing:-.005em}
 /* ---- works: two to a row everywhere (see the PR #11 block at the end) ---- */
 .count-row{display:flex;justify-content:space-between;align-items:center;gap:16px;margin-bottom:22px}
 @media (max-width:640px){
-  .filters-line{position:sticky;top:56px;z-index:5;background:rgba(245,244,240,.94);-webkit-backdrop-filter:blur(8px);backdrop-filter:blur(8px);
+  .filters-line{position:sticky;top:56px;z-index:5;background:var(--bg);
     margin-inline:calc(-1 * var(--gut));padding:10px var(--gut);border-bottom:1px solid var(--hair)}
 }
 
@@ -1046,8 +1046,8 @@ h1,h2,h3{font-weight:500;letter-spacing:-.005em}
   .tabpanel dl{grid-template-columns:110px 1fr;font-size:15px}
   .prevnext a b{font-size:19px}
   .wp-bar{display:flex;align-items:center;justify-content:space-between;gap:14px;position:fixed;left:0;right:0;bottom:0;z-index:25;
-    padding:10px var(--gut) calc(10px + env(safe-area-inset-bottom));background:rgba(245,244,240,.96);
-    -webkit-backdrop-filter:blur(10px);backdrop-filter:blur(10px);border-top:1px solid var(--hair);
+    padding:10px var(--gut) calc(10px + env(safe-area-inset-bottom));background:var(--bg);
+    border-top:1px solid var(--rule,var(--hair));
     transform:translateY(0);transition:transform .4s var(--ease)}
   .wp-bar span{display:flex;flex-direction:column;min-width:0}
   .wp-bar b{font-family:var(--serif);font-size:19px;font-weight:500;line-height:1.1;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
@@ -1055,8 +1055,7 @@ h1,h2,h3{font-weight:500;letter-spacing:-.005em}
   .wp-bar .btn{min-height:44px;flex:none}
   .site:has(.wp-bar){padding-bottom:72px}
   .wp-bar.is-away{transform:translateY(110%);pointer-events:none;visibility:hidden;transition:transform .4s var(--ease),visibility 0s .4s}
-  body:has(.wp-bar) .float-ask{display:none}
-}
+  body:has(.wp-bar) }
 
 /* ---- the painting, full screen ---- */
 .zoom{position:fixed;inset:0;z-index:100;background:#181513;color:var(--dark-ink);display:flex;flex-direction:column;animation:zoom-in .35s ease}
@@ -1155,7 +1154,7 @@ h1,h2,h3{font-weight:500;letter-spacing:-.005em}
   .flip:hover .flip-in{transform:none}
 }
 /* a blurred header would trap the full-screen menu inside it: while the menu is open, the header is plain */
-.hdr.is-open{-webkit-backdrop-filter:none;backdrop-filter:none;background:var(--bg);border-bottom-color:transparent;box-shadow:none}
+.hdr.is-open{background:var(--bg);border-bottom-color:transparent;box-shadow:none}
 
 /* ==== integrated preview: round 2/3 content keeps its denser rhythm (less empty page between things) ==== */
 .sec{padding-block:clamp(26px,3.6vw,48px)}
@@ -1388,6 +1387,9 @@ section.wrap:has(+ .marq) .sec-head{margin-bottom:0}
 /* ==== the single divider (brief 005, pick C): a reading figure between two hairlines at a section break ==== */
 .divider{display:flex;align-items:center;justify-content:center;gap:18px;padding:64px var(--gut);position:relative;z-index:1}
 .divider::before,.divider::after{content:"";height:1px;width:44px;background:var(--ink);opacity:.4}
+/* a <picture> (components/site/Pic) takes no box: every rule written for its <img> still applies */
+.site picture{display:contents}
+.site picture>source{display:none}
 .divider picture{display:block;flex:none}
 .divider img{display:block;height:48px;width:auto;flex:none}
 @media (min-width:761px){ .divider{padding-block:88px} .divider::before,.divider::after{width:80px} .divider img{height:64px} }
@@ -1456,9 +1458,9 @@ section.wrap:has(+ .marq) .sec-head{margin-bottom:0}
 .slides-stage{background:transparent;box-shadow:none;overflow:visible}
 .slides-bg{display:none}
 .slides-stage img{filter:none;max-width:calc(100% - 24px);max-height:calc(100% - 24px);border:3px solid var(--frame);
-  box-shadow:0 1px 2px rgba(20,12,6,.16),0 6px 14px -4px rgba(20,12,6,.2),0 18px 36px -14px rgba(20,12,6,.3)}
+  box-shadow:var(--lift)}
 .slides-thumbs img{border:0;box-shadow:none}
-.clip img{border:3px solid var(--frame);box-shadow:0 1px 2px rgba(20,12,6,.16),0 6px 14px -4px rgba(20,12,6,.2),0 18px 36px -14px rgba(20,12,6,.3)}
+.clip img{border:3px solid var(--frame);box-shadow:var(--lift)}
 @media (max-width:760px){
   .slides-stage{margin-inline:0}
   .slides-stage img{max-width:calc(100% - 8px);max-height:calc(100% - 8px)}
@@ -1512,11 +1514,10 @@ section.wrap:has(+ .marq) .sec-head{margin-bottom:0}
 :root{--hdr-tuck:28px}
 @media (max-width:640px){ :root{--hdr-tuck:22px} }
 .hdr{top:calc(-1 * var(--hdr-tuck));padding-top:4px;z-index:40;background-color:rgba(245,244,240,1);
-  -webkit-backdrop-filter:none;backdrop-filter:none;border-bottom:1px solid transparent;box-shadow:none;
-  transition:background-color .3s ease,border-color .3s ease,box-shadow .3s ease,-webkit-backdrop-filter .3s ease,backdrop-filter .3s ease}
+  border-bottom:1px solid transparent;box-shadow:none;transition:border-color .3s ease}
 .hdr .band-top{margin:0;transition:opacity .3s ease}
-.is-scrolled .hdr{background-color:rgba(245,244,240,.8);-webkit-backdrop-filter:saturate(1.5) blur(16px);backdrop-filter:saturate(1.5) blur(16px);
-  border-bottom-color:rgba(38,33,29,.12);box-shadow:0 10px 28px -18px rgba(38,33,29,.45)}
+/* elevate (26 Nov 2026): a solid Khadi bar with a hairline once the page moves; no glass, no shadow (kb/taste.md) */
+.is-scrolled .hdr{background-color:var(--bg);border-bottom-color:var(--rule,rgba(38,33,29,.16))}
 .is-scrolled .hdr .band-top{opacity:.6}
 /* the bar keeps its size when the page moves (the old slimming moved the page under it) */
 .is-scrolled .hdr-in{padding-block:14px}
@@ -1529,10 +1530,9 @@ section.wrap:has(+ .marq) .sec-head{margin-bottom:0}
   .is-scrolled .brand img{width:36px;height:36px}
   .is-scrolled .brand-t b{font-size:24px}
 }
-@supports not ((backdrop-filter:blur(1px)) or (-webkit-backdrop-filter:blur(1px))){ .is-scrolled .hdr{background-color:rgba(245,244,240,.97)} }
 .hdr.is-open{background-color:var(--bg)}
 /* a sticky bar under the header covered the paintings on a phone: the Works filters scroll with the page */
-@media (max-width:640px){ .filters-line{position:static;margin-inline:0;padding:0;border-bottom:0;background:none;-webkit-backdrop-filter:none;backdrop-filter:none} }
+@media (max-width:640px){ .filters-line{position:static;margin-inline:0;padding:0;border-bottom:0;background:none} }
 
 /* ---- 1 · page openings: the card beside the wall (computer) or under it (tablet, phone), never on it ---- */
 .wh{display:grid;grid-template-columns:minmax(330px,31%) minmax(0,1fr);background:var(--wall)}
@@ -1644,7 +1644,7 @@ main + .divider{padding:clamp(36px,4vw,56px) var(--gut) clamp(28px,3vw,40px)}
 .sm-media{display:flex;flex-direction:column;gap:12px;min-width:0}
 .sm-hero{display:flex;align-items:center;justify-content:center;aspect-ratio:3/2;width:100%;padding:0;border:0;background:transparent;cursor:zoom-in}
 .sm-hero img{max-width:100%;max-height:100%;width:auto;height:auto;border:3px solid var(--frame);
-  box-shadow:0 1px 2px rgba(20,12,6,.16),0 6px 14px -4px rgba(20,12,6,.2),0 18px 36px -14px rgba(20,12,6,.3);animation:sm-in .5s ease}
+  box-shadow:var(--lift);animation:sm-in .5s ease}
 @keyframes sm-in{from{opacity:.25}to{opacity:1}}
 .sm-cap{font-size:15px;color:var(--muted);line-height:1.45}
 .sm-strip{display:flex;gap:10px;flex-wrap:wrap}
@@ -1676,9 +1676,9 @@ main + .divider{padding:clamp(36px,4vw,56px) var(--gut) clamp(28px,3vw,40px)}
 .press-item figure{margin:0;display:flex;flex-direction:column;gap:12px}
 .press-open{display:block;width:100%;padding:0;border:0;background:none;cursor:zoom-in;line-height:0}
 .press-open img,.press-clip{display:block;width:100%;height:auto;border:3px solid var(--frame);
-  box-shadow:0 1px 2px rgba(20,12,6,.16),0 6px 14px -4px rgba(20,12,6,.2),0 18px 36px -14px rgba(20,12,6,.3);
+  box-shadow:var(--lift);
   transition:transform .28s cubic-bezier(.2,.7,.2,1),box-shadow .28s ease}
-@media (hover:hover) and (pointer:fine){ .press-open:hover img{transform:translateY(-4px);box-shadow:0 2px 6px rgba(20,12,6,.2),0 22px 44px -10px rgba(20,12,6,.45)} }
+@media (hover:hover) and (pointer:fine){ .press-open:hover img{transform:translateY(-4px);box-shadow:var(--lift)} }
 .press-clip{position:relative;aspect-ratio:4/3;background:#242625;overflow:hidden}
 .press-clip video{position:absolute;inset:0;width:100%;height:100%;object-fit:contain;background:#242625;display:block}
 .press-play{position:absolute;left:50%;top:50%;width:64px;height:64px;margin:-32px 0 0 -32px;border-radius:50%;
@@ -1703,7 +1703,7 @@ main + .divider{padding:clamp(36px,4vw,56px) var(--gut) clamp(28px,3vw,40px)}
 .gal{position:fixed;inset:0;z-index:120;background:rgba(22,19,17,.97);color:#F3EEE7;display:flex;flex-direction:column;animation:zoom-in .25s ease}
 .gal-stage{position:relative;flex:1;min-height:0;display:flex;align-items:center;justify-content:center;
   padding:clamp(64px,6vw,76px) clamp(12px,7vw,104px) 8px;touch-action:pan-y;-webkit-user-select:none;user-select:none}
-.gal-stage img{max-width:100%;max-height:100%;width:auto;height:auto;object-fit:contain;border:3px solid #0B0A09;box-shadow:0 24px 60px rgba(0,0,0,.55);
+.gal-stage img{max-width:100%;max-height:100%;width:auto;height:auto;object-fit:contain;border:3px solid #0B0A09;box-shadow:none;
   translate:var(--pull,0) 0;transition:translate .3s var(--ease)}
 .gal-bar{display:flex;justify-content:space-between;align-items:flex-end;gap:16px;padding:10px clamp(16px,7vw,104px) calc(18px + env(safe-area-inset-bottom))}
 .gal-cap{display:flex;flex-direction:column;gap:3px;max-width:760px}
@@ -1736,7 +1736,7 @@ main + .divider{padding:clamp(36px,4vw,56px) var(--gut) clamp(28px,3vw,40px)}
 
 /* ==== CR-005 QA P1s (18 Oct, night) ==== */
 /* P1-2 · the full-screen look: a near-solid ground and a solid caption panel */
-.gal{background:rgba(20,18,16,.96);-webkit-backdrop-filter:blur(8px);backdrop-filter:blur(8px)}
+.gal{background:rgba(20,18,16,.97)}
 .gal-bar{background:#141210;border-top:1px solid rgba(243,238,230,.12)}
 /* P1-3 · the back of a short or narrow wall tile keeps its title whole */
 @container (max-height:190px){ .tile.flip .back em,.tile.flip .back .go{display:none} }
@@ -1878,7 +1878,7 @@ body *{font-style:normal !important}
 .pp-art img{display:block;width:auto;height:auto;max-width:min(100%,1100px);max-height:min(72svh,780px);object-fit:contain;border:5px solid var(--frame);box-shadow:var(--shadow-2)}
 .pp-art img.is-small{max-height:min(360px,60svh)}
 .pp-room{width:min(100%,900px,calc(64svh * 1.5));display:flex;flex-direction:column;gap:10px}
-.pp-room .room{box-shadow:0 18px 44px rgba(20,12,6,.18)}
+.pp-room .room{box-shadow:var(--lift)}
 .pp-cap{margin:0;text-align:center;font-family:var(--sans);font-size:13px;letter-spacing:.14em;text-transform:uppercase;color:var(--muted)}
 .pp-bar{display:flex;align-items:center;justify-content:center;flex-wrap:wrap;gap:6px 18px;min-height:44px}
 .pp-toggle{display:inline-flex;align-items:center;gap:9px;min-height:44px;padding:0 20px;border:1px solid var(--ink);border-radius:999px;background:transparent;color:var(--ink);
@@ -1938,7 +1938,6 @@ body *{font-style:normal !important}
 /* ---- 2 · one tile size on every wall: seven columns each (set in Collage.tsx) ---- */
 
 /* ---- 3 · painting page: whole first screen on a phone ---- */
-.pp-art img{box-shadow:0 1px 2px rgba(20,12,6,.35),0 6px 12px rgba(20,12,6,.22),0 18px 30px -4px rgba(20,12,6,.28),0 38px 64px -18px rgba(20,12,6,.5);transform:translateY(-3px)}
 .pp-bar{flex-wrap:nowrap;gap:10px;min-height:0;margin-top:10px}
 .pp-toggle,.pp-zoom{position:relative;display:inline-flex;align-items:center;justify-content:center;gap:7px;min-height:32px;padding:0 14px;border:1px solid var(--ink);border-radius:999px;
   background:transparent;color:var(--ink);font:500 11px/1 var(--sans);letter-spacing:.14em;text-transform:uppercase;white-space:nowrap;cursor:pointer}
@@ -2128,13 +2127,13 @@ body *{font-style:normal !important}
 .sband.tone-0,.sband.tone-1{background:#F5F4F0}
 .sband.tone-2{background:#F5F4F0}
 
-/* black frame + white mat: the frame is the border, the mat is padding on white */
+/* black frame + cream mat: the frame is the border, the mat is padding on --mat-c (tokens.css) */
 .framed,.framed.thin,.tile .framed,
 .viewer .paper img,.roll-stage img.framed,.slides-stage img,.clip img,
 .ab-portrait img,.ig-track img,.now-box .imgs img,.wpa-art img,.freel-stage img{
   border:6px solid var(--frame) !important;
   padding:var(--mat) !important;
-  background:#FFFFFF !important;
+  background:var(--mat-c) !important;
   object-fit:contain;
   box-shadow:inset 0 0 0 1px rgba(0,0,0,.06),var(--lift3d) !important;
 }
@@ -2157,7 +2156,7 @@ body *{font-style:normal !important}
 .wpa-art img{border-width:9px !important;padding:9px !important}
 @media (max-width:640px){ .wpa-art img{border-width:5px !important;padding:5px !important} }
 .ss-stage{background:#F5F4F0}
-.pp-art img,.room-art img{border:9px solid var(--frame) !important;padding:9px !important;background:#FFFFFF !important;
+.pp-art img,.room-art img{border:9px solid var(--frame) !important;padding:9px !important;background:var(--mat-c) !important;
   box-shadow:inset 0 0 0 1px rgba(0,0,0,.06),var(--lift3d) !important}
 @media (max-width:640px){ .pp-art img,.room-art img{border-width:5px !important;padding:5px !important} }
 
@@ -2277,7 +2276,7 @@ body *{font-style:normal !important}
 @keyframes page-in{from{transform:translateY(6px)}to{transform:none}}
 
 /* v5 · museum placards: one label style on every wall (home, collections, about, exhibitions) */
-.xcard,.ncard,.ccard{background:#FAF9F6 !important;color:#1A1614 !important;border:1px solid #D9D5CC;box-shadow:0 8px 20px -10px rgba(10,8,6,.35) !important}
+.xcard,.ncard,.ccard{background:#FAF9F6 !important;color:#1A1614 !important;border:1px solid #D9D5CC;box-shadow:var(--lift) !important}
 .ncard.rust,.ncard.dark,.ccard.indigo{background:#211B18 !important;color:#F3EEE7 !important;border-color:#211B18}
 .xcard div{padding:12px 14px 14px;gap:2px;background:#FAF9F6}
 .xcard em,.ncard em,.ccard em{font:500 11.5px/1.3 var(--sans);letter-spacing:.18em;text-transform:uppercase;color:#6B6558 !important;opacity:1}
@@ -2299,11 +2298,11 @@ body *{font-style:normal !important}
 @media (max-width:760px){ .pp .pp-toggle,.pp .pp-zoom{min-height:32px} .pp .pp-toggle::after,.pp .pp-zoom::after{inset:-6px -4px} }
 .pp .pp-strip{display:flex;flex-wrap:nowrap;justify-content:center;align-items:center;gap:4px;overflow:visible;margin:10px auto 0;padding:0;max-width:100%}
 .pp .pp-chip{flex:0 1 48px;width:48px;min-width:44px;height:48px;min-height:44px;padding:4px;border:0;background:transparent;opacity:.7;overflow:visible;position:relative}
-.pp .pp-chip>img{display:block;width:100%;height:100%;border:1px solid #CFC6B9;background:#FAF9F6;object-fit:cover;box-sizing:border-box}
-.pp .pp-chip:first-child>img{object-fit:contain;padding:2px}
+.pp .pp-chip img{display:block;width:100%;height:100%;border:1px solid #CFC6B9;background:#FAF9F6;object-fit:cover;box-sizing:border-box}
+.pp .pp-chip:first-child img{object-fit:contain;padding:2px}
 .pp .pp-chip:hover{opacity:1}
 .pp .pp-chip[aria-pressed="true"]{opacity:1;border:0}
-.pp .pp-chip[aria-pressed="true"]>img{border:2px solid var(--ink);box-shadow:0 0 0 2px #F5F4F0,0 0 0 3px var(--ink)}
+.pp .pp-chip[aria-pressed="true"] img{border:2px solid var(--ink);box-shadow:0 0 0 2px #F5F4F0,0 0 0 3px var(--ink)}
 .pp .pp-chip:focus-visible{outline:2px solid var(--ink);outline-offset:1px}
 /* the story first, then the status line, so the page reads as one story */
 .pp .pp-text .pp-story{margin-top:4px}
@@ -2338,7 +2337,7 @@ body *{font-style:normal !important}
 .five-b{display:flex;flex-direction:column;gap:4px;text-decoration:none;color:var(--black)}
 .five-stage{position:relative;display:block;aspect-ratio:4/5;background:#F5F4F0;overflow:hidden}
 .five-stage img{position:absolute;inset:0;margin:auto;max-width:calc(100% - 24px);max-height:calc(100% - 24px);width:auto;height:auto;
-  border:5px solid #141210;box-shadow:0 0 0 3px #fff inset,0 10px 22px -10px rgba(0,0,0,.45);opacity:0;transition:opacity .9s ease}
+  border:5px solid #141210;box-shadow:0 0 0 3px var(--mat-c) inset,var(--lift);opacity:0;transition:opacity .9s ease}
 .five-stage img.is-on{opacity:1}
 .five-n{font-family:var(--serif);font-size:20px;font-weight:600;color:var(--red);margin-top:8px}
 .five-t{font-family:var(--serif);font-size:clamp(19px,1.6vw,23px);font-weight:600;line-height:1.15}
@@ -2356,12 +2355,12 @@ body *{font-style:normal !important}
 /* Palette (Shubham, 20 Oct): white and indigo, with the one pale cream only where a box needs a ground.
    One indigo everywhere (the site's deeper indigo); one cream (--pale); no beige or off-white variants. */
 .wh .namecard{background:#FAF9F6}
-.collage .framed,.collage .tile img{background-color:var(--pale) !important}
+.collage .framed,.collage .tile img{background-color:var(--mat-c) !important}
 .xcard,.ncard,.ccard{background:#FAF9F6}
 .ncard.rust,.ncard.dark,.ccard.indigo{background:var(--indigo) !important;border-color:var(--indigo)}
 .five-stage{background:var(--pale)}
 /* carousels: no cream box while a picture arrives; the frame waits on white */
-.marq .framed{background-color:#fff}
+.marq .framed{background-color:var(--mat-c)}
 
 /* In the press (20 Oct): a neat grid, not a collage. Every item the same shape, captions on one line-up.
    Photos fill their frame; the newspaper clipping and the television stills sit whole on cream. */

@@ -19,3 +19,6 @@ assets/figure/tex/
 
 # her scans (Gaussian splats, Scaniverse, 13 Oct 2026): the raw takes stay off the web and out of git
 assets/figure/scan/
+
+# generated at build by scripts/images/variants.cjs (prebuild): AVIF/WebP copies, never committed
+public/i/

@@ -1,9 +1,10 @@
 import Link from "next/link";
 import { BY_ID, workPath } from "@/lib/works";
 import { LOOK, SERIES_PAGES, worksIn, PRESS, SHOWS, SHOWS_AS_RECORDED, SMALL_PHOTO, labelLine } from "@/lib/site";
-import { dims, smSet } from "@/lib/images";
+import { dims } from "@/lib/images";
 import { thumb } from "./Card";
 import WallDrift from "./WallDrift";
+import Pic from "./Pic";
 
 /**
  * The moving wall: columns drifting slowly up and down (alternately) while the
@@ -38,6 +39,9 @@ const S = (big: string, mid: string, small: string, href = "#record"): Item => (
 /** words: hers verbatim (in quote marks, with her name), or a short editorial line about a show */
 const Q = (text: string, by: string, href: string, hers: boolean): Item => ({ k: "q", text, by, href, hers });
 const lede = (id: string) => SHOWS.find((x) => x.id === id)?.lede.split(". ").slice(0, 2).join(". ").replace(/\.?$/, ".") ?? "";
+
+/** the home wall's lead tile, "column:row": the ICCR sign, the largest thing on a phone's first screen (Lighthouse, 26 Nov 2026) */
+const HOME_LEAD = "2:0";
 
 export const HOME: Item[][] = [
   [P("bulls-and-wheel"), P("temple-bells"), P("red-turban-portrait"),
@@ -116,7 +120,17 @@ export const SHOW_WALL: Item[][] = SHOWS_AS_RECORDED.map((sh, i) => [
   ...(sh.works ?? []).map((id) => P(id)),
 ]);
 
-function Tile({ it }: { it: Item }) {
+/** a wall tile is about 140 px wide on a phone and a seventh of a wide screen */
+const TILE_SIZES = "(max-width: 640px) 140px, (max-width: 1100px) 25vw, 16vw";
+
+/**
+ * Tiles load lazily: the ones on the first screen at once, the rest when the page has settled
+ * (WallDrift fetches them then, so no tile drifts in empty) instead of all of them up front.
+ * `first`: the tile is in its column's first run; the repeats that make the loop seamless are
+ * decorative duplicates and carry no alt.
+ * `lead`: the one tile fetched ahead of everything else (the largest thing on the first screen).
+ */
+function Tile({ it, first, lead = false }: { it: Item; first: boolean; lead?: boolean }) {
   if (it.k === "s") {
     return (
       <Link className="tile scard" href={it.href} tabIndex={-1}>
@@ -149,8 +163,7 @@ function Tile({ it }: { it: Item }) {
   if (it.k === "x") {
     return (
       <Link className="tile xcard" href={it.href} tabIndex={-1}>
-        {/* eslint-disable-next-line @next/next/no-img-element */}
-        <img src={it.src} alt={it.alt} decoding="async" {...dims(it.src)} {...smSet(it.src)} />
+        <Pic src={it.src} alt={first ? it.alt : ""} sizes={TILE_SIZES} eager={lead} fetchPriority={lead ? "high" : undefined} {...dims(it.src)} />
         <div><em>{it.eyebrow}</em><b>{it.title}</b><small>{it.sub}</small></div>
       </Link>
     );
@@ -161,14 +174,13 @@ function Tile({ it }: { it: Item }) {
   return (
     <Link className="tile flip" href={workPath(w.id)} tabIndex={-1}>
       <span className="flipper">
-        {/* eslint-disable-next-line @next/next/no-img-element */}
-        <img className="framed" src={thumb(w.id)} alt={w.title} loading="eager" decoding="async" {...dims(thumb(w.id))} {...smSet(thumb(w.id))} />
+        <Pic className="framed" src={thumb(w.id)} alt={first ? w.title : ""} sizes={TILE_SIZES} {...dims(thumb(w.id))} />
         <span className="back">
           <em>{w.series}</em>
           <b>{w.title}</b>
           <small>{labelLine(w)}</small>
           {line && <i>{line}</i>}
-          <span className="go">View the painting</span>
+          <span className="go">See the painting</span>
         </span>
       </span>
     </Link>
@@ -184,13 +196,14 @@ const repFor = (items: Item[]) => (items.length >= 6 ? 2 : 3);
 const WALL_COLS = 7;
 const half = (items: Item[]) => [...items.slice(Math.ceil(items.length / 2)), ...items.slice(0, Math.ceil(items.length / 2))];
 
-export function Wall({ columns, speed = 95 }: { columns: Item[][]; speed?: number }) {
+export function Wall({ columns, speed = 95, lead }: { columns: Item[][]; speed?: number; /** "column:row" of the one tile to fetch first */ lead?: string }) {
+  if (!lead && columns === HOME) lead = HOME_LEAD;
   const all = Array.from({ length: Math.max(WALL_COLS, columns.length) }, (_, i) => (i < columns.length ? columns[i] : half(columns[i % columns.length])));
   return (
     <WallDrift n={all.length}>
       {all.map((items, i) => (
         <div key={i} data-rep={repFor(items)} className={`col${i % 2 ? " down" : ""}`} style={{ ["--dur" as string]: `${Math.round(speed * (1 + (i % 3) * 0.17))}s` }}>
-          {Array.from({ length: repFor(items) }, () => items).flat().map((it, j) => <Tile key={j} it={it} />)}
+          {Array.from({ length: repFor(items) }, () => items).flat().map((it, j) => <Tile key={j} it={it} first={j < items.length} lead={lead === `${i}:${j}`} />)}
         </div>
       ))}
     </WallDrift>

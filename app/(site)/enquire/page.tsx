@@ -1,13 +1,18 @@
 import type { Metadata } from "next";
+import { pageOg } from "@/lib/og";
 import EnquireForm from "@/components/site/EnquireForm";
 import IndigoBand from "@/components/site/IndigoBand";
 import Link from "next/link";
 import { SERIES_PAGES } from "@/lib/site";
 
+const TITLE = "Enquire";
+const DESCRIPTION = "Write to ask about a painting by Dr Dolly Prasad, its price and details, or an exhibition. Every painting can be shipped worldwide.";
 export const metadata: Metadata = {
-  title: "Enquire",
-  description: "Ask Dr Dolly Prasad about a painting or an exhibition.",
+  title: TITLE,
+  description: DESCRIPTION,
   alternates: { canonical: "/enquire" },
+  // the link preview carries this page's own title, line and address (elevate, 26 Nov 2026)
+  openGraph: pageOg(TITLE, DESCRIPTION, "/enquire"),
 };
 
 export default function Enquire() {
@@ -16,7 +21,7 @@ export default function Enquire() {
     <div className="wrap">
       <section className="page-head">
         <h1 className="page-title">Enquire</h1>
-        <p className="lede">A painting you would like to know more about, an exhibition, or the press. Prices are on request.</p>
+        <p className="lede">Found a painting you would like to live with? Write by email for its price and details. Every painting can be shipped worldwide.</p>
       </section>
       <EnquireForm />
     </div>

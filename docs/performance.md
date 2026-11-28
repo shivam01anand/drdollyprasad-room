@@ -114,3 +114,35 @@ viewport sizes. Six offline portrait renders confirm the wall compositions.
 These checks do not measure browser frame rates or prove that all device-specific
 stuttering is resolved. The actual browser regression/profile is still pending
 the disconnected browser connection or permission for headless Chrome.
+
+## Lighter load, 26 November 2026
+
+The house opened on about 6.4 MB and then pulled everything else at once: every room's paintings,
+both full-size lightmaps, the 2k surfaces and her head, about 16 MB within eight seconds of the
+welcome lifting, on a phone as on a desktop. Now it streams what the walk is near.
+
+- Paintings: the rooms of the stop before, this stop and the next two (`ROOMS_AT` in `lib/room/Room.ts`).
+  A room loads as one, since its whole hang is in view from its door. The last stops (the house from
+  above) take whatever is left.
+- The evening lightmap: when the visitor first walks on, or lights the diya (the room waits for it,
+  at most 3 s, so the walls go down with the sky).
+- Surfaces: a phone stays on the 1k set and the 2k lightmaps. A wide screen takes the 2k courtyard
+  sets once inside and the hall's as its paintings begin to load.
+- The lane door's set (one door leaf in the Red Room, 0.5 MB at 1k and 1.8 MB at 2k) is a single texel
+  until three stops before the Red Room, and never 2k.
+- `public/tex/plaster_nor.webp` (2k) re-encoded from itself at WebP q70: 1.28 MB to 0.44 MB.
+  `dwebp plaster_nor.webp -o n.png && cwebp -q 70 -m 6 n.png -o plaster_nor.webp`
+- Her head: the file is fetched at the second stop and built while the camera stands still, with its
+  first frames drawn out of view, so none of it lands on the walk up to her easel.
+
+Measured against a local `next start`, cold cache, network held to 10 Mbps (40 ms latency):
+
+| | Before | After |
+|---|---:|---:|
+| Before the welcome lifts | 6.35 MB, 5.9 s | 5.84 MB, 5.5 s |
+| Before the arrows | 7.57 MB, 6.9 s | 5.84 MB, 6.5 s |
+| Eight seconds later, standing at the first stop (desktop) | 16.1 MB | 8.4 MB |
+| The same on a phone | 16.1 MB | 5.84 MB |
+
+What is left before the welcome lifts is half `house.glb` (2.9 MB). Making that smaller is a publish
+or Blender pass on the model, not a loading change.

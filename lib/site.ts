@@ -9,9 +9,8 @@ import { WORKS, type Work, EMAIL, INSTAGRAM, SITE, quoted, workPath } from "./wo
 
 export { EMAIL, INSTAGRAM, SITE, quoted, workPath };
 
-/** her WhatsApp number in international form without "+" (e.g. "9198xxxxxxxx").
- *  Empty until she chooses the number: the WhatsApp buttons then go to the enquiry page. */
-export const WHATSAPP = "";
+/** the one delivery line, shown with the way to enquire (Enquire page and painting page) */
+export const DELIVERY_LINE = "Paintings ship worldwide.";
 
 export const STUDIO_PATH = "/studio";
 
@@ -31,47 +30,47 @@ export const BIO_SUB = "Catching the hues of India in its waiting and wishing, i
  * the story, then what the painting holds. Source: kb descriptions (story-first lines, 2026-11-22).
  */
 export const LOOK: Record<string, string> = {
-  "rickshaw-puller-and-coin": "He puts his whole back into every fare, for twenty paise coins that matter so little now. This painting gives the coin back the weight it had when a whole family lived on what he pulled.",
-  "carriage-and-autorickshaw": "He waits under the orange hood, the grey horse standing ready, for a fare who now flags down an auto instead. Aakhri savaari means the last ride, and the painting never tells us whether his has already gone.",
-  "bullock-cart-and-truck": "He lifts the whip over a cartload of sacks, and the bullock walks on at the one speed it has. The truck beside him carries the same sacks, and here it waits in the dark while the bullock sets the pace.",
-  "rickshaw-rest-framed": "After a day on his feet he sits back against the rickshaw, and even now he glances over his shoulder in case the next passenger has come. Behind him stands ek rupaya, the coin his whole day was counted in.",
-  "coins-and-clay-bank": "Children fed coins through a slot like this for months, and the only way to get them out was to break the clay. Nobody breaks this one, and the annas around it would buy nothing now.",
-  "postbox-and-stamps": "A letter went into a red box like this one, and a family looked out for the postman until the reply came. Each stamp on the wall in this painting paid for that wait, a few paise to send a voice across the country.",
-  "mother-india-and-kettles": "Kettles like these poured tea all day at a stall, under a Mother India poster nobody ever took down. The film’s mother carried her sons through flood and hunger, and now she fades into the red and goes on minding the stall.",
-  "shree-420-and-milk-cans": "Every morning the cans stood against the nearest wall, and that season the wall belonged to Raj Kapoor. Milk and the movies were what every house on the street shared, and this painting keeps that wall the way a family keeps an old photograph.",
-  "bulls-and-wheel": "Someone painted their horns blue and green and hung bells at their throats, the way you dress those who do your heaviest work. Before the Engines remembers when a harvest got to market only as fast as these two could walk.",
-  "cycle-rickshaw": "He pedals on with a cloth held to his mouth, and the road around him belongs to cars and autos now. For once he has right of way, and every engine has to wait behind him.",
-  "rickshaw-rest": "He has climbed onto the footboard to rest his legs, the brass bell hanging from his fingers, ready the moment anyone waves. All the street ever spared him was thodi der, a little while, and on canvas it lasts.",
-  "horse-cart-and-autorickshaw": "Three passengers squeezed in behind a turbaned driver, and the tonga took them across town at a trot. In A Ride Together the auto that would one day take his fares has drawn up alongside, and for now the two share the road.",
-  "rickshaw-and-autorickshaw": "A thin man walks between the shafts down the old street, and the man he pulls sits back as if he weighed nothing. An auto that runs on its own already waits beside him, and still he pulls.",
-  "terracotta-pots": "Copper like this was scrubbed till it shone and sent back to the kitchen, and nobody looked twice. This painting turns each pot to the light and lets the dark between them warm the copper.",
-  "weathered-door-ring": "On a door like this, whoever knocked was looked over first through the small barred window. We stand on the visitor’s step, a hand’s reach from the ring, and wait on a face that does not come to the bars.",
-  "red-and-teal-door-lock": "Someone padlocked this door from outside, meaning to come back, and the lock has rusted into its hasp. This painting keeps watch on it the way a family watches the lane for someone long overdue.",
-  "teal-door-bolt": "Whoever left last slid the bolt across both doors, then hung a padlock on it for good measure. Every rivet is painted with the same care, the way people lock up a house they mean to keep.",
-  "carved-door-knocker": "Someone worked a flower into each stud on this door and bent its handle into a heart for a guest’s hand. No lock shows anywhere on it, and it stays as it was made, ready for the next knock.",
-  "monks-and-blue-buddha": "Four young monks sit down to the same prayer, and two have shut their eyes while one still reads his loose pages. Over them the Buddha’s eyes are already shut, and the painting gives each boy as many days as it takes to get there.",
-  "monk-and-green-buddha": "He presses his face into his joined palms, the way people pray when what they need is too big to say aloud. Sharan means refuge, and he finds it in a raised hand above his bowed head that asks for nothing back.",
-  "offering-of-light": "A boy holds his lamp out at arm’s length to a wall of the prayer said before any new beginning. For a boy at the start of nearly everything, this painting finds the right prayer, the one that asks for every road to be clear.",
-  "prayer-and-scripture": "He sits bare-backed before the Gayatri, the prayer many Hindus say at sunrise every day of their lives. We sit just behind him, close enough to read the lines he has long known by heart.",
-  "priest-with-flame": "A temple’s aarti comes at the same hour every day, and he is the man who lifts the flame for it. Years of that hour have not dulled it, and in this painting the air around him still shakes with the bell.",
-  "sacred-tree": "Every turn of thread round this trunk is someone’s mannat, a vow tied on in hope and left with the tree. Nobody can tell now which ones came true, and every one stays wound as tight as the day it was tied.",
-  "newspaper-reader": "Before the day asks anything of him he sits with the paper up close, and one page has slipped to the floor. The tilak is the mark of a morning puja, and he reads the news with the same slow care.",
-  "elder-woman-portrait": "Whatever the years asked her to wait for, she waited, and each wait left its line on her face. Nobody thanks a woman for patience like hers, so the painting does, and gives it its name, sabr.",
-  "red-turban-portrait": "Something has tickled him, and the grin has dipped his head and nearly shut his eyes. A smile like this is gone before anyone looks, and Muskaan keeps it one breath short of the laugh.",
-  "yellow-turban-portrait": "He keeps his head up under a turban tied high and full, and his eyes come round to hold yours till you look away. In any crowd he would be one more face, and this painting gives his pride the whole canvas.",
-  "patterned-turban-portrait": "Worry has pulled his mouth down and his eyes to the ground, for all the brightness of his turban. He is left to it, the way you let an old man finish a thought.",
-  "mother-and-child": "He holds on to his mother’s arm and stares out at the world from the one place it cannot reach him. The painting takes its name from that place, aanchal, the edge of a sari and the first shelter a child knows.",
-  "boy-and-kettle": "He looks young enough for a classroom, yet he sits by the stove, chin in hand, till the tea boils. Bachpan is what this painting calls his hours at the stove, and for many boys like him they were all the childhood there was.",
-  "man-among-metal-pans": "He has set out his kadhais in a ring on the ground and sits among them, his back to us, until someone stops to buy. Each empty pan in Intezar is one more customer who has not come.",
-  "three-veiled-women": "Three women draw their veils close and lean in together, and the world gets only their arms and the silver on them. The red that hides them from us is what makes the three of them one.",
-  "milkman-on-bicycle": "He is out before the city wakes, cans swinging at both sides, so every house has milk for its first chai. The title puts him first in the day, and the painting follows a man most homes knew only by the clank at the gate.",
-  "riverside-figures": "They sit on the ghat steps under woven umbrellas, wrapped in white and saffron, and wait for whoever comes down to the river next. Evening at the Ghat gives them the hour when the crowds have gone home and the steps are theirs again.",
-  "child-among-flowers": "She has been found out at something, or thinks she has, and a hand over her mouth is all the hiding she knows yet. Among the bougainvillea she is one more bloom, held there before life has had its say.",
-  "woman-with-poppies": "She has gone somewhere none of us can follow, to talk things over with no one but herself. Khwaab means a dream, and poppies, the old flower of sleep, grow right out to the edges.",
-  "temple-bells": "People often come back to hang a bell at a temple once a prayer is answered, and these rails have run out of room. Whoever hung them has gone home, and the brass is left in this painting to go on saying thank you.",
-  "woman-with-bird": "Spring is in full voice around her, a bird calling at her shoulder, and she has found the one quiet place left, behind her own eyes. In this painting the bird will never finish its call, and still she does not turn her head.",
-  "woman-with-red-flower": "There is something she cannot find the words for, and she sits with it, a fingertip under one eye. The flower at her lips will have to speak for her, and it opens wide and red.",
-  "boy-with-bananas": "He wears a whole bunch of bananas like a crown, and his small smile says he knows how fine he looks. In this painting a village errand turns into a coronation, under a flower that will one day fill out into bananas.",
+  "rickshaw-puller-and-coin": "Most of us remember twenty paise as loose change, yet a rickshaw puller laboured through a whole ride to earn it. I have tried to paint the coin as large as that labour, and to honour the man who still pulls towards it.",
+  "carriage-and-autorickshaw": "Every city reaches a day when the old way of getting somewhere quietly stops being the way. Here the tonga still holds the road in full colour, and the auto waits beside it in a few white lines, sure of its turn.",
+  "bullock-cart-and-truck": "Dheere dheere, slowly, was the only speed a bullock cart ever had. The truck will get there first now, yet for generations this patient pace was enough to feed a city.",
+  "rickshaw-rest-framed": "He sits back against his rickshaw, but his eyes have not left the road. To him ek rupaya, one rupee, meant supper at home, earned one ride at a time.",
+  "coins-and-clay-bank": "Every coin in a gullak was a small promise, a toffee given up or a fare saved for. Together they kept a family's hope for a better tomorrow, and breaking it open was how that tomorrow arrived.",
+  "postbox-and-stamps": "A family's news once travelled through a red patra petika like this. A letter in a familiar hand was the next best thing to a visit, and waiting for one was half the joy.",
+  "mother-india-and-kettles": "Mother India gave the screen a mother who bore everything for her children. The kettles beside her kept a working street going, one cup of tea at a time.",
+  "shree-420-and-milk-cans": "With milk at the door each morning and Raj Kapoor on screen at night, a working family asked for little more. The cans and the torn poster have worn down together, year after year.",
+  "bulls-and-wheel": "Before the engines, a farmer's year rested on two animals walking as one. Dressed in bells and painted horns, they were counted as family, and the harvest was as much theirs as anyone's.",
+  "cycle-rickshaw": "Cars and autos have taken over the street, and still he pedals on, the last of his trade. In all that rush, he keeps one gentler seat for anyone happy to ride slow.",
+  "rickshaw-rest": "All a long day allows him is thodi der, a little while, crouched on the footboard with the bell loose in his fingers. For that little while, the street can wait.",
+  "horse-cart-and-autorickshaw": "A tonga rarely left half empty, and strangers squeezed in shoulder to shoulder for the ride to the bazaar. The auto beside it will get there faster, but few rides since have felt this much like company.",
+  "rickshaw-and-autorickshaw": "Not so long ago, one man's legs were enough to carry another across town. The auto has already pulled up beside him, and I have kept him on the canvas a little longer, so the strength he spent is remembered.",
+  "terracotta-pots": "A copper kadhai was scrubbed bright after each meal and passed down from mother to daughter. Heaped together here, they hold the glow of a family's kitchen, from festival halwa to a weekday sabzi.",
+  "weathered-door-ring": "The little barred window let a house see who had come before it opened up. Lift the ring and let it fall, and someone inside who knows your knock is already on the way.",
+  "red-and-teal-door-lock": "Someone locked this door and walked away meaning to return. The rust shows how long it has been, and the lock shows how faithfully it has waited.",
+  "teal-door-bolt": "Whoever left last slid the bolt and then added a padlock, the way you lock up a home you love before a long journey. Two locks on one door say how much inside was worth coming back to.",
+  "carved-door-knocker": "A heart for a handle and flowers for studs. This door was made to say come in.",
+  "monks-and-blue-buddha": "These young monks are still learning to meditate, one with his eyes shut and another following the words on his page. Above them the Buddha's face holds the stillness they are slowly growing into.",
+  "monk-and-green-buddha": "He brings everything he carries to prayer, his face pressed into his hands. Before him the Buddha raises a calm palm, as if to say he may set it all down here.",
+  "offering-of-light": "Vakratunda mahakaya is the prayer to Ganesh said before anything new begins. It suits a boy at the start of his own life, holding his small flame up to the words with complete trust.",
+  "prayer-and-scripture": "He knows these words better than his own name. Sitting before them, he asks once more for the light they promise.",
+  "priest-with-flame": "As the aarti bell begins to ring, one man raises the flame, and a whole crowd prays through his hands. This painting honours a devotion he renews each dusk, on behalf of all who gather.",
+  "sacred-tree": "A mannat is a wish tied to a sacred tree with a thread and a prayer. Round this peepal, the hopes of strangers have wound into one strong band, and the old tree carries them all.",
+  "newspaper-reader": "For his generation the morning paper was a ritual of its own, read in full while the day waited. The tilak from his puja is fresh, and he gives the news the same unhurried care.",
+  "elder-woman-portrait": "Sabr means patience, the quiet kind that holds a family together through decades and never asks for thanks. This portrait offers that gratitude, long overdue.",
+  "red-turban-portrait": "Muskaan means a smile, and his is the private kind, head bowed and eyes crinkled at something only he has heard. A moment like this is gone in a breath, and here it stays long enough for us to smile back.",
+  "yellow-turban-portrait": "Pride like his is earned the hard way, and the years have written it across his brow. Under the yellow turban he holds his head high and meets our eyes as an equal.",
+  "patterned-turban-portrait": "On a face like his, worry is mostly for others, a son far from home or a crop still waiting for rain. Look again and it turns out to be love, the kind that keeps watch.",
+  "mother-and-child": "Aanchal is the edge of a mother's sari, the first shelter a child ever knows. With his hand on her arm, he can look the whole world straight in the eye.",
+  "boy-and-kettle": "For many boys like him, bachpan meant a tea stall instead of a classroom. Chin in hand, waiting for the kettle, he is still a child, dreaming somewhere far from the stove.",
+  "man-among-metal-pans": "He has spread his iron pans across the ground and sat down among them to wait for the day's first buyer. The pans are empty, and the hope is not.",
+  "three-veiled-women": "These three keep their modesty together, veils drawn close and faces turned in. The world sees only the silver at their wrists, and whatever they are sharing stays among the three of them.",
+  "milkman-on-bicycle": "Long before the lane was awake, he was out on his bicycle with the morning's milk. The street had its tea because he rose first.",
+  "riverside-figures": "By evening the ghat slows, and people settle on its steps under the cane umbrellas to let the day go. The river has watched this rest for centuries, and it makes room for anyone who sits.",
+  "child-among-flowers": "Something has made her giggle, or blush, and a hand over her mouth is all the hiding she knows yet. The bougainvillea around her is as bright and unguarded as she is.",
+  "woman-with-poppies": "Her eyes have drifted far beyond the poppies crowding round her, into a dream of her own. Whatever she sees there has softened her face.",
+  "temple-bells": "Every thread tied to these rails is a wish, and every bell is the gratitude of someone whose wish was granted. What this painting holds is a faith that bears no names, one longing shared by all and a chime of thanks that rings out for everyone.",
+  "woman-with-bird": "A bird calls at her shoulder with its beak wide open, and she does not turn her head. She is at peace with her thoughts, and the bird can call as long as it likes.",
+  "woman-with-red-flower": "She rests a fingertip below one eye, keeping a thought to herself. The red flower at her lips will say it for her when she is ready.",
+  "boy-with-bananas": "The bananas sit on his head like a crown, and he knows it. There is no prouder walk than a child carrying something home for the family.",
 };
 
 /** approved editorial lines (third person), for cards and chapters */
@@ -119,99 +118,98 @@ export const SERIES_PAGES: SeriesPage[] = [
   // Content elevate (2026-11-22): lines from items/content-elevate-2026-11-22 (reviewer finals), structure per kb/decisions.md.
   {
     slug: "bahaar", label: "Bahaar", period: "2024 to 2025",
-    line: "Spring is in flower all around them, and each of them keeps one thought back.",
+    line: "A spring in full bloom, and the faraway look we all wear when our mind is somewhere else.",
     hero: "boy-with-bananas",
-    held: "Bahaar means spring, and here it comes into flower around people who have gone quiet inside.",
+    held: "Spring comes into flower, and the day goes on beneath it, a chore here and a daydream there, as innocent as ever.",
     intro: [
-      "A boy smiles out at us from under the banana leaves. At the far end a woman has turned her face away among the poppies, and spring carries on without her.",
-      "In between, the thoughts grow longer and harder to read.",
+      "Most of us remember a spring afternoon when everything around us was in flower and our mind was somewhere else entirely. I painted Bahaar from that distance, the season at its loudest around people who have gone somewhere of their own, where no blossom can follow.",
     ],
     chapters: [
       { title: "Under Canopy of Greens", works: ["boy-with-bananas"], room: true,
-        big: "Spring at its lightest, and his is the one thought in the series that is easy to read." },
+        big: "Childhood keeps no secrets from spring, and this boy's pleasure is as plain as the green above him." },
       { title: "Blooming Innocence", works: ["child-among-flowers"], room: true,
-        big: "Her secret is a child’s first, and the bougainvillea crowds in to keep it." },
+        big: "A first secret is guarded with all the seriousness of being small." },
       { title: "Petals of Thought", works: ["woman-with-red-flower"],
-        big: "Then the thoughts grow up, and this one is heavy to carry." },
+        big: "Some feelings arrive before there are words for them, and wait unsaid, close enough to touch." },
       { title: "Whispers of Stillness", works: ["woman-with-bird"], room: true, dark: true,
-        big: "Everything around her has come into season at once, and her mind is somewhere the season hasn’t reached." },
+        big: "Later still, the mind learns to make its own silence, even with the whole season singing round it." },
       { title: "Khwaab", works: ["woman-with-poppies"],
-        big: "The thought has carried her off now, and the series leaves her to it." },
+        big: "Last comes the dream, the longest of our private conversations, and spring is left outside it." },
     ],
   },
   {
     slug: "bandh-darwaze", label: "Bandh Darwaze", period: "2018",
-    line: "Old doors pulled shut, waiting for a knock, or for whoever locked them to come home.",
+    line: "Old doors pulled shut, waiting the way we all have waited for someone to come home.",
     hero: "red-and-teal-door-lock",
-    held: "A shut door is the part of a house that does the waiting.",
+    held: "Every shut door is a house holding its breath for the hand that will open it.",
     intro: [
-      "Bandh darwaze means closed doors. In an old Indian house the door was where the family met the street, and a padlock on the outside told the whole lane that nobody was home.",
-      "Seen this close, the teal and the red have flaked away to bare grain, and nobody appears in any of them.",
+      "In the old lanes of India, a shut door told you that the house was waiting. These four have waited through years of sun and rain, some for a knock and some for a key, and what they keep is the simple hope that someone will open them again.",
     ],
     chapters: [
       { title: "Someone may be home", works: ["weathered-door-ring", "carved-door-knocker"], dark: true,
-        big: "Nothing locks these two from outside. Someone is expected, and the house will open in its own time." },
+        big: "With no padlock on these two, a knock may still bring someone to the door." },
       { title: "Gone for now", works: ["red-and-teal-door-lock", "teal-door-bolt"],
-        big: "These two were locked from the street side. The house behind them is empty for now, and its doors hold it for the day the key comes home." },
+        big: "Others were locked from the lane side, and the family took the key with them, meaning every turn of it.",
+        small: "The rust has had years, and the promise still holds." },
     ],
   },
   {
     slug: "gone-are-the-days", label: "Gone Are The Days", period: "2007 to 2018",
-    line: "The men and animals who carried a city through its day, some of them painted beside the engines that took their place.",
+    line: "The tongas and bullock carts a city once ran on, before we learned to hurry past the ordinary.",
     hero: "bulls-and-wheel",
-    held: "Nobody waved goodbye to the last tonga.",
+    held: "The last tonga left without a goodbye, and a whole way of life went with it.",
     intro: [
-      "The street used to run on muscle and patience, a man hauling a rickshaw, a tonga at a trot. Every fare was counted in paise.",
-      "Most of it has gone now, and in several of these canvases the auto or the truck that replaced it already shares the frame.",
+      "There was a time when the morning came to the door on a bicycle and getting anywhere meant a bullock cart or a tonga at a trot. A whole city ran on daily toil then, counted out in paise from the first cup of chai to the evening show. These paintings are a tribute to those years and to the hands that carried them.",
     ],
     chapters: [
       { title: "What a day was worth", works: ["rickshaw-puller-and-coin", "rickshaw-rest-framed", "coins-and-clay-bank", "terracotta-pots"],
-        big: "A day on the street came down to a handful of coins, and a home guarded them as carefully as its copper.",
-        small: "Every fare further along this street, every cup of tea, was paid for in coins like these." },
-      { title: "Under one yoke", works: ["bulls-and-wheel"], room: true, dark: true,
-        big: "Some of the street’s hardest work fell to animals, two under one yoke, step for step." },
+        big: "What we call loose change is someone's hard-earned pride, every coin a hope for tomorrow.",
+        small: "These paintings honour that toil, the honest hours a family gave, day after day, so their children might have more." },
+      { title: "On four legs", works: ["bulls-and-wheel"], room: true, dark: true,
+        big: "On the old road, partnership meant two bullocks pulling as one, mile after mile.",
+        small: "Their painted horns were the only thanks they ever got." },
       { title: "When the engines came", works: ["carriage-and-autorickshaw", "bullock-cart-and-truck", "horse-cart-and-autorickshaw", "rickshaw-and-autorickshaw", "cycle-rickshaw"],
-        big: "Then the engines came. In four of these the old street sits on a worn sheet of its own, as if already put away, with the new traffic painted all round it.",
-        small: "By Last of the Pedals the sheet is gone, and the rickshaw is all that is left of the old street." },
+        big: "Then came the engines, and for a few years the old pace and the new shared the same street.",
+        small: "Here that slower world gets the farewell it never had." },
       { title: "Dawn to dusk", works: ["milkman-on-bicycle", "newspaper-reader", "boy-and-kettle", "rickshaw-rest", "man-among-metal-pans", "riverside-figures"], dark: true,
-        big: "The day began with the milk round before first light and ended on the ghat steps in the evening. Most of what lay between was waiting, and nobody paid for that." },
+        big: "These are the hours a city never saw, kept by the people who opened its day and closed it.",
+        small: "A newspaper read before the shops open, and a kettle waiting for its first customer." },
       { title: "Two ways out", works: ["postbox-and-stamps", "mother-india-and-kettles", "shree-420-and-milk-cans"],
-        big: "After work the street had two ways out into the world, a letter in the post and an evening in the dark at the picture hall.",
-        small: "The Shree 420 poster has peeled, and you can still read where it played, Maratha Mandir, four shows a day." },
+        big: "A letter home and an evening at the pictures were how a working street travelled.",
+        small: "Both carried people further than any fare could." },
     ],
   },
   {
     slug: "portraits", label: "Portraits", period: "2007 to 2012",
-    line: "Ordinary faces, looked at until the feeling behind each one has a name.",
+    line: "A handful of faces, each holding a feeling we all know well and rarely stop to see.",
     hero: "three-veiled-women",
-    held: "Lajja means modesty, and of all the faces here, these are the ones we are not allowed to see.",
+    held: "A stranger's worry, held still long enough, turns out to be our own.",
     intro: [
-      "You could pass any of these people in a bazaar and never look back. Held still, each face gives up a single feeling, and the painting takes its name from it.",
+      "We pass faces like these every day, at a bus stop or on a temple step, and never look twice. This collection stops and looks, and in each stranger, from an old woman's patience to a boy holding his mother's arm, it finds a feeling we know as our own.",
     ],
     chapters: [
       { title: "Four feelings", works: ["elder-woman-portrait", "red-turban-portrait", "yellow-turban-portrait", "patterned-turban-portrait"],
-        setup: "Sabr, Muskaan, Garv, Fikr: patience, a smile, pride, worry.",
-        big: "Each of these faces has had a lifetime to learn its feeling." },
+        setup: "Sabr is patience, Muskaan a smile, Garv pride and Fikr worry.",
+        big: "A lifetime leaves one feeling on a face more clearly than the rest, and each portrait here is named for it." },
       { title: "Together", works: ["three-veiled-women", "mother-and-child"], room: true,
-        big: "Three women keep one modesty between them, and a child is safe for as long as his mother is near." },
+        big: "Some feelings need a second person, like the safety in a small hand on a mother's arm or the modesty of women who veil together." },
     ],
   },
   {
     slug: "faith", label: "Faith", period: "2007 to 2026",
-    line: "Prayer at its daily hour: a lamp lifted to a wall of mantras, a thread tied round a peepal for a wish.",
+    line: "The daily prayers of Indian homes and temples, a devotion we all grew up inside.",
     hero: "offering-of-light",
-    held: "Most of them pray with their backs to us, and we take our place behind them.",
+    held: "We stand behind them at prayer and find we have known the words all our lives.",
     intro: [
-      "In an Indian house prayer keeps hours as regular as the kitchen’s. The same words come at the same time, said so often they wear smooth.",
-      "Some prayers need nobody to say them. A thread wound round a peepal goes on asking, and a bell hung on a temple rail answers for a prayer that came true.",
+      "Long before we understood a word of it, most of us knew the sound of a prayer said at dawn in the homes we grew up in. These paintings go back to that sound and find, in strangers bowed before their gods, a devotion we still know by heart.",
     ],
     chapters: [
       { title: "The written prayer", works: ["offering-of-light", "prayer-and-scripture"],
-        big: "Words fill the wall, written over and over, and a figure in saffron faces them. Apart from a few small drawings of Ganesha, the god is there only in the words." },
+        big: "A prayer begins as words on a wall, and after enough mornings it lives in the one who says it." },
       { title: "Stillness", works: ["monks-and-blue-buddha", "monk-and-green-buddha"], room: true, dark: true,
-        big: "Stillness can take a lifetime to reach. The Buddha above them has it already, and the monks are still on the way." },
+        big: "In time the words on the page give way to a calm that takes a lifetime to reach." },
       { title: "Vows and thanks", works: ["priest-with-flame", "sacred-tree", "temple-bells"],
-        big: "The priest lifts the flame for everyone at once. A wish is a private matter, tied on with red thread, and so is the thanks that comes after." },
+        big: "A wish is tied on in hope and left to wait, and when it comes true, someone comes back to say thank you." },
     ],
   },
 ];
@@ -274,14 +272,6 @@ export const labelLine = (w: Work) => [w.medium, w.size, shownYear(w)].filter(Bo
 /** a painting shows one year: the year recorded, or the latest year of the series' range */
 export const shownYear = (w: Work) => w.year?.match(/\d{4}(?!.*\d{4})/)?.[0];
 
-const waText = (w?: Work) =>
-  w ? `Hello Dr Prasad, I saw ${quoted(w.title)} on your website and would like to know more. ${SITE}${workPath(w.id)}`
-    : "Hello Dr Prasad, I saw your paintings on your website and would like to know more.";
-
-/** the WhatsApp link, with the painting named, or the enquiry page when no number is set */
-export const whatsappHref = (w?: Work) =>
-  WHATSAPP ? `https://wa.me/${WHATSAPP}?text=${encodeURIComponent(waText(w))}` : enquireHref(w);
-
 export const enquireHref = (w?: Work) => (w ? `/enquire?work=${w.id}` : "/enquire");
 
 /* ---------------------------------------------------------------- exhibitions */
@@ -332,7 +322,7 @@ const CAP: Record<string, string> = {
   "ihc-press-b": "Dr Dolly Prasad in an interview, India Habitat Centre",
   "ihc-01": "The room, a lamp at its centre, India Habitat Centre",
   "ihc-07": "Before the Engines and Twenty Paise, with a rickshaw puller painting between them, India Habitat Centre",
-  "ihc-room-a": "Aakhri Savaari, Dheere Dheere and Mitti, India Habitat Centre",
+  "ihc-room-a": "Aakhri Savaari, Dheere Dheere and Kadhai, India Habitat Centre",
   "ihc-room-b": "A rickshaw puller painting and Twenty Paise, behind the brass lamp, India Habitat Centre",
   "ihc-room-c": "“Before the Engines” on the wall, India Habitat Centre",
   "ihc-room-e": "Gullak, India Habitat Centre",
@@ -469,7 +459,7 @@ export const PRESS = {
   clipping: ph("delhi-times", "A Delhi Times clipping, Must See Must Do, listing Art Today And Tomorrow, a group show at Travancore Art Gallery."),
   clippingLine: "Delhi Times picked Art Today And Tomorrow, a group show of paintings at Travancore Art Gallery, among the week’s Must See, Must Do.",
   clips: [
-    { src: "/site/video/tv-archive-2.mp4", poster: "/site/video/tv-archive-2.jpg", title: "On NCR television · June 2010",
+    { src: "/site/video/tv-archive-2.mp4", poster: "/site/video/tv-archive-2.jpg", title: "On television · June 2010",
       line: "12 June 2010. The camera turns from the paintings to her, speaking in the gallery." },
   ] as Clip[],
 };
@@ -498,7 +488,7 @@ export const RECORD: RecordEntry[] = [
   { year: "2005", venue: "Sriram Centre", city: "New Delhi" },
 ];
 
-export const RECORD_LINE = "Nineteen exhibitions and art fairs, 2005 to 2026";
+export const RECORD_LINE = "From the first show to the latest";
 
 export const PORTRAIT = "/site/dolly.jpg";
 export const PORTRAIT_LARGE = "/site/ex/kala-dolly.jpg";

@@ -1,17 +1,21 @@
 "use client";
 
 import { useEffect, useRef, useState } from "react";
-import { EMAIL, SERIES_PAGES, SITE, WHATSAPP, collectionOrder, quoted, workPath } from "@/lib/site";
+import { EMAIL, SERIES_PAGES, SITE, collectionOrder, quoted, workPath } from "@/lib/site";
 import { BY_ID } from "@/lib/works";
 import { paintingProperties, track } from "@/lib/analytics";
+import { dims } from "@/lib/images";
+import { altOf } from "@/lib/alt";
+import Pic from "./Pic";
 
 /**
- * An enquiry, written once and sent the way the visitor prefers: WhatsApp
- * (when her number is set) or email. "Send" posts to /api/enquire, which
- * delivers it to her inbox with no further step; if the site's mail service
- * is not set up (or fails), the visitor's mail app opens with the message
- * ready, as before. The message names the painting and links its page. The
+ * An enquiry, written once and sent to her email only (no WhatsApp, no phone number shown). "Send" posts
+ * to /api/enquire, which delivers it to her inbox; if the site's mail service is not set up (RESEND_API_KEY)
+ * or fails, a "Open your mail app" link (a real mailto: link, so a phone opens it on the tap) shows, with the
+ * message pre-filled to her address and the painting's title, plus Copy the message. The message names the painting and links its page. The
  * email address is always shown as text with a copy button.
+ * Arriving from a painting (?work=), the form opens on that painting, framed, with its title and size;
+ * the two pickers stay folded behind "Change" (elevate, 26 Nov 2026).
  */
 export default function EnquireForm() {
   const [work, setWork] = useState("");
@@ -21,9 +25,11 @@ export default function EnquireForm() {
   const [kind, setKind] = useState("A painting");
   const [msg, setMsg] = useState("");
   const [copied, setCopied] = useState(false);
-  const [sent, setSent] = useState<"" | "wa" | "mail" | "sending" | "sent">("");
+  const [sent, setSent] = useState<"" | "mail" | "sending" | "sent">("");
   const [trap, setTrap] = useState("");
   const started = useRef(false);
+  // the pickers are folded away while the form shows the painting it was opened for
+  const [picking, setPicking] = useState(false);
 
   useEffect(() => {
     const id = new URLSearchParams(location.search).get("work");
@@ -51,10 +57,13 @@ export default function EnquireForm() {
   };
 
   const subject = w ? `Enquiry: ${w.title}` : `Enquiry: ${kind}`;
+  const mailto = `mailto:${EMAIL}?subject=${encodeURIComponent(subject)}&body=${encodeURIComponent(text())}`;
+  // the fallback: show a real mailto link under the visitor's finger (a phone opens it on the tap; a script
+  // redirect after an await is often blocked), and try the redirect too
   const mailApp = () => {
     track("enquiry_handoff", { ...context(), method: "email" });
     setSent("mail");
-    location.href = `mailto:${EMAIL}?subject=${encodeURIComponent(subject)}&body=${encodeURIComponent(text())}`;
+    location.href = mailto;
   };
   const viaMail = async (e?: React.FormEvent) => {
     e?.preventDefault();
@@ -73,11 +82,6 @@ export default function EnquireForm() {
     } catch { /* offline or blocked: the mail app is the fallback */ }
     mailApp();
   };
-  const viaWa = () => {
-    track("enquiry_handoff", { ...context(), method: "whatsapp" });
-    setSent("wa");
-    window.open(`https://wa.me/${WHATSAPP}?text=${encodeURIComponent(text())}`, "_blank", "noopener");
-  };
   const copy = async () => {
     try { await navigator.clipboard.writeText(EMAIL); track("contact_copied", { source: "enquiry_page" }); setCopied(true); setTimeout(() => setCopied(false), 2000); } catch { /* refused */ }
   };
@@ -87,8 +91,18 @@ export default function EnquireForm() {
 
   return (
     <div className="enq">
-      <form onFocusCapture={start} onSubmit={WHATSAPP ? (e) => { e.preventDefault(); viaWa(); } : viaMail}>
-        <div className="two">
+      <form onFocusCapture={start} onSubmit={viaMail}>
+        {w && !picking && (
+          <div className="enq-about">
+            <Pic className="framed thin" src={`/site/thumbs/${w.id}.jpg`} alt={altOf(w)} sizes="120px" eager {...dims(`/site/thumbs/${w.id}.jpg`)} />
+            <p>
+              <b>{w.title}</b>
+              {w.size && <span className="meta">{w.size}</span>}
+              <button type="button" className="link" onClick={() => setPicking(true)}>Change</button>
+            </p>
+          </div>
+        )}
+        <div className="two" hidden={!!w && !picking}>
           <div className="field">
             <label htmlFor="q-kind">I’m asking about</label>
             <select id="q-kind" value={w ? "A painting" : kind} onChange={(e) => { setKind(e.target.value); if (e.target.value !== "A painting") setWork(""); }}>
@@ -117,8 +131,8 @@ export default function EnquireForm() {
           </div>
         </div>
         <div className="field">
-          <label htmlFor="q-reply">Phone or email, for the reply</label>
-          <input id="q-reply" autoComplete="email" value={reply} onChange={(e) => setReply(e.target.value)} required />
+          <label htmlFor="q-reply">Your email, for the reply</label>
+          <input id="q-reply" type="email" inputMode="email" autoComplete="email" value={reply} onChange={(e) => setReply(e.target.value)} required />
         </div>
         <div className="hp" aria-hidden="true">
           <label htmlFor="q-web">Leave this empty</label>
@@ -130,28 +144,27 @@ export default function EnquireForm() {
                     placeholder={w ? `What would you like to know about ${w.title}?` : "What are you looking for?"} />
         </div>
         <div style={{ display: "flex", gap: 10, flexWrap: "wrap" }}>
-          {WHATSAPP && <button type="submit" className="btn btn-wa">Send on WhatsApp</button>}
-          <button type={WHATSAPP ? "button" : "submit"} className={WHATSAPP ? "btn" : "btn btn-solid"} onClick={WHATSAPP ? () => viaMail() : undefined}
-                  disabled={sent === "sending"}>
-            {sent === "sending" ? "Sending…" : WHATSAPP ? "Send by email" : "Send"}
+          <button type="submit" className="btn btn-solid" disabled={sent === "sending"}>
+            {sent === "sending" ? "Sending…" : "Send"}
           </button>
           <button type="button" className="btn" onClick={copyMessage}>Copy the message</button>
         </div>
         {sent === "mail" && (
-          <p className="done" role="status">
-            Your mail app should open with the message ready to send. If nothing opened, copy the message and send it to <b>{EMAIL}</b> from any email account.
-          </p>
+          <div className="done" role="status">
+            <p>Sorry, the form could not send this time. Your message is ready to go from your mail app. Tap below to send it.</p>
+            <p><a className="btn btn-solid" href={mailto}>Open your mail app</a></p>
+            <p>If nothing opens, copy the message and send it to <b>{EMAIL}</b> from any email account.</p>
+          </div>
         )}
         {sent === "sent" && (
           <p className="done" role="status">
-            Thank you{name ? `, ${name.split(" ")[0]}` : ""}. Your enquiry has been sent, and the reply will come to {reply}.
+            Thank you{name ? `, ${name.split(" ")[0]}` : ""}. Your message is on its way, and the reply will come to {reply}.
           </p>
         )}
-        {sent === "wa" && <p className="done" role="status">WhatsApp should open with your message ready to send.</p>}
       </form>
 
       <aside>
-        <div className="note">
+        <div className="note note-plain">
           <b>Write directly</b>
           <div className="mail"><code>{EMAIL}</code>
             <button type="button" className="chip" onClick={copy} aria-live="polite">{copied ? "Copied" : "Copy"}</button>

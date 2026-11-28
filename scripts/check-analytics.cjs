@@ -115,9 +115,8 @@ const click = async (el) => act(async () => { el.dispatchEvent(new MouseEvent('c
   assert.equal(byEvent('$pageview').length, 1);
   assert.equal(byEvent('$pageview')[0].properties.is_test, true, 'Catalogue URL updates must preserve the first-visit verification flag');
   assert.ok(byEvent('$pageview')[0].properties.$current_url.includes('utm_source=instagram'), 'Campaign attribution must survive initial catalogue URL setup');
-  const status = document.querySelectorAll('.filters select')[1];
-  status.value = 'available';
-  await act(async () => status.dispatchEvent(new Event('change', { bubbles: true })));
+  const status = [...document.querySelectorAll('.wchip')].find((b) => b.textContent === 'Available');
+  await click(status);
   assert.equal(byEvent('works_filter_changed').at(-1).properties.value, 'available');
   assert.equal(byEvent('$pageview').length, 1, 'Changing filters must not inflate pageview counts');
 
@@ -151,12 +150,12 @@ const click = async (el) => act(async () => { el.dispatchEvent(new MouseEvent('c
   assert.ok(clipboard.at(-1).includes('PRIVATE MESSAGE'), 'The actual form must still produce the visitor’s message');
   assert.equal(byEvent('enquiry_message_copied').length, 1);
 
-  // The message in a direct WhatsApp/mail link must never become an event property.
+  // The message in a direct mail link must never become an event property.
   const direct = document.createElement('a');
-  direct.href = 'https://wa.me/911234567890?text=PRIVATE%20MESSAGE%20private-visitor%40example.com';
+  direct.href = 'mailto:artist@example.com?body=PRIVATE%20MESSAGE%20private-visitor%40example.com';
   document.body.append(direct);
   await click(direct);
-  assert.equal(byEvent('enquiry_handoff').at(-1).properties.method, 'whatsapp');
+  assert.equal(byEvent('enquiry_handoff').at(-1).properties.method, 'email');
   assert.ok(!JSON.stringify(captures).includes('private-visitor@example.com'));
   assert.ok(!JSON.stringify(captures).includes('Private Visitor Name'));
   assert.ok(!JSON.stringify(captures).includes('PRIVATE MESSAGE'));
